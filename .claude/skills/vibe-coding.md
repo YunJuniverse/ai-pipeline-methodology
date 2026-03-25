@@ -1,151 +1,159 @@
 ---
 name: vibe-coding
-description: Stage 4 구현 워크플로우 — 4-레이어 아키텍처, TDG 루프, 멱등성 체크리스트, 린터 설정. "구현", "코딩", "개발", "기능 만들어", "API", "컴포넌트" 등 개발 키워드 시 활성화.
+description: 하네스 기반 구현 워크플로우. 개발명세, readability, 테스트, 린터, 스프린트 보고 체계까지 포함한다.
 ---
 
-# 바이브코딩 구현 가이드 (Stage 4)
+# Vibe Coding Implementation Guide
 
 ## 전제 조건
 
-- `docs/spec.md` (Product Spec)가 존재해야 한다
-- spec.md가 PRD 역할을 겸한다 — 별도 CPS/PRD 작성 불필요
-- spec.md가 없으면 Stage 2부터 시작하도록 안내한다
+구현 전에 아래를 우선 확인한다.
+
+- 관련 planning docs가 존재하는가
+- `docs/development/development-spec*.md`가 있는가
+- 현재 작업이 Definition of Ready를 만족하는가
+- 현재 스프린트 목표와 범위가 명확한가
+
+기획 없이 바로 구현을 시작하지 않는다.
 
 ---
 
-## 구현 순서 (TDG 루프)
+## 구현 루프
 
-매 기능 구현 시 아래 순서를 반복한다:
+각 기능 구현은 아래 루프를 따른다.
 
+```text
+1. planning docs와 development spec 확인
+2. requirements traceability 확인
+3. 테스트 케이스 먼저 작성
+4. 구현
+5. lint / typecheck / test 확인
+6. human-readable review 관점으로 점검
+7. 필요한 ADR 기록
+8. sprint artifact에 결과 반영
 ```
-1. spec.md에서 해당 기능 요구사항 확인
-2. 도메인 타입/인터페이스 정의 (/domain)
-3. 유스케이스 테스트 작성 (/application)
-4. 유스케이스 구현 (/application)
-5. 인프라 구현 (/infrastructure)
-6. 인터페이스 구현 (/interface)
-7. 통합 테스트
-8. 린터 통과 확인
-9. 커밋 (컨벤션 형식)
-```
 
-> 테스트 → 구현 → 린터 → 커밋. 이 순서를 깨지 않는다.
+핵심은 "동작하는 코드"가 아니라 "다음 스프린트에도 읽히는 코드"다.
 
 ---
 
-## 4-레이어 아키텍처
+## 하네스 우선순위
 
-```
+### 1. 문서 하네스
+- 구현 전 관련 문서를 확인한다
+- 요구사항을 추측하지 않는다
+- 범위 밖 요청은 out-of-scope로 분리한다
+
+### 2. 코드 하네스
+- 린터와 구조 규칙으로 출력을 강제한다
+- 레이어 경계를 유지한다
+- 중복 파일/함수 생성을 피한다
+
+### 3. 평가 하네스
+- 테스트, QA, UI, 피어리뷰에서 다시 읽히는 결과를 만든다
+
+### 4. 승인 하네스
+- 구조적 변경, 아키텍처 변경, 범위 확장은 인간 승인 후 진행한다
+
+---
+
+## 4-레이어 기본 구조
+
+```text
 /src
-  /domain          # 순수 비즈니스 로직 — 외부 의존 없음
-  /application     # 유스케이스, 서비스 조합
-  /infrastructure  # DB, 외부 API, 파일 I/O
-  /interface       # HTTP 핸들러, CLI, 웹소켓
-  /shared          # 공통 타입, 유틸, 상수
+  /domain
+  /application
+  /infrastructure
+  /interface
+  /shared
 ```
 
 ### 레이어 의존성
 
-```
-interface ──→ application ──→ domain
-                    ↑
+```text
+interface -> application -> domain
+                    ^
              infrastructure
 ```
 
 | 레이어 | 가능한 import | 금지된 import |
-|--------|-------------|-------------|
-| `domain` | `shared`만 | 나머지 모두 |
+|--------|-------------|---------------|
+| `domain` | `shared` | 나머지 |
 | `application` | `domain`, `shared` | `infrastructure`, `interface` |
 | `infrastructure` | `domain`, `application/ports`, `shared` | `interface` |
 | `interface` | `application`, `shared` | `domain`, `infrastructure` |
 
-> 역방향 import 절대 금지
+---
+
+## 휴먼리더블 코드 규칙
+
+- 이름은 축약보다 의미를 우선한다
+- 함수는 한 책임만 가진다
+- 깊은 중첩보다 early return을 선호한다
+- 에러 흐름은 숨기지 않는다
+- 주석은 왜를 설명하고, 코드가 이미 말하는 what은 반복하지 않는다
+
+관련 기준은 `human-readable-code-guide`와 함께 본다.
 
 ---
 
-## 파일 네이밍
+## 멱등성 체크리스트
 
-| 종류 | 패턴 | 예시 |
-|------|------|------|
-| 도메인 엔티티 | `[name].ts` | `user.ts` |
-| 유스케이스 | `[name].usecase.ts` | `create-user.usecase.ts` |
-| 레포지토리 | `[name].repository.ts` | `user.repository.ts` |
-| 라우터 | `[name].router.ts` | `users.router.ts` |
-| 핸들러 | `[name].handler.ts` | `users.handler.ts` |
-| 테스트 | `[name].test.ts` | `create-user.usecase.test.ts` |
-| 포트 | `[name].port.ts` | `user-repo.port.ts` |
-| 인덱스 | `index.ts` | barrel export |
-
-**금지 패턴**: `userList.ts`, `userDetail.ts`, `userManager.ts`, `userHelper.ts`
-
----
-
-## 멱등성 체크리스트 (매 구현 전 확인)
-
-```
-[ ] 이 파일이 이미 존재하는가 (덮어쓰기 전 확인)
-[ ] 이 함수가 이미 비슷한 곳에 있는가 (중복 생성 방지)
-[ ] DB 삽입은 upsert인가 (insert 단독 금지)
-[ ] 환경변수 처리가 되어 있는가
-[ ] 에러 핸들링이 포함되어 있는가
+```text
+[ ] 기존 파일과 역할이 중복되지 않는가
+[ ] 기존 함수/컴포넌트와 책임이 중복되지 않는가
+[ ] 동일 입력에서 예측 가능한 결과를 만드는가
+[ ] 에러 처리와 재실행 가능성을 고려했는가
+[ ] 스프린트 산출물에 반영 가능한 형태인가
 ```
 
 ---
 
-## 린터 핵심 규칙
+## 테스트 및 검증
 
-| 규칙 | 설정 | 목적 |
-|------|------|------|
-| `@typescript-eslint/no-explicit-any` | error | any 타입 금지 |
-| `@typescript-eslint/naming-convention` | error | 네이밍 컨벤션 강제 |
-| `import/order` | error | import 순서 고정 |
-| `import/no-cycle` | error | 순환 참조 금지 |
-| `max-depth` | error (3) | 중첩 깊이 제한 |
-| `no-console` | warn | console.log 경고 |
-| `import/no-restricted-paths` | error | 레이어 경계 강제 |
+- 단위 테스트: 도메인/유스케이스 계약 검증
+- 통합 테스트: 인프라와 경계 검증
+- UI 또는 E2E 테스트: 핵심 흐름 검증
+- 수동 QA: 스프린트 리뷰 관점 검증
+
+테스트 통과는 필요조건이고,
+가독성과 추적성은 별도 점검 대상이다.
 
 ---
 
-## Git 훅 3단계
+## Git 훅 / 린터 원칙
 
-- **pre-commit**: 린터 → 타입체크 → console.log 검사
-- **commit-msg**: `feat/fix/refactor/docs/test/chore` 형식 검사
-- **pre-push**: 테스트 전체 실행
+- pre-commit: lint, typecheck, obvious logging checks
+- pre-push: test suite
+- commit-msg: commit type convention
 
-> 커밋 시 린터 실패 → "린터 에러 고쳐줘" → 재커밋. 이 루프가 Normal Form 수렴의 핵심.
-
----
-
-## 프로젝트 유형별 변형
-
-### 웹 앱 / 대시보드
-```
-interface/ → http/ + views/
-```
-
-### 자동화 / 백엔드 API
-```
-interface/ → http/ + jobs/
-```
-
-### AI 에이전트 / 챗봇
-```
-domain/ → conversation/ + tools/
-infrastructure/ → llm/ + memory/
-interface/ → bot/
-```
-
-### 풀스택 서비스 (모노레포)
-```
-apps/ → web/ + api/
-packages/ → shared/
-```
+린터 실패 시 통과할 때까지 수정하는 루프를 통해 Normal Form 수렴을 유도한다.
 
 ---
 
-## 주기적 유지보수
+## 스프린트 연동 규칙
 
-- 기능 세션과 리팩토링 세션 **분리** (같은 날 섞지 않기)
-- 리팩토링 전 "분석만 해줘, 수정 금지" 프롬프트 사용
-- 주요 결정은 CLAUDE.md ADR 로그에 기록
-- CLAUDE.md "현재 상태" 섹션 업데이트
+기능을 구현했으면 아래 문서 반영 필요를 같이 판단한다.
+
+- `sprint-completion-report`
+- `sprint-feedback-report`
+- `approval-log`
+- `requirements-traceability-matrix`
+- `docs/adr/*`
+
+구현은 코드만 바꾸고 끝나지 않는다.
+
+---
+
+## 리팩토링 세션 규칙
+
+- 기능 추가 세션과 리팩토링 세션을 분리한다
+- 먼저 분석 보고를 만든 뒤 수정한다
+- 대규모 리팩토링은 approval 대상인지 확인한다
+
+추천 프롬프트:
+
+```text
+수정하지 말고 먼저 분석만 해줘.
+중복, 50줄 초과 함수, 경계 위반, 가독성 문제를 리스트업해줘.
+```

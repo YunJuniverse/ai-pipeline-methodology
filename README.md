@@ -1,220 +1,279 @@
-# AI Pipeline Methodology
+# Harness-Driven Agile Methodology
 
-**AI 기획 + 바이브코딩 + 멀티AI 릴레이를 하나의 파이프라인으로 통합한 1인 개발/기획 방법론**
+**AI 코딩 툴을 활용한 바이브코딩을, 인간 승인 체계와 휴먼리더블 산출물 위에 올려놓기 위한 방법론**
 
 ---
 
 ## 이 방법론이 해결하는 문제
 
-### 문제 1: 기획서를 두 번 쓴다
-사업기획서를 쓰고, 개발 들어가면 또 CPS/PRD를 쓴다. 같은 내용을 다른 포맷으로 반복한다.
+### 문제 1: AI는 빠르지만 결과물이 매번 달라진다
+같은 요구를 주어도 모델, 세션, 컨텍스트에 따라 문서 구조와 코드 스타일이 흔들린다.
 
-### 문제 2: AI에게 매번 맥락을 설명한다
-새 세션을 열 때마다 "이 프로젝트는 이런 거고, 지금까지 이렇게 진행했고..." 를 반복한다.
+### 문제 2: 기획과 개발은 빨라졌지만 승인 체계는 그대로다
+실무자 검토, 경영자 컨펌, 보고 문서, 변경 승인 같은 기존 의사결정 구조는 여전히 필요하다.
 
-### 문제 3: 기획과 개발이 단절된다
-기획 방법론과 개발 방법론이 별개라서, 기획서에서 코드까지 자연스럽게 이어지지 않는다.
+### 문제 3: 바이브코딩 결과가 유지보수 가능한 자산으로 남지 않는다
+"일단 되는 코드"는 빨리 나오지만, 휴먼리더블 코드 컨벤션과 변경 이력이 없으면 팀 자산이 되지 못한다.
 
-### 문제 4: AI 산출물 품질이 들쭉날쭉하다
-같은 요청을 해도 매번 다른 구조, 다른 수준의 결과물이 나온다.
+### 문제 4: 애자일을 한다고 해도 환류 문서 체계가 없으면 반복 개선이 남지 않는다
+스프린트가 끝나도 이슈, QA, 피어리뷰, 레퍼런스 괴리, 개선 포인트가 구조적으로 누적되지 않는다.
+
+---
+
+## 핵심 관점
+
+이 저장소는 단순한 프롬프트 모음이 아니다.
+
+이 방법론은 아래 3가지를 결합한다.
+
+1. **애자일 방법론**
+스프린트 단위로 계획, 구현, 리뷰, 환류를 반복한다.
+
+2. **하네스 엔지니어링**
+문서, 코드 규칙, 평가 체계를 통해 AI 출력이 가능한 한 같은 Normal Form으로 수렴하게 만든다.
+
+3. **인간 승인 체계**
+실무자 리뷰와 경영자 승인 흐름을 문서와 체크포인트로 유지한다.
 
 ---
 
 ## 핵심 원리
 
-### 단일 파이프라인
+### 문서 = 다음 단계 입력
+리서치 문서는 기획의 입력이고, 기획 문서는 개발명세의 입력이며, 개발명세는 구현과 테스트의 입력이다.
 
-기획과 개발을 별도 방법론으로 분리하지 않는다. 하나의 파이프라인에서 Stage별로 자연스럽게 전환된다.
+### 스프린트 종료 시 반드시 문서가 남아야 한다
+매 스프린트는 코드만 끝나면 안 된다.
+반드시 빌드 결과, 리뷰 결과, 환류 결과, 다음 버전 문서가 남아야 한다.
 
-```
-Stage 0: Project Init     → 프로젝트 세팅
-Stage 1: Foundation        → WHY (사업기획 + 브랜드 방향)
-Stage 2: Product Spec      → WHAT (서비스 + 운영 + PRD)
-Stage 3: Growth            → HOW TO GROW (마케팅)
-Stage 4: Implementation    → HOW TO BUILD (코딩)
-```
+### 하네스는 4개 층으로 구성된다
 
-기획만 필요하면 Stage 1~3에서 끝내고, 코딩까지 필요하면 Stage 4로 넘어간다. 모드 전환이 아니라 단계 진행이다.
+1. **문서 하네스**
+리서치, 기획서, 개발명세서, 보고서, ADR
 
-### 문서 = 다음 단계의 프롬프트
+2. **코드 하네스**
+컨벤션, 린터, 커밋훅, 테스트, 레이어 경계
 
-Foundation(사업기획서)은 그 자체로 산출물이면서, 동시에 Product Spec을 쓰기 위한 컨텍스트가 된다. Product Spec은 코드를 구현하기 위한 컨텍스트가 된다. 각 문서가 다음 단계 AI 작업의 입력이 되는 구조다.
+3. **평가 하네스**
+QA, UI 점검, 피어리뷰, 레퍼런스 괴리 점검, 추적성 검토
 
-### 깊이 제어
+4. **승인 하네스**
+실무 승인, 스프린트 종료 승인, 다음 스프린트 승인, 릴리스 승인
 
-모든 문서를 항상 완성본으로 쓸 필요 없다. 5단계 깊이 중 필요한 수준만 선택한다.
+### Human-in-the-loop는 기본값이다
+AI는 초안과 제안을 만든다.
+전략 변경, 범위 변경, 아키텍처 변경, 스프린트 종료, 릴리스 결정은 인간이 승인한다.
 
-| 깊이 | 설명 | 사용 시점 |
-|------|------|-----------|
-| 개요 | 1페이지 요약 | 방향 검토, 빠른 판단 |
-| 목차 | 구조 + 섹션별 한 줄 | 구조 합의 |
-| 초안 | 주요 섹션 채운 문서 | 내부 검토, 피드백용 |
-| 완성본 | 실무 사용 가능 수준 | 대표 보고, 투자, 실행 |
-| 템플릿 | 재사용 빈 구조 | 다음 프로젝트 준비 |
-
-### 멱등성
-
-같은 요구사항을 넣으면 항상 같은 구조의 산출물이 나온다. AI가 매번 다른 형태로 답하는 문제를 CLAUDE.md + 스킬 + 작성 지침으로 강제한다.
+### 문서 기본값은 항상 Markdown이다
+이 저장소에서 문서 산출물은 기본적으로 모두 `.md`를 사용한다.
 
 ---
 
-## 구성 요소
+## 전체 파이프라인
 
-### 파일 구조
-
+```text
+Phase 0  Project Init
+   ↓
+Phase 1  Discovery Research
+   ↓
+Phase 2  Planning Documents
+   ↓
+Phase 3  Development Spec
+   ↓
+Phase 4  MVP Build
+   ↓
+Phase 5  Sprint Review
+   ↓
+Phase 6  Feedback Revision
+   ↓
+Phase 7  Next Sprint Update
+   ↓
+Repeat until approval / release readiness
 ```
-methodology/
-│
-├── CLAUDE.md                          # 프로젝트 앵커 (매 세션 자동 로딩)
-├── KICKOFF_PROMPT.md                  # 프로젝트 시작 프롬프트 템플릿
-├── init-project.sh                    # 새 프로젝트 자동 세팅 스크립트
-│
-├── .claude/skills/                    # 온디맨드 스킬 (필요할 때만 로딩)
-│   ├── ai-planning.md                 #   기획 오케스트레이션
-│   ├── vibe-coding.md                 #   개발 구현 가이드
-│   └── ai-relay.md                    #   멀티AI 핸드오프
-│
-└── docs/
-    ├── planning-guides/               # 기획서 상세 작성 지침 (8개)
-    ├── vibe-templates/                # 개발 문서 템플릿 (CPS/PRD/ADR 등)
-    └── relay-templates/               # 릴레이 핸드오프 템플릿
-```
 
-### 각 구성 요소의 역할
-
-**CLAUDE.md** — 프로젝트의 뇌. 매 세션 시작 시 AI가 자동으로 읽는다. 프로젝트 개요, 파이프라인 원칙, 현재 진행 상태, 코드 컨벤션을 담고 있다. 세션이 끝나면 "현재 상태" 섹션이 업데이트되어 다음 세션에서 맥락이 이어진다.
-
-**스킬 3개** — 상황에 맞게 자동 활성화되는 전문 가이드.
-- `ai-planning`: "사업기획서 써줘" → 어떤 문서를, 어떤 깊이로, 어떤 구조로 쓸지 판단
-- `vibe-coding`: "인증 기능 구현해줘" → 4-레이어 아키텍처, TDG 루프, 멱등성 체크
-- `ai-relay`: "ChatGPT 피어리뷰 보내줘" → 핸드오프 파일 생성, 릴레이 설계
-
-**docs/planning-guides/** — 6종 기획서(사업/서비스/운영/마케팅/브랜드/프로젝트관리)의 상세 작성 지침 원본. 평소에는 스킬의 압축 가이드라인만 사용하고, 완성본 수준 작성 시에만 이 원본을 참조한다. 이렇게 분리하는 이유는 AI의 컨텍스트 윈도우(한 번에 읽을 수 있는 양)를 효율적으로 사용하기 위해서다.
-
-**init-project.sh** — 새 프로젝트 폴더를 자동으로 세팅하는 스크립트. 프로젝트 유형에 따라 필요한 파일만 복사한다.
+핵심은 선형 완료가 아니라, `Build -> Review -> Feedback -> Update`를 계속 반복하는 것이다.
 
 ---
 
-## 프로젝트 유형
+## 필수 산출물 체계
 
-| 유형 | Stage | 예시 |
-|------|-------|------|
-| `fullstack` | 0→1→2→3→4 | 커뮤니티 플랫폼 개발 |
-| `planning-only` | 0→1→2→3 | 사업기획서 + 서비스기획서 작성 |
-| `research` | 0→1 | 시장 조사, 사업성 검토 |
-| `coding-only` | 0→2→4 | 기존 기획 기반 바로 개발 |
+### 1. 리서치
+- `docs/research/research-v0.1.md`
+
+### 2. 기획 문서 세트
+- `service-overview`
+- `requirements`
+- `user-stories`
+- `information-architecture`
+- `user-flow`
+- `wireframes`
+- `functional-spec`
+- `data-model`
+- `operations-policy` (권장)
+
+### 3. 개발명세
+- `docs/development/development-spec-v0.1.md`
+
+### 4. 구현 산출물
+- `src/...`
+- `tests/...`
+- `docs/adr/...`
+
+### 5. 스프린트 보고 체계
+- `sprint-XX-completion-report.md`
+- `sprint-XX-feedback-report.md`
+- `executive-decision-brief.md`
+
+### 6. 거버넌스 / 추적 / 승인 문서
+- `approval-log.md`
+- `definition-of-ready-done.md`
+- `requirements-traceability-matrix.md`
+- `human-readable-code-guide.md`
+
+상세 맵은 [docs/agile-deliverables-map.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-deliverables-map.md) 참고.
 
 ---
 
-## 사용 흐름
+## 왜 보고 문서가 필요한가
+
+애자일은 문서를 버리라는 뜻이 아니다.
+현실의 IT 프로젝트는 여전히 아래를 요구한다.
+
+- 현업자와의 합의
+- 경영진의 승인
+- 변경 이력 추적
+- QA 결과 공유
+- 위험과 가정 관리
+- 릴리스 전 최종 판단
+
+그래서 이 방법론은 "문서는 최소화"가 아니라, **판단과 승인에 필요한 문서는 구조화해서 유지**하는 쪽을 택한다.
+
+---
+
+## 하네스 엔지니어링 관점에서의 운영 방식
+
+### 문서 하네스
+- 모든 중요한 판단은 문서로 남긴다
+- 각 문서는 버전과 변경 이유를 가진다
+- 문서마다 단일 원본을 유지한다
+
+### 코드 하네스
+- 코드 컨벤션은 사람이 읽기 좋은 방향을 우선한다
+- AI가 생성한 코드도 린터와 테스트를 통과해야 한다
+- 레이어 경계와 네이밍 규칙으로 구조를 강제한다
+
+### 평가 하네스
+- 매 스프린트마다 QA, UI, 피어리뷰, 레퍼런스 괴리를 평가한다
+- "무엇이 잘못되었는가"뿐 아니라 "왜 그랬는가"를 남긴다
+
+### 승인 하네스
+- 각 스프린트는 close decision을 가진다
+- 계획 변경은 approval log에 기록한다
+- 릴리스 전에는 readiness 관점으로 다시 본다
+
+---
+
+## 이 저장소의 핵심 파일
+
+### 운영 앵커
+- [AGENTS.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/AGENTS.md)
+- [CLAUDE.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/CLAUDE.md)
+
+### 시작 프롬프트
+- [KICKOFF_PROMPT.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/KICKOFF_PROMPT.md)
+
+### 애자일 산출물 맵
+- [docs/agile-deliverables-map.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-deliverables-map.md)
+
+### 애자일 템플릿 세트
+- [docs/agile-templates/README.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/README.md)
+
+### 기존 계획 지침
+- `docs/planning-guides/`
+
+### 릴레이 템플릿
+- `docs/relay-templates/`
+
+### 구현 가이드 템플릿
+- `docs/vibe-templates/`
+
+---
+
+## 권장 사용 흐름
 
 ### 1. 새 프로젝트 시작
 
 ```bash
-# 프로젝트 폴더 생성
 ./init-project.sh my-project --type fullstack
-
-# 프로젝트로 이동
 cd my-project
-
-# Claude Code 실행
 claude
 ```
 
-### 2. 킥오프 프롬프트 전달
+### 2. 프로젝트 앵커 작성
+- 프로젝트명
+- 목적
+- 스택
+- 현재 버전
+- 현재 스프린트
+- 현재 페이즈
 
-```
+### 3. 첫 세션 요청
+
+```text
 CLAUDE.md를 읽고 프로젝트를 세팅해줘.
 
-## 아이디어
-남성 그루밍 정보 커뮤니티 플랫폼
-
-## 레퍼런스
-- 화해 — 리뷰 기반 추천 구조
-- Reddit r/malegrooming — 커뮤니티 운영
-
-## 오늘 할 일
-Foundation 초안부터 잡아줘.
+오늘은 Discovery Research와 Planning Docs v0.1을 시작하고 싶어.
+레퍼런스와 목표를 반영해서 service-overview부터 작성해줘.
 ```
 
-최소 3개(아이디어, 레퍼런스, 오늘 할 일)만 있으면 시작 가능. 상세 템플릿은 `KICKOFF_PROMPT.md` 참고.
+### 4. 스프린트 진행
+- 리서치
+- 기획 문서 작성/업데이트
+- 개발명세 작성/업데이트
+- 구현
+- 스프린트 완료 보고
+- 스프린트 환류 보고
+- 다음 버전 문서 업데이트
 
-### 3. Stage별 진행
+### 5. 세션 종료 시
 
+```text
+오늘 작업 기준으로 AGENTS.md 현재 상태와 버전 테이블을 업데이트해줘.
 ```
-Stage 1 완료 → "이제 Product Spec 초안 써줘"
-Stage 2 완료 → "마케팅 전략도 잡아줘"
-Stage 3 완료 → "이제 코딩 시작하자. 도메인 모델부터"
-```
-
-각 Stage 산출물이 다음 Stage의 입력이 되므로 별도로 컨텍스트를 다시 설명할 필요 없다.
-
-### 4. 세션 종료 시
-
-```
-오늘 작업 내용 CLAUDE.md 현재 상태에 업데이트해줘.
-```
-
-다음에 Claude Code를 열면 CLAUDE.md를 자동으로 읽어서 맥락이 이어진다.
-
-### 5. 다른 AI 릴레이 (선택)
-
-```
-이 Foundation을 ChatGPT 피어리뷰 보낼 핸드오프 만들어줘.
-```
-
-핸드오프 파일이 생성되고, ChatGPT에 첨부하면 표준 프롬프트 한 줄로 리뷰를 받을 수 있다.
 
 ---
 
-## 기획서 종류와 파이프라인 매핑
+## 현재 포함된 템플릿
 
-이 방법론에서는 전통적인 6종 기획서를 3개의 Stage 산출물로 통합한다.
+### 계획 / 설계
+- [service-overview-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/service-overview-template.md)
+- [requirements-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/requirements-template.md)
+- [user-stories-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/user-stories-template.md)
+- [information-architecture-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/information-architecture-template.md)
+- [user-flow-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/user-flow-template.md)
+- [wireframes-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/wireframes-template.md)
+- [functional-spec-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/functional-spec-template.md)
+- [data-model-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/data-model-template.md)
+- [operations-policy-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/planning/operations-policy-template.md)
+- [development-spec-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/development/development-spec-template.md)
 
-| 전통 기획서 | 파이프라인 Stage | 산출물 |
-|------------|----------------|--------|
-| 사업기획서 | Stage 1: Foundation | `docs/foundation.md` |
-| 브랜드기획서 | Stage 1: Foundation (브랜드 섹션) | `docs/foundation.md` |
-| 서비스기획서 | Stage 2: Product Spec | `docs/spec.md` |
-| 운영기획서 | Stage 2: Product Spec (운영 섹션) | `docs/spec.md` |
-| 마케팅기획서 | Stage 3: Growth | `docs/growth.md` |
-| 프로젝트관리기획서 | CLAUDE.md 현재 상태 섹션 | `CLAUDE.md` |
-
-통합했다고 해서 내용이 줄어드는 것이 아니다. 1인 운영에서 불필요한 문서 분리 오버헤드를 제거한 것이다. 완성본 수준 작성 시에는 `docs/planning-guides/`의 상세 지침을 참조하므로 품질은 동일하게 유지된다.
-
-필요에 따라 브랜드기획서나 운영기획서를 별도 문서로 분리할 수도 있다. AI가 분리 시점을 제안한다.
-
----
-
-## 토큰 효율 설계
-
-AI 도구는 한 번에 읽을 수 있는 양(컨텍스트 윈도우)에 제한이 있다. 이 방법론은 3단계로 컨텍스트를 관리한다.
-
-| 단계 | 로딩 시점 | 크기 | 내용 |
-|------|-----------|------|------|
-| CLAUDE.md | 매 세션 자동 | ~150줄 | 원칙, Stage, 현재 상태 |
-| 스킬 | 키워드 매칭 시 | 각 ~150줄 | 판단 트리, 압축 가이드 |
-| 원본 지침 | 완성본 작성 시만 | 각 수천 줄 | 상세 작성 기준 |
-
-평상시에는 CLAUDE.md 150줄만 읽고, 기획서를 쓸 때 스킬이 추가되고, 완성본을 쓸 때만 원본 지침이 로딩된다. 전부 한 번에 넣으면 약 8만 토큰인데, 이 구조에서는 필요한 순간에 필요한 만큼만 사용한다.
+### 리뷰 / 환류 / 승인
+- [sprint-completion-report-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/sprints/sprint-completion-report-template.md)
+- [sprint-feedback-report-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/sprints/sprint-feedback-report-template.md)
+- [executive-decision-brief-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/governance/executive-decision-brief-template.md)
+- [approval-log-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/governance/approval-log-template.md)
+- [definition-of-ready-done-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/governance/definition-of-ready-done-template.md)
+- [requirements-traceability-matrix-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/governance/requirements-traceability-matrix-template.md)
+- [human-readable-code-guide-template.md](/Users/hayden/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/methodology/docs/agile-templates/governance/human-readable-code-guide-template.md)
 
 ---
 
-## 핵심 원칙 요약
+## 요약
 
-1. **단일 파이프라인** — 기획과 개발을 분리하지 않는다. Stage로 자연스럽게 전환한다.
-2. **문서 = 프롬프트** — 각 문서가 다음 단계 AI 작업의 입력이 된다.
-3. **깊이 제어** — 모든 문서를 완성본으로 쓸 필요 없다. 필요한 수준만 선택한다.
-4. **경계 유지** — 정보의 원본은 한 문서에만. 중복보다 참조.
-5. **멱등성** — 같은 입력이면 항상 같은 구조의 산출물.
-6. **추상어 금지** — "혁신적인", "차별화된" 단독 사용 금지. 근거를 붙인다.
-7. **Human-in-the-loop** — AI가 단독으로 전략/아키텍처 결정하지 않는다.
+이 방법론의 목표는 단순하다.
 
----
+**AI 코딩 툴을 써도, 결과물이 매번 흔들리지 않게 만들고, 인간이 검토하고 승인할 수 있는 형태로 남기는 것.**
 
-## 도구 요구사항
-
-- **Claude Code** (필수) — 메인 작업 도구
-- **Claude Chat / ChatGPT / GenSpark** (선택) — 릴레이 피어리뷰용
-- **터미널** — init-project.sh 실행
-- 별도 API 키나 서버 설정 불필요
+즉, 이 저장소는
+`바이브코딩을 하되 멱등성과 지속 유지 가능성을 잃지 않기 위한 하네스 기반 애자일 운영체계`
+를 제공한다.

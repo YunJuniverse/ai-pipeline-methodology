@@ -1,171 +1,127 @@
 ---
 name: ai-relay
-description: 다른 AI와의 릴레이 워크플로우 — 핸드오프 파일 생성, 릴레이 설계, 표준 프롬프트. "핸드오프", "릴레이", "ChatGPT에 넘겨", "피어리뷰", "다른 AI" 등 멀티AI 키워드 시 활성화.
+description: 하네스 기반 멀티AI 릴레이 가이드. 피어리뷰, 외부 리서치, 시각화 작업을 스프린트 문서 체계와 연결한다.
 ---
 
-# AI 릴레이 가이드
+# AI Relay Guide
 
 ## 언제 사용하는가
 
-- 다른 AI(ChatGPT, GenSpark 등)의 **피어리뷰**가 필요할 때
-- **시각적 산출물**(PPT 등) 제작이 필요할 때
-- **외부 리서치** 보강이 필요할 때
-- Claude Code 세션 결과를 다른 도구로 넘길 때
-
-## 핵심 원칙
-
-1. **빌더와 리뷰어는 반드시 다른 AI** — 자기 편향 방지
-2. **핸드오프 파일이 공유 메모리** — 산출물 + 핸드오프만 전달
-3. **프로젝트 시작은 항상 Claude**
-4. **이전 라운드 산출물은 넘기지 않는다** — 핸드오프가 누적 맥락 압축
+- 다른 AI에게 피어리뷰를 맡길 때
+- 외부 리서치 보강이 필요할 때
+- PPT 같은 시각 산출물이 필요할 때
+- 스프린트 결과를 외부 AI에게 검토시킬 때
 
 ---
 
-## 핸드오프 파일 생성
+## 핵심 원칙
 
-사용자가 핸드오프를 요청하면 아래 구조로 생성한다:
+1. Builder와 Reviewer는 분리한다
+2. 릴레이는 현재 스프린트와 현재 버전 기준으로 보낸다
+3. 산출물보다 맥락 압축 문서가 우선이다
+4. 릴레이 결과도 다시 인간 승인 체계 안으로 가져온다
+
+---
+
+## 기본 전달 세트
+
+릴레이 시 보낼 기본 세트는 아래다.
+
+- 현재 relevant 문서
+- 현재 버전
+- 현재 스프린트
+- 현재 목표
+- 현재 open issues
+- 요청받은 역할
+
+가능하면 아래 중 필요한 것만 보낸다.
+
+- research summary
+- planning doc excerpt
+- development spec excerpt
+- sprint completion report
+- sprint feedback report
+- executive decision brief
+
+---
+
+## Handoff Note 구조
 
 ```markdown
 # HANDOFF NOTE
 
-- **Project**: {CLAUDE.md에서 프로젝트명}
-- **Version**: v{이전} → v{현재}
-- **Current Stage**: {현재 파이프라인 Stage}
-- **Completed by**: Claude
-- **Date**: {오늘 날짜}
+- Project:
+- Current Version:
+- Current Sprint:
+- Current Phase:
+- Completed By:
+- Date:
 
----
+## OBJECTIVE
 
-## OBJECTIVE (불변)
-{CLAUDE.md 프로젝트 목적에서 가져옴. 매 핸드오프마다 동일 유지.}
+## WHY THIS RELAY IS HAPPENING
 
----
-
-## KEY DECISIONS SO FAR
-- {CLAUDE.md 현재 상태의 확정 사항에서 가져옴}
-- {이번 세션에서 추가된 결정 포함}
-
----
+## CURRENT CONTEXT
+- Relevant artifacts:
+- Relevant constraints:
+- Approval boundaries:
 
 ## WHAT CHANGED THIS ROUND
-- {이번 세션에서 구체적으로 바뀐 것들}
-- {추가/삭제/구조 변경 — diff 성격으로 간결하게}
-
----
 
 ## OPEN ISSUES
 
-| # | Issue | Status | AI Recommendation |
-|---|-------|--------|-------------------|
-| 1 | {이슈} | 🟢 CLOSED / 🔴 OPEN / 🟡 NEW | {추천} |
-
-> ⚠️ 사용자 검수: 다음 AI에 넘기기 전 이 테이블을 확인하세요.
-
----
-
-## NEXT AGENT ROLE
-
-- **Agent**: {다음 AI 이름}
-- **Role**: Builder / Reviewer / Researcher / Visualizer
-- **Task**: {구체적 작업}
-- **Focus**: {집중 포인트}
-- **Output expected**: {기대 산출물 파일명}
+## REQUEST FOR NEXT AGENT
+- Role:
+- Task:
+- Output expected:
+- What not to change:
 ```
 
 ---
 
-## 릴레이 설계서
-
-릴레이를 시작하기 전에 반드시 설계서를 먼저 작성한다:
+## Relay Plan 구조
 
 ```markdown
-# Relay Plan: {프로젝트명}
+# Relay Plan
 
-## PROJECT OBJECTIVE
-{최종 목표 1~2줄}
+## Objective
 
-## FINAL DELIVERABLE
-- 형태: md / pptx / 코드
-- 기대 분량: {대략적 규모}
-- 마감: {있다면}
+## Final Deliverable
 
-## RELAY SEQUENCE
+## Current Sprint Context
 
+## Relay Sequence
 | Stage | AI | Role | Task | Output |
-|-------|-----|------|------|--------|
-| 01 | Claude | Builder | 초안 작성 | draft_v1.md |
-| 02 | ChatGPT | Reviewer | 피어리뷰 | review_v1.md |
-| 03 | Claude | Builder | 리뷰 반영 수정 | draft_v2.md |
-| 04 | {AI} | {Role} | {Task} | {Output} |
 
-> 빌더와 리뷰어는 반드시 다른 AI로 배정.
-
-## ROLE DEFINITIONS
-- **Builder**: 구조화된 문서 작성, 수정 반영, 톤/포맷 일관성 유지
-- **Reviewer**: 비판적 평가, 강점/약점/제안 구조
-- **Researcher**: 외부 정보 수집, 근거/데이터/사례 보강
-- **Visualizer**: 시각적 산출물 제작
-
-## CONSTRAINTS & NOTES
-- {프로젝트 특이사항, 제약조건}
+## Approval Notes
+- What needs human approval before adoption:
+- What can be treated as advisory only:
 ```
 
 ---
 
-## 표준 프롬프트
+## 리뷰어 지침
 
-### 릴레이 전달 (모든 AI 공통)
-```
-첨부된 핸드오프 파일과 산출물을 읽고, NEXT AGENT ROLE에 명시된 작업을 수행해주세요.
+리뷰어에게는 아래 기준을 우선 요청한다.
 
-작업 완료 후, 동일한 핸드오프 포맷으로 새 핸드오프 파일을 생성해주세요.
-핸드오프에는 반드시 다음을 포함:
-- OBJECTIVE 그대로 유지
-- KEY DECISIONS에 새 결정사항 추가
-- WHAT CHANGED에 이번 변경분 기록
-- OPEN ISSUES 테이블 업데이트
-- NEXT AGENT ROLE에 다음 단계 지시
-```
-
-### 리뷰어 특화
-```
-위 표준 프롬프트 + 리뷰는 아래 구조로:
-1. 강점 (잘 된 부분)
-2. 약점 (개선 필요)
-3. 구체적 제안 (어떻게 고치면 좋을지)
-4. 치명적 빠짐 (놓친 관점, 누락된 내용)
-```
-
-### 최종 단계
-```
-이번이 릴레이의 마지막 단계입니다.
-OPEN ISSUES가 모두 해결되었는지 확인하고 최종 산출물을 완성해주세요.
-핸드오프 대신 프로젝트 완료 요약을 작성해주세요:
-- 최종 결과물 설명
-- 전체 릴레이 주요 변경 히스토리
-- 남은 후속 작업 (있다면)
-```
+1. 계획 대비 구현 일치도
+2. 레퍼런스 대비 괴리
+3. 휴먼리더블 가독성
+4. QA / UX 리스크
+5. 다음 스프린트에서 반드시 반영할 항목
 
 ---
 
-## 파일 네이밍 규칙
+## 릴레이 후 처리
 
-```
-{순번}_{AI이름}_{역할}_{버전}.md
-```
+릴레이 결과를 받으면 아래 중 어디에 반영할지 판단한다.
 
-예시: `01_claude_draft_v1.md`, `02_gpt_review_v1.md`, `03_claude_draft_v2.md`
+- `sprint-completion-report`
+- `sprint-feedback-report`
+- `executive-decision-brief`
+- `approval-log`
+- planning docs next version
+- development spec next version
 
----
-
-## 확장 시나리오
-
-| 시나리오 | 릴레이 흐름 | 산출물 |
-|----------|------------|--------|
-| 기획서 | Claude→ChatGPT→Claude→GenSpark | md, pptx |
-| 블로그/리뷰 | Claude→ChatGPT→Claude | md |
-| 투자 리서치 | Claude→GenSpark→Claude→ChatGPT→Claude | md |
-| 바이브 코딩 | Claude→ChatGPT→Claude | md, 코드 |
-| 프레젠테이션 | Claude→ChatGPT→GenSpark→Claude | md, pptx |
-
-> 모든 시나리오에서 프로젝트 시작은 항상 Claude.
+릴레이 결과를 그대로 채택하지 말고,
+반드시 인간 검토 또는 승인 조건을 확인한다.

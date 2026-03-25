@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-> This file is auto-loaded by Claude Code at the start of each session.
+> This file is auto-loaded by Codex at the start of each session.
 > Fill the placeholders before project work begins.
 
 ---
@@ -107,7 +107,7 @@ Create and maintain the planning set under `docs/planning/`:
 
 | Phase | Required Outputs | Typical Versioning |
 |------|------------------|--------------------|
-| 0 | `CLAUDE.md` current state | project-level |
+| 0 | `AGENTS.md` current state | project-level |
 | 1 | research docs | `v0.1`, `v0.2` |
 | 2 | planning docs set | `v0.1`, `v0.2` |
 | 3 | development spec | `v0.1`, `v0.2` |
