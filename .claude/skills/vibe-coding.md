@@ -9,12 +9,14 @@ description: 하네스 기반 구현 워크플로우. 개발명세, readability,
 
 구현 전에 아래를 우선 확인한다.
 
-- 관련 planning docs가 존재하는가
-- `docs/development/development-spec*.md`가 있는가
+- `docs/development/` 아래 개발명세서 8종이 존재하는가
+  (service-overview, requirements, user-stories, information-architecture,
+   user-flow, wireframes, functional-spec, data-model)
 - 현재 작업이 Definition of Ready를 만족하는가
 - 현재 스프린트 목표와 범위가 명확한가
+- 기획서 6종(`docs/planning/`)이 승인되어 있는가 (참조용)
 
-기획 없이 바로 구현을 시작하지 않는다.
+개발명세서 없이 바로 구현을 시작하지 않는다.
 
 ---
 
@@ -23,7 +25,7 @@ description: 하네스 기반 구현 워크플로우. 개발명세, readability,
 각 기능 구현은 아래 루프를 따른다.
 
 ```text
-1. planning docs와 development spec 확인
+1. 개발명세서 8종 확인 (특히 requirements, functional-spec, data-model)
 2. requirements traceability 확인
 3. 테스트 케이스 먼저 작성
 4. 구현
