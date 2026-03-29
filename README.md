@@ -1,321 +1,194 @@
-# Harness-Driven Agile Methodology
+# Evidence-Driven AI Development Methodology
 
-**AI 기획 + 바이브코딩 + 멀티 AI 릴레이를 인간 승인 체계와 휴먼리더블 산출물 위에 올려놓기 위한 통합 방법론**
-
----
-
-## 이 방법론이 해결하는 문제
-
-### 문제 1: AI는 빠르지만 결과물이 매번 달라진다
-같은 요구를 주어도 모델, 세션, 컨텍스트에 따라 문서 구조와 코드 스타일이 흔들린다.
-
-### 문제 2: 기획과 개발은 빨라졌지만 승인 체계는 그대로다
-실무자 검토, 경영자 컨펌, 보고 문서, 변경 승인 같은 기존 의사결정 구조는 여전히 필요하다.
-
-### 문제 3: 바이브코딩 결과가 유지보수 가능한 자산으로 남지 않는다
-"일단 되는 코드"는 빨리 나오지만, 휴먼리더블 코드 컨벤션과 변경 이력이 없으면 팀 자산이 되지 못한다.
-
-### 문제 4: 애자일을 한다고 해도 환류 문서 체계가 없으면 반복 개선이 남지 않는다
-스프린트가 끝나도 이슈, QA, 피어리뷰, 레퍼런스 괴리, 개선 포인트가 구조적으로 누적되지 않는다.
+**1인+AI 개발에 맞춘 경량 운영 체계. 문서 연극은 줄이고, 코드·테스트·PR·결정 근거는 남긴다.**
 
 ---
 
-## 핵심 관점
+## Why This Exists
 
-이 저장소는 단순한 프롬프트 모음이 아니다.
+이 저장소의 이전 방법론은 문서, 게이트, 보고 체계를 너무 많이 요구했다.
+실전에서는 다음 문제가 반복됐다.
 
-이 방법론은 아래 3가지를 결합한다.
+- AI 컨텍스트가 문서 유지보수에 잠식됨
+- 텍스트 게이트가 물리적으로 강제되지 않아 무력화됨
+- 보고서가 환류보다 의례가 됨
+- 상태 문서가 많아질수록 실제 코드 품질 검토가 약해짐
 
-1. **애자일 방법론**
-스프린트 단위로 계획, 구현, 리뷰, 환류를 반복한다.
+이 버전은 그 실패를 전제로 다시 설계했다.
 
-2. **하네스 엔지니어링**
-문서, 코드 규칙, 평가 체계를 통해 AI 출력이 가능한 한 같은 Normal Form으로 수렴하게 만든다.
+핵심 변화는 단순하다.
 
-3. **인간 승인 체계**
-매 Phase 전환마다 인간이 산출물을 받고, 검토하고, 다음 작업을 지시한다.
-
----
-
-## 핵심 원리
-
-### 문서 = 다음 단계 입력
-리서치는 기획서의 입력이고, 기획서는 개발명세서의 입력이며, 개발명세서는 구현과 테스트의 입력이다.
-
-### 스프린트 종료 시 반드시 문서가 남아야 한다
-매 스프린트는 코드만 끝나면 안 된다.
-반드시 완료 보고서, 환류 보고서, 추가 리서치, 다음 스크럼 계획 보고서, 개발명세서 업데이트가 남아야 한다.
-
-### 하네스는 4개 층으로 구성된다
-
-1. **문서 하네스**
-리서치, 기획서 6종, 개발명세서 8종, 스프린트 보고서, ADR
-
-2. **코드 하네스**
-컨벤션, 린터, 커밋훅, 테스트, 레이어 경계
-
-3. **평가 하네스**
-QA, UI 점검, 피어리뷰, 레퍼런스 괴리 점검, 추적성 검토
-
-4. **승인 하네스**
-매 Phase 전환마다 인간이 검토하고 다음 작업을 지시
-
-### Human-in-the-loop는 기본값이다
-AI는 초안과 제안을 만든다.
-인간은 매 게이트에서 산출물을 검토하고, 승인하고, 다음 Phase를 지시한다.
-AI는 인간의 지시 없이 다음 Phase로 넘어가지 않는다.
-
-### 문서 기본값은 항상 Markdown이다
-이 저장소에서 문서 산출물은 기본적으로 모두 `.md`를 사용한다.
+- 구현의 진실은 `code + tests + PR`
+- 결정의 진실은 `ADR + 승인 증거`
+- 세션 상태의 진실은 `HANDOFF.md`
+- 대외 문서는 `snapshot`으로만 생성
 
 ---
 
-## 전체 파이프라인
+## Active Model
+
+### 운영 원칙
+
+- `CLAUDE.md`와 `AGENTS.md`는 에이전트 운영 규칙만 담는다.
+- `HANDOFF.md`는 현재 상태만 담는다. 살아 있는 운영 파일은 이 문서 하나다.
+- `TODO.md`는 backlog와 acceptance criteria를 담는다.
+- `docs/adr/`는 코드에서 역산할 수 없는 결정 이유만 기록한다.
+- `docs/snapshots/`의 문서는 날짜가 찍힌 산출물이며 live source가 아니다.
+- 인간 승인은 텍스트 선언이 아니라 `merged PR` 또는 링크된 `issue/ADR approval evidence`로만 성립한다.
+
+### 기본 부트 컨텍스트
+
+세션 시작 시 AI는 기본적으로 아래 두 파일만 읽는다.
+
+- `CLAUDE.md`
+- `HANDOFF.md`
+
+그 뒤 필요한 경우에만 아래를 추가로 읽는다.
+
+- 관련 `TODO.md` 항목
+- 관련 코드/테스트
+- 관련 `docs/adr/*.md`
+- 필요한 snapshot 문서
+
+---
+
+## Change Classes
+
+| Class | 의미 | 자동 트리거 | 필요한 증거 | Gate |
+|------|------|-------------|-------------|------|
+| `A` | 기본 구현 변경 | 트리거 없음 | 테스트/PR 설명 | PR merge |
+| `B` | 영향이 큰 기술 변경 | DB migration, 새 외부 API, 인증/권한 변경, destructive data change, background job | PR에 결정 근거, 영향 범위, rollback, 리스크 | PR merge |
+| `C` | 비기술 또는 대외 영향 변경 | 가격, 법무/규정, 브랜드, 공개 릴리스, 대외 약속, 인간이 명시적으로 승격한 항목 | ADR 또는 issue approval 링크 | 인간 승인 후 PR merge |
+
+추가 규칙:
+
+- AI는 작업을 `A`에서 `B/C`로 상향 분류할 수 있다.
+- AI는 자동 트리거가 걸린 작업을 임의로 하향 분류하지 않는다.
+- `Class C`는 구현 전에 인간 승인 증거가 있어야 한다.
+
+---
+
+## Project Files
+
+새 프로젝트의 기본 구조는 아래와 같다.
 
 ```text
-Phase 0   Project Init
-   ↓
-Phase 1   Discovery Research
-   ↓      ← Gate 1: 인간 리서치 검토 → "기획서 작성 시작해"
-Phase 2   기획서 작성 (6종)
-   ↓      ← Gate 2: 인간 기획서 승인 → "개발명세서 작성해"
-Phase 3   개발명세서 작성 (8종)
-   ↓      ← Gate 3: 인간 개발명세서 승인 → "MVP 개발 시작해"
-Phase 4   MVP Build
-   ↓
-Phase 5   Sprint Completion Report
-   ↓      ← Gate 4: 인간 빌드 확인 → "환류 작업 진행해"
-Phase 6   Sprint Feedback Report
-   ↓
-Phase 7   Feedback-Driven Research
-   ↓
-Phase 8   Sprint Plan Report
-   ↓      ← Gate 5: 인간 다음 스크럼 승인 → "개발명세서 업데이트하고 개발해"
-Phase 9   Development Spec Update
-   ↓
-   └──→ Phase 4로 반복 (컨펌까지)
-
-           ← Gate 6: 인간 "개발 완료" 선언
-Phase 10  Final Planning Update (기획서 6종 최종 업데이트)
+my-project/
+├── CLAUDE.md
+├── AGENTS.md
+├── HANDOFF.md
+├── TODO.md
+├── .github/
+│   └── PULL_REQUEST_TEMPLATE.md
+├── docs/
+│   ├── adr/
+│   └── snapshots/
+├── src/        # fullstack만
+└── tests/      # fullstack만
 ```
 
-핵심은 선형 완료가 아니라, `Build → Review → Feedback → Research → Plan → Spec Update → Build`를 인간 승인 하에 계속 반복하는 것이다.
+각 파일의 역할:
+
+| File | 역할 |
+|------|------|
+| `CLAUDE.md` | 프로젝트 설정, 변경 등급 트리거, 코딩/리뷰 규칙 |
+| `AGENTS.md` | Codex용 미러 |
+| `HANDOFF.md` | 지금 무엇을 하고 있는지, 다음 무엇을 해야 하는지 |
+| `TODO.md` | backlog와 acceptance criteria |
+| `.github/PULL_REQUEST_TEMPLATE.md` | PR 근거, 테스트, 승인 증거 체크 |
+| `docs/adr/` | 결정 이유 |
+| `docs/snapshots/` | 필요할 때만 생성하는 문서 |
 
 ---
 
-## 필수 산출물 체계
+## Workflows
 
-### 1. 리서치
-- `docs/research/research.md`
+### Fullstack
 
-### 2. 기획서 6종
-- `docs/planning/business-plan.md` (사업기획서)
-- `docs/planning/service-plan.md` (서비스기획서)
-- `docs/planning/operations-plan.md` (운영기획서)
-- `docs/planning/marketing-plan.md` (마케팅기획서)
-- `docs/planning/brand-plan.md` (브랜드기획서)
-- `docs/planning/project-management.md` (프로젝트관리기획서)
+1. 인간이 `TODO.md`에 작업과 acceptance criteria를 적는다.
+2. AI가 `CLAUDE.md`와 `HANDOFF.md`를 읽고 시작한다.
+3. AI가 관련 TODO와 코드만 추가로 로드한다.
+4. AI가 Change Class를 판별한다.
+5. `Class A`는 바로 구현한다.
+6. `Class B`는 PR에 영향과 근거를 남기고 구현한다.
+7. `Class C`는 ADR 또는 issue approval evidence를 확보한 뒤 구현한다.
+8. 비즈니스 로직 변경에는 테스트를 추가하고 PR을 연다.
+9. 인간이 리뷰하고 merge한다.
+10. AI가 `HANDOFF.md`와 `TODO.md`를 갱신한다.
 
-### 3. 개발명세서 8종
-- `docs/development/service-overview.md` (서비스 개요서)
-- `docs/development/requirements.md` (요구사항 정의서)
-- `docs/development/user-stories.md` (사용자 스토리)
-- `docs/development/information-architecture.md` (정보구조도)
-- `docs/development/user-flow.md` (사용자 플로우차트)
-- `docs/development/wireframes.md` (화면 설계서)
-- `docs/development/functional-spec.md` (기능 정의서)
-- `docs/development/data-model.md` (데이터 모델 정의서)
+### Planning-Only
 
-### 4. 구현 산출물
-- `src/...`
-- `tests/...`
-- `docs/adr/...`
-
-### 5. 스프린트 보고 체계
-- `sprint-XX-completion-report.md` (완료 보고서)
-- `sprint-XX-feedback-report.md` (환류 보고서)
-- `sprint-XX-plan-report.md` (계획 보고서)
-- `executive-decision-brief.md` (의사결정 요약)
-
-### 6. 거버넌스 / 추적 / 승인 문서
-- `approval-log.md`
-- `definition-of-ready-done.md`
-- `requirements-traceability-matrix.md`
-- `human-readable-code-guide.md`
-
-상세 맵은 [docs/agile-deliverables-map.md](docs/agile-deliverables-map.md) 참고.
+1. 인간이 `TODO.md`에 리서치/기획 항목과 acceptance criteria를 적는다.
+2. AI가 `CLAUDE.md`와 `HANDOFF.md`를 읽고 시작한다.
+3. 필요한 외부 자료를 조사한다.
+4. 결과를 `docs/snapshots/`에 날짜가 찍힌 문서로 생성한다.
+5. 인간이 PR 또는 issue에서 검토한다.
+6. AI가 `HANDOFF.md`와 `TODO.md`를 갱신한다.
 
 ---
 
-## 인간 승인 게이트 요약
+## Snapshot Rules
 
-| Gate | 시점 | 인간이 하는 일 | 다음 지시 |
-|------|------|----------------|-----------|
-| 1 | 리서치 후 | 리서치 결과 검토 | "기획서 작성 시작해" |
-| 2 | 기획서 후 | 기획서 6종 검토/승인 | "개발명세서 작성해" |
-| 3 | 개발명세서 후 | 개발명세서 8종 검토/승인 | "MVP 개발 시작해" |
-| 4 | 완료 보고서 후 | 빌드 결과 확인 | "환류 작업 진행해" |
-| 5 | 계획 보고서 후 | 다음 스크럼 범위 승인 | "개발명세서 업데이트하고 개발해" |
-| 6 | 최종 컨펌 | "개발 완료" 선언 | "기획서 최종 업데이트해" |
+`docs/snapshots/`의 문서는 다음 규칙을 따른다.
 
----
-
-## 왜 보고 문서가 필요한가
-
-애자일은 문서를 버리라는 뜻이 아니다.
-현실의 IT 프로젝트는 여전히 아래를 요구한다.
-
-- 현업자와의 합의
-- 경영진의 승인
-- 변경 이력 추적
-- QA 결과 공유
-- 위험과 가정 관리
-- 릴리스 전 최종 판단
-
-그래서 이 방법론은 "문서는 최소화"가 아니라, **판단과 승인에 필요한 문서는 구조화해서 유지**하는 쪽을 택한다.
+- 파일명에 날짜를 포함한다.
+- 문서 상단에 snapshot 경고를 넣는다.
+- 코드에서 역산할 수 없는 사실은 외부 근거 링크를 요구한다.
+- 근거가 없으면 추정으로 포장하지 말고 `Evidence Needed` 섹션에 남긴다.
+- snapshot은 후속 세션의 live operating doc로 사용하지 않는다.
 
 ---
 
-## 하네스 엔지니어링 관점에서의 운영 방식
+## What Changed
 
-### 문서 하네스
-- 모든 중요한 판단은 문서로 남긴다
-- 각 문서는 버전과 변경 이유를 가진다
-- 문서마다 단일 원본을 유지한다
+현재 활성 방법론에서 제거된 것:
 
-### 코드 하네스
-- 코드 컨벤션은 사람이 읽기 좋은 방향을 우선한다
-- AI가 생성한 코드도 린터와 테스트를 통과해야 한다
-- 레이어 경계와 네이밍 규칙으로 구조를 강제한다
+- Phase 0~10 선형 파이프라인
+- 기획서 6종 + 개발명세서 8종 상시 유지
+- 스프린트 완료/피드백/계획 보고서 3종 의무화
+- approval log 같은 텍스트 게이트 중심 운영
+- 프로젝트마다 대형 템플릿 세트 복사
 
-### 평가 하네스
-- 매 스프린트마다 QA, UI, 피어리뷰, 레퍼런스 괴리를 평가한다
-- "무엇이 잘못되었는가"뿐 아니라 "왜 그랬는가"를 남긴다
+남긴 것:
 
-### 승인 하네스
-- 매 Phase 전환마다 인간이 산출물을 받고 검토하고 다음 작업을 지시한다
-- 계획 변경은 approval log에 기록한다
-- 릴리스 전에는 readiness 관점으로 다시 본다
+- 테스트 중심 완료 기준
+- 인간 승인 원칙
+- ADR
+- 휴먼리더블 코드 규칙
+- 기획 문서 생성 능력 자체
 
 ---
 
-## 이 저장소의 핵심 파일
-
-### 운영 앵커
-- [AGENTS.md](AGENTS.md) — Codex용
-- [CLAUDE.md](CLAUDE.md) — Claude Code용
-
-### 시작 프롬프트
-- [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)
-
-### 애자일 산출물 맵
-- [docs/agile-deliverables-map.md](docs/agile-deliverables-map.md)
-
-### 애자일 템플릿 세트
-- [docs/agile-templates/README.md](docs/agile-templates/README.md)
-
-### 기획서 작성 지침 (완성본 참조용)
-- `docs/planning-guides/`
-
-### 릴레이 템플릿
-- `docs/relay-templates/`
-
-### 구현 가이드 템플릿
-- `docs/vibe-templates/`
-
----
-
-## 권장 사용 흐름
-
-### 1. 새 프로젝트 시작
+## Getting Started
 
 ```bash
-# 새 프로젝트 골격 생성
-./init-project.sh my-project --type fullstack
-cd my-project
-claude
+METHODOLOGY="/Users/hayden/Library/Mobile Documents/iCloud~md~obsidian/Documents/methodology"
+cd ~/Projects
+bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 ```
 
-### 2. 프로젝트 앵커 작성
-- 프로젝트명, 목적, 스택, 현재 버전, 현재 스프린트, 현재 페이즈
-
-### 3. 첫 세션 요청
-
-```text
-CLAUDE.md를 읽고 프로젝트를 세팅해줘.
-오늘은 Discovery Research부터 시작하고 싶어.
-```
-
-### 4. 스프린트 진행 (인간 승인 하에 반복)
-
-```text
-Phase 1: 리서치
-  → 인간 검토 → "기획서 작성 시작해"
-Phase 2: 기획서 6종
-  → 인간 검토 → "개발명세서 작성해"
-Phase 3: 개발명세서 8종
-  → 인간 검토 → "MVP 개발 시작해"
-Phase 4: MVP 개발
-Phase 5: 완료 보고서
-  → 인간 검토 → "환류 작업 진행해"
-Phase 6: 환류 보고서
-Phase 7: 추가 리서치
-Phase 8: 스크럼 계획 보고서
-  → 인간 검토 → "개발명세서 업데이트하고 개발해"
-Phase 9: 개발명세서 업데이트
-  → Phase 4로 반복
-...
-Phase 10: 기획서 최종 업데이트
-```
-
-### 5. 세션 종료 시
-
-```text
-오늘 작업 기준으로 CLAUDE.md 현재 상태와 버전 테이블을 업데이트해줘.
-```
+첫 세션에서는 [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)를 사용하면 된다.
+적용 절차는 [HOW_TO_APPLY.md](HOW_TO_APPLY.md)에 정리되어 있다.
 
 ---
 
-## 현재 포함된 템플릿
+## Repository Map
 
-### 기획서 (기획서 6종 산출물용)
-- [business-plan-template.md](docs/agile-templates/planning/business-plan-template.md)
-- [service-plan-template.md](docs/agile-templates/planning/service-plan-template.md)
-- [operations-plan-template.md](docs/agile-templates/planning/operations-plan-template.md)
-- [marketing-plan-template.md](docs/agile-templates/planning/marketing-plan-template.md)
-- [brand-plan-template.md](docs/agile-templates/planning/brand-plan-template.md)
-- [project-management-template.md](docs/agile-templates/planning/project-management-template.md)
+- [CLAUDE.md](CLAUDE.md)
+- [AGENTS.md](AGENTS.md)
+- [HOW_TO_APPLY.md](HOW_TO_APPLY.md)
+- [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)
+- [DIAGRAM.md](DIAGRAM.md)
+- [docs/REDESIGN_PROPOSAL.md](docs/REDESIGN_PROPOSAL.md)
+- [docs/templates/HANDOFF.md](docs/templates/HANDOFF.md)
+- [docs/templates/ADR-template.md](docs/templates/ADR-template.md)
+- [docs/on-demand-prompts/](docs/on-demand-prompts)
 
-### 개발명세서 (개발명세서 8종 산출물용)
-- [service-overview-template.md](docs/agile-templates/development/service-overview-template.md)
-- [requirements-template.md](docs/agile-templates/development/requirements-template.md)
-- [user-stories-template.md](docs/agile-templates/development/user-stories-template.md)
-- [information-architecture-template.md](docs/agile-templates/development/information-architecture-template.md)
-- [user-flow-template.md](docs/agile-templates/development/user-flow-template.md)
-- [wireframes-template.md](docs/agile-templates/development/wireframes-template.md)
-- [functional-spec-template.md](docs/agile-templates/development/functional-spec-template.md)
-- [data-model-template.md](docs/agile-templates/development/data-model-template.md)
+레거시 자료는 아래에 보존했다.
 
-### 스프린트 보고서
-- [sprint-completion-report-template.md](docs/agile-templates/sprints/sprint-completion-report-template.md)
-- [sprint-feedback-report-template.md](docs/agile-templates/sprints/sprint-feedback-report-template.md)
-- [sprint-plan-report-template.md](docs/agile-templates/sprints/sprint-plan-report-template.md)
+- [docs/archive/legacy-methodology/](docs/archive/legacy-methodology)
+- [docs/archive/planning-guides/](docs/archive/planning-guides)
 
-### 거버넌스 / 승인
-- [executive-decision-brief-template.md](docs/agile-templates/governance/executive-decision-brief-template.md)
-- [approval-log-template.md](docs/agile-templates/governance/approval-log-template.md)
-- [definition-of-ready-done-template.md](docs/agile-templates/governance/definition-of-ready-done-template.md)
-- [requirements-traceability-matrix-template.md](docs/agile-templates/governance/requirements-traceability-matrix-template.md)
-- [human-readable-code-guide-template.md](docs/agile-templates/governance/human-readable-code-guide-template.md)
+평가와 외부 비판 문서는 그대로 유지한다.
 
----
-
-## 요약
-
-이 방법론의 목표는 단순하다.
-
-**AI 코딩 툴을 써도, 결과물이 매번 흔들리지 않게 만들고, 인간이 매 단계에서 검토하고 승인하며 다음을 지시할 수 있는 형태로 남기는 것.**
-
-즉, 이 저장소는
-`바이브코딩을 하되 멱등성과 지속 유지 가능성을 잃지 않기 위한, 인간 승인 기반 하네스 애자일 운영체계`
-를 제공한다.
+- [evaluation/](evaluation)
