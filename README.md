@@ -179,15 +179,17 @@ bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 - [HOW_TO_APPLY.md](HOW_TO_APPLY.md)
 - [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)
 - [DIAGRAM.md](DIAGRAM.md)
-- [docs/REDESIGN_PROPOSAL.md](docs/REDESIGN_PROPOSAL.md)
 - [docs/templates/HANDOFF.md](docs/templates/HANDOFF.md)
+- [docs/templates/TODO.md](docs/templates/TODO.md)
 - [docs/templates/ADR-template.md](docs/templates/ADR-template.md)
-- [docs/on-demand-prompts/](docs/on-demand-prompts)
+- [docs/prompts/](docs/prompts)
 
-레거시 자료는 아래에 보존했다.
+레거시 및 보관 자료는 아래에 보존했다.
 
+- [docs/archive/decisions/redesign-proposal-2026-03-29.md](docs/archive/decisions/redesign-proposal-2026-03-29.md)
 - [docs/archive/legacy-methodology/](docs/archive/legacy-methodology)
 - [docs/archive/planning-guides/](docs/archive/planning-guides)
+- [docs/archive/harness/](docs/archive/harness)
 
 평가와 외부 비판 문서는 그대로 유지한다.
 
