@@ -22,10 +22,13 @@
 - Code is the source of truth for implementation details.
 - ADR is the source of truth for decisions that code cannot explain.
 - `HANDOFF.md` is the only live state file. Keep it under 150 lines.
+- `TODO.md` is the active backlog. Use stable IDs and acceptance criteria.
 - `docs/snapshots/` contains dated artifacts. Snapshots are never live source.
 - Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.
 - Default boot context is `CLAUDE.md` + `HANDOFF.md`.
 - Load `TODO.md`, related code/tests, and related ADRs only when needed.
+- `AI-LOG.md` is optional. Use it only for short collaboration notes not yet captured in `HANDOFF.md`, `TODO.md`, a PR, or an ADR.
+- Do not keep sprint summaries, deliverable tables, or open-issue lists in this file.
 
 ---
 
@@ -78,11 +81,49 @@ Additional rule:
 
 ---
 
-## 4. Workflow
+## 4. File Roles
+
+| File | Contains | Must NOT contain |
+|------|----------|-----------------|
+| `CLAUDE.md` | Project settings, change-class rules, workflow rules, file-role definitions, code/test conventions | Current sprint summaries, deliverable version tables, open-issue inventories, evolving implementation status |
+| `AGENTS.md` | Codex-facing mirror of `CLAUDE.md` | Same restrictions as `CLAUDE.md` |
+| `HANDOFF.md` | Current focus, latest verified checks, latest local or merged work, open issues, next best actions, active links | Long project history, full sprint archives, methodology essays, duplicated ADR reasoning |
+| `TODO.md` | Active backlog items with stable IDs, mode, change class, owner, acceptance criteria | Full completion archives — move historical detail to git, PRs, or dated snapshots |
+| `AI-LOG.md` | Optional short collaboration notes not yet in a durable home | Duplicates of `HANDOFF.md`, `TODO.md`, PR descriptions, or ADR decisions |
+| `docs/adr/` | Durable decisions that code cannot explain | Implementation detail that belongs in code |
+| `docs/snapshots/` | Dated outputs, reviews, plans, runbooks | Live operating state — never promote a snapshot to a live document |
+
+---
+
+## 5. Human Approval Gates
+
+Phase gates require explicit human instruction before the AI proceeds to the next phase.
+
+Rules:
+- AI does not cross a phase gate without a human review and an explicit next instruction.
+- A phase gate is only passed when the human provides a named trigger phrase or links durable approval evidence (merged PR, ADR, or issue).
+- AI may surface a gate recommendation ("ready for Phase N review") but must not self-advance.
+
+Typical gate points:
+
+| Gate | When | What the human provides |
+|------|------|-------------------------|
+| Research → Planning | After research deliverable | Instruction to begin planning document |
+| Planning → Dev Spec | After planning review | Instruction to write development spec |
+| Dev Spec → Build | After spec review | Instruction to start implementation |
+| Build → Feedback | After build review | Instruction to begin feedback/hardening pass |
+| Feedback → Next Sprint | After feedback integration | Instruction to update spec and start next sprint |
+| Final | Work declared complete | Explicit completion declaration |
+
+> Customize gate labels and trigger phrases for your project in `HANDOFF.md` or a project-specific ADR. Keep this section as the structural rule only.
+
+---
+
+## 6. Workflow
 
 ### Fullstack
 
-1. Human adds a TODO item with acceptance criteria.
+1. Human adds or confirms a backlog item in `TODO.md`.
 2. AI reads `CLAUDE.md` and `HANDOFF.md`.
 3. AI loads only the relevant TODO, code, tests, and ADRs.
 4. AI determines the change class.
@@ -92,7 +133,7 @@ Additional rule:
 
 ### Planning-Only
 
-1. Human adds a research or planning TODO with acceptance criteria.
+1. Human adds or confirms a planning item in `TODO.md`.
 2. AI reads `CLAUDE.md` and `HANDOFF.md`.
 3. AI performs research and writes a dated snapshot under `docs/snapshots/`.
 4. Human reviews through a PR or issue thread.
@@ -106,7 +147,7 @@ Restrictions:
 
 ---
 
-## 5. Code And Review Rules
+## 7. Code And Review Rules
 
 ### Naming
 

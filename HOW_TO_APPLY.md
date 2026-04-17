@@ -161,7 +161,7 @@ Snapshot 문서는 필요할 때만 만든다.
 - 외부 사실은 링크로 증명
 - 증거 없는 내용은 `Evidence Needed`로 명시
 
-on-demand prompt 예시는 [docs/on-demand-prompts/](docs/on-demand-prompts)에 있다.
+on-demand prompt 예시는 [docs/prompts/](docs/prompts)에 있다.
 
 ---
 
