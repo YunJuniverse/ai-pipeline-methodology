@@ -1,0 +1,198 @@
+{
+  "$schema": "methodology-graph/v1",
+  "version": "v3-2026-05",
+  "description": "방법론 폴더·문서 관계 그래프 + 기획-개발 라이프사이클 플로우",
+
+  "nodes": [
+    {
+      "id": "claude-md",
+      "label": "CLAUDE.md",
+      "kind": "root-doc",
+      "path": "CLAUDE.md",
+      "role": "Claude Code 세션 시작 시 자동 로드되는 프로젝트 설정·운영 규칙·체인지 클래스 트리거"
+    },
+    {
+      "id": "agents-md",
+      "label": "AGENTS.md",
+      "kind": "root-doc",
+      "path": "AGENTS.md",
+      "role": "Codex/타 AI를 위한 CLAUDE.md 미러"
+    },
+    {
+      "id": "handoff",
+      "label": "HANDOFF.md",
+      "kind": "live-state",
+      "path": "HANDOFF.md",
+      "role": "현재 포커스·최근 검증·다음 행동의 단일 라이브 상태 (≤150줄)"
+    },
+    {
+      "id": "todo",
+      "label": "TODO.md",
+      "kind": "live-state",
+      "path": "TODO.md",
+      "role": "활성 백로그 (Ready/InProgress/Blocked/Done)"
+    },
+    {
+      "id": "ai-log",
+      "label": "AI-LOG.md",
+      "kind": "live-state-optional",
+      "path": "AI-LOG.md",
+      "role": "선택적 짧은 협업 노트"
+    },
+    {
+      "id": "adr",
+      "label": "docs/adr/",
+      "kind": "decisions",
+      "path": "docs/adr/",
+      "role": "코드가 설명할 수 없는 결정의 단일 출처"
+    },
+    {
+      "id": "snapshots",
+      "label": "docs/snapshots/",
+      "kind": "snapshots",
+      "path": "docs/snapshots/",
+      "role": "날짜별 산출물·리뷰·플랜·런북 (라이브 아님)"
+    },
+    {
+      "id": "templates",
+      "label": "docs/templates/",
+      "kind": "templates",
+      "path": "docs/templates/",
+      "role": "HANDOFF/TODO/ADR/STACK/SPRINTS 템플릿"
+    },
+    {
+      "id": "prompts",
+      "label": "docs/prompts/",
+      "kind": "prompts",
+      "path": "docs/prompts/",
+      "role": "킥오프·재기획 등 프롬프트 카탈로그"
+    },
+
+    { "id": "g00", "label": "00 운영 원칙",      "kind": "guide", "path": "docs/archive/planning-guides/00_AI_기획_프로젝트_운영_원칙.md", "role": "최상위 철학·원칙·frontmatter 표준 (root)" },
+    { "id": "g01", "label": "01 오케스트레이션", "kind": "guide", "path": "docs/archive/planning-guides/01_AI_기획_오케스트레이션_지침서.md", "role": "요청을 어느 문서로 라우팅할지 결정" },
+    { "id": "g10", "label": "10 사업기획서",     "kind": "guide", "path": "docs/archive/planning-guides/10_사업기획서_작성_지침.md", "role": "시장·BM·재무·로드맵 단일 출처" },
+    { "id": "g11", "label": "11 서비스기획서",   "kind": "guide", "path": "docs/archive/planning-guides/11_서비스기획서_작성_지침.md", "role": "사용자 시나리오·IA·기능·정책 단일 출처" },
+    { "id": "g12", "label": "12 운영기획서",     "kind": "guide", "path": "docs/archive/planning-guides/12_운영기획서_작성_지침.md", "role": "운영 절차·CS·관리자 도구 단일 출처" },
+    { "id": "g13", "label": "13 마케팅기획서",   "kind": "guide", "path": "docs/archive/planning-guides/13_마케팅기획서_작성_지침.md", "role": "타깃·퍼널·채널·캠페인 단일 출처" },
+    { "id": "g14", "label": "14 브랜드기획서",   "kind": "guide", "path": "docs/archive/planning-guides/14_브랜드기획서_작성_지침.md", "role": "정체성·메시지·톤·비주얼 단일 출처" },
+    { "id": "g15", "label": "15 PM기획서",       "kind": "guide", "path": "docs/archive/planning-guides/15_프로젝트_관리_기획서_작성_지침.md", "role": "일정·리스크·Eval 포트폴리오·게이트 카탈로그" },
+    { "id": "g16", "label": "16 AI 기능 기획서", "kind": "guide-ai", "path": "docs/archive/planning-guides/16_AI_기능_기획서_작성_지침.md", "role": "AI 기능 단위의 입출력·평가·가드·fallback 원본" },
+    { "id": "g17", "label": "17 평가·가드레일", "kind": "guide-ai", "path": "docs/archive/planning-guides/17_평가_및_가드레일_지침.md", "role": "평가·가드의 조직 표준 카탈로그" }
+  ],
+
+  "edges": [
+    { "from": "claude-md",  "to": "handoff",   "kind": "boots", "label": "기본 부트 컨텍스트" },
+    { "from": "claude-md",  "to": "todo",      "kind": "loads-on-demand" },
+    { "from": "claude-md",  "to": "adr",       "kind": "loads-on-demand" },
+    { "from": "handoff",    "to": "todo",      "kind": "references" },
+    { "from": "todo",       "to": "snapshots", "kind": "archives-to" },
+
+    { "from": "g00", "to": "g01", "kind": "parent-of" },
+    { "from": "g01", "to": "g10", "kind": "routes-to" },
+    { "from": "g01", "to": "g11", "kind": "routes-to" },
+    { "from": "g01", "to": "g12", "kind": "routes-to" },
+    { "from": "g01", "to": "g13", "kind": "routes-to" },
+    { "from": "g01", "to": "g14", "kind": "routes-to" },
+    { "from": "g01", "to": "g15", "kind": "routes-to" },
+    { "from": "g11", "to": "g16", "kind": "child-when-ai", "label": "AI 기능이 있을 때만" },
+    { "from": "g16", "to": "g17", "kind": "applies-standard" },
+    { "from": "g15", "to": "g17", "kind": "tracks-portfolio" },
+
+    { "from": "g10", "to": "adr",       "kind": "decisions-go-to" },
+    { "from": "g11", "to": "adr",       "kind": "decisions-go-to" },
+    { "from": "g15", "to": "todo",      "kind": "schedules-via" },
+    { "from": "g15", "to": "snapshots", "kind": "snapshots-via" }
+  ],
+
+  "lifecycle": {
+    "description": "기획-개발 라이프사이클 — 입력에서 환류까지의 단일 사이클. 환류 시점에서 다시 시작 가능.",
+    "stages": [
+      {
+        "id": "L1",
+        "label": "브리프 & 프롬프트",
+        "produces": ["docs/prompts/kickoff.md", "user-brief.md"],
+        "guides": ["g00"],
+        "next": "L2",
+        "is_entry": true,
+        "human_gate": false
+      },
+      {
+        "id": "L2",
+        "label": "기획서 작성",
+        "produces": ["g10", "g11", "g14", "g13", "g12", "g15", "g16", "g17"],
+        "guides": ["g01", "g10", "g11", "g12", "g13", "g14", "g15", "g16", "g17"],
+        "next": "L3",
+        "human_gate": "Planning → Dev Spec"
+      },
+      {
+        "id": "L3",
+        "label": "프로젝트 세팅",
+        "produces": ["CLAUDE.md", "HANDOFF.md", "TODO.md", "STACK.md"],
+        "guides": ["g00"],
+        "next": "L4",
+        "human_gate": false
+      },
+      {
+        "id": "L4",
+        "label": "개발 마스터 플랜",
+        "produces": ["docs/snapshots/dev-master-plan-YYYY-MM-DD.md"],
+        "guides": ["g15"],
+        "next": "L5",
+        "human_gate": "Dev Spec → Build (master plan)"
+      },
+      {
+        "id": "L5",
+        "label": "개발 명세 & 스프린트",
+        "produces": ["docs/templates/SPRINTS.md", "TODO.md (Ready/InProgress)"],
+        "guides": ["g15", "g16"],
+        "next": "L6",
+        "human_gate": "Dev Spec → Build (sprint)"
+      },
+      {
+        "id": "L6",
+        "label": "개발",
+        "produces": ["code", "tests", "PR", "ADR (B/C 변경 시)"],
+        "guides": ["g00"],
+        "next": "L7",
+        "human_gate": false
+      },
+      {
+        "id": "L7",
+        "label": "환류 / 신규 입력",
+        "produces": ["snapshots/feedback-YYYY-MM-DD.md", "신규 브리프(선택)"],
+        "guides": ["g15", "g17"],
+        "next": "L8",
+        "human_gate": "Build → Feedback"
+      },
+      {
+        "id": "L8",
+        "label": "기획 업데이트",
+        "produces": ["g10..g17 부분 갱신"],
+        "guides": ["g01"],
+        "next": "L9",
+        "human_gate": false
+      },
+      {
+        "id": "L9",
+        "label": "명세·스프린트 업데이트",
+        "produces": ["TODO.md (재배치)", "SPRINTS.md (다음 스프린트)"],
+        "guides": ["g15"],
+        "next": "L6",
+        "human_gate": "Feedback → Next Sprint",
+        "loops_to": "L6"
+      }
+    ]
+  },
+
+  "kinds": {
+    "root-doc":          { "color": "#0F172A", "shape": "rect" },
+    "live-state":        { "color": "#2563EB", "shape": "rect" },
+    "live-state-optional":{ "color": "#60A5FA", "shape": "rect" },
+    "decisions":         { "color": "#7C3AED", "shape": "folder" },
+    "snapshots":         { "color": "#9CA3AF", "shape": "folder" },
+    "templates":         { "color": "#64748B", "shape": "folder" },
+    "prompts":           { "color": "#0EA5E9", "shape": "folder" },
+    "guide":             { "color": "#059669", "shape": "round" },
+    "guide-ai":          { "color": "#DC2626", "shape": "round" }
+  }
+}
