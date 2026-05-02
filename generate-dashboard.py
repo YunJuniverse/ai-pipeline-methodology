@@ -259,7 +259,31 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 .tbar.done{background:var(--accent2);opacity:.7}
 .tbar.planned{background:var(--violet)} .tbar.cancelled{background:var(--danger);opacity:.5}
 .tbar.active{background:var(--warn);color:#0B1220}
+.graph-layout{display:grid;grid-template-columns:1fr 320px;gap:12px}
+@media(max-width:900px){ .graph-layout{grid-template-columns:1fr} }
 #graph{width:100%;height:640px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+.graph-detail{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;
+  max-height:640px;overflow-y:auto;font-size:13px}
+.graph-detail h4{margin:0 0 4px;font-size:15px;color:var(--text)}
+.graph-detail .kind-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
+  font-weight:600;color:#0B1220;margin-bottom:8px}
+.graph-detail code{background:var(--panel);padding:2px 6px;border-radius:4px;font-size:11px;color:#CBD5E1}
+.graph-detail .role{margin:8px 0;color:var(--text);line-height:1.6}
+.graph-detail .conn{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.graph-detail .conn h5{margin:0 0 6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.graph-detail .conn ul{margin:0;padding-left:16px}
+.graph-detail .conn li{margin-bottom:3px;color:var(--text)}
+.graph-detail .conn li .edge-kind{color:var(--muted);font-size:11px}
+.role-table{width:100%;border-collapse:collapse;font-size:12px}
+.role-table th,.role-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.role-table th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;background:var(--panel2)}
+.role-table tr:hover td{background:var(--panel2)}
+.role-table .label{font-weight:600;color:var(--text);white-space:nowrap}
+.role-table .path{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#94A3B8}
+.role-table .role-cell{color:var(--text);max-width:520px}
+.node-circle{cursor:pointer;transition:stroke-width .15s}
+.node-circle:hover{stroke-width:4}
+.node-circle.selected{stroke:#FBBF24;stroke-width:4}
 #flow{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:20px}
 .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .guide-grid pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;
@@ -298,9 +322,18 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 <section class="page" id="page-graph">
   <div class="card">
     <h3>방법론 폴더·문서 관계 그래프</h3>
-    <div class="muted" style="margin-bottom:8px">노드를 드래그해서 정렬할 수 있습니다. 색상은 문서 유형을 나타냅니다.</div>
-    <svg id="graph"></svg>
+    <div class="muted" style="margin-bottom:8px">노드를 클릭하면 오른쪽 패널에 역할이 나옵니다. 드래그로 정렬 가능.</div>
+    <div class="graph-layout">
+      <svg id="graph"></svg>
+      <aside id="graph-detail" class="graph-detail">
+        <div class="muted">노드를 클릭하면 여기에 역할·경로·연결이 표시됩니다.</div>
+      </aside>
+    </div>
     <div class="legend" id="graph-legend"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>전체 문서·폴더 역할 목록</h3>
+    <div id="role-table"></div>
   </div>
 </section>
 
@@ -440,10 +473,12 @@ function renderGraph(){
       .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; })
       .on('end',   (e,d) => { if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
 
-  node.append('circle').attr('r',16).attr('fill', d => kinds[d.kind]?.color || '#64748B')
-    .attr('stroke','#0B0F1A').attr('stroke-width',2);
+  node.append('circle').attr('class','node-circle').attr('r',16)
+    .attr('fill', d => kinds[d.kind]?.color || '#64748B')
+    .attr('stroke','#0B0F1A').attr('stroke-width',2)
+    .on('click', (e, d) => { e.stopPropagation(); selectNode(d); });
   node.append('text').attr('dy',32).attr('text-anchor','middle').attr('fill','#E5E7EB')
-    .attr('font-size',11).text(d => d.label);
+    .attr('font-size',11).text(d => d.label).style('pointer-events','none');
   node.append('title').text(d => `${d.label}\n${d.path||''}\n\n${d.role||''}`);
 
   sim.on('tick', () => {
@@ -453,7 +488,62 @@ function renderGraph(){
 
   document.getElementById('graph-legend').innerHTML = Object.entries(kinds)
     .map(([k,v]) => `<span><span class="dot" style="background:${v.color}"></span>${k}</span>`).join('');
+
+  // 클릭 시 상세 패널 갱신 + 선택 표시
+  function selectNode(d){
+    svg.selectAll('.node-circle').classed('selected', n => n.id === d.id);
+    const incoming = (DATA.graph.edges||[]).filter(e => e.to === d.id);
+    const outgoing = (DATA.graph.edges||[]).filter(e => e.from === d.id);
+    const labelOf = id => (DATA.graph.nodes.find(n => n.id===id)||{}).label || id;
+    const kindMeta = kinds[d.kind] || {};
+    const html = `
+      <span class="kind-tag" style="background:${kindMeta.color||'#64748B'}">${d.kind}</span>
+      <h4>${escapeHtml(d.label)}</h4>
+      ${d.path ? `<code>${escapeHtml(d.path)}</code>` : ''}
+      <div class="role">${escapeHtml(d.role||'(역할 미정)')}</div>
+      ${outgoing.length ? `<div class="conn"><h5>→ 연결 (out)</h5><ul>${
+        outgoing.map(e => `<li>${escapeHtml(labelOf(e.to))} <span class="edge-kind">· ${e.kind}${e.label?' · '+escapeHtml(e.label):''}</span></li>`).join('')
+      }</ul></div>` : ''}
+      ${incoming.length ? `<div class="conn"><h5>← 연결 (in)</h5><ul>${
+        incoming.map(e => `<li>${escapeHtml(labelOf(e.from))} <span class="edge-kind">· ${e.kind}${e.label?' · '+escapeHtml(e.label):''}</span></li>`).join('')
+      }</ul></div>` : ''}
+    `;
+    document.getElementById('graph-detail').innerHTML = html;
+  }
+
+  // 첫 노드 자동 선택
+  if(nodes.length) selectNode(nodes[0]);
 }
+
+// ── 역할 테이블 (그래프 탭 하단)
+function renderRoleTable(){
+  const nodes = DATA.graph.nodes || [];
+  const kinds = DATA.graph.kinds || {};
+  const groupOrder = ['root-doc','live-state','live-state-optional','decisions','snapshots','templates','prompts','guide','guide-ai'];
+  const groupLabels = {
+    'root-doc':'루트 문서','live-state':'라이브 상태','live-state-optional':'선택적 라이브 상태',
+    'decisions':'결정 기록','snapshots':'스냅샷','templates':'템플릿','prompts':'프롬프트',
+    'guide':'기획 지침서','guide-ai':'AI 보조 지침서'
+  };
+  const grouped = {};
+  nodes.forEach(n => { (grouped[n.kind] = grouped[n.kind]||[]).push(n); });
+  let html = '<table class="role-table"><thead><tr><th style="width:80px">유형</th><th style="width:160px">문서/폴더</th><th style="width:280px">경로</th><th>역할</th></tr></thead><tbody>';
+  groupOrder.forEach(k => {
+    if(!grouped[k]) return;
+    const color = kinds[k]?.color || '#64748B';
+    grouped[k].forEach((n, i) => {
+      html += `<tr>
+        ${i===0 ? `<td rowspan="${grouped[k].length}"><span class="kind-tag" style="background:${color}">${groupLabels[k]||k}</span></td>` : ''}
+        <td class="label">${escapeHtml(n.label)}</td>
+        <td class="path">${escapeHtml(n.path||'—')}</td>
+        <td class="role-cell">${escapeHtml(n.role||'')}</td>
+      </tr>`;
+    });
+  });
+  html += '</tbody></table>';
+  document.getElementById('role-table').innerHTML = html;
+}
+renderRoleTable();
 
 // ── 타임라인
 function parseDate(s){ if(!s) return null; const m = s.match(/(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2]-1, +m[3]) : null; }
