@@ -78,11 +78,12 @@ my-project/
 ├── AGENTS.md
 ├── HANDOFF.md
 ├── TODO.md
+├── briefs/                    ← 사람이 만든 기획 파일 (아이디어 노트, PDF 등)
 ├── .github/
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── docs/
 │   ├── adr/
-│   └── snapshots/
+│   └── snapshots/             ← plan-*.md, dev-spec-*.md 등 생성됨
 ├── src/        # fullstack만
 └── tests/      # fullstack만
 ```
@@ -95,9 +96,10 @@ my-project/
 | `AGENTS.md` | Codex용 미러 |
 | `HANDOFF.md` | 지금 무엇을 하고 있는지, 다음 무엇을 해야 하는지 |
 | `TODO.md` | backlog와 acceptance criteria |
+| `briefs/` | 사람이 제공하는 원본 기획 자료 (AI가 수정하지 않음) |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR 근거, 테스트, 승인 증거 체크 |
 | `docs/adr/` | 결정 이유 |
-| `docs/snapshots/` | 필요할 때만 생성하는 문서 |
+| `docs/snapshots/` | plan, dev-spec 등 날짜가 찍힌 산출물 |
 
 ---
 
@@ -170,6 +172,17 @@ bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 첫 세션에서는 [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)를 사용하면 된다.
 적용 절차는 [HOW_TO_APPLY.md](HOW_TO_APPLY.md)에 정리되어 있다.
 
+### Dashboard
+
+프로젝트 루트에서 실행하면 `dashboard.html` 한 파일이 생성된다.
+
+```bash
+python3 generate-dashboard.py
+open dashboard.html
+```
+
+포함 내용: 현재 상태(HANDOFF) · 백로그(TODO) · 다이어그램 · Snapshots · ADR · Briefs
+
 ---
 
 ## Repository Map
@@ -182,7 +195,10 @@ bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 - [docs/templates/HANDOFF.md](docs/templates/HANDOFF.md)
 - [docs/templates/TODO.md](docs/templates/TODO.md)
 - [docs/templates/ADR-template.md](docs/templates/ADR-template.md)
-- [docs/prompts/](docs/prompts)
+- [docs/prompts/plan.md](docs/prompts/plan.md) — 브리프 → 기획서
+- [docs/prompts/dev-spec.md](docs/prompts/dev-spec.md) — 기획서 → 개발명세서
+- [docs/prompts/](docs/prompts) — 기타 snapshot 프롬프트
+- [generate-dashboard.py](generate-dashboard.py) — 프로젝트 대시보드 생성기
 
 레거시 및 보관 자료는 아래에 보존했다.
 
