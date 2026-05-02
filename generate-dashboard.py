@@ -322,7 +322,11 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 <section class="page" id="page-graph">
   <div class="card">
     <h3>방법론 폴더·문서 관계 그래프</h3>
-    <div class="muted" style="margin-bottom:8px">노드를 클릭하면 오른쪽 패널에 역할이 나옵니다. 드래그로 정렬 가능.</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn active" data-layout="hierarchy">계층 (상하위)</button>
+      <button class="btn" data-layout="force">자유 (force)</button>
+      <span class="muted" style="margin-left:8px">노드 클릭 → 오른쪽 패널에 역할 표시</span>
+    </div>
     <div class="graph-layout">
       <svg id="graph"></svg>
       <aside id="graph-detail" class="graph-detail">
@@ -441,13 +445,17 @@ function renderFlow(){
 }
 renderFlow();
 
-// ── 관계 그래프
-let graphRendered = false;
-function renderGraph(){
-  if(graphRendered) return; graphRendered = true;
+// ── 관계 그래프 (계층 / 자유 토글)
+let graphState = { rendered:false, layout:'hierarchy', selectedId:null };
+
+function renderGraph(layout){
+  layout = layout || graphState.layout || 'hierarchy';
+  graphState.layout = layout;
+
   const nodes = (DATA.graph.nodes||[]).map(n => ({...n}));
   const links = (DATA.graph.edges||[]).map(e => ({source:e.from, target:e.to, kind:e.kind, label:e.label}));
   const kinds = DATA.graph.kinds || {};
+  const tiers = DATA.graph.tiers || [];
 
   const svg = d3.select('#graph');
   const w = svg.node().clientWidth, h = 640;
@@ -457,47 +465,110 @@ function renderGraph(){
     .attr('refX',18).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
     .append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#475569');
 
-  const sim = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d=>d.id).distance(110).strength(0.6))
-    .force('charge', d3.forceManyBody().strength(-360))
-    .force('center', d3.forceCenter(w/2, h/2))
-    .force('collide', d3.forceCollide(38));
+  let sim = null;
 
-  const link = svg.append('g').selectAll('line').data(links).enter().append('line')
-    .attr('stroke','#475569').attr('stroke-opacity',.6).attr('stroke-width',1.2)
+  if(layout === 'hierarchy'){
+    // 계층 배치: tier별 행으로 묶고, 각 행 내에서 균등 분포
+    const byTier = {};
+    nodes.forEach(n => {
+      const t = (n.tier == null) ? 99 : n.tier;
+      (byTier[t] = byTier[t] || []).push(n);
+    });
+    const tierKeys = Object.keys(byTier).map(Number).sort((a,b)=>a-b);
+    const rowGap = (h - 80) / Math.max(1, tierKeys.length - 1);
+    tierKeys.forEach((t, ti) => {
+      const row = byTier[t];
+      const colGap = (w - 100) / Math.max(1, row.length);
+      row.forEach((n, i) => {
+        n.x = 50 + colGap * (i + 0.5);
+        n.y = 40 + rowGap * ti;
+        n.fx = n.x; n.fy = n.y;
+      });
+    });
+
+    // tier 라벨 (좌측)
+    const tierMap = Object.fromEntries(tiers.map(t => [t.id, t.label]));
+    svg.append('g').selectAll('text.tier-label').data(tierKeys).enter()
+      .append('text').attr('class','tier-label')
+      .attr('x', 12).attr('y', t => 40 + rowGap * tierKeys.indexOf(t) + 5)
+      .attr('fill','#94A3B8').attr('font-size',11).attr('font-weight',600)
+      .text(t => `T${t} · ${tierMap[t] || ''}`);
+
+    // 가로 가이드라인
+    svg.append('g').selectAll('line.tier-line').data(tierKeys).enter()
+      .append('line').attr('class','tier-line')
+      .attr('x1', 0).attr('x2', w).attr('y1', t => 40 + rowGap * tierKeys.indexOf(t))
+      .attr('y2', t => 40 + rowGap * tierKeys.indexOf(t))
+      .attr('stroke','#1F2937').attr('stroke-dasharray','2 4');
+  } else {
+    // 자유 force 시뮬레이션
+    sim = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id(d=>d.id).distance(110).strength(0.6))
+      .force('charge', d3.forceManyBody().strength(-360))
+      .force('center', d3.forceCenter(w/2, h/2))
+      .force('collide', d3.forceCollide(38));
+  }
+
+  // 엣지: 계층 모드에서는 곡선(베지어), 자유 모드에서는 직선
+  const link = svg.append('g').selectAll('path').data(links).enter().append('path')
+    .attr('stroke','#475569').attr('stroke-opacity',.55).attr('stroke-width',1.2).attr('fill','none')
     .attr('marker-end','url(#garr)');
+
+  function tickLinks(){
+    link.attr('d', d => {
+      const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y;
+      if(layout === 'hierarchy'){
+        const my = (sy + ty) / 2;
+        return `M${sx},${sy} C${sx},${my} ${tx},${my} ${tx},${ty}`;
+      }
+      return `M${sx},${sy} L${tx},${ty}`;
+    });
+  }
+
+  // 자유 모드는 source/target이 객체로 치환되는 시점 차이가 있어서 별도 처리
+  if(layout !== 'hierarchy'){
+    // links의 source/target 문자열을 객체 참조로 교체 (force가 알아서 해줌)
+  } else {
+    // 계층 모드는 source/target이 여전히 문자열이므로 노드 매핑
+    const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+    links.forEach(l => { l.source = nodeById[l.source] || l.source; l.target = nodeById[l.target] || l.target; });
+    tickLinks();
+  }
 
   const node = svg.append('g').selectAll('g').data(nodes).enter().append('g')
     .call(d3.drag()
-      .on('start', (e,d) => { if(!e.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
-      .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; })
-      .on('end',   (e,d) => { if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+      .on('start', (e,d) => { if(sim){ if(!e.active) sim.alphaTarget(.3).restart(); } d.fx=d.x; d.fy=d.y; })
+      .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; if(layout==='hierarchy'){ d.x=e.x; d.y=e.y; node.attr('transform', n=>`translate(${n.x},${n.y})`); tickLinks(); } })
+      .on('end',   (e,d) => { if(sim && !e.active) sim.alphaTarget(0); /* keep fx,fy in hierarchy mode */ }));
 
-  node.append('circle').attr('class','node-circle').attr('r',16)
+  node.append('circle').attr('class','node-circle').attr('r',18)
     .attr('fill', d => kinds[d.kind]?.color || '#64748B')
     .attr('stroke','#0B0F1A').attr('stroke-width',2)
     .on('click', (e, d) => { e.stopPropagation(); selectNode(d); });
-  node.append('text').attr('dy',32).attr('text-anchor','middle').attr('fill','#E5E7EB')
+  node.append('text').attr('dy',34).attr('text-anchor','middle').attr('fill','#E5E7EB')
     .attr('font-size',11).text(d => d.label).style('pointer-events','none');
   node.append('title').text(d => `${d.label}\n${d.path||''}\n\n${d.role||''}`);
 
-  sim.on('tick', () => {
-    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+  if(sim){
+    sim.on('tick', () => { tickLinks(); node.attr('transform', d=>`translate(${d.x},${d.y})`); });
+  } else {
     node.attr('transform', d=>`translate(${d.x},${d.y})`);
-  });
+  }
 
   document.getElementById('graph-legend').innerHTML = Object.entries(kinds)
     .map(([k,v]) => `<span><span class="dot" style="background:${v.color}"></span>${k}</span>`).join('');
 
-  // 클릭 시 상세 패널 갱신 + 선택 표시
   function selectNode(d){
+    graphState.selectedId = d.id;
     svg.selectAll('.node-circle').classed('selected', n => n.id === d.id);
     const incoming = (DATA.graph.edges||[]).filter(e => e.to === d.id);
     const outgoing = (DATA.graph.edges||[]).filter(e => e.from === d.id);
     const labelOf = id => (DATA.graph.nodes.find(n => n.id===id)||{}).label || id;
     const kindMeta = kinds[d.kind] || {};
+    const tierLabel = tiers.find(t => t.id === d.tier)?.label;
     const html = `
       <span class="kind-tag" style="background:${kindMeta.color||'#64748B'}">${d.kind}</span>
+      ${tierLabel ? `<span class="kind-tag" style="background:#334155;color:#E5E7EB;margin-left:4px">T${d.tier} · ${escapeHtml(tierLabel)}</span>` : ''}
       <h4>${escapeHtml(d.label)}</h4>
       ${d.path ? `<code>${escapeHtml(d.path)}</code>` : ''}
       <div class="role">${escapeHtml(d.role||'(역할 미정)')}</div>
@@ -511,9 +582,17 @@ function renderGraph(){
     document.getElementById('graph-detail').innerHTML = html;
   }
 
-  // 첫 노드 자동 선택
-  if(nodes.length) selectNode(nodes[0]);
+  const initId = graphState.selectedId || (nodes[0] && nodes[0].id);
+  const initNode = nodes.find(n => n.id === initId);
+  if(initNode) selectNode(initNode);
+  graphState.rendered = true;
 }
+
+document.querySelectorAll('[data-layout]').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('[data-layout]').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderGraph(btn.dataset.layout);
+}));
 
 // ── 역할 테이블 (그래프 탭 하단)
 function renderRoleTable(){
