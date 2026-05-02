@@ -64,6 +64,13 @@
       "path": "docs/archive/planning-guides/17_평가_및_가드레일_지침.md",
       "role": "평가·가드의 조직 표준 카탈로그" },
 
+    { "id": "g18", "label": "18 마스터플랜", "kind": "guide-build", "tier": 5,
+      "path": "docs/archive/planning-guides/18_개발_마스터_플랜_작성_지침.md",
+      "role": "기획서를 빌드 순서로 정렬·MVP 확정·페이즈 게이트·B/C 트리거 사전 매핑" },
+
+    { "id": "master-plan", "label": "MASTER_PLAN.md", "kind": "live-state", "tier": 1, "path": "MASTER_PLAN.md",
+      "role": "프로젝트당 1개의 살아있는 마스터플랜 — 페이즈·MVP·게이트의 단일 출처" },
+
     { "id": "adr", "label": "docs/adr/", "kind": "decisions", "tier": 6, "path": "docs/adr/",
       "role": "코드가 설명할 수 없는 결정의 단일 출처" },
     { "id": "snapshots", "label": "docs/snapshots/", "kind": "snapshots", "tier": 6, "path": "docs/snapshots/",
@@ -97,7 +104,15 @@
     { "from": "g15", "to": "todo",      "kind": "schedules-via" },
     { "from": "g15", "to": "snapshots", "kind": "snapshots-via" },
 
-    { "from": "prompts", "to": "g00", "kind": "kicks-off" }
+    { "from": "prompts", "to": "g00", "kind": "kicks-off" },
+
+    { "from": "g11", "to": "g18", "kind": "sequences" },
+    { "from": "g15", "to": "g18", "kind": "gate-catalog-applied-by" },
+    { "from": "g16", "to": "g18", "kind": "phased-by" },
+    { "from": "g18", "to": "master-plan", "kind": "instantiated-as" },
+    { "from": "master-plan", "to": "todo", "kind": "drives-sprints-of" },
+    { "from": "master-plan", "to": "adr", "kind": "decisions-go-to" },
+    { "from": "templates", "to": "master-plan", "kind": "templates-for" }
   ],
 
   "lifecycle": {
@@ -106,7 +121,7 @@
       { "id": "L1", "label": "브리프 & 프롬프트", "produces": ["docs/prompts/kickoff.md", "user-brief.md"], "guides": ["g00"], "next": "L2", "is_entry": true, "human_gate": false },
       { "id": "L2", "label": "기획서 작성", "produces": ["g10", "g11", "g14", "g13", "g12", "g15", "g16", "g17"], "guides": ["g01", "g10", "g11", "g12", "g13", "g14", "g15", "g16", "g17"], "next": "L3", "human_gate": "Planning → Dev Spec" },
       { "id": "L3", "label": "프로젝트 세팅", "produces": ["CLAUDE.md", "HANDOFF.md", "TODO.md", "STACK.md"], "guides": ["g00"], "next": "L4", "human_gate": false },
-      { "id": "L4", "label": "개발 마스터 플랜", "produces": ["docs/snapshots/dev-master-plan-YYYY-MM-DD.md"], "guides": ["g15"], "next": "L5", "human_gate": "Dev Spec → Build (master plan)" },
+      { "id": "L4", "label": "개발 마스터 플랜", "produces": ["MASTER_PLAN.md"], "guides": ["g15", "g18"], "next": "L5", "human_gate": "master-plan-approval" },
       { "id": "L5", "label": "개발 명세 & 스프린트", "produces": ["docs/templates/SPRINTS.md", "TODO.md (Ready/InProgress)"], "guides": ["g15", "g16"], "next": "L6", "human_gate": "Dev Spec → Build (sprint)" },
       { "id": "L6", "label": "개발", "produces": ["code", "tests", "PR", "ADR (B/C 변경 시)"], "guides": ["g00"], "next": "L7", "human_gate": false },
       { "id": "L7", "label": "환류 / 신규 입력", "produces": ["snapshots/feedback-YYYY-MM-DD.md", "신규 브리프(선택)"], "guides": ["g15", "g17"], "next": "L8", "human_gate": "Build → Feedback" },
@@ -124,6 +139,7 @@
     "templates":          { "color": "#64748B", "shape": "folder" },
     "prompts":            { "color": "#0EA5E9", "shape": "folder" },
     "guide":              { "color": "#059669", "shape": "round" },
-    "guide-ai":           { "color": "#DC2626", "shape": "round" }
+    "guide-ai":           { "color": "#DC2626", "shape": "round" },
+    "guide-build":        { "color": "#F59E0B", "shape": "round" }
   }
 }
