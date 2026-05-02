@@ -600,12 +600,26 @@ def main() -> int:
         import socketserver
         os.chdir(out.parent)
         handler = http.server.SimpleHTTPRequestHandler
-        with socketserver.TCPServer(("", args.port), handler) as httpd:
-            print(f"[serve] http://localhost:{args.port}/{out.name}", file=sys.stderr)
+
+        class Server(socketserver.TCPServer):
+            allow_reuse_address = True
+
+        port = args.port
+        for attempt in range(20):
             try:
-                httpd.serve_forever()
-            except KeyboardInterrupt:
-                print("\n[stop]", file=sys.stderr)
+                with Server(("", port), handler) as httpd:
+                    print(f"[serve] http://localhost:{port}/{out.name}", file=sys.stderr)
+                    try:
+                        httpd.serve_forever()
+                    except KeyboardInterrupt:
+                        print("\n[stop]", file=sys.stderr)
+                    break
+            except OSError as e:
+                if e.errno == 48:  # Address already in use
+                    print(f"[warn] port {port} busy, trying {port+1}", file=sys.stderr)
+                    port += 1
+                    continue
+                raise
 
     return 0
 
