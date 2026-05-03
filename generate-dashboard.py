@@ -181,6 +181,12 @@ def assemble(root: Path) -> dict[str, Any]:
         if not handoff_path.exists():
             handoff_path = cand
 
+    # MASTER_PLAN: 30_dev → root → 40_resources/templates
+    master_plan_path = root / "30_dev" / "MASTER_PLAN.md"
+    for cand in [root / "MASTER_PLAN.md", root / "40_resources" / "templates" / "MASTER_PLAN.md"]:
+        if not master_plan_path.exists():
+            master_plan_path = cand
+
     claude_path = root / "CLAUDE.md"
     # README: 새 구조 → 구 구조 fallback
     readme_path = root / "10_guides" / "README.md"
@@ -236,6 +242,8 @@ def assemble(root: Path) -> dict[str, Any]:
         "kanban": kanban,
         "sprints": sprints_json,
         "node_contents": node_contents,
+        "master_plan_text": read_text_safe(master_plan_path, 50000),
+        "master_plan_path": str(master_plan_path.relative_to(root)) if master_plan_path.exists() else "",
         "guide_excerpts": {
             "claude_md": read_text_safe(claude_path, 4000),
             "handoff_md": read_text_safe(handoff_path, 3000),
@@ -350,6 +358,38 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 .content-dir-list .dir-icon{color:#F59E0B;margin-right:6px}
 .content-dir-list .file-icon{color:#94A3B8;margin-right:6px}
 .content-dir-list .file-size{color:#64748B;font-size:11px;float:right}
+.mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;margin-top:12px}
+.mp-card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;
+  max-height:340px;overflow-y:auto}
+.mp-card h4{margin:0 0 10px;font-size:13px;color:var(--accent);font-weight:600;
+  padding-bottom:6px;border-bottom:1px solid var(--line)}
+.mp-card .mp-content{font-size:12px;line-height:1.65;color:#CBD5E1}
+.mp-card .mp-content p{margin:4px 0}
+.mp-card .mp-content ul,.mp-card .mp-content ol{padding-left:18px;margin:4px 0}
+.mp-card .mp-content table{border-collapse:collapse;font-size:11px;width:100%;margin:6px 0}
+.mp-card .mp-content th,.mp-card .mp-content td{border:1px solid var(--line);padding:3px 6px;text-align:left}
+.mp-card .mp-content th{background:var(--panel);color:#E5E7EB}
+.mp-card .mp-content code{background:var(--panel);color:#FCD34D;padding:1px 4px;border-radius:3px;font-size:11px}
+.mp-card .mp-content h2,.mp-card .mp-content h3{font-size:13px;color:#E5E7EB;margin:8px 0 4px}
+.mp-card.empty{opacity:.5}
+.mp-card.empty .mp-content::after{content:"(아직 내용 없음 — TODO)";color:#64748B;font-style:italic}
+.sprint-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.sprint-table th,.sprint-table td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+.sprint-table th{background:var(--panel2);color:#94A3B8;font-weight:500;text-transform:uppercase;
+  letter-spacing:.04em;font-size:11px;white-space:nowrap}
+.sprint-table tr:hover td{background:var(--panel2)}
+.sprint-table .s-id{font-weight:600;color:var(--text);white-space:nowrap}
+.sprint-table .s-status{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;
+  display:inline-block;text-transform:uppercase}
+.sprint-table .s-status.planned{background:#A78BFA;color:#0B1220}
+.sprint-table .s-status.active{background:#F59E0B;color:#0B1220}
+.sprint-table .s-status.done{background:#34D399;color:#0B1220}
+.sprint-table .s-status.cancelled{background:#EF4444;color:#FFF}
+.sprint-table .s-goals{margin:0;padding:0;list-style:none}
+.sprint-table .s-goals li{font-size:11px;color:#CBD5E1;line-height:1.5}
+.sprint-table .s-goals li.done{color:#64748B;text-decoration:line-through}
+.sprint-table .s-goals li::before{content:"☐ ";color:#64748B}
+.sprint-table .s-goals li.done::before{content:"☑ ";color:#34D399}
 #flow{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:20px}
 .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .guide-grid pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;
@@ -370,6 +410,7 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
   <div class="tab" data-page="graph">관계 그래프</div>
   <div class="tab" data-page="timeline">타임라인</div>
   <div class="tab" data-page="kanban">칸반보드</div>
+  <div class="tab" data-page="exec">통합 뷰</div>
 </nav>
 
 <section class="page active" id="page-guide">
@@ -436,6 +477,26 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 
 <section class="page" id="page-kanban">
   <div class="kanban" id="kanban"></div>
+</section>
+
+<section class="page" id="page-exec">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <h3 style="margin:0">마스터플랜</h3>
+      <span class="muted" id="mp-meta" style="font-size:12px"></span>
+    </div>
+    <div id="mp-sections" class="mp-grid"></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h3>스프린트 (전체)</h3>
+    <div style="overflow-x:auto"><table class="sprint-table" id="sprint-table"></table></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h3>칸반보드</h3>
+    <div class="kanban" id="kanban-exec"></div>
+  </div>
 </section>
 
 <script id="data" type="application/json">__DATA__</script>
@@ -875,6 +936,111 @@ function renderKanban(){
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 renderKanban();
+
+// ── 통합 뷰: 마스터플랜 섹션 카드 + 스프린트 표 + 칸반
+function renderExec(){
+  // 1) 마스터플랜
+  const text = DATA.master_plan_text || '';
+  const meta = document.getElementById('mp-meta');
+  meta.innerHTML = DATA.master_plan_path
+    ? `<code style="background:var(--panel);padding:2px 6px;border-radius:4px">${escapeHtml(DATA.master_plan_path)}</code>`
+    : '<span class="muted">(MASTER_PLAN.md 없음 — 템플릿 사용 중)</span>';
+
+  const sectionsRoot = document.getElementById('mp-sections');
+  sectionsRoot.innerHTML = '';
+  if(!text){
+    sectionsRoot.innerHTML = '<div class="muted">마스터플랜 내용 없음</div>';
+  } else {
+    // ## N 헤더로 분할
+    const lines = text.split('\n');
+    let buf = [], header = '(머리말)', sections = [];
+    function flush(){ if(buf.length || sections.length===0) sections.push({title:header, body:buf.join('\n').trim()}); }
+    for(const line of lines){
+      const m = /^##\s+(.+?)\s*$/.exec(line);
+      if(m){ flush(); header = m[1]; buf = []; }
+      else { buf.push(line); }
+    }
+    flush();
+
+    sections.forEach(s => {
+      // 머리말은 frontmatter라 스킵
+      if(s.title === '(머리말)' && s.body.startsWith('---')) return;
+      const isEmpty = !s.body.replace(/<!--[\s\S]*?-->/g, '').replace(/\s/g, '');
+      const card = document.createElement('div');
+      card.className = 'mp-card' + (isEmpty ? ' empty' : '');
+      let rendered = '';
+      if(window.marked && s.body){
+        try { rendered = marked.parse(s.body); } catch(e){ rendered = `<pre>${escapeHtml(s.body)}</pre>`; }
+      }
+      card.innerHTML = `<h4>${escapeHtml(s.title)}</h4><div class="mp-content">${rendered}</div>`;
+      sectionsRoot.appendChild(card);
+    });
+  }
+
+  // 2) 스프린트 표
+  const tbl = document.getElementById('sprint-table');
+  const sprints = DATA.sprints || [];
+  const headers = ['ID', '제목', '기간', 'cadence', '상태', 'owner', '게이트', '목표 (done/total)', 'TODO IDs', '메모'];
+  let html = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+  if(!sprints.length){
+    html += `<tr><td colspan="${headers.length}" class="muted" style="text-align:center;padding:18px">스프린트 없음</td></tr>`;
+  } else {
+    sprints.forEach(s => {
+      const f = s.fields || {};
+      const status = (f.status || 'planned').toLowerCase();
+      const done = (s.goals || []).filter(g => g[0]).length;
+      const total = (s.goals || []).length;
+      const goalsHtml = (s.goals || []).map(g =>
+        `<li class="${g[0] ? 'done' : ''}">${escapeHtml(g[1])}</li>`
+      ).join('');
+      html += `<tr>
+        <td class="s-id">${escapeHtml(s.id)}</td>
+        <td>${escapeHtml(f.title || '—')}</td>
+        <td style="white-space:nowrap;font-size:11px">${escapeHtml(f.start || '?')} ~ ${escapeHtml(f.end || '?')}</td>
+        <td>${escapeHtml(f.cadence || '—')}</td>
+        <td><span class="s-status ${status}">${escapeHtml(status)}</span></td>
+        <td>${escapeHtml(f.owner || '—')}</td>
+        <td>${escapeHtml(f.gate || '—')}</td>
+        <td>${goalsHtml ? `<ul class="s-goals">${goalsHtml}</ul><div style="font-size:10px;color:#64748B;margin-top:4px">${done}/${total}</div>` : '—'}</td>
+        <td style="font-family:ui-monospace,Menlo,monospace;font-size:11px">${escapeHtml(f['todo-ids'] || '—')}</td>
+        <td style="font-size:11px;color:#94A3B8">${escapeHtml(f.notes || '—')}</td>
+      </tr>`;
+    });
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+
+  // 3) 칸반 (기존 renderKanban과 같은 로직, exec 컨테이너에 다시 그림)
+  const kbExec = document.getElementById('kanban-exec');
+  kbExec.innerHTML = '';
+  const order = ['Backlog','Ready','InProgress','Blocked','Done'];
+  const labels = {Backlog:'백로그', Ready:'대기', InProgress:'진행 중', Blocked:'차단됨', Done:'완료'};
+  order.forEach(sec => {
+    const cards = (DATA.kanban[sec] || []);
+    const col = document.createElement('div'); col.className='col';
+    col.innerHTML = `<h2>${labels[sec]} <span class="count">${cards.length}</span></h2>`;
+    cards.forEach(c => {
+      const div = document.createElement('div'); div.className='card';
+      const cls = (c.fields['change-class']||'').replace(/\s/g,'').toUpperCase();
+      const done = c.criteria.filter(x=>x[0]).length, total = c.criteria.length;
+      div.innerHTML = `
+        <h3 style="font-size:13px">${c.id}${c.fields.title ? ' · '+escapeHtml(c.fields.title) : ''}</h3>
+        <div class="row">
+          ${cls ? `<span class="pill ${cls}">Class ${cls}</span>` : ''}
+          ${c.fields.sprint ? `<span class="pill">${escapeHtml(c.fields.sprint)}</span>` : ''}
+          ${total ? `<span class="pill">${done}/${total}</span>` : ''}
+        </div>`;
+      col.appendChild(div);
+    });
+    kbExec.appendChild(col);
+  });
+}
+
+// 탭 전환 시 그래프와 동일하게 lazy-render
+const _origTabHandler = document.querySelectorAll('.tab');
+_origTabHandler.forEach(t => t.addEventListener('click', () => {
+  if(t.dataset.page === 'exec') renderExec();
+}));
 </script>
 </body>
 </html>
