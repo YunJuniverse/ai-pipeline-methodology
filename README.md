@@ -177,11 +177,41 @@ my-project/
 ```bash
 METHODOLOGY="/Users/hayden/Library/Mobile Documents/iCloud~md~obsidian/Documents/methodology"
 cd ~/Projects
-bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
+python3 "$METHODOLOGY/methodology.py" init my-project --type fullstack
 ```
 
 첫 세션에서는 [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)를 사용하면 된다.
 적용 절차는 [HOW_TO_APPLY.md](HOW_TO_APPLY.md)에 정리되어 있다.
+
+---
+
+## Updating Methodology in Existing Projects
+
+방법론 자체가 갱신되었을 때 (예: v3.0 → v3.1), 이미 적용한 프로젝트는 다음으로 업데이트:
+
+```bash
+cd my-project
+python3 "$METHODOLOGY/methodology.py" status        # 현재 vs 업스트림 비교
+python3 "$METHODOLOGY/methodology.py" sync          # 변경 미리보기 (dry-run)
+python3 "$METHODOLOGY/methodology.py" sync --apply  # 실제 적용
+```
+
+CLI는 파일을 4가지로 분류해 안전하게 갱신한다:
+
+| 클래스 | 예시 | 정책 |
+|--------|------|------|
+| **shared** | `10_guides/`, `40_resources/`, `methodology-graph.json` | sync가 항상 덮어씀 |
+| **managed** | `CLAUDE.md`, `AGENTS.md` | `<!-- methodology:managed:* -->` 마커 사이만 머지 |
+| **init scaffolds** | `20_planning/`, `30_dev/` | init이 1회 생성, sync 무시 |
+| **project-local** | `HANDOFF.md`, `TODO.md`, `30_dev/MASTER_PLAN.md`, ADR/snapshots | 절대 안 건드림 |
+
+**버전 마이그레이션**: `migrations/v<a>_to_<b>.py`가 자동 실행된다 (예: 폴더 구조 변경, 파일 이동).
+프로젝트의 `.methodology-version`이 현재 적용된 버전을 추적한다.
+
+```bash
+python3 methodology.py diff CLAUDE.md   # 단일 파일 변경 미리보기
+python3 methodology.py version          # 메소돌로지 자체 버전 확인
+```
 
 ---
 
@@ -199,6 +229,8 @@ bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 - [40_resources/prompts/](40_resources/prompts/) — 스냅샷 생성 프롬프트
 - [methodology-graph.json](methodology-graph.json) — 폴더·문서 관계 그래프
 - [generate-dashboard.py](generate-dashboard.py) — 4탭 대시보드
+- [methodology.py](methodology.py) — 배포·갱신 CLI (init / sync / status / diff / version)
+- [migrations/](migrations/) — 버전 간 자동 마이그레이션 스크립트
 
 레거시 및 보관 자료:
 

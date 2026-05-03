@@ -17,6 +17,7 @@
 
 ---
 
+<!-- methodology:managed:start id=operating-rules -->
 ## 2. Operating Rules
 
 - Code is the source of truth for implementation details.
@@ -182,3 +183,5 @@ Restrictions:
 ### Commit Types
 
 - `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+
+<!-- methodology:managed:end -->

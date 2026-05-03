@@ -3,3 +3,7 @@
 
 # Generated artifacts
 dashboard.html
+
+# Python cache
+__pycache__/
+*.pyc

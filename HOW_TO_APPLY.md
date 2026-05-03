@@ -20,7 +20,7 @@
 ```bash
 METHODOLOGY="/Users/hayden/Library/Mobile Documents/iCloud~md~obsidian/Documents/methodology"
 cd ~/Projects
-bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
+python3 "$METHODOLOGY/methodology.py" init my-project --type fullstack
 ```
 
 생성 결과:
