@@ -204,12 +204,38 @@ def assemble(root: Path) -> dict[str, Any]:
         {"id": s.id, "fields": s.fields, "goals": s.goals} for s in sprints
     ]
 
+    # 그래프 노드의 path를 따라 실제 파일 내용 로드 (클릭 시 하단 패널에 표시)
+    node_contents = {}
+    for n in graph.get("nodes", []):
+        rel = n.get("path")
+        if not rel:
+            continue
+        p = root / rel
+        if p.is_file():
+            try:
+                txt = p.read_text(encoding="utf-8")
+                node_contents[n["id"]] = {"kind": "file", "text": txt, "size": len(txt)}
+            except Exception as e:
+                node_contents[n["id"]] = {"kind": "error", "text": f"(읽기 실패: {e})"}
+        elif p.is_dir():
+            entries = []
+            for child in sorted(p.iterdir()):
+                entries.append({
+                    "name": child.name,
+                    "is_dir": child.is_dir(),
+                    "size": child.stat().st_size if child.is_file() else None,
+                })
+            node_contents[n["id"]] = {"kind": "dir", "entries": entries, "rel": rel}
+        else:
+            node_contents[n["id"]] = {"kind": "missing", "text": f"(경로 없음: {rel})"}
+
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "root": str(root),
         "graph": graph,
         "kanban": kanban,
         "sprints": sprints_json,
+        "node_contents": node_contents,
         "guide_excerpts": {
             "claude_md": read_text_safe(claude_path, 4000),
             "handoff_md": read_text_safe(handoff_path, 3000),
@@ -227,6 +253,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <title>방법론 대시보드</title>
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <style>
 :root{
   --bg:#0B0F1A; --panel:#111827; --panel2:#0F172A; --line:#1F2937;
@@ -296,6 +323,33 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 .node-circle{cursor:pointer;transition:stroke-width .15s}
 .node-circle:hover{stroke-width:4}
 .node-circle.selected{stroke:#FBBF24;stroke-width:4}
+.content-body{background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+  padding:18px 22px;max-height:560px;overflow-y:auto;font-size:13px;line-height:1.7;color:#CBD5E1}
+.content-body h1{font-size:20px;color:#F1F5F9;margin:8px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.content-body h2{font-size:16px;color:#E2E8F0;margin:18px 0 8px}
+.content-body h3{font-size:14px;color:#CBD5E1;margin:14px 0 6px}
+.content-body h4,.content-body h5{font-size:13px;color:#94A3B8;margin:10px 0 4px}
+.content-body p{margin:6px 0}
+.content-body ul,.content-body ol{margin:6px 0;padding-left:22px}
+.content-body li{margin:2px 0}
+.content-body code{background:#1E293B;color:#FCD34D;padding:1px 5px;border-radius:3px;font-size:12px}
+.content-body pre{background:#0B1220;border:1px solid var(--line);border-radius:6px;padding:10px;
+  overflow-x:auto;margin:8px 0}
+.content-body pre code{background:transparent;color:#CBD5E1;padding:0}
+.content-body table{border-collapse:collapse;margin:8px 0;font-size:12px;width:100%}
+.content-body th,.content-body td{border:1px solid var(--line);padding:5px 9px;text-align:left}
+.content-body th{background:var(--panel);color:#E5E7EB;font-weight:600}
+.content-body blockquote{border-left:3px solid var(--accent);padding:2px 12px;margin:8px 0;
+  color:#94A3B8;background:rgba(96,165,250,.06)}
+.content-body hr{border:none;border-top:1px solid var(--line);margin:14px 0}
+.content-body a{color:var(--accent);text-decoration:none}
+.content-body a:hover{text-decoration:underline}
+.content-dir-list{list-style:none;padding:0;margin:0}
+.content-dir-list li{padding:4px 8px;border-bottom:1px solid var(--line);font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.content-dir-list li:last-child{border-bottom:none}
+.content-dir-list .dir-icon{color:#F59E0B;margin-right:6px}
+.content-dir-list .file-icon{color:#94A3B8;margin-right:6px}
+.content-dir-list .file-size{color:#64748B;font-size:11px;float:right}
 #flow{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:20px}
 .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .guide-grid pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;
@@ -346,6 +400,15 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
       </aside>
     </div>
     <div class="legend" id="graph-legend"></div>
+  </div>
+  <div class="card" id="content-card" style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px">
+      <h3 id="content-title" style="margin:0">파일 내용</h3>
+      <span id="content-meta" class="muted" style="font-size:12px"></span>
+    </div>
+    <div id="content-body" class="content-body">
+      <div class="muted">노드를 클릭하면 여기에 파일 내용이 표시됩니다.</div>
+    </div>
   </div>
   <div class="card" style="margin-top:12px">
     <h3>전체 문서·폴더 역할 목록</h3>
@@ -612,6 +675,7 @@ function renderGraph(layout){
       }</ul></div>` : ''}
     `;
     document.getElementById('graph-detail').innerHTML = html;
+    renderNodeContent(d);
   }
 
   const initId = graphState.selectedId || (nodes[0] && nodes[0].id);
@@ -625,6 +689,51 @@ document.querySelectorAll('[data-layout]').forEach(btn => btn.addEventListener('
   btn.classList.add('active');
   renderGraph(btn.dataset.layout);
 }));
+
+// ── 노드 클릭 시 파일 내용 렌더
+function renderNodeContent(node){
+  const titleEl = document.getElementById('content-title');
+  const metaEl  = document.getElementById('content-meta');
+  const bodyEl  = document.getElementById('content-body');
+  titleEl.textContent = node.label;
+  metaEl.innerHTML = node.path
+    ? `<code style="background:var(--panel);padding:2px 6px;border-radius:4px;color:#94A3B8">${escapeHtml(node.path)}</code>`
+    : '';
+
+  const data = (DATA.node_contents || {})[node.id];
+  if(!data){ bodyEl.innerHTML = '<div class="muted">(이 노드는 연결된 파일이 없습니다)</div>'; return; }
+
+  if(data.kind === 'file'){
+    const isMarkdown = node.path && node.path.toLowerCase().endsWith('.md');
+    const isJson     = node.path && node.path.toLowerCase().endsWith('.json');
+    metaEl.innerHTML += ` <span style="margin-left:6px;color:#64748B">${data.size.toLocaleString()} bytes</span>`;
+    if(isMarkdown && window.marked){
+      try {
+        marked.setOptions({ breaks:true, gfm:true });
+        bodyEl.innerHTML = marked.parse(data.text);
+      } catch(e){
+        bodyEl.innerHTML = `<pre>${escapeHtml(data.text)}</pre>`;
+      }
+    } else if(isJson){
+      let pretty = data.text;
+      try { pretty = JSON.stringify(JSON.parse(data.text), null, 2); } catch(e){}
+      bodyEl.innerHTML = `<pre><code>${escapeHtml(pretty)}</code></pre>`;
+    } else {
+      bodyEl.innerHTML = `<pre>${escapeHtml(data.text)}</pre>`;
+    }
+  } else if(data.kind === 'dir'){
+    const items = data.entries.map(e =>
+      `<li>
+        <span class="${e.is_dir ? 'dir-icon' : 'file-icon'}">${e.is_dir ? '▸' : '·'}</span>
+        ${escapeHtml(e.name)}${e.is_dir ? '/' : ''}
+        ${e.size != null ? `<span class="file-size">${e.size.toLocaleString()} B</span>` : ''}
+      </li>`
+    ).join('');
+    bodyEl.innerHTML = `<div class="muted" style="margin-bottom:8px">디렉터리 — ${data.entries.length}개 항목</div><ul class="content-dir-list">${items || '<li class="muted">(비어있음)</li>'}</ul>`;
+  } else {
+    bodyEl.innerHTML = `<div class="muted">${escapeHtml(data.text || '(없음)')}</div>`;
+  }
+}
 
 // ── 역할 테이블 (그래프 탭 하단)
 function renderRoleTable(){
