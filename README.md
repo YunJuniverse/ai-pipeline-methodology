@@ -32,8 +32,8 @@
 - `CLAUDE.md`와 `AGENTS.md`는 에이전트 운영 규칙만 담는다.
 - `HANDOFF.md`는 현재 상태만 담는다. 살아 있는 운영 파일은 이 문서 하나다.
 - `TODO.md`는 backlog와 acceptance criteria를 담는다.
-- `docs/adr/`는 코드에서 역산할 수 없는 결정 이유만 기록한다.
-- `docs/snapshots/`의 문서는 날짜가 찍힌 산출물이며 live source가 아니다.
+- `30_dev/adr/`는 코드에서 역산할 수 없는 결정 이유만 기록한다.
+- `30_dev/snapshots/`의 문서는 날짜가 찍힌 산출물이며 live source가 아니다.
 - 인간 승인은 텍스트 선언이 아니라 `merged PR` 또는 링크된 `issue/ADR approval evidence`로만 성립한다.
 
 ### 기본 부트 컨텍스트
@@ -47,7 +47,7 @@
 
 - 관련 `TODO.md` 항목
 - 관련 코드/테스트
-- 관련 `docs/adr/*.md`
+- 관련 `30_dev/adr/*.md`
 - 필요한 snapshot 문서
 
 ---
@@ -74,30 +74,43 @@
 
 ```text
 my-project/
-├── CLAUDE.md
-├── AGENTS.md
-├── HANDOFF.md
-├── TODO.md
-├── .github/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── docs/
-│   ├── adr/
-│   └── snapshots/
-├── src/        # fullstack만
-└── tests/      # fullstack만
+├── CLAUDE.md, AGENTS.md          # 진입점 (AI 자동 로드)
+├── HANDOFF.md, TODO.md           # 라이브 상태
+├── methodology-graph.json        # 폴더·문서 관계 그래프
+├── generate-dashboard.py         # 4탭 대시보드 빌더
+├── 10_guides/                    # 작성 지침서 (00~18)
+├── 20_planning/                  # 기획 산출물 (v0 스켈레톤 미리 위치)
+│   ├── 10_사업기획서.md
+│   ├── 11_서비스기획서.md
+│   ├── 12_운영기획서.md
+│   ├── 13_마케팅기획서.md
+│   ├── 14_브랜드기획서.md
+│   ├── 15_PM기획서.md
+│   ├── 16_AI_기능/AI-NNN.md      # AI 기능별 1개
+│   └── 17_평가_가드레일.md
+├── 30_dev/                       # 개발 산출물
+│   ├── MASTER_PLAN.md            # 18번 기반, 프로젝트당 1개
+│   ├── SPRINTS.md                # 스프린트 타임라인
+│   ├── adr/                      # Class B/C 결정 기록
+│   └── snapshots/                # 날짜별 산출물
+├── 40_resources/                 # 재사용 자원
+│   ├── templates/
+│   └── prompts/
+├── 90_archive/                   # 레거시 자료
+├── src/                          # fullstack만
+└── tests/                        # fullstack만
 ```
 
-각 파일의 역할:
+각 영역의 역할:
 
-| File | 역할 |
-|------|------|
-| `CLAUDE.md` | 프로젝트 설정, 변경 등급 트리거, 코딩/리뷰 규칙 |
-| `AGENTS.md` | Codex용 미러 |
-| `HANDOFF.md` | 지금 무엇을 하고 있는지, 다음 무엇을 해야 하는지 |
-| `TODO.md` | backlog와 acceptance criteria |
-| `.github/PULL_REQUEST_TEMPLATE.md` | PR 근거, 테스트, 승인 증거 체크 |
-| `docs/adr/` | 결정 이유 |
-| `docs/snapshots/` | 필요할 때만 생성하는 문서 |
+| 영역 | 폴더 | 역할 |
+|------|------|------|
+| 메타 / 진입점 | (root) | CLAUDE/AGENTS/HANDOFF/TODO — AI 부트 컨텍스트 |
+| 지침서 | `10_guides/` | *어떻게* 문서를 작성하는가의 표준 (11종) |
+| 기획 산출물 | `20_planning/` | *무엇을 만드는가* — 지침에 따라 채워지는 v0 스켈레톤 |
+| 개발 산출물 | `30_dev/` | *어떤 순서로 어떻게 빌드하는가* — MASTER_PLAN/SPRINTS/ADR/snapshots |
+| 재사용 자원 | `40_resources/` | 템플릿·프롬프트 |
+| 아카이브 | `90_archive/` | 레거시 자료 |
 
 ---
 
@@ -121,7 +134,7 @@ my-project/
 1. 인간이 `TODO.md`에 리서치/기획 항목과 acceptance criteria를 적는다.
 2. AI가 `CLAUDE.md`와 `HANDOFF.md`를 읽고 시작한다.
 3. 필요한 외부 자료를 조사한다.
-4. 결과를 `docs/snapshots/`에 날짜가 찍힌 문서로 생성한다.
+4. 결과를 `30_dev/snapshots/`에 날짜가 찍힌 문서로 생성한다.
 5. 인간이 PR 또는 issue에서 검토한다.
 6. AI가 `HANDOFF.md`와 `TODO.md`를 갱신한다.
 
@@ -129,7 +142,7 @@ my-project/
 
 ## Snapshot Rules
 
-`docs/snapshots/`의 문서는 다음 규칙을 따른다.
+`30_dev/snapshots/`의 문서는 다음 규칙을 따른다.
 
 - 파일명에 날짜를 포함한다.
 - 문서 상단에 snapshot 경고를 넣는다.
@@ -179,17 +192,19 @@ bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 - [HOW_TO_APPLY.md](HOW_TO_APPLY.md)
 - [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)
 - [DIAGRAM.md](DIAGRAM.md)
-- [docs/templates/HANDOFF.md](docs/templates/HANDOFF.md)
-- [docs/templates/TODO.md](docs/templates/TODO.md)
-- [docs/templates/ADR-template.md](docs/templates/ADR-template.md)
-- [docs/prompts/](docs/prompts)
+- [10_guides/](10_guides/) — 작성 지침서 카탈로그
+- [20_planning/](20_planning/) — 기획 산출물 v0
+- [30_dev/](30_dev/) — MASTER_PLAN / SPRINTS / ADR / snapshots
+- [40_resources/templates/](40_resources/templates/) — HANDOFF/TODO/ADR/SPRINTS/MASTER_PLAN
+- [40_resources/prompts/](40_resources/prompts/) — 스냅샷 생성 프롬프트
+- [methodology-graph.json](methodology-graph.json) — 폴더·문서 관계 그래프
+- [generate-dashboard.py](generate-dashboard.py) — 4탭 대시보드
 
-레거시 및 보관 자료는 아래에 보존했다.
+레거시 및 보관 자료:
 
-- [docs/archive/decisions/redesign-proposal-2026-03-29.md](docs/archive/decisions/redesign-proposal-2026-03-29.md)
-- [docs/archive/legacy-methodology/](docs/archive/legacy-methodology)
-- [docs/archive/planning-guides/](docs/archive/planning-guides)
-- [docs/archive/harness/](docs/archive/harness)
+- [90_archive/decisions/](90_archive/decisions/)
+- [90_archive/legacy-methodology/](90_archive/legacy-methodology/)
+- [90_archive/harness/](90_archive/harness/)
 
 평가와 외부 비판 문서는 그대로 유지한다.
 

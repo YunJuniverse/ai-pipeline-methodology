@@ -159,21 +159,33 @@ def read_text_safe(path: Path, max_chars: int = 8000) -> str:
 
 
 def assemble(root: Path) -> dict[str, Any]:
-    graph_path = root / "docs" / "methodology-graph.json"
+    # graph: root에 있고, 없으면 docs/ 하위 fallback (이전 구조 호환)
+    graph_path = root / "methodology-graph.json"
+    if not graph_path.exists():
+        graph_path = root / "docs" / "methodology-graph.json"
+
+    # TODO: 루트 → 40_resources/templates → docs/templates
     todo_path = root / "TODO.md"
-    if not todo_path.exists():
-        # 템플릿이 루트에 없으면 템플릿을 미리보기로 사용
-        todo_path = root / "docs" / "templates" / "TODO.md"
-    sprints_path = root / "SPRINTS.md"
-    if not sprints_path.exists():
-        sprints_path = root / "docs" / "templates" / "SPRINTS.md"
+    for cand in [root / "40_resources" / "templates" / "TODO.md", root / "docs" / "templates" / "TODO.md"]:
+        if not todo_path.exists():
+            todo_path = cand
+
+    # SPRINTS: 30_dev → 루트 → 40_resources/templates → docs/templates
+    sprints_path = root / "30_dev" / "SPRINTS.md"
+    for cand in [root / "SPRINTS.md", root / "40_resources" / "templates" / "SPRINTS.md", root / "docs" / "templates" / "SPRINTS.md"]:
+        if not sprints_path.exists():
+            sprints_path = cand
 
     handoff_path = root / "HANDOFF.md"
-    if not handoff_path.exists():
-        handoff_path = root / "docs" / "templates" / "HANDOFF.md"
+    for cand in [root / "40_resources" / "templates" / "HANDOFF.md", root / "docs" / "templates" / "HANDOFF.md"]:
+        if not handoff_path.exists():
+            handoff_path = cand
 
     claude_path = root / "CLAUDE.md"
-    readme_path = root / "docs" / "archive" / "planning-guides" / "README.md"
+    # README: 새 구조 → 구 구조 fallback
+    readme_path = root / "10_guides" / "README.md"
+    if not readme_path.exists():
+        readme_path = root / "docs" / "archive" / "planning-guides" / "README.md"
 
     graph = json.loads(graph_path.read_text(encoding="utf-8")) if graph_path.exists() else {
         "nodes": [], "edges": [], "lifecycle": {"stages": []}, "kinds": {}
@@ -468,38 +480,52 @@ function renderGraph(layout){
   let sim = null;
 
   if(layout === 'hierarchy'){
-    // 계층 배치: tier별 행으로 묶고, 각 행 내에서 균등 분포
-    const byTier = {};
+    // 2D 계층 배치: 가로축=category(5개), 세로축=tier(category 내부 순서)
+    const categories = DATA.graph.categories || [];
+    const catOrder = categories.length ? categories.map(c => c.id) : [...new Set(nodes.map(n=>n.category||'misc'))];
+    const catLabel = Object.fromEntries((categories||[]).map(c => [c.id, c.label]));
+    const catColor = Object.fromEntries((categories||[]).map(c => [c.id, c.color]));
+
+    // 노드를 카테고리별로 분류 → 카테고리 안에서 tier 정렬
+    const byCat = {};
     nodes.forEach(n => {
-      const t = (n.tier == null) ? 99 : n.tier;
-      (byTier[t] = byTier[t] || []).push(n);
+      const c = n.category || 'misc';
+      (byCat[c] = byCat[c] || []).push(n);
     });
-    const tierKeys = Object.keys(byTier).map(Number).sort((a,b)=>a-b);
-    const rowGap = (h - 80) / Math.max(1, tierKeys.length - 1);
-    tierKeys.forEach((t, ti) => {
-      const row = byTier[t];
-      const colGap = (w - 100) / Math.max(1, row.length);
-      row.forEach((n, i) => {
-        n.x = 50 + colGap * (i + 0.5);
-        n.y = 40 + rowGap * ti;
+    Object.values(byCat).forEach(arr => arr.sort((a,b) => (a.tier||99) - (b.tier||99)));
+
+    // 가로: 카테고리별 컬럼 (균등)
+    const colW = w / Math.max(1, catOrder.length);
+    const padTop = 60, padBot = 30;
+
+    // 카테고리 배경 밴드 + 헤더
+    catOrder.forEach((cid, ci) => {
+      const x0 = ci * colW;
+      svg.append('rect').attr('class','cat-band')
+        .attr('x', x0+2).attr('y', padTop-4).attr('width', colW-4).attr('height', h-padTop-padBot+10)
+        .attr('rx', 8).attr('fill', catColor[cid]||'#1E293B').attr('opacity', 0.18);
+      svg.append('text').attr('class','cat-header')
+        .attr('x', x0 + colW/2).attr('y', 22).attr('text-anchor','middle')
+        .attr('fill','#E5E7EB').attr('font-size',13).attr('font-weight',700)
+        .text(catLabel[cid] || cid);
+      svg.append('text').attr('class','cat-folder')
+        .attr('x', x0 + colW/2).attr('y', 40).attr('text-anchor','middle')
+        .attr('fill','#94A3B8').attr('font-size',10).attr('font-family','ui-monospace,Menlo,monospace')
+        .text((categories.find(c => c.id===cid)||{}).folder || '');
+    });
+
+    // 노드 좌표: 컬럼 안에서 tier 순서대로 배치
+    catOrder.forEach((cid, ci) => {
+      const arr = byCat[cid] || [];
+      const x0 = ci * colW;
+      const innerH = h - padTop - padBot;
+      const stepY = arr.length > 1 ? innerH / (arr.length) : 0;
+      arr.forEach((n, i) => {
+        n.x = x0 + colW/2;
+        n.y = padTop + stepY * (i + 0.5);
         n.fx = n.x; n.fy = n.y;
       });
     });
-
-    // tier 라벨 (좌측)
-    const tierMap = Object.fromEntries(tiers.map(t => [t.id, t.label]));
-    svg.append('g').selectAll('text.tier-label').data(tierKeys).enter()
-      .append('text').attr('class','tier-label')
-      .attr('x', 12).attr('y', t => 40 + rowGap * tierKeys.indexOf(t) + 5)
-      .attr('fill','#94A3B8').attr('font-size',11).attr('font-weight',600)
-      .text(t => `T${t} · ${tierMap[t] || ''}`);
-
-    // 가로 가이드라인
-    svg.append('g').selectAll('line.tier-line').data(tierKeys).enter()
-      .append('line').attr('class','tier-line')
-      .attr('x1', 0).attr('x2', w).attr('y1', t => 40 + rowGap * tierKeys.indexOf(t))
-      .attr('y2', t => 40 + rowGap * tierKeys.indexOf(t))
-      .attr('stroke','#1F2937').attr('stroke-dasharray','2 4');
   } else {
     // 자유 force 시뮬레이션
     sim = d3.forceSimulation(nodes)
@@ -555,8 +581,12 @@ function renderGraph(layout){
     node.attr('transform', d=>`translate(${d.x},${d.y})`);
   }
 
-  document.getElementById('graph-legend').innerHTML = Object.entries(kinds)
-    .map(([k,v]) => `<span><span class="dot" style="background:${v.color}"></span>${k}</span>`).join('');
+  const categories = DATA.graph.categories || [];
+  document.getElementById('graph-legend').innerHTML =
+    '<strong style="color:#94A3B8;margin-right:6px">카테고리:</strong>' +
+    categories.map(c => `<span><span class="dot" style="background:${c.color}"></span>${c.label} <code style="font-size:10px;color:#64748B">${c.folder}</code></span>`).join(' ') +
+    ' <span style="margin:0 8px;color:#475569">|</span> <strong style="color:#94A3B8;margin-right:6px">유형:</strong>' +
+    Object.entries(kinds).map(([k,v]) => `<span><span class="dot" style="background:${v.color}"></span>${k}</span>`).join('');
 
   function selectNode(d){
     graphState.selectedId = d.id;
@@ -566,9 +596,11 @@ function renderGraph(layout){
     const labelOf = id => (DATA.graph.nodes.find(n => n.id===id)||{}).label || id;
     const kindMeta = kinds[d.kind] || {};
     const tierLabel = tiers.find(t => t.id === d.tier)?.label;
+    const catMeta = (DATA.graph.categories||[]).find(c => c.id === d.category);
     const html = `
-      <span class="kind-tag" style="background:${kindMeta.color||'#64748B'}">${d.kind}</span>
-      ${tierLabel ? `<span class="kind-tag" style="background:#334155;color:#E5E7EB;margin-left:4px">T${d.tier} · ${escapeHtml(tierLabel)}</span>` : ''}
+      ${catMeta ? `<span class="kind-tag" style="background:${catMeta.color};color:#E5E7EB">${escapeHtml(catMeta.label)}</span>` : ''}
+      <span class="kind-tag" style="background:${kindMeta.color||'#64748B'};margin-left:4px">${d.kind}</span>
+      ${tierLabel ? `<span class="kind-tag" style="background:#334155;color:#E5E7EB;margin-left:4px">T${d.tier}</span>` : ''}
       <h4>${escapeHtml(d.label)}</h4>
       ${d.path ? `<code>${escapeHtml(d.path)}</code>` : ''}
       <div class="role">${escapeHtml(d.role||'(역할 미정)')}</div>

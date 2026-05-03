@@ -27,17 +27,17 @@ bash "$METHODOLOGY/init-project.sh" my-project --type fullstack
 
 ```text
 my-project/
-├── CLAUDE.md
-├── AGENTS.md
-├── HANDOFF.md
-├── TODO.md
-├── .github/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── docs/
-│   ├── adr/
-│   └── snapshots/
-├── src/        # fullstack만
-└── tests/      # fullstack만
+├── CLAUDE.md, AGENTS.md
+├── HANDOFF.md, TODO.md
+├── methodology-graph.json
+├── generate-dashboard.py
+├── .github/PULL_REQUEST_TEMPLATE.md
+├── 10_guides/        # 작성 지침서 11종
+├── 20_planning/      # 기획 산출물 v0
+├── 30_dev/           # MASTER_PLAN / SPRINTS / adr / snapshots
+├── 40_resources/     # templates / prompts
+├── src/              # fullstack만
+└── tests/            # fullstack만
 ```
 
 ---
@@ -161,7 +161,7 @@ Snapshot 문서는 필요할 때만 만든다.
 - 외부 사실은 링크로 증명
 - 증거 없는 내용은 `Evidence Needed`로 명시
 
-on-demand prompt 예시는 [docs/prompts/](docs/prompts)에 있다.
+on-demand prompt 예시는 [40_resources/prompts/](40_resources/prompts/)에 있다.
 
 ---
 
