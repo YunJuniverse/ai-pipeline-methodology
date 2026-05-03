@@ -155,6 +155,112 @@ def read_text_safe(path: Path, max_chars: int = 8000) -> str:
     return s if len(s) <= max_chars else s[:max_chars] + "\n\n…(truncated)"
 
 
+def parse_project_meta(claude_path: Path) -> dict:
+    """CLAUDE.md §1 Project Settings의 `**Key**: value` 줄을 파싱."""
+    out = {}
+    if not claude_path.exists():
+        return out
+    in_section = False
+    for line in claude_path.read_text(encoding="utf-8").splitlines():
+        if re.match(r"^##\s+1\.", line):
+            in_section = True
+            continue
+        if in_section and re.match(r"^##\s+", line):
+            break
+        if not in_section:
+            continue
+        m = re.match(r"^-\s+\*\*([^*]+)\*\*\s*:\s*(.+?)\s*$", line)
+        if m:
+            out[m.group(1).strip()] = m.group(2).strip()
+    return out
+
+
+def detect_dev_url(root: Path) -> str | None:
+    """package.json scripts에서 dev URL을 추정."""
+    pkg = root / "package.json"
+    if not pkg.exists():
+        return None
+    try:
+        data = json.loads(pkg.read_text(encoding="utf-8"))
+        scripts = " ".join(data.get("scripts", {}).values()) if isinstance(data.get("scripts"), dict) else ""
+        deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
+        # 명시적 PORT
+        m = re.search(r"PORT[=:](\d+)", scripts)
+        if m:
+            return f"http://localhost:{m.group(1)}"
+        m = re.search(r"-p\s+(\d+)", scripts) or re.search(r"--port[=\s](\d+)", scripts)
+        if m:
+            return f"http://localhost:{m.group(1)}"
+        # 프레임워크 기본 포트
+        if "next" in deps:
+            return "http://localhost:3000"
+        if "vite" in deps:
+            return "http://localhost:5173"
+        if "@remix-run/dev" in deps:
+            return "http://localhost:3000"
+        if "nuxt" in deps:
+            return "http://localhost:3000"
+        if "fastify" in deps:
+            return "http://localhost:3000"
+    except Exception:
+        return None
+    return None
+
+
+def read_package_info(root: Path) -> dict:
+    pkg = root / "package.json"
+    if not pkg.exists():
+        return {}
+    try:
+        data = json.loads(pkg.read_text(encoding="utf-8"))
+        return {
+            "name": data.get("name", ""),
+            "version": data.get("version", ""),
+            "scripts": data.get("scripts", {}),
+            "dependencies_count": len(data.get("dependencies", {})),
+            "dev_dependencies_count": len(data.get("devDependencies", {})),
+            "main_deps": list((data.get("dependencies") or {}).keys())[:8],
+        }
+    except Exception:
+        return {}
+
+
+def read_project_config(root: Path) -> dict:
+    """선택: 30_dev/project-config.json (사용자가 직접 채우는 추가 메타)."""
+    p = root / "30_dev" / "project-config.json"
+    if not p.exists():
+        return {}
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def parse_master_plan_meta(master_plan_path: Path) -> dict:
+    """MASTER_PLAN.md frontmatter의 master_plan 블록 추출 (간이 YAML 파서)."""
+    if not master_plan_path.exists():
+        return {}
+    text = master_plan_path.read_text(encoding="utf-8")
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.DOTALL)
+    if not m:
+        return {}
+    out = {}
+    for line in m.group(1).splitlines():
+        kv = re.match(r"^(\w+):\s*(.+)\s*$", line)
+        if kv:
+            out[kv.group(1)] = kv.group(2).strip()
+        nested = re.match(r"^\s+(\w+):\s*(.+)\s*$", line)
+        if nested:
+            out[nested.group(1)] = nested.group(2).strip()
+    return out
+
+
+def count_files(p: Path, suffix: str = "") -> int:
+    if not p.exists() or not p.is_dir():
+        return 0
+    return sum(1 for x in p.glob(f"*{suffix}") if x.is_file() and not x.name.startswith("."))
+
+
 # ──────────────────────────────────── data assembly ────────────────────────────────────
 
 
@@ -244,11 +350,26 @@ def assemble(root: Path) -> dict[str, Any]:
         "node_contents": node_contents,
         "master_plan_text": read_text_safe(master_plan_path, 50000),
         "master_plan_path": str(master_plan_path.relative_to(root)) if master_plan_path.exists() else "",
-        "guide_excerpts": {
-            "claude_md": read_text_safe(claude_path, 4000),
-            "handoff_md": read_text_safe(handoff_path, 3000),
-            "guides_readme": read_text_safe(readme_path, 8000),
+        "project_overview": {
+            "meta":            parse_project_meta(claude_path),
+            "config":          read_project_config(root),
+            "dev_url":         detect_dev_url(root),
+            "package":         read_package_info(root),
+            "claude_md":       read_text_safe(claude_path, 50000),
+            "claude_md_path":  str(claude_path.relative_to(root)) if claude_path.exists() else "",
+            "agents_md":       read_text_safe(root / "AGENTS.md", 50000),
+            "handoff_md":      read_text_safe(handoff_path, 50000),
+            "handoff_md_path": str(handoff_path.relative_to(root)) if handoff_path.exists() else "",
+            "todo_md":         read_text_safe(todo_path, 50000),
+            "todo_md_path":    str(todo_path.relative_to(root)) if todo_path.exists() else "",
+            "master_plan_meta": parse_master_plan_meta(master_plan_path),
+            "kanban_summary": {sec: len(cards) for sec, cards in kanban.items()},
+            "adr_count":     count_files(root / "30_dev" / "adr", ".md"),
+            "snapshot_count": count_files(root / "30_dev" / "snapshots", ".md"),
+            "sprint_total":   len(sprints_json),
+            "sprint_active":  sum(1 for s in sprints_json if s["fields"].get("status", "").lower() == "active"),
         },
+        "guides_readme": read_text_safe(readme_path, 50000),
     }
 
 
@@ -390,6 +511,58 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 .sprint-table .s-goals li.done{color:#64748B;text-decoration:line-through}
 .sprint-table .s-goals li::before{content:"☐ ";color:#64748B}
 .sprint-table .s-goals li.done::before{content:"☑ ";color:#34D399}
+
+/* ─── 프로젝트 개요 ─── */
+.ov-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ov-title-row h2{margin:0;font-size:22px;color:#F1F5F9}
+.ov-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;
+  background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+.ov-badge.type-fullstack{background:#065F46;color:#A7F3D0;border-color:#047857}
+.ov-badge.type-planning-only{background:#1E40AF;color:#BFDBFE;border-color:#2563EB}
+.ov-badge.phase{background:#78350F;color:#FCD34D;border-color:#92400E}
+.ov-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:12px 0}
+.ov-stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.ov-stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ov-stat .value{font-size:20px;font-weight:700;color:var(--text);margin-top:4px}
+.ov-stat .sub{font-size:11px;color:var(--muted);margin-top:2px}
+.ov-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:800px){.ov-row{grid-template-columns:1fr}}
+.ov-list{list-style:none;padding:0;margin:0}
+.ov-list li{padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;font-size:13px}
+.ov-list li:last-child{border-bottom:none}
+.ov-list .k{color:var(--muted);font-weight:500}
+.ov-list .v{color:var(--text);text-align:right;max-width:60%;word-break:break-word}
+.ov-list code{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:12px;color:#FCD34D}
+.ov-link{color:var(--accent);text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.ov-link:hover{text-decoration:underline}
+.ov-progress-bar{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:6px;display:flex}
+.ov-progress-bar > div{height:100%}
+.ov-progress-bar .done{background:#34D399}
+.ov-progress-bar .progress{background:#F59E0B}
+.ov-progress-bar .ready{background:#60A5FA}
+.ov-progress-bar .blocked{background:#EF4444}
+.ov-progress-bar .backlog{background:#475569}
+.ov-file-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.ov-file-tab{padding:5px 11px;border-radius:6px;cursor:pointer;font-size:12px;
+  background:var(--panel2);border:1px solid var(--line);color:var(--muted);user-select:none}
+.ov-file-tab.active{background:var(--accent);color:#0B1220;border-color:var(--accent)}
+.ov-file-tab:hover{color:var(--text)}
+
+/* ─── 가이드 백서 ─── */
+.paper-list{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.7}
+.paper-list li{margin:4px 0}
+.paper-list b{color:var(--text)}
+.paper-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+.paper-table th,.paper-table td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.paper-table th{background:var(--panel2);color:#94A3B8;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.paper-table td{color:#CBD5E1}
+.paper-table code{background:var(--panel2);color:#FCD34D;padding:1px 5px;border-radius:3px;font-size:11px}
+.cat-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.cat-dot.meta{background:#1E293B;border:1px solid #334155}
+.cat-dot.guides{background:#065F46}
+.cat-dot.planning{background:#7C2D12}
+.cat-dot.dev{background:#78350F}
+.cat-dot.resources{background:#1E40AF}
 #flow{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:20px}
 .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .guide-grid pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;
@@ -406,23 +579,143 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
   <span class="muted" id="meta"></span>
 </header>
 <nav class="tabs" id="tabs">
-  <div class="tab active" data-page="guide">가이드 &amp; 플로우</div>
+  <div class="tab active" data-page="overview">프로젝트 개요</div>
+  <div class="tab" data-page="guide">가이드 &amp; 플로우</div>
   <div class="tab" data-page="graph">관계 그래프</div>
   <div class="tab" data-page="timeline">타임라인</div>
   <div class="tab" data-page="kanban">칸반보드</div>
   <div class="tab" data-page="exec">통합 뷰</div>
 </nav>
 
-<section class="page active" id="page-guide">
-  <div class="card">
-    <h3>기획-개발 라이프사이클</h3>
-    <div id="flow"></div>
-    <div class="legend" id="flow-legend"></div>
+<section class="page active" id="page-overview">
+  <div class="card" id="ov-header">
+    <div class="ov-title-row">
+      <h2 id="ov-name">—</h2>
+      <span id="ov-type-badge" class="ov-badge">—</span>
+      <span id="ov-version-badge" class="ov-badge">—</span>
+      <span id="ov-phase-badge" class="ov-badge">—</span>
+    </div>
+    <div id="ov-objective" class="muted" style="margin-top:6px;font-size:13px"></div>
   </div>
+
+  <div class="ov-stat-grid" id="ov-stats"></div>
+
+  <div class="ov-row">
+    <div class="card">
+      <h3>스택 / 개발 정보</h3>
+      <div id="ov-stack"></div>
+    </div>
+    <div class="card">
+      <h3>진행 상황</h3>
+      <div id="ov-progress"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:10px;flex-wrap:wrap">
+      <h3 style="margin:0">파일 보기</h3>
+      <div id="ov-file-tabs" class="ov-file-tabs"></div>
+    </div>
+    <div id="ov-file-content" class="content-body"></div>
+  </div>
+</section>
+
+<section class="page" id="page-guide">
+  <div class="card">
+    <h2 style="margin:0 0 6px">방법론 백서 — Evidence-Driven AI Development</h2>
+    <div class="muted" style="font-size:13px">
+      문서 연극을 줄이고, 코드·테스트·PR·결정 근거는 남긴다. 1인 + AI 개발에 맞춘 경량 운영 체계.
+    </div>
+  </div>
+
   <div class="guide-grid">
-    <div class="card"><h3>CLAUDE.md (요약)</h3><pre id="g-claude"></pre></div>
-    <div class="card"><h3>HANDOFF.md (현재 상태)</h3><pre id="g-handoff"></pre></div>
-    <div class="card" style="grid-column:1/-1"><h3>기획 지침서 카탈로그</h3><pre id="g-readme"></pre></div>
+    <div class="card">
+      <h3>1. 목적</h3>
+      <ul class="paper-list">
+        <li><b>AI에게 작업 표준을 제공</b> — 어떤 문서를 언제·어떤 구조로 만들지의 단일 출처</li>
+        <li><b>사람·AI가 공유하는 계약</b> — 사람이 검토하고, AI가 실행하는 공용 산출물 표준</li>
+        <li><b>문서 간 경계 강제</b> — 원본 정보 중복을 막고 책임을 분명히 함</li>
+        <li><b>AI 시대 표준 통합</b> — Eval-First / Harness 분리 / Guardrails-by-Construction / EU AI Act</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>2. 5개 영역 설계</h3>
+      <table class="paper-table">
+        <thead><tr><th>영역</th><th>폴더</th><th>역할</th></tr></thead>
+        <tbody>
+          <tr><td><span class="cat-dot meta"></span>메타</td><td><code>(root)</code></td><td>CLAUDE/AGENTS/HANDOFF/TODO — AI 부트 컨텍스트</td></tr>
+          <tr><td><span class="cat-dot guides"></span>지침서</td><td><code>10_guides/</code></td><td><b>어떻게</b> 문서를 작성하는가의 표준 (00–18)</td></tr>
+          <tr><td><span class="cat-dot planning"></span>기획 산출물</td><td><code>20_planning/</code></td><td><b>무엇을 만드는가</b> — v0 스켈레톤이 미리 위치</td></tr>
+          <tr><td><span class="cat-dot dev"></span>개발 산출물</td><td><code>30_dev/</code></td><td><b>어떻게 빌드하는가</b> — MASTER_PLAN/SPRINTS/ADR/snapshots</td></tr>
+          <tr><td><span class="cat-dot resources"></span>재사용 자원</td><td><code>40_resources/</code></td><td>templates / prompts</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h3>3. 라이프사이클 (브리프 → 빌드 → 환류)</h3>
+      <div id="flow"></div>
+      <div class="legend" id="flow-legend"></div>
+    </div>
+
+    <div class="card">
+      <h3>4. 핵심 원칙</h3>
+      <ul class="paper-list">
+        <li><b>Eval-First</b> — 작성보다 평가 정의를 먼저 (16/17이 동시 시작)</li>
+        <li><b>Harness 분리</b> — Plan / Generate / Evaluate를 같은 세션·에이전트로 묶지 않음</li>
+        <li><b>Guardrails-by-Construction</b> — 프롬프트가 아닌 시스템 컴포넌트로 강제</li>
+        <li><b>사람-AI 공용 산출물</b> — 자연어 + 기계 판독 형태 (OpenAPI/llms.txt/policy.yaml)</li>
+        <li><b>단일 출처 원칙</b> — 모든 정보는 정확히 한 군데에서만 산다 (12절 다른 문서와의 경계)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>5. 변경 등급 (Change Class)</h3>
+      <ul class="paper-list">
+        <li><b>Class A</b> (기본) — 일반 기능·UI 카피·내부 리팩토링·버그 수정. 게이트: 머지된 PR.</li>
+        <li><b>Class B</b> — 스키마/auth/외부 계약/destructive/배경 잡 변경. 영향·롤백 명시 의무.</li>
+        <li><b>Class C</b> — 가격·법무·브랜드·공개 출시. 명시적 휴먼 승인 + ADR 필수.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>6. 활용 가이드 — CLI</h3>
+      <pre style="font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0"><code># 새 프로젝트
+methodology.py init my-project --type fullstack
+
+# 기존 프로젝트 갱신 (자동 마이그레이션)
+methodology.py status               # 현재 vs 업스트림
+methodology.py sync                 # 미리보기
+methodology.py sync --apply         # 실제 적용
+
+# 단일 파일 변경 미리보기
+methodology.py diff CLAUDE.md</code></pre>
+    </div>
+
+    <div class="card">
+      <h3>7. 파일 분류 (sync 정책)</h3>
+      <table class="paper-table">
+        <thead><tr><th>클래스</th><th>예시</th><th>정책</th></tr></thead>
+        <tbody>
+          <tr><td><b>shared</b></td><td>10_guides/, 40_resources/, graph, dashboard</td><td>sync가 항상 덮어씀</td></tr>
+          <tr><td><b>managed</b></td><td>CLAUDE.md, AGENTS.md</td><td><code>&lt;!-- methodology:managed --&gt;</code> 마커 사이만 머지</td></tr>
+          <tr><td><b>scaffolds</b></td><td>20_planning/, 30_dev/</td><td>init 1회, sync 무시</td></tr>
+          <tr><td><b>local</b></td><td>HANDOFF, TODO, MASTER_PLAN, ADR</td><td>절대 안 건드림</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h3>8. 외부 표준 (v3 통합)</h3>
+      <ul class="paper-list">
+        <li>Anthropic <i>Effective Harnesses for long-running agents</i></li>
+        <li>arXiv 2411.13768 — <i>Evaluation-Driven Development of LLM Agents</i></li>
+        <li>Spec-Driven Development (Kiro / EARS — Requirements/Design/Tasks)</li>
+        <li>EU AI Act (Regulation 2024/1689) — 2026-08 high-risk obligations 발효</li>
+        <li>Agent Experience (AX) — 사람·AI 동시 판독 가능 형태 병행</li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -514,10 +807,134 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   if(t.dataset.page === 'graph') renderGraph();
 }));
 
-// ── 가이드 인라인
-document.getElementById('g-claude').textContent = DATA.guide_excerpts.claude_md || '(CLAUDE.md 없음)';
-document.getElementById('g-handoff').textContent = DATA.guide_excerpts.handoff_md || '(HANDOFF.md 없음 — 템플릿 미리보기)';
-document.getElementById('g-readme').textContent = DATA.guide_excerpts.guides_readme || '(planning-guides/README.md 없음)';
+// (가이드 페이지는 이제 정적 백서 — JS 주입 없음. CLAUDE/HANDOFF는 프로젝트 개요로 이동)
+
+// ── 프로젝트 개요 렌더
+function renderOverview(){
+  const ov = DATA.project_overview || {};
+  const meta = ov.meta || {};
+  const pkg = ov.package || {};
+  const cfg = ov.config || {};
+  const mp  = ov.master_plan_meta || {};
+
+  // 헤더
+  const name = meta['Project Name'] || meta['Project'] || pkg.name || '(이름 없음)';
+  document.getElementById('ov-name').textContent = name;
+  document.getElementById('ov-objective').textContent = meta['Objective'] || meta['Goal'] || '';
+
+  const typeEl = document.getElementById('ov-type-badge');
+  const t = (meta['Type'] || meta['Mode'] || '').toLowerCase();
+  typeEl.textContent = t || '—';
+  typeEl.className = 'ov-badge type-' + (t.includes('fullstack') ? 'fullstack' : t.includes('planning') ? 'planning-only' : '');
+
+  const verEl = document.getElementById('ov-version-badge');
+  verEl.textContent = pkg.version ? 'v' + pkg.version : (meta['Version'] || '—');
+
+  const phaseEl = document.getElementById('ov-phase-badge');
+  if(mp.current_phase){
+    phaseEl.textContent = 'Phase ' + mp.current_phase;
+    phaseEl.className = 'ov-badge phase';
+  } else {
+    phaseEl.textContent = 'no master plan';
+  }
+
+  // 통계 카드
+  const totalKanban = Object.values(ov.kanban_summary || {}).reduce((a,b)=>a+b,0);
+  const doneKanban = (ov.kanban_summary || {}).Done || 0;
+  const stats = [
+    { label: '진행 중 작업', value: (ov.kanban_summary||{}).InProgress || 0, sub: '칸반 InProgress' },
+    { label: '대기 작업', value: (ov.kanban_summary||{}).Ready || 0, sub: 'Ready 큐' },
+    { label: '차단됨', value: (ov.kanban_summary||{}).Blocked || 0, sub: '해소 필요' },
+    { label: '완료', value: doneKanban, sub: `${totalKanban}개 중` },
+    { label: '활성 스프린트', value: ov.sprint_active || 0, sub: `총 ${ov.sprint_total || 0}개` },
+    { label: 'ADR', value: ov.adr_count || 0, sub: '결정 기록' },
+    { label: 'Snapshots', value: ov.snapshot_count || 0, sub: '날짜별 산출물' },
+    { label: '의존성', value: pkg.dependencies_count || 0, sub: `${pkg.dev_dependencies_count || 0} dev` },
+  ];
+  document.getElementById('ov-stats').innerHTML = stats.map(s =>
+    `<div class="ov-stat"><div class="label">${escapeHtml(s.label)}</div><div class="value">${s.value}</div><div class="sub">${escapeHtml(s.sub)}</div></div>`
+  ).join('');
+
+  // 스택 / 개발 정보
+  const stackRows = [];
+  ['Stack','Type','Started On','Release Policy','Primary Approver','Mode'].forEach(k => {
+    if(meta[k]) stackRows.push([k, meta[k]]);
+  });
+  if(pkg.name) stackRows.push(['package', `<code>${escapeHtml(pkg.name)}@${escapeHtml(pkg.version||'')}</code>`]);
+  if(pkg.main_deps && pkg.main_deps.length){
+    stackRows.push(['주요 의존성', pkg.main_deps.map(d => `<code>${escapeHtml(d)}</code>`).join(' ')]);
+  }
+  if(ov.dev_url){
+    stackRows.push(['Dev URL', `<a class="ov-link" href="${escapeHtml(ov.dev_url)}" target="_blank" rel="noopener">${escapeHtml(ov.dev_url)} ↗</a>`]);
+  }
+  if(cfg.urls){
+    Object.entries(cfg.urls).forEach(([k,v]) => stackRows.push([k, `<a class="ov-link" href="${escapeHtml(v)}" target="_blank" rel="noopener">${escapeHtml(v)} ↗</a>`]));
+  }
+  if(pkg.scripts && Object.keys(pkg.scripts).length){
+    const scriptList = Object.entries(pkg.scripts).slice(0,6).map(([k,v]) => `<code>${escapeHtml(k)}</code>`).join(' ');
+    stackRows.push(['npm scripts', scriptList]);
+  }
+  document.getElementById('ov-stack').innerHTML = stackRows.length
+    ? '<ul class="ov-list">' + stackRows.map(([k,v]) => `<li><span class="k">${escapeHtml(k)}</span><span class="v">${v}</span></li>`).join('') + '</ul>'
+    : '<div class="muted">CLAUDE.md §1 Project Settings를 채워주세요.</div>';
+
+  // 진행 상황 (칸반 분포 + 마스터플랜 페이즈)
+  const ks = ov.kanban_summary || {};
+  const total = Math.max(1, Object.values(ks).reduce((a,b)=>a+b,0));
+  const bar = ['Done','InProgress','Ready','Blocked','Backlog'].map(s => {
+    const w = ((ks[s]||0) / total * 100).toFixed(1);
+    const cls = {Done:'done', InProgress:'progress', Ready:'ready', Blocked:'blocked', Backlog:'backlog'}[s];
+    return w > 0 ? `<div class="${cls}" style="width:${w}%" title="${s}: ${ks[s]||0}"></div>` : '';
+  }).join('');
+
+  const progRows = [];
+  if(mp.current_phase) progRows.push(['현재 페이즈', escapeHtml(mp.current_phase)]);
+  if(mp.next_gate) progRows.push(['다음 게이트', escapeHtml(mp.next_gate)]);
+  if(mp.last_replanning) progRows.push(['최근 환류', escapeHtml(mp.last_replanning)]);
+  progRows.push(['칸반 진행률', `${doneKanban}/${total - 1} 완료 (${((doneKanban/Math.max(1,total))*100).toFixed(0)}%)`]);
+
+  document.getElementById('ov-progress').innerHTML = `
+    <ul class="ov-list">${progRows.map(([k,v]) => `<li><span class="k">${k}</span><span class="v">${v}</span></li>`).join('')}</ul>
+    <div style="margin-top:10px">
+      <div class="muted" style="font-size:11px;margin-bottom:2px">칸반 분포</div>
+      <div class="ov-progress-bar">${bar}</div>
+      <div style="display:flex;gap:10px;margin-top:6px;font-size:10px;color:var(--muted);flex-wrap:wrap">
+        <span>● <span style="color:#34D399">Done</span> ${ks.Done||0}</span>
+        <span>● <span style="color:#F59E0B">InProgress</span> ${ks.InProgress||0}</span>
+        <span>● <span style="color:#60A5FA">Ready</span> ${ks.Ready||0}</span>
+        <span>● <span style="color:#EF4444">Blocked</span> ${ks.Blocked||0}</span>
+        <span>● <span style="color:#475569">Backlog</span> ${ks.Backlog||0}</span>
+      </div>
+    </div>`;
+
+  // 파일 보기 (탭 전환)
+  const files = [
+    { id: 'claude',  label: 'CLAUDE.md',  path: ov.claude_md_path,  text: ov.claude_md },
+    { id: 'agents',  label: 'AGENTS.md',  path: 'AGENTS.md',        text: ov.agents_md },
+    { id: 'handoff', label: 'HANDOFF.md', path: ov.handoff_md_path, text: ov.handoff_md },
+    { id: 'todo',    label: 'TODO.md',    path: ov.todo_md_path,    text: ov.todo_md },
+  ].filter(f => f.text);
+  const tabsEl = document.getElementById('ov-file-tabs');
+  const bodyEl = document.getElementById('ov-file-content');
+  tabsEl.innerHTML = files.map((f,i) =>
+    `<div class="ov-file-tab${i===0?' active':''}" data-file="${f.id}">${escapeHtml(f.label)}</div>`).join('');
+  function showFile(id){
+    const f = files.find(x => x.id === id);
+    if(!f){ bodyEl.innerHTML = '<div class="muted">파일 없음</div>'; return; }
+    if(window.marked){
+      try { bodyEl.innerHTML = marked.parse(f.text); return; } catch(e){}
+    }
+    bodyEl.innerHTML = `<pre>${escapeHtml(f.text)}</pre>`;
+  }
+  tabsEl.querySelectorAll('.ov-file-tab').forEach(t => t.addEventListener('click', () => {
+    tabsEl.querySelectorAll('.ov-file-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    showFile(t.dataset.file);
+  }));
+  if(files.length) showFile(files[0].id);
+  else bodyEl.innerHTML = '<div class="muted">표시할 파일 없음</div>';
+}
+renderOverview();
 
 // ── 라이프사이클 플로우 (SVG)
 function renderFlow(){
