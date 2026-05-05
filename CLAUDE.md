@@ -24,6 +24,7 @@
 - ADR is the source of truth for decisions that code cannot explain.
 - `HANDOFF.md` is the only live state file. Keep it under 150 lines.
 - `TODO.md` is the active backlog. Use stable IDs and acceptance criteria.
+- **After every task**: update `TODO.md` (mark completed items) and `HANDOFF.md` (current state, next actions). The Kanban board reads these files and will not reflect changes until they are updated.
 - `docs/snapshots/` contains dated artifacts. Snapshots are never live source.
 - Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.
 - Default boot context is `CLAUDE.md` + `HANDOFF.md`.
