@@ -25,6 +25,7 @@
 - `HANDOFF.md` is the only live state file. Keep it under 150 lines.
 - `TODO.md` is the active backlog. Use stable IDs and acceptance criteria.
 - **After every task**: update `TODO.md` (mark completed items) and `HANDOFF.md` (current state, next actions). The Kanban board reads these files and will not reflect changes until they are updated.
+- Identifier and versioning rules (phase M0/M1, sprint S-NNN, TODO ID, ADR, doc version, AI feature ID) are defined in `10_guides/02_식별자_및_버전_관리_규칙.md`. Follow that file before creating any new identifier.
 - `docs/snapshots/` contains dated artifacts. Snapshots are never live source.
 - Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.
 - Default boot context is `CLAUDE.md` + `HANDOFF.md`.
