@@ -29,3 +29,11 @@
 ### METH-001
 - **title**: 폴더 구조와 문서 경로를 현재 규칙에 맞게 정리
 - **notes**: Completed 2026-05-07. Moved onboarding docs to `40_resources/onboarding/`, moved evaluation docs to `90_archive/evaluation/`, and aligned live docs to `30_dev/*` paths.
+
+### METH-003
+- **title**: `40_resources` L1/L2 자산 디렉터리 골격과 스키마 문서 신설
+- **notes**: Completed 2026-05-07. Added `40_resources/catalog/`, `40_resources/skeletons/`, and `40_resources/ai_observations/` with `_README.md` schema documents.
+
+### METH-004
+- **title**: AI 관찰 로그 작성 규칙 가이드 신설
+- **notes**: Completed 2026-05-07. Added `10_guides/03_AI_관찰_로그_작성_규칙.md` as the single-source writing rule for L1 observation logs.
