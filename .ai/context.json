@@ -8,13 +8,13 @@
     "started_on": "2026-05-06"
   },
   "current_phase": {
-    "stage": "stage-1",
-    "label": "토대 — L0 이식성 코어 + L1 관찰 로그",
-    "since": "2026-05-07"
+    "stage": "stage-5-v0",
+    "label": "검증·확장 — L0~L4 v0 흐름 완료, 실제 반복 friction 대기",
+    "since": "2026-05-08"
   },
   "active_skeleton": null,
   "last_session": {
-    "ended_at": "2026-05-07T12:49:20Z",
+    "ended_at": "2026-05-07T15:05:26Z",
     "agent": {
       "model": "gpt-5",
       "tool": "codex-desktop",
@@ -37,9 +37,10 @@
     "10_guides/00_AI_기획_프로젝트_운영_원칙.md",
     "10_guides/03_AI_관찰_로그_작성_규칙.md",
     "30_dev/snapshots/implementation-plan-2026-05-07.md",
+    "30_dev/snapshots/transfer-drill-2026-05-08.md",
     "30_dev/snapshots/2026-05-07_handoff_simulation_baseline.md"
   ],
-  "active_todos": ["METH-007"],
+  "active_todos": [],
   "active_catalog_hits": [],
   "adapters_present": ["generic", "claude", "codex", "gpt"]
 }

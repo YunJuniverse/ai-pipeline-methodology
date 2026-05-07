@@ -1,7 +1,7 @@
 ---
 doc_id: skeletons-readme
 title: Skeleton Registry — 디렉터리 명세
-version: v0.1.0
+version: v0.2.0
 status: active
 last_updated: 2026-05-07
 ai_relevance: schema
@@ -9,7 +9,7 @@ ai_relevance: schema
 
 # Skeleton Registry (L2 활성 자산)
 
-> 도메인별 부트스트랩 자산. **손으로 작성하지 않는다** — 도메인 베이스 + Catalog 엔트리 합성으로 *결정적 빌드*.
+> 도메인별 부트스트랩 자산. `base/`는 사람이 최소 관리하고, lock/apply 결과는 Catalog 엔트리 합성으로 *결정적 빌드*.
 > 위상은 [00_foundation/WHITEPAPER.md](../../00_foundation/WHITEPAPER.md) §5 L2 참조.
 > 핵심 가치: *알려진 문제를 미리 패치한* 의존성·코드를 새 프로젝트에 즉시 주입.
 
@@ -43,7 +43,12 @@ ai_relevance: schema
 }
 ```
 
-## 3. 빌드·적용 명령 (TODO: 50_tools/methodology.py 서브커맨드 추가 예정)
+## 3. 빌드·적용 명령
+
+초기화:
+```bash
+python3 50_tools/methodology.py skeleton init <domain>
+```
 
 빌드 (Catalog 변경 시):
 ```bash
@@ -55,7 +60,8 @@ python3 50_tools/methodology.py skeleton build <domain>
 python3 50_tools/methodology.py skeleton apply <domain> ../my-new-project
 ```
 
-> 현재는 **명세만 정의된 상태**. 실제 빌더 구현은 `_pending` (G2 후속 작업).
+현재 v0 구현은 `base/` 파일 복사, `bakes-in.json` 읽기, `skeleton.lock.json` 생성, `README.md` 생성을 지원한다.
+Pending Lesson은 bake-in 대상이 아니며, active Catalog ID만 `catalog_entries`에 넣는다.
 
 ## 4. 도메인 식별자 컨벤션
 

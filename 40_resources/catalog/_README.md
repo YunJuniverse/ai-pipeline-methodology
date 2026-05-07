@@ -1,7 +1,7 @@
 ---
 doc_id: catalog-readme
 title: Problem-Solution Catalog — 디렉터리 명세
-version: v0.1.0
+version: v0.2.0
 status: active
 last_updated: 2026-05-07
 ai_relevance: schema
@@ -11,7 +11,7 @@ ai_relevance: schema
 
 > 재발한 문제 1건당 1엔트리로 정제된 활성 자산 라이브러리.
 > 위상·운영 원칙은 [00_foundation/WHITEPAPER.md](../../00_foundation/WHITEPAPER.md) §5 L2 참조.
-> *부패 방지 핵심: 한 번만 발생한 건 절대 들어가지 않는다 (N≥2 승급 규칙).*
+> *부패 방지 핵심: 1회 해결은 Pending Lesson, 반복 검증은 active Catalog.*
 
 ---
 
@@ -20,12 +20,13 @@ ai_relevance: schema
 ```
 40_resources/catalog/
 ├── _README.md            ← 본 문서 (스키마·운영)
-├── _pending/             ← L3 씽크탱크가 자동 생성한 승급 후보 (사람이 머지)
+├── _pending/             ← 1회 해결된 Pending Lesson과 L3 승급 후보
 ├── archived/             ← 6개월 hit 0회로 자동 아카이브된 엔트리
 └── C-NNN_<slug>.md       ← 활성 엔트리 (예: C-014_supabase-ssr-auth.md)
 ```
 
-엔트리 ID는 프로젝트 전체에서 *연속*. `C-` + 3자리 제로패딩.
+활성 엔트리 ID는 프로젝트 전체에서 *연속*. `C-` + 3자리 제로패딩.
+Pending Lesson ID는 `P-` + 3자리 제로패딩.
 
 ## 2. 엔트리 스키마
 
@@ -68,10 +69,17 @@ last_hit: 2026-03-22
 
 ## 3. 승급·아카이브 규칙
 
+### Pending Lesson
+- 1회 해결된 문제 중 재사용 가능성이 있으면 `_pending/P-NNN_<slug>.md`에 저장한다.
+- Pending Lesson은 학습 데이터이자 승급 후보일 뿐, Skeleton에 bake-in 하지 않는다.
+- Pending Lesson 추가는 Class A다.
+
 ### 승급 (Promotion)
-- L3 씽크탱크가 L1 관찰 로그를 클러스터링 → 동일 마찰이 **N≥2회** 매칭되면 후보 PR 생성.
+- L3 씽크탱크가 L1 관찰 로그를 클러스터링 → 동일 마찰이 **N≥2회** 매칭되면 active Catalog 승급 후보 생성.
+- 사람이 명시 승인하면 N=1에서도 active 승급 가능하나, PR/ADR에 이유를 남긴다.
 - 후보는 `_pending/` 에 저장. **사람이 머지해야** 활성으로 이동.
 - 자동 머지 절대 금지 (백서 §8-2).
+- 승급은 Class B다. PR에는 rationale, impact scope, rollback plan이 필요하다.
 
 ### 검증 상태 전이
 - `tentative`: 단일 AI 모델에서만 검증됨
@@ -94,7 +102,15 @@ Catalog 변경 시 의존하는 스켈레톤은 자동 재빌드 대상 (백서 
 4. PR 본문에 *목격된 L1 관찰 로그 ID* 를 링크
 5. 사람 머지 후 활성
 
-## 6. 안티패턴 (이 디렉터리 자체에 대해)
+## 6. CLI
+
+```bash
+python3 50_tools/methodology.py catalog init
+python3 50_tools/methodology.py catalog seed-pending
+python3 50_tools/methodology.py catalog status
+```
+
+## 7. 안티패턴 (이 디렉터리 자체에 대해)
 
 - ❌ "유용해 보이는" 패턴을 1회 목격으로 추가 — 노이즈
 - ❌ 손으로 직접 추가 (L3 마이닝 없이) — *가능하지만 권장하지 않음*. 추가하면 `seen_in`을 정직하게 기록.

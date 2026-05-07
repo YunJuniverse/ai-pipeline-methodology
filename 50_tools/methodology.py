@@ -19,6 +19,21 @@ Commands
   methodology version
       이 메소돌로지 자신의 버전을 출력한다.
 
+  methodology observe --slug <kebab-slug> --summary <text> [options]
+      L1 AI 관찰 로그를 생성한다.
+
+  methodology observe --validate <path>
+      L1 AI 관찰 로그의 필수 필드와 경로 규칙을 검증한다.
+
+  methodology catalog init|status|seed-pending
+      Pending Lesson과 active Catalog 흐름을 관리한다.
+
+  methodology skeleton init|build|apply
+      도메인 skeleton base/lock/apply v0 흐름을 실행한다.
+
+  methodology thinktank
+      L1 관찰 로그 기반 주간 인사이트 리포트를 생성한다.
+
 Classification
 --------------
   shared          — sync가 항상 덮어쓴다 (10_guides/, 40_resources/, 그래프, 대시보드)
@@ -44,10 +59,10 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import date
+from datetime import date, datetime, timezone
 from difflib import unified_diff
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 # ─── 메소돌로지 자체 버전 ───────────────────────────────────────────────────
 METHODOLOGY_VERSION = "v3.1"
@@ -91,6 +106,13 @@ MARKER_RE = re.compile(
 )
 
 VERSION_FILE_NAME = ".methodology-version"
+OBSERVATION_DIR = Path("40_resources/ai_observations")
+CATALOG_DIR = Path("40_resources/catalog")
+SKELETONS_DIR = Path("40_resources/skeletons")
+INSIGHTS_DIR = Path("30_dev/snapshots/insights")
+OBSERVATION_TASK_TYPES = {"bootstrap", "feature", "bugfix", "refactor", "research", "docs"}
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+OBSERVATION_FILE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}_[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 
 
 # ─── 유틸 ───────────────────────────────────────────────────────────────────
@@ -119,6 +141,23 @@ def read_text(p: Path) -> str:
 def write_text(p: Path, content: str) -> None:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(content, encoding="utf-8")
+
+
+def utc_stamp() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def utc_date() -> str:
+    return datetime.now(timezone.utc).date().isoformat()
+
+
+def host_os_label() -> str:
+    try:
+        system = subprocess.check_output(["uname", "-s"], text=True).strip().lower()
+        release = subprocess.check_output(["uname", "-r"], text=True).strip()
+        return f"{system}-{release}"
+    except Exception:
+        return "unknown"
 
 
 def upstream_commit() -> str:
@@ -207,6 +246,496 @@ def write_version_file(target: Path, label: str | None) -> None:
         "project_label": label,
     }
     write_text(target / VERSION_FILE_NAME, json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+
+
+# ─── L1 관찰 로그 ───────────────────────────────────────────────────────────
+
+
+def load_ai_context(root: Path) -> dict:
+    p = root / ".ai" / "context.json"
+    if not p.exists():
+        return {}
+    try:
+        return json.loads(read_text(p))
+    except json.JSONDecodeError:
+        return {}
+
+
+def yaml_scalar(value: str | None) -> str:
+    if value is None:
+        return "null"
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def parse_friction_item(raw: str, index: int) -> dict:
+    parts = raw.split("|")
+    if len(parts) != 4:
+        raise ValueError("--friction 형식은 'where|cost_minutes|resolution|repeat_of' 입니다")
+    where, cost, resolution, repeat_of = [p.strip() for p in parts]
+    try:
+        cost_minutes = int(cost)
+    except ValueError as exc:
+        raise ValueError("friction cost_minutes는 정수여야 합니다") from exc
+    repeat_value = None if repeat_of in {"", "null", "none", "-"} else repeat_of
+    return {
+        "id": f"F-{index:03d}",
+        "where": where,
+        "cost_minutes": cost_minutes,
+        "resolution": resolution,
+        "repeat_of": repeat_value,
+    }
+
+
+def render_observation(payload: dict) -> str:
+    lines = [
+        "---",
+        f"session_id: {payload['session_id']}",
+        "authored_by:",
+        f"  agent: {yaml_scalar(payload['agent'])}",
+        f"  tool: {yaml_scalar(payload['tool'])}",
+        f"  host_os: {yaml_scalar(payload['host_os'])}",
+        f"domain: {payload['domain']}",
+        f"task_type: {payload['task_type']}",
+        "stack_used:",
+    ]
+    for stack in payload["stack_used"]:
+        lines.append(f"  - {yaml_scalar(stack)}")
+    lines.append(f"flow_used: {payload['flow_used']}")
+
+    friction = payload["friction"]
+    if friction:
+        lines.append("friction:")
+        for item in friction:
+            lines.extend([
+                f"  - id: {item['id']}",
+                f"    where: {yaml_scalar(item['where'])}",
+                f"    cost_minutes: {item['cost_minutes']}",
+                f"    resolution: {yaml_scalar(item['resolution'])}",
+                f"    repeat_of: {item['repeat_of'] or 'null'}",
+            ])
+    else:
+        lines.append("friction: []")
+
+    patterns = payload["prompt_patterns"]
+    if patterns:
+        lines.append("prompt_patterns:")
+        for index, intent in enumerate(patterns, start=1):
+            lines.extend([
+                f"  - intent: {yaml_scalar(intent)}",
+                "    success: true",
+                f"    rounds: {payload['rounds'][index - 1]}",
+            ])
+    else:
+        lines.append("prompt_patterns: []")
+
+    lines.extend([
+        "---",
+        "",
+        payload["summary"].strip(),
+        "",
+    ])
+    return "\n".join(lines)
+
+
+def validate_observation_file(path: Path) -> list[str]:
+    errors: list[str] = []
+    if not path.exists():
+        return [f"파일 없음: {path}"]
+    if not OBSERVATION_FILE_RE.match(path.name):
+        errors.append("파일명은 YYYY-MM-DD_<kebab-slug>.md 형식이어야 합니다")
+    text = read_text(path)
+    if "/Users/" in text or "\\Users\\" in text:
+        errors.append("절대 사용자 경로가 포함되어 있습니다")
+    if not text.startswith("---\n"):
+        errors.append("YAML frontmatter 시작 마커가 없습니다")
+        return errors
+    try:
+        _, frontmatter, body = text.split("---", 2)
+    except ValueError:
+        errors.append("YAML frontmatter 종료 마커가 없습니다")
+        return errors
+
+    required_snippets = [
+        "session_id:",
+        "authored_by:",
+        "  agent:",
+        "  tool:",
+        "  host_os:",
+        "domain:",
+        "task_type:",
+        "stack_used:",
+        "flow_used:",
+        "friction:",
+        "prompt_patterns:",
+    ]
+    for snippet in required_snippets:
+        if snippet not in frontmatter:
+            errors.append(f"필수 필드 누락: {snippet.strip()}")
+
+    session_match = re.search(r"^session_id:\s*([^\s]+)\s*$", frontmatter, flags=re.MULTILINE)
+    if session_match and session_match.group(1) != path.stem:
+        errors.append("session_id는 파일명(.md 제외)과 같아야 합니다")
+    task_match = re.search(r"^task_type:\s*([^\s]+)\s*$", frontmatter, flags=re.MULTILINE)
+    if task_match and task_match.group(1) not in OBSERVATION_TASK_TYPES:
+        errors.append(f"task_type은 {', '.join(sorted(OBSERVATION_TASK_TYPES))} 중 하나여야 합니다")
+    if re.search(r"^\s*-\s*\[?None\]?\s*$", frontmatter, flags=re.MULTILINE):
+        errors.append("빈 배열은 [None] 대신 []로 기록해야 합니다")
+    paragraphs = [p for p in body.strip().split("\n\n") if p.strip()]
+    if len(paragraphs) != 1:
+        errors.append("자유서술은 1단락이어야 합니다")
+    elif len(paragraphs[0]) > 220:
+        errors.append("자유서술이 너무 깁니다")
+    return errors
+
+
+def parse_observation_frontmatter(path: Path) -> dict[str, Any]:
+    text = read_text(path)
+    if not text.startswith("---\n"):
+        return {}
+    try:
+        _, frontmatter, _body = text.split("---", 2)
+    except ValueError:
+        return {}
+    out: dict[str, Any] = {"path": str(path.relative_to(METHODOLOGY_ROOT))}
+    current = None
+    for raw in frontmatter.splitlines():
+        line = raw.rstrip()
+        if not line.strip():
+            continue
+        top = re.match(r"^([a-z_]+):\s*(.*)$", line)
+        if top:
+            current = top.group(1)
+            value = top.group(2).strip()
+            out[current] = value.strip('"') if value else []
+            continue
+        item = re.match(r"^\s+-\s+(.+)$", line)
+        if item and current:
+            out.setdefault(current, [])
+            if isinstance(out[current], list):
+                out[current].append(item.group(1).strip().strip('"'))
+    return out
+
+
+def cmd_observe(args: argparse.Namespace) -> int:
+    if args.validate:
+        path = Path(args.validate)
+        errors = validate_observation_file(path)
+        if errors:
+            for item in errors:
+                err(item)
+            return 1
+        ok(f"observation valid: {path}")
+        return 0
+
+    if not args.slug or not args.summary:
+        err("observe 생성에는 --slug 와 --summary 가 필요합니다")
+        return 2
+    if not SLUG_RE.match(args.slug):
+        err("--slug 는 영문 소문자/숫자/kebab-case 여야 합니다")
+        return 2
+    if args.task_type not in OBSERVATION_TASK_TYPES:
+        err(f"--task-type 은 {', '.join(sorted(OBSERVATION_TASK_TYPES))} 중 하나여야 합니다")
+        return 2
+
+    ctx = load_ai_context(METHODOLOGY_ROOT)
+    agent = args.agent or ctx.get("last_session", {}).get("agent", {}).get("model") or "unknown"
+    tool = args.tool or ctx.get("last_session", {}).get("agent", {}).get("tool") or "unknown"
+    host_os = args.host_os or ctx.get("last_session", {}).get("host_os") or host_os_label()
+    domain = args.domain or ctx.get("project", {}).get("domain") or "meta"
+    stack_used = args.stack or ["python3", f"methodology@{METHODOLOGY_VERSION}"]
+    intents = args.intent or ["l1 observation capture"]
+    rounds = args.rounds or [1 for _ in intents]
+    if len(rounds) != len(intents):
+        err("--rounds 개수는 --intent 개수와 같아야 합니다")
+        return 2
+
+    try:
+        friction = [parse_friction_item(raw, i) for i, raw in enumerate(args.friction or [], start=1)]
+    except ValueError as exc:
+        err(str(exc))
+        return 2
+
+    date_part = args.date or utc_date()
+    session_id = f"{date_part}_{args.slug}"
+    output = METHODOLOGY_ROOT / OBSERVATION_DIR / f"{session_id}.md"
+    if output.exists() and not args.force:
+        err(f"이미 존재합니다: {output.relative_to(METHODOLOGY_ROOT)} (--force 로 덮어쓰기)")
+        return 1
+
+    payload = {
+        "session_id": session_id,
+        "agent": agent,
+        "tool": tool,
+        "host_os": host_os,
+        "domain": domain,
+        "task_type": args.task_type,
+        "stack_used": stack_used,
+        "flow_used": args.flow_used,
+        "friction": friction,
+        "prompt_patterns": intents,
+        "rounds": rounds,
+        "summary": args.summary,
+        "created_at": utc_stamp(),
+    }
+    content = render_observation(payload)
+    if args.dry_run:
+        print(content)
+        return 0
+    write_text(output, content)
+    errors = validate_observation_file(output)
+    if errors:
+        for item in errors:
+            err(item)
+        return 1
+    ok(f"observation created: {output.relative_to(METHODOLOGY_ROOT)}")
+    return 0
+
+
+# ─── L2 Catalog / Pending Lesson ────────────────────────────────────────────
+
+
+def catalog_dirs() -> dict[str, Path]:
+    base = METHODOLOGY_ROOT / CATALOG_DIR
+    return {
+        "base": base,
+        "pending": base / "_pending",
+        "archived": base / "archived",
+    }
+
+
+def ensure_catalog_dirs() -> None:
+    for p in catalog_dirs().values():
+        p.mkdir(parents=True, exist_ok=True)
+    for p in [catalog_dirs()["pending"] / ".gitkeep", catalog_dirs()["archived"] / ".gitkeep"]:
+        if not p.exists():
+            write_text(p, "")
+
+
+def count_markdown(path: Path, prefix: str | None = None) -> int:
+    if not path.exists():
+        return 0
+    files = [p for p in path.glob("*.md") if p.name != "_README.md"]
+    if prefix:
+        files = [p for p in files if p.name.startswith(prefix)]
+    return len(files)
+
+
+def cmd_catalog(args: argparse.Namespace) -> int:
+    ensure_catalog_dirs()
+    dirs = catalog_dirs()
+    if args.catalog_cmd == "init":
+        ok("catalog dirs ready: 40_resources/catalog/{_pending,archived}")
+        return 0
+    if args.catalog_cmd == "status":
+        print(f"pending {count_markdown(dirs['pending'])}")
+        print(f"active  {count_markdown(dirs['base'], 'C-')}")
+        print(f"archive {count_markdown(dirs['archived'])}")
+        return 0
+    if args.catalog_cmd == "seed-pending":
+        target = dirs["pending"] / "P-001_git-write-lock.md"
+        if target.exists() and not args.force:
+            warn(f"exists: {target.relative_to(METHODOLOGY_ROOT)}")
+            return 0
+        content = """---
+id: P-001
+title: "Git metadata write blocked in sandboxed agent session"
+domain: meta
+status: pending
+source_observations:
+  - 2026-05-07_l1-observe-flow
+signature: "git.*(index.lock|refs).*Operation not permitted|cannot lock ref"
+created: 2026-05-08
+last_seen: 2026-05-07
+promotion_rule: "Promote to active Catalog after N>=2 observations or explicit human approval."
+---
+
+## 증상 (Symptom)
+
+Agent can edit workspace files but cannot create Git lock/ref files under `.git/`, so branch creation, staging, commit, or push fails.
+
+## 임시 해결 (Current Workaround)
+
+Leave file changes in the workspace and ask the human to run Git commands from a local terminal with normal repository permissions.
+
+## 승급 조건
+
+Same friction appears in another L1 observation, or a human explicitly approves active Catalog promotion.
+"""
+        write_text(target, content)
+        ok(f"pending lesson seeded: {target.relative_to(METHODOLOGY_ROOT)}")
+        return 0
+    err("unknown catalog command")
+    return 2
+
+
+# ─── L2 Skeleton ────────────────────────────────────────────────────────────
+
+
+def skeleton_domain_dir(domain: str) -> Path:
+    return METHODOLOGY_ROOT / SKELETONS_DIR / domain
+
+
+def list_base_files(base_dir: Path) -> list[str]:
+    if not base_dir.exists():
+        return []
+    return [
+        str(p.relative_to(base_dir))
+        for p in sorted(base_dir.rglob("*"))
+        if p.is_file()
+    ]
+
+
+def load_catalog_entry(entry_id: str) -> dict[str, str]:
+    base = METHODOLOGY_ROOT / CATALOG_DIR
+    matches = list(base.glob(f"{entry_id}_*.md"))
+    if not matches:
+        return {"id": entry_id, "status": "missing", "path": ""}
+    p = matches[0]
+    text = read_text(p)
+    title_match = re.search(r"^title:\s*\"?(.+?)\"?\s*$", text, flags=re.MULTILINE)
+    return {
+        "id": entry_id,
+        "status": "found",
+        "path": str(p.relative_to(METHODOLOGY_ROOT)),
+        "title": title_match.group(1) if title_match else entry_id,
+    }
+
+
+def cmd_skeleton(args: argparse.Namespace) -> int:
+    if not SLUG_RE.match(args.domain):
+        err("domain은 영문 소문자/숫자/kebab-case 여야 합니다")
+        return 2
+    domain_dir = skeleton_domain_dir(args.domain)
+    base_dir = domain_dir / "base"
+    bakes_in = domain_dir / "bakes-in.json"
+    lock_path = domain_dir / "skeleton.lock.json"
+
+    if args.skeleton_cmd == "init":
+        base_dir.mkdir(parents=True, exist_ok=True)
+        readme = base_dir / "README.md"
+        if not readme.exists():
+            write_text(readme, f"# {args.domain} base\n\nMinimal portable base for `{args.domain}` skeleton.\n")
+        if not bakes_in.exists():
+            payload = {
+                "schema_version": "1.0",
+                "domain": args.domain,
+                "base_version": "v0",
+                "catalog_entries": [],
+                "verified_with": [],
+                "last_built": None,
+            }
+            write_text(bakes_in, json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+        ok(f"skeleton initialized: {domain_dir.relative_to(METHODOLOGY_ROOT)}")
+        return 0
+
+    if args.skeleton_cmd == "build":
+        if not bakes_in.exists():
+            err(f"missing {bakes_in.relative_to(METHODOLOGY_ROOT)} — run skeleton init first")
+            return 1
+        config = json.loads(read_text(bakes_in))
+        entries = [load_catalog_entry(e) for e in config.get("catalog_entries", [])]
+        lock = {
+            "schema_version": "1.0",
+            "domain": args.domain,
+            "base_version": config.get("base_version", "v0"),
+            "built_at": utc_stamp(),
+            "base_files": list_base_files(base_dir),
+            "catalog_entries": entries,
+        }
+        write_text(lock_path, json.dumps(lock, indent=2, ensure_ascii=False) + "\n")
+        readme_lines = [
+            f"# Skeleton: {args.domain}",
+            "",
+            f"- Base version: `{lock['base_version']}`",
+            f"- Base files: {len(lock['base_files'])}",
+            f"- Catalog entries: {len(entries)}",
+            "",
+            "## Prevented Problems",
+            "",
+        ]
+        if entries:
+            readme_lines.extend(f"- `{e['id']}`: {e.get('title', e['status'])}" for e in entries)
+        else:
+            readme_lines.append("- No active Catalog entries baked in yet.")
+        write_text(domain_dir / "README.md", "\n".join(readme_lines) + "\n")
+        ok(f"skeleton built: {lock_path.relative_to(METHODOLOGY_ROOT)}")
+        return 0
+
+    if args.skeleton_cmd == "apply":
+        if not lock_path.exists():
+            err(f"missing {lock_path.relative_to(METHODOLOGY_ROOT)} — run skeleton build first")
+            return 1
+        target = Path(args.target).resolve()
+        if target.exists() and any(target.iterdir()) and not args.force:
+            err(f"target {target} is not empty (--force to apply anyway)")
+            return 1
+        target.mkdir(parents=True, exist_ok=True)
+        n = copy_path(base_dir, target, dry_run=False)
+        write_text(target / ".methodology-skeleton.json", read_text(lock_path))
+        ok(f"skeleton applied: {args.domain} -> {target} ({n} base files)")
+        return 0
+
+    err("unknown skeleton command")
+    return 2
+
+
+# ─── L3 Thinktank v0 ────────────────────────────────────────────────────────
+
+
+def observation_files() -> list[Path]:
+    base = METHODOLOGY_ROOT / OBSERVATION_DIR
+    if not base.exists():
+        return []
+    return sorted(p for p in base.glob("*.md") if OBSERVATION_FILE_RE.match(p.name))
+
+
+def cmd_thinktank(args: argparse.Namespace) -> int:
+    files = observation_files()
+    observations = [parse_observation_frontmatter(p) for p in files]
+    friction_lines: list[str] = []
+    for p in files:
+        text = read_text(p)
+        for match in re.finditer(r"where:\s*\"?(.+?)\"?\s*$", text, flags=re.MULTILINE):
+            friction_lines.append(match.group(1))
+    counts: dict[str, int] = {}
+    for item in friction_lines:
+        counts[item] = counts.get(item, 0) + 1
+
+    now = datetime.now(timezone.utc)
+    iso_year, iso_week, _ = now.isocalendar()
+    out_dir = METHODOLOGY_ROOT / INSIGHTS_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out = out_dir / f"{iso_year}-W{iso_week:02d}_thinktank.md"
+    lines = [
+        f"# Thinktank v0 — {iso_year}-W{iso_week:02d}",
+        "",
+        "> Snapshot. Generated from L1 observations and repository metadata.",
+        "",
+        "## Inputs",
+        "",
+        f"- Observation files: {len(files)}",
+        f"- Generated at: {utc_stamp()}",
+        "",
+        "## Repeated Friction Candidates",
+        "",
+    ]
+    if counts:
+        for name, count in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
+            marker = "PROMOTE-CANDIDATE" if count >= 2 else "watch"
+            lines.append(f"- `{marker}` x{count}: {name}")
+    else:
+        lines.append("- No friction entries yet.")
+    lines.extend([
+        "",
+        "## Observations",
+        "",
+    ])
+    for obs in observations:
+        lines.append(f"- `{obs.get('session_id', 'unknown')}` — domain `{obs.get('domain', '?')}`, task `{obs.get('task_type', '?')}`")
+    write_text(out, "\n".join(lines) + "\n")
+    ok(f"thinktank report: {out.relative_to(METHODOLOGY_ROOT)}")
+    return 0
 
 
 # ─── 마이그레이션 ───────────────────────────────────────────────────────────
@@ -561,6 +1090,52 @@ def main(argv: list[str] | None = None) -> int:
 
     pv = sub.add_parser("version", help="메소돌로지 버전 출력")
     pv.set_defaults(func=cmd_version)
+
+    po = sub.add_parser("observe", help="L1 AI 관찰 로그 생성·검증")
+    po.add_argument("--slug", help="파일명 slug (영문 소문자/숫자/kebab-case)")
+    po.add_argument("--summary", help="자유서술 1단락")
+    po.add_argument("--task-type", choices=sorted(OBSERVATION_TASK_TYPES), default="docs")
+    po.add_argument("--domain", help="도메인 식별자 (기본: .ai/context.json project.domain)")
+    po.add_argument("--agent", help="작성 AI 모델 (기본: .ai/context.json last_session.agent.model)")
+    po.add_argument("--tool", help="호스팅 도구 (기본: .ai/context.json last_session.agent.tool)")
+    po.add_argument("--host-os", help="호스트 OS 라벨 (기본: .ai/context.json 또는 uname)")
+    po.add_argument("--stack", action="append", help="사용한 스택/도구. 여러 번 지정 가능")
+    po.add_argument("--flow-used", default="ad-hoc", help="skeleton:<id>-<version> 또는 ad-hoc")
+    po.add_argument("--intent", action="append", help="프롬프트 intent. 여러 번 지정 가능")
+    po.add_argument("--rounds", action="append", type=int, help="각 intent의 turn 수. --intent와 같은 개수")
+    po.add_argument("--friction", action="append", help="'where|cost_minutes|resolution|repeat_of' 형식. 여러 번 지정 가능")
+    po.add_argument("--date", help="UTC 날짜 YYYY-MM-DD (기본: 오늘 UTC)")
+    po.add_argument("--force", action="store_true", help="동일 파일이 있으면 덮어쓰기")
+    po.add_argument("--dry-run", action="store_true", help="파일을 쓰지 않고 출력")
+    po.add_argument("--validate", help="기존 observation 파일 검증")
+    po.set_defaults(func=cmd_observe)
+
+    pc = sub.add_parser("catalog", help="Catalog/Pending Lesson 흐름 관리")
+    csub = pc.add_subparsers(dest="catalog_cmd", required=True)
+    ci = csub.add_parser("init", help="catalog 하위 디렉터리 생성")
+    ci.set_defaults(func=cmd_catalog)
+    cs = csub.add_parser("status", help="pending/active/archive 개수 출력")
+    cs.set_defaults(func=cmd_catalog)
+    cp = csub.add_parser("seed-pending", help="첫 Pending Lesson seed 생성")
+    cp.add_argument("--force", action="store_true")
+    cp.set_defaults(func=cmd_catalog)
+
+    psk = sub.add_parser("skeleton", help="Skeleton build/apply v0")
+    sksub = psk.add_subparsers(dest="skeleton_cmd", required=True)
+    ski = sksub.add_parser("init", help="도메인 skeleton 초기화")
+    ski.add_argument("domain")
+    ski.set_defaults(func=cmd_skeleton)
+    skb = sksub.add_parser("build", help="bakes-in.json 기준 lock/README 생성")
+    skb.add_argument("domain")
+    skb.set_defaults(func=cmd_skeleton)
+    ska = sksub.add_parser("apply", help="skeleton base와 lock을 대상 폴더에 적용")
+    ska.add_argument("domain")
+    ska.add_argument("target")
+    ska.add_argument("--force", action="store_true")
+    ska.set_defaults(func=cmd_skeleton)
+
+    pt = sub.add_parser("thinktank", help="L3 Thinktank v0 리포트 생성")
+    pt.set_defaults(func=cmd_thinktank)
 
     args = p.parse_args(argv)
     return args.func(args)
