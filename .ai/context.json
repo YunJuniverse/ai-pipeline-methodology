@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "schema_url": ".ai/schema/context.schema.json",
+  "project": {
+    "name": "methodology",
+    "kind": "methodology-source",
+    "domain": "meta",
+    "started_on": "2026-05-06"
+  },
+  "current_phase": {
+    "stage": "stage-1",
+    "label": "토대 — L0 이식성 코어 + L1 관찰 로그",
+    "since": "2026-05-07"
+  },
+  "active_skeleton": null,
+  "last_session": {
+    "ended_at": "2026-05-07T19:30:00Z",
+    "agent": {
+      "model": "claude-sonnet-4-6",
+      "tool": "claude-code-cli",
+      "version": "1.0"
+    },
+    "host_os": "darwin-25.4",
+    "checkpoint_file": ".ai/checkpoint.md"
+  },
+  "must_read": [
+    "ONBOARDING.md",
+    "00_foundation/WHITEPAPER.md",
+    "CLAUDE.md",
+    ".ai/checkpoint.md"
+  ],
+  "must_read_optional": [
+    "README.md",
+    "10_guides/README.md",
+    "10_guides/00_AI_기획_프로젝트_운영_원칙.md",
+    "30_dev/snapshots/2026-05-07_handoff_simulation_baseline.md"
+  ],
+  "active_todos": [],
+  "active_catalog_hits": [],
+  "adapters_present": ["generic", "claude"]
+}
