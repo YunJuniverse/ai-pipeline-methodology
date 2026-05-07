@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- Working on: post-merge follow-up after repository structure normalization
+- Working on: executable constitution and portable implementation roadmap
 - Current mode: fullstack
-- Next TODO: decide git policy for local tool metadata and implement first L1 observation capture flow
+- Next TODO: METH-007 — implement L1 observation log generation and validation flow
 - Blockers: none
 
 ## Active Links
@@ -16,7 +16,7 @@
 - Current PR:
 - Current issue:
 - Relevant ADRs:
-- Relevant snapshots:
+- Relevant snapshots: `30_dev/snapshots/implementation-plan-2026-05-07.md`
 
 ## Open Decisions
 
@@ -37,3 +37,6 @@
 - 2026-05-07: created `40_resources/catalog/`, `40_resources/skeletons/`, and `40_resources/ai_observations/` with schema `_README.md` files
 - 2026-05-07: added `10_guides/03_AI_관찰_로그_작성_규칙.md` as the single-source rule for L1 observation logs
 - 2026-05-07: moved onboarding docs into `40_resources/onboarding/` and evaluation notes into `90_archive/evaluation/`
+- 2026-05-07: revised `00_foundation/WHITEPAPER.md` to v0.2.0 as an executable constitution
+- 2026-05-07: added implementation roadmap snapshot for L0/L1 first execution path
+- 2026-05-07: completed `METH-006` L0 portable boot context refresh (`.ai/context.json`, schema, checkpoint, adapters)

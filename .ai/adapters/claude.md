@@ -28,8 +28,8 @@ Claude Code는 세션 시작 시 다음을 자동 컨텍스트에 포함:
 
 ```
 .ai/checkpoint.md를 이 세션 작업 내용으로 갱신해줘.
-형식: 00_foundation/WHITEPAPER.md §2-2.
-규칙: 과장·요약·서술 금지, 사실·시간 비용만.
+형식: 현재 .ai/checkpoint.md의 필수 섹션.
+규칙: 과장·칭찬·추측 금지, 다음 AI가 이어받는 데 필요한 사실과 첫 행동만.
 ```
 
 **향후 (TODO)**: `.claude/settings.json`의 `hooks.SessionEnd`에 checkpoint 자동 갱신 명령을 등록.
@@ -49,5 +49,5 @@ Claude Code는 세션 시작 시 다음을 자동 컨텍스트에 포함:
 
 ## 주의
 
-- worktree 환경에서 작업 중일 수 있음 (`.claude/worktrees/<name>/`). `pwd`로 항상 확인.
+- worktree 환경에서 작업 중일 수 있음. `pwd`와 `git branch --show-current`로 항상 확인.
 - Claude Code 자동 로드 컨텍스트가 본 방법론의 운영 규칙(`CLAUDE.md`)과 충돌 시, **`CLAUDE.md`가 이김** — 백서 §8-1 우선순위.

@@ -57,7 +57,7 @@ python3 50_tools/methodology.py version
 ## 자주 하는 실수 (출시 시점)
 
 - **루트에서 `python3 methodology.py` 실행** — 이전 구조의 잔재. 현재는 `50_tools/methodology.py`.
-- **`HANDOFF.md`를 루트에서 찾음** — 적용 프로젝트엔 있지만, 본 *methodology-source* 저장소엔 없음(있을지 미결정. checkpoint Open Questions §1 참조).
+- **`HANDOFF.md`를 루트에서 찾음** — 현재 상태의 단일 live handoff다. 150줄 이하를 유지한다.
 - **변경 직접 커밋** — `CLAUDE.md` §운영 규칙: 사용자 명시 승인 없이 커밋 금지.
 
 ## 인계 성공 기준 (체크리스트)
