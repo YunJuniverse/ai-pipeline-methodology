@@ -52,7 +52,7 @@ from typing import Callable
 # ─── 메소돌로지 자체 버전 ───────────────────────────────────────────────────
 METHODOLOGY_VERSION = "v3.1"
 
-METHODOLOGY_ROOT = Path(__file__).resolve().parent
+METHODOLOGY_ROOT = Path(__file__).resolve().parent.parent
 
 # ─── 매니페스트 ─────────────────────────────────────────────────────────────
 MANIFEST = {
@@ -61,8 +61,9 @@ MANIFEST = {
         "10_guides",
         "40_resources/templates",
         "40_resources/prompts",
-        "methodology-graph.json",
-        "generate-dashboard.py",
+        "50_tools/methodology-graph.json",
+        "50_tools/generate-dashboard.py",
+        "50_tools/methodology.py",
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
@@ -382,8 +383,8 @@ def cmd_init(args: argparse.Namespace) -> int:
 
     info("done. 다음:")
     print("  cd", target)
-    print("  python3 generate-dashboard.py --serve   # 대시보드 확인")
-    print(f"  방법론 갱신 시: python3 {METHODOLOGY_ROOT}/methodology.py sync --apply")
+    print("  python3 50_tools/generate-dashboard.py --serve   # 대시보드 확인")
+    print(f"  방법론 갱신 시: python3 {METHODOLOGY_ROOT}/50_tools/methodology.py sync --apply")
     return 0
 
 
@@ -398,7 +399,7 @@ def cmd_sync(args: argparse.Namespace) -> int:
     vinfo = load_version_file(target)
     if not vinfo:
         err(f"{VERSION_FILE_NAME} 없음 — 이 폴더는 methodology init으로 만든 프로젝트가 아닙니다.")
-        err("처음 적용한다면: methodology.py init <path> 또는 빈 .methodology-version 파일 만들고 재시도")
+        err("처음 적용한다면: 50_tools/methodology.py init <path> 또는 빈 .methodology-version 파일 만들고 재시도")
         return 2
 
     cur_v = vinfo.get("methodology_version", "v0.0")

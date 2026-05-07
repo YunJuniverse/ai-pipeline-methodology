@@ -9,11 +9,11 @@
 
 산출물: dashboard.html (자기완결, CDN: d3.v7)
 
-사용:
-  python generate-dashboard.py                 # dashboard.html 생성
-  python generate-dashboard.py --serve         # 파일 생성 후 8765 포트로 서빙
-  python generate-dashboard.py --out PATH      # 출력 경로 지정
-  python generate-dashboard.py --root PATH     # 다른 프로젝트에 대해 실행
+사용 (저장소 루트에서 실행):
+  python 50_tools/generate-dashboard.py                 # dashboard.html 생성
+  python 50_tools/generate-dashboard.py --serve         # 파일 생성 후 8765 포트로 서빙
+  python 50_tools/generate-dashboard.py --out PATH      # 출력 경로 지정
+  python 50_tools/generate-dashboard.py --root PATH     # 다른 프로젝트에 대해 실행
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 
 KANBAN_SECTIONS = ["Backlog", "Ready", "InProgress", "Blocked", "Done"]
 
@@ -265,10 +265,11 @@ def count_files(p: Path, suffix: str = "") -> int:
 
 
 def assemble(root: Path) -> dict[str, Any]:
-    # graph: root에 있고, 없으면 docs/ 하위 fallback (이전 구조 호환)
-    graph_path = root / "methodology-graph.json"
-    if not graph_path.exists():
-        graph_path = root / "docs" / "methodology-graph.json"
+    # graph: 50_tools/ 우선, 루트 fallback, docs/ fallback (이전 구조 호환)
+    graph_path = root / "50_tools" / "methodology-graph.json"
+    for cand in [root / "methodology-graph.json", root / "docs" / "methodology-graph.json"]:
+        if not graph_path.exists():
+            graph_path = cand
 
     # TODO: 루트 → 40_resources/templates → docs/templates
     todo_path = root / "TODO.md"
@@ -682,15 +683,15 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
     <div class="card">
       <h3>6. 활용 가이드 — CLI</h3>
       <pre style="font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0"><code># 새 프로젝트
-methodology.py init my-project --type fullstack
+50_tools/methodology.py init my-project --type fullstack
 
 # 기존 프로젝트 갱신 (자동 마이그레이션)
-methodology.py status               # 현재 vs 업스트림
-methodology.py sync                 # 미리보기
-methodology.py sync --apply         # 실제 적용
+50_tools/methodology.py status               # 현재 vs 업스트림
+50_tools/methodology.py sync                 # 미리보기
+50_tools/methodology.py sync --apply         # 실제 적용
 
 # 단일 파일 변경 미리보기
-methodology.py diff CLAUDE.md</code></pre>
+50_tools/methodology.py diff CLAUDE.md</code></pre>
     </div>
 
     <div class="card">

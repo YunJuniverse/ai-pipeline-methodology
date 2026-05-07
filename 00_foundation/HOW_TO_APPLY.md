@@ -20,7 +20,7 @@
 ```bash
 METHODOLOGY="/Users/hayden/Library/Mobile Documents/iCloud~md~obsidian/Documents/methodology"
 cd ~/Projects
-python3 "$METHODOLOGY/methodology.py" init my-project --type fullstack
+python3 "$METHODOLOGY/50_tools/methodology.py" init my-project --type fullstack
 ```
 
 생성 결과:
@@ -29,13 +29,13 @@ python3 "$METHODOLOGY/methodology.py" init my-project --type fullstack
 my-project/
 ├── CLAUDE.md, AGENTS.md
 ├── HANDOFF.md, TODO.md
-├── methodology-graph.json
-├── generate-dashboard.py
 ├── .github/PULL_REQUEST_TEMPLATE.md
+├── 00_foundation/    # WHITEPAPER / HOW_TO_APPLY / KICKOFF / DIAGRAM
 ├── 10_guides/        # 작성 지침서 11종
 ├── 20_planning/      # 기획 산출물 v0
 ├── 30_dev/           # MASTER_PLAN / SPRINTS / adr / snapshots
 ├── 40_resources/     # templates / prompts
+├── 50_tools/         # methodology.py / generate-dashboard.py / methodology-graph.json
 ├── src/              # fullstack만
 └── tests/            # fullstack만
 ```
@@ -65,7 +65,7 @@ my-project/
 cd ~/Projects/my-project
 ```
 
-첫 메시지는 [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)를 기준으로 보낸다.
+첫 메시지는 [KICKOFF_PROMPT.md](KICKOFF_PROMPT.md)를 기준으로 보낸다 (같은 폴더).
 
 첫 세션의 목표는 보통 아래 네 가지다.
 
