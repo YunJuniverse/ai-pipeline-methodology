@@ -9,11 +9,11 @@
 ## Instructions
 
 - Read `briefs/` and `briefs/updates/`.
-- Read `docs/guides/planning/13_마케팅기획서_작성_지침.md` — follow its structure exactly.
-- Read `docs/snapshots/plans/business/` (최신) — 수익 모델, 타겟 고객과 정합성 유지.
-- Read prior versions in `docs/snapshots/plans/marketing/` if they exist.
+- Read `10_guides/13_마케팅기획서_작성_지침.md` — follow its structure exactly.
+- Read `30_dev/snapshots/plans/business/` (최신) — 수익 모델, 타겟 고객과 정합성 유지.
+- Read prior versions in `30_dev/snapshots/plans/marketing/` if they exist.
 - Add frontmatter block and snapshot warning header.
-- Write to `docs/snapshots/plans/marketing/v{N}-{YYYY-MM-DD}.md`.
+- Write to `30_dev/snapshots/plans/marketing/v{N}-{YYYY-MM-DD}.md`.
 - Update `HANDOFF.md`.
 
 ## Frontmatter

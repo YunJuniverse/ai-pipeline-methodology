@@ -2,7 +2,7 @@
 
 ## 구성
 
-- `templates/` — 풀 템플릿 (`init-project.sh`가 새 프로젝트로 복사하는 원본)
+- `templates/` — 풀 템플릿 (`methodology.py init`이 새 프로젝트로 복사하는 원본)
   - `MASTER_PLAN.md` — 18번 풀 템플릿 (30_dev/MASTER_PLAN.md는 v0 스켈레톤)
   - `SPRINTS.md` — 풀 템플릿
   - `TODO.md` — 5섹션 칸반 헤더 포함
@@ -10,6 +10,10 @@
   - `ADR-template.md`
 - `prompts/` — 스냅샷 생성 프롬프트
   - `business-plan.md`, `service-spec.md`, `architecture.md`, `api-spec.md`, `data-model.md`
+- `onboarding/` — 사람이 바로 읽는 시작 자료
+  - `HOW_TO_APPLY.md` — 적용 절차
+  - `KICKOFF_PROMPT.md` — 첫 세션 시작 프롬프트
+  - `DIAGRAM.md` — 핵심 워크플로 다이어그램
 
 ## 사용
 

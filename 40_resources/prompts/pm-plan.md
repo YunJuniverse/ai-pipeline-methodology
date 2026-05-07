@@ -9,11 +9,11 @@
 ## Instructions
 
 - Read `briefs/` and `briefs/updates/`.
-- Read `docs/guides/planning/15_프로젝트_관리_기획서_작성_지침.md` — follow its structure exactly.
+- Read `10_guides/15_프로젝트_관리_기획서_작성_지침.md` — follow its structure exactly.
 - Read all other plan snapshots (business, service, ops, marketing, brand) — 최신 버전.
-- Read prior versions in `docs/snapshots/plans/pm/` if they exist.
+- Read prior versions in `30_dev/snapshots/plans/pm/` if they exist.
 - Add frontmatter block and snapshot warning header.
-- Write to `docs/snapshots/plans/pm/v{N}-{YYYY-MM-DD}.md`.
+- Write to `30_dev/snapshots/plans/pm/v{N}-{YYYY-MM-DD}.md`.
 - Update `HANDOFF.md`: note all 6 plans complete, ready for Phase 1 review gate.
 
 ## Frontmatter

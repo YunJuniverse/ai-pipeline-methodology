@@ -7,7 +7,7 @@ Use this when a dated schema or domain model document is needed.
 - Read actual schema files, migrations, ORM models, tests, and relevant ADRs.
 - Do not rely on stale planning docs.
 - If the schema is inconsistent across code paths, state that explicitly.
-- Write the result to `docs/snapshots/data-model-YYYY-MM-DD.md`.
+- Write the result to `30_dev/snapshots/data-model-YYYY-MM-DD.md`.
 - Add a header that says the document is a snapshot and not a live source.
 
 ## Include

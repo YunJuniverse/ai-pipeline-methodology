@@ -14,7 +14,7 @@ Use this to generate a planning document (기획서) from brief files in `briefs
 - Read `HANDOFF.md` and `CLAUDE.md`.
 - Do not infer market facts, user needs, or business viability without evidence from the briefs.
 - If evidence is missing, add an `Evidence Needed` section instead of inventing.
-- Write the result to `docs/snapshots/plan-YYYY-MM-DD.md`.
+- Write the result to `30_dev/snapshots/plan-YYYY-MM-DD.md`.
 - Add a snapshot warning header at the top.
 - After writing, update `HANDOFF.md` to note that the plan snapshot is ready for human review.
 

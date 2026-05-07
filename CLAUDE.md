@@ -26,7 +26,7 @@
 - `TODO.md` is the active backlog. Use stable IDs and acceptance criteria.
 - **After every task**: update `TODO.md` (mark completed items) and `HANDOFF.md` (current state, next actions). The Kanban board reads these files and will not reflect changes until they are updated.
 - Identifier and versioning rules (phase M0/M1, sprint S-NNN, TODO ID, ADR, doc version, AI feature ID) are defined in `10_guides/02_식별자_및_버전_관리_규칙.md`. Follow that file before creating any new identifier.
-- `docs/snapshots/` contains dated artifacts. Snapshots are never live source.
+- `30_dev/snapshots/` contains dated artifacts. Snapshots are never live source.
 - Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.
 - Default boot context is `CLAUDE.md` + `HANDOFF.md`.
 - Load `TODO.md`, related code/tests, and related ADRs only when needed.
@@ -93,8 +93,8 @@ Additional rule:
 | `HANDOFF.md` | Current focus, latest verified checks, latest local or merged work, open issues, next best actions, active links | Long project history, full sprint archives, methodology essays, duplicated ADR reasoning |
 | `TODO.md` | Active backlog items with stable IDs, mode, change class, owner, acceptance criteria | Full completion archives — move historical detail to git, PRs, or dated snapshots |
 | `AI-LOG.md` | Optional short collaboration notes not yet in a durable home | Duplicates of `HANDOFF.md`, `TODO.md`, PR descriptions, or ADR decisions |
-| `docs/adr/` | Durable decisions that code cannot explain | Implementation detail that belongs in code |
-| `docs/snapshots/` | Dated outputs, reviews, plans, runbooks | Live operating state — never promote a snapshot to a live document |
+| `30_dev/adr/` | Durable decisions that code cannot explain | Implementation detail that belongs in code |
+| `30_dev/snapshots/` | Dated outputs, reviews, plans, runbooks | Live operating state — never promote a snapshot to a live document |
 
 ---
 
@@ -138,7 +138,7 @@ Typical gate points:
 
 1. Human adds or confirms a planning item in `TODO.md`.
 2. AI reads `CLAUDE.md` and `HANDOFF.md`.
-3. AI performs research and writes a dated snapshot under `docs/snapshots/`.
+3. AI performs research and writes a dated snapshot under `30_dev/snapshots/`.
 4. Human reviews through a PR or issue thread.
 5. AI updates `HANDOFF.md` and `TODO.md`.
 
@@ -179,7 +179,7 @@ Restrictions:
 
 ### Decision Records
 
-- architecture and product decisions go to `docs/adr/`
+- architecture and product decisions go to `30_dev/adr/`
 - use ADRs only when code cannot explain the reason
 
 ### Commit Types

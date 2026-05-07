@@ -61,6 +61,6 @@ Use this when new ideas or direction changes require updating existing planning 
 ## File Naming
 
 ```
-docs/snapshots/plans/business/v2-2026-05-15.md
-docs/snapshots/plans/service/v2-2026-05-15.md
+30_dev/snapshots/plans/business/v2-2026-05-15.md
+30_dev/snapshots/plans/service/v2-2026-05-15.md
 ```

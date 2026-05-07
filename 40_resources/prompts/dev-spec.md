@@ -4,17 +4,17 @@ Use this to generate a development specification (개발명세서) from an appro
 
 ## When To Use
 
-- Human has approved the plan snapshot (`docs/snapshots/plan-YYYY-MM-DD.md`)
+- Human has approved the plan snapshot (`30_dev/snapshots/plan-YYYY-MM-DD.md`)
 - Human has given explicit instruction to proceed to dev spec
 - No dev spec exists yet for this planning cycle
 
 ## Instructions
 
-- Read the approved plan snapshot from `docs/snapshots/`.
+- Read the approved plan snapshot from `30_dev/snapshots/`.
 - Read `HANDOFF.md`, `CLAUDE.md`, and any relevant ADRs.
 - Identify all Change Class B and C triggers in the planned features and call them out explicitly.
 - Do not design beyond what the plan describes.
-- Write the result to `docs/snapshots/dev-spec-YYYY-MM-DD.md`.
+- Write the result to `30_dev/snapshots/dev-spec-YYYY-MM-DD.md`.
 - Add a snapshot warning header at the top.
 - After writing, update `HANDOFF.md` to note the dev spec is ready for human review, and list Change Class B/C items that will need evidence in their PRs.
 
@@ -25,7 +25,7 @@ Use this to generate a development specification (개발명세서) from an appro
 
 > SNAPSHOT: This document was generated on YYYY-MM-DD and is not a live source of truth.
 > Do not treat it as current after the date above.
-> Source plan: docs/snapshots/plan-YYYY-MM-DD.md
+> Source plan: 30_dev/snapshots/plan-YYYY-MM-DD.md
 
 ## Scope
 What this spec covers. What is explicitly out of scope.

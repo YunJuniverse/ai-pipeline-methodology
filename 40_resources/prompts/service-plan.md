@@ -9,11 +9,11 @@
 ## Instructions
 
 - Read `briefs/` and `briefs/updates/`.
-- Read `docs/guides/planning/11_서비스기획서_작성_지침.md` — follow its structure exactly.
-- Read `docs/snapshots/plans/business/` (최신 버전) — 사업기획서와 정합성 유지.
-- Read prior versions in `docs/snapshots/plans/service/` if they exist.
+- Read `10_guides/11_서비스기획서_작성_지침.md` — follow its structure exactly.
+- Read `30_dev/snapshots/plans/business/` (최신 버전) — 사업기획서와 정합성 유지.
+- Read prior versions in `30_dev/snapshots/plans/service/` if they exist.
 - Add frontmatter block and snapshot warning header.
-- Write to `docs/snapshots/plans/service/v{N}-{YYYY-MM-DD}.md`.
+- Write to `30_dev/snapshots/plans/service/v{N}-{YYYY-MM-DD}.md`.
 - Update `HANDOFF.md`.
 
 ## Frontmatter
