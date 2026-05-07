@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "domain": "meta",
+  "base_version": "v0",
+  "built_at": "2026-05-07T15:06:28Z",
+  "base_files": [
+    "README.md"
+  ],
+  "catalog_entries": []
+}

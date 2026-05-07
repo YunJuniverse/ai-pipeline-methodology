@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- Working on: executable constitution and portable implementation roadmap
+- Working on: L0~L4 v0 implementation complete; waiting for real repeated friction evidence
 - Current mode: fullstack
-- Next TODO: METH-007 — implement L1 observation log generation and validation flow
+- Next TODO: none in Ready; next candidate is a real active Catalog promotion when N>=2 evidence exists
 - Blockers: none
 
 ## Active Links
@@ -16,13 +16,13 @@
 - Current PR:
 - Current issue:
 - Relevant ADRs:
-- Relevant snapshots: `30_dev/snapshots/implementation-plan-2026-05-07.md`
+- Relevant snapshots: `30_dev/snapshots/implementation-plan-2026-05-07.md`, `30_dev/snapshots/transfer-drill-2026-05-08.md`
 
 ## Open Decisions
 
 | ID | Decision | Needed By | Status |
 |----|----------|-----------|--------|
-| - | Whether `.claude/worktrees/` and `.codex/` should be gitignored | Next cleanup pass | Open |
+| - | `.claude/worktrees/` and `.codex/` are local tool metadata and should be gitignored | 2026-05-07 | Closed |
 
 ## Open Issues
 
@@ -40,3 +40,6 @@
 - 2026-05-07: revised `00_foundation/WHITEPAPER.md` to v0.2.0 as an executable constitution
 - 2026-05-07: added implementation roadmap snapshot for L0/L1 first execution path
 - 2026-05-07: completed `METH-006` L0 portable boot context refresh (`.ai/context.json`, schema, checkpoint, adapters)
+- 2026-05-07: completed `METH-007` L1 observation CLI flow (`methodology observe`, validation, sample log)
+- 2026-05-07: completed `METH-002` by ignoring local tool metadata paths while keeping `.ai/` tracked
+- 2026-05-08: completed `METH-008` through `METH-012` v0 flows for Catalog, Skeleton, Thinktank, Dashboard assets, and transfer drill

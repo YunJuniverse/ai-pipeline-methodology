@@ -58,6 +58,26 @@ prompt_patterns:
 (자유서술 1단락 이내)
 ```
 
+## 2.1 CLI 생성·검증
+
+생성:
+
+```bash
+python3 50_tools/methodology.py observe \
+  --slug l1-observe-flow \
+  --summary "다음 세션 자기 자신에게 남길 1단락 메모" \
+  --task-type docs \
+  --stack python3 \
+  --intent "l1 observation capture" \
+  --rounds 2
+```
+
+검증:
+
+```bash
+python3 50_tools/methodology.py observe --validate 40_resources/ai_observations/YYYY-MM-DD_slug.md
+```
+
 ## 3. 절대 규칙 (강제)
 
 - ✅ AI가 작성 (사용자 아님)

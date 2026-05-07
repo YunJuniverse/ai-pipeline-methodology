@@ -261,6 +261,41 @@ def count_files(p: Path, suffix: str = "") -> int:
     return sum(1 for x in p.glob(f"*{suffix}") if x.is_file() and not x.name.startswith("."))
 
 
+def count_files_recursive(p: Path, suffix: str = "") -> int:
+    if not p.exists() or not p.is_dir():
+        return 0
+    return sum(1 for x in p.rglob(f"*{suffix}") if x.is_file() and not x.name.startswith("."))
+
+
+def read_json_safe(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def read_methodology_assets(root: Path) -> dict:
+    catalog = root / "40_resources" / "catalog"
+    skeletons = root / "40_resources" / "skeletons"
+    observations = root / "40_resources" / "ai_observations"
+    insights = root / "30_dev" / "snapshots" / "insights"
+    context = read_json_safe(root / ".ai" / "context.json")
+    return {
+        "context": context,
+        "observations": count_files(observations, ".md") - (1 if (observations / "_README.md").exists() else 0),
+        "catalog_pending": count_files(catalog / "_pending", ".md"),
+        "catalog_active": len([p for p in catalog.glob("C-*.md") if p.is_file()]),
+        "catalog_archived": count_files(catalog / "archived", ".md"),
+        "skeleton_domains": len([p for p in skeletons.iterdir() if p.is_dir()]) if skeletons.exists() else 0,
+        "skeleton_locks": count_files_recursive(skeletons, "skeleton.lock.json"),
+        "insight_reports": count_files(insights, ".md"),
+        "adapters": context.get("adapters_present", []),
+        "active_todos": context.get("active_todos", []),
+    }
+
+
 # ──────────────────────────────────── data assembly ────────────────────────────────────
 
 
@@ -369,6 +404,7 @@ def assemble(root: Path) -> dict[str, Any]:
             "snapshot_count": count_files(root / "30_dev" / "snapshots", ".md"),
             "sprint_total":   len(sprints_json),
             "sprint_active":  sum(1 for s in sprints_json if s["fields"].get("status", "").lower() == "active"),
+            "methodology_assets": read_methodology_assets(root),
         },
         "guides_readme": read_text_safe(readme_path, 50000),
     }
@@ -817,6 +853,7 @@ function renderOverview(){
   const pkg = ov.package || {};
   const cfg = ov.config || {};
   const mp  = ov.master_plan_meta || {};
+  const assets = ov.methodology_assets || {};
 
   // 헤더
   const name = meta['Project Name'] || meta['Project'] || pkg.name || '(이름 없음)';
@@ -851,6 +888,10 @@ function renderOverview(){
     { label: 'ADR', value: ov.adr_count || 0, sub: '결정 기록' },
     { label: 'Snapshots', value: ov.snapshot_count || 0, sub: '날짜별 산출물' },
     { label: '의존성', value: pkg.dependencies_count || 0, sub: `${pkg.dev_dependencies_count || 0} dev` },
+    { label: 'L1 관찰', value: assets.observations || 0, sub: 'ai_observations' },
+    { label: 'Pending', value: assets.catalog_pending || 0, sub: 'Catalog 후보' },
+    { label: 'Skeleton', value: assets.skeleton_domains || 0, sub: `${assets.skeleton_locks || 0} locks` },
+    { label: 'Insights', value: assets.insight_reports || 0, sub: 'Thinktank' },
   ];
   document.getElementById('ov-stats').innerHTML = stats.map(s =>
     `<div class="ov-stat"><div class="label">${escapeHtml(s.label)}</div><div class="value">${s.value}</div><div class="sub">${escapeHtml(s.sub)}</div></div>`
@@ -875,6 +916,8 @@ function renderOverview(){
     const scriptList = Object.entries(pkg.scripts).slice(0,6).map(([k,v]) => `<code>${escapeHtml(k)}</code>`).join(' ');
     stackRows.push(['npm scripts', scriptList]);
   }
+  stackRows.push(['L0 adapters', (assets.adapters || []).map(a => `<code>${escapeHtml(a)}</code>`).join(' ') || '—']);
+  stackRows.push(['Active TODOs', (assets.active_todos || []).map(a => `<code>${escapeHtml(a)}</code>`).join(' ') || 'none']);
   document.getElementById('ov-stack').innerHTML = stackRows.length
     ? '<ul class="ov-list">' + stackRows.map(([k,v]) => `<li><span class="k">${escapeHtml(k)}</span><span class="v">${v}</span></li>`).join('') + '</ul>'
     : '<div class="muted">CLAUDE.md §1 Project Settings를 채워주세요.</div>';
