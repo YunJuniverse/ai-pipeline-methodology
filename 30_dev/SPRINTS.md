@@ -10,7 +10,7 @@ guide: 10_guides/15_프로젝트_관리_기획서_작성_지침.md
 # [PROJECT_NAME] 스프린트 타임라인
 
 > v0 스켈레톤. 풀 템플릿: `40_resources/templates/SPRINTS.md`
-> 대시보드(`generate-dashboard.py`)가 이 파일을 파싱한다. `### S-NNN` 형식 유지.
+> 대시보드(`50_tools/generate-dashboard.py`)가 이 파일을 파싱한다. `### S-NNN` 형식 유지.
 
 ## 연간 목표
 
