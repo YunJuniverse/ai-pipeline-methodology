@@ -14,28 +14,32 @@
   },
   "active_skeleton": null,
   "last_session": {
-    "ended_at": "2026-05-07T19:30:00Z",
+    "ended_at": "2026-05-07T12:49:20Z",
     "agent": {
-      "model": "claude-sonnet-4-6",
-      "tool": "claude-code-cli",
-      "version": "1.0"
+      "model": "gpt-5",
+      "tool": "codex-desktop",
+      "version": "unknown"
     },
-    "host_os": "darwin-25.4",
+    "host_os": "darwin-26.4.1-arm64",
     "checkpoint_file": ".ai/checkpoint.md"
   },
   "must_read": [
     "ONBOARDING.md",
     "00_foundation/WHITEPAPER.md",
-    "CLAUDE.md",
+    "AGENTS.md",
+    "HANDOFF.md",
+    "TODO.md",
     ".ai/checkpoint.md"
   ],
   "must_read_optional": [
     "README.md",
-    "10_guides/README.md",
+    "CLAUDE.md",
     "10_guides/00_AI_기획_프로젝트_운영_원칙.md",
+    "10_guides/03_AI_관찰_로그_작성_규칙.md",
+    "30_dev/snapshots/implementation-plan-2026-05-07.md",
     "30_dev/snapshots/2026-05-07_handoff_simulation_baseline.md"
   ],
-  "active_todos": [],
+  "active_todos": ["METH-007"],
   "active_catalog_hits": [],
-  "adapters_present": ["generic", "claude"]
+  "adapters_present": ["generic", "claude", "codex", "gpt"]
 }
