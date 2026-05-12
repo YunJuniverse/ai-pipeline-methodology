@@ -1067,10 +1067,11 @@ def cmd_status(args: argparse.Namespace) -> int:
         err(f"{VERSION_FILE_NAME} 없음 — methodology 적용 안 된 폴더")
         return 2
     cur_v = vinfo.get("methodology_version", "?")
+    applied_commit = vinfo.get("upstream_commit") or "unknown"
+    up_commit = upstream_commit()
     print(f"project          {target}")
-    print(f"applied version  {cur_v}")
-    print(f"upstream version {METHODOLOGY_VERSION}")
-    print(f"upstream commit  {upstream_commit()}")
+    print(f"applied version  {cur_v}  (commit: {applied_commit})")
+    print(f"upstream version {METHODOLOGY_VERSION}  (commit: {up_commit})")
     if cur_v != METHODOLOGY_VERSION:
         chain = find_migration_chain(cur_v, METHODOLOGY_VERSION)
         if chain:
@@ -1080,7 +1081,12 @@ def cmd_status(args: argparse.Namespace) -> int:
         else:
             print("migrations:      (직접 동기화)")
     else:
-        print("status:          최신 ✓")
+        # 같은 버전 — upstream commit 격차도 확인 (RFC-001 / MP-001)
+        if applied_commit != "unknown" and up_commit != "unknown" and applied_commit != up_commit:
+            print(f"status:          behind upstream — {applied_commit} → {up_commit}")
+            print("                 (실측 격차 확인: methodology sync --path <project> 로 dry-run)")
+        else:
+            print("status:          최신 ✓")
     return 0
 
 
