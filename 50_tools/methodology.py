@@ -65,7 +65,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 # ─── 메소돌로지 자체 버전 ───────────────────────────────────────────────────
-METHODOLOGY_VERSION = "v3.1"
+METHODOLOGY_VERSION = "v3.2"
 
 METHODOLOGY_ROOT = Path(__file__).resolve().parent.parent
 
@@ -76,14 +76,28 @@ MANIFEST = {
         "10_guides",
         "40_resources/templates",
         "40_resources/prompts",
+        "40_resources/catalog/_README.md",
+        "40_resources/skeletons/_README.md",
+        "40_resources/ai_observations/_README.md",
         "50_tools/methodology-graph.json",
         "50_tools/generate-dashboard.py",
         "50_tools/methodology.py",
+        "00_foundation/WHITEPAPER.md",
+        "00_foundation/HOW_TO_APPLY.md",
+        "00_foundation/KICKOFF_PROMPT.md",
+        "00_foundation/DIAGRAM.md",
+        ".ai/schema",
+        ".ai/adapters",
+        "ONBOARDING.md",
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
         "20_planning",
         "30_dev",
+        "40_resources/catalog/_pending",
+        "40_resources/catalog/archived",
+        "40_resources/skeletons",
+        "40_resources/ai_observations",
     ],
     # init이 src→dst 매핑으로 복사하는 단일 파일들 (PROJECT_NAME 치환 가능)
     "init_files": [
@@ -92,6 +106,8 @@ MANIFEST = {
         ("AGENTS.md", "AGENTS.md", True),
         ("40_resources/templates/HANDOFF.md", "HANDOFF.md", True),
         ("40_resources/templates/TODO.md", "TODO.md", True),
+        ("40_resources/templates/context.json", ".ai/context.json", True),
+        ("40_resources/templates/checkpoint.md", ".ai/checkpoint.md", True),
     ],
     # sync가 마커 사이만 머지하는 파일
     "managed_files": [
