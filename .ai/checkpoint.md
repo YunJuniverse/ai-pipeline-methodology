@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-12 (dashboard CLI + 부팅 의무 호출)
+# Checkpoint — 2026-05-12 (ship + hooks + auto-merge — 작업 종료 자동화 완성)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -19,6 +19,16 @@
 4. "다음 사람에게" 첫 항목부터 시작.
 
 ## 방금 한 것 (정확히)
+
+**A. ship + hooks + auto-merge** (이번 세션):
+- `methodology ship -m "..."` — 7단계 통합 (wrap → manifest-check → sensitive → test → build → add+commit → push). 각 옵션 (--no-test/build/push/commit/add-all/allow-sensitive)
+- `methodology hooks install` — `.git/hooks/pre-push` 자동 설치 (manifest-check + wrap --strict). 우회 `git push --no-verify`
+- `.github/workflows/methodology-auto-merge.yml` — PR 'auto-merge' 라벨 시 자동 squash 머지 (외부 action 무의존)
+- MANIFEST shared_paths에 auto-merge.yml 추가
+- CLAUDE.md / AGENTS.md managed 마커에 ship 사용 권고 + hooks 1회 설치 안내
+
+**B. dashboard CLI** (이전 세션):
+- `methodology dashboard` — 빌드 + background 서빙 + URL 출력 (branch/commit/pid). 포트 중복 회피.
 
 0. **dashboard CLI 신설** — `50_tools/methodology.py cmd_dashboard` + 서브커맨드 등록.
    - `--port` (기본 8765), `--no-serve`, `--path`, `--out`, `--background` 옵션

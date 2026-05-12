@@ -90,6 +90,7 @@ MANIFEST = {
         ".ai/adapters",
         "ONBOARDING.md",
         ".github/workflows/methodology-applied-ci.yml",
+        ".github/workflows/methodology-auto-merge.yml",
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
@@ -1134,6 +1135,230 @@ def cmd_version(args: argparse.Namespace) -> int:
     return 0
 
 
+_SENSITIVE_PATTERNS = [".env", "credential", "secret", ".pem", ".key", ".p12", ".pfx"]
+
+
+def _detect_sensitive(target: Path) -> list[str]:
+    """git status에서 sensitive 파일 패턴 탐지."""
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "status", "--porcelain"], text=True
+        )
+    except Exception:
+        return []
+    hits: list[str] = []
+    for line in out.splitlines():
+        if not line.strip():
+            continue
+        path = line[3:].strip().strip('"')
+        low = path.lower()
+        for pat in _SENSITIVE_PATTERNS:
+            if pat in low and not low.endswith(".sample") and not low.endswith(".example"):
+                hits.append(path)
+                break
+    return hits
+
+
+def cmd_ship(args: argparse.Namespace) -> int:
+    """작업 종료 흐름을 단일 명령으로 통합.
+
+    단계:
+      1) wrap --strict — 4 라이브 파일 갱신 검증
+      2) manifest-check — 60_meta 격리 안전망
+      3) sensitive 파일 검사 — .env/credentials/keys 차단
+      4) (선택) pnpm test / pnpm build — package.json 있으면
+      5) git add -A (--no-add-all 면 staged만)
+      6) git commit -m <message>
+      7) git push origin <current-branch> (--no-push 면 생략)
+    """
+    target = Path(args.path or ".").resolve()
+    message: str | None = args.message
+    if not message and not args.no_commit:
+        err("--message 필수 (또는 --no-commit 으로 commit 단계 skip)")
+        return 2
+
+    self_py = METHODOLOGY_ROOT / "50_tools" / "methodology.py"
+    if not self_py.exists():
+        self_py = target / "50_tools" / "methodology.py"
+
+    # 1) wrap --strict
+    info("ship: 1/7 — wrap --strict")
+    rc = subprocess.call([sys.executable, str(self_py), "wrap", "--path", str(target), "--strict"])
+    if rc != 0:
+        err("wrap 실패 — 4 라이브 파일을 갱신한 뒤 ship 재호출.")
+        return 1
+
+    # 2) manifest-check (본 저장소만 의미 있음 — MANIFEST 파일 존재 시)
+    info("ship: 2/7 — manifest-check")
+    if (METHODOLOGY_ROOT / "50_tools" / "methodology.py").resolve() == self_py.resolve():
+        rc = subprocess.call([sys.executable, str(self_py), "manifest-check"])
+        if rc != 0:
+            err("manifest-check 실패.")
+            return 1
+    else:
+        print("  (적용 프로젝트 — skip)")
+
+    # 3) sensitive 파일 검사
+    info("ship: 3/7 — sensitive 파일 검사")
+    if not args.allow_sensitive:
+        hits = _detect_sensitive(target)
+        if hits:
+            err("sensitive 의심 파일 발견:")
+            for h in hits:
+                err(f"  - {h}")
+            err("의도된 것이면 --allow-sensitive 로 재호출.")
+            return 1
+        print("  ✓ 매칭 없음")
+
+    # 4) test / build (있을 때만)
+    pkg = target / "package.json"
+    if pkg.exists() and not args.no_test:
+        info("ship: 4/7 — pnpm test (있으면)")
+        # 어느 매니저인지 단순 추정
+        manager = "pnpm" if (target / "pnpm-lock.yaml").exists() else (
+            "yarn" if (target / "yarn.lock").exists() else "npm"
+        )
+        # test 스크립트 있는지 확인
+        try:
+            pkg_data = json.loads(pkg.read_text(encoding="utf-8"))
+            scripts = pkg_data.get("scripts", {})
+        except Exception:
+            scripts = {}
+        if "test" in scripts:
+            rc = subprocess.call([manager, "test"], cwd=str(target))
+            if rc != 0:
+                err("테스트 실패 — push 중단.")
+                return 1
+        else:
+            print("  (package.json scripts.test 없음 — skip)")
+    else:
+        info("ship: 4/7 — test (package.json 없음 또는 --no-test) — skip")
+
+    if pkg.exists() and not args.no_build:
+        info("ship: 5/7 — pnpm build (있으면)")
+        manager = "pnpm" if (target / "pnpm-lock.yaml").exists() else (
+            "yarn" if (target / "yarn.lock").exists() else "npm"
+        )
+        try:
+            pkg_data = json.loads(pkg.read_text(encoding="utf-8"))
+            scripts = pkg_data.get("scripts", {})
+        except Exception:
+            scripts = {}
+        if "build" in scripts:
+            rc = subprocess.call([manager, "build"], cwd=str(target))
+            if rc != 0:
+                err("빌드 실패 — push 중단.")
+                return 1
+        else:
+            print("  (package.json scripts.build 없음 — skip)")
+    else:
+        info("ship: 5/7 — build (package.json 없음 또는 --no-build) — skip")
+
+    # 6) commit
+    if args.no_commit:
+        ok("ship: 6/7 — commit (--no-commit) — skip")
+        ok("ship: 7/7 — push — skip (--no-commit)")
+        return 0
+
+    info("ship: 6/7 — commit")
+    if not args.no_add_all:
+        rc = subprocess.call(["git", "-C", str(target), "add", "-A"])
+        if rc != 0:
+            err("git add 실패.")
+            return 1
+    # 변경이 staged 됐는지 확인
+    diff_rc = subprocess.call(
+        ["git", "-C", str(target), "diff", "--cached", "--quiet"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    if diff_rc == 0:
+        warn("staged 변경 없음 — commit/push skip")
+        return 0
+    rc = subprocess.call(["git", "-C", str(target), "commit", "-m", message])
+    if rc != 0:
+        err("commit 실패.")
+        return 1
+
+    # 7) push
+    if args.no_push:
+        ok("ship: 7/7 — push (--no-push) — skip")
+        return 0
+    info("ship: 7/7 — push")
+    branch = subprocess.check_output(
+        ["git", "-C", str(target), "branch", "--show-current"], text=True
+    ).strip()
+    if not branch:
+        err("DETACHED HEAD — push 안 함.")
+        return 1
+    rc = subprocess.call(["git", "-C", str(target), "push", "origin", branch])
+    if rc != 0:
+        err(f"push 실패 (branch: {branch})")
+        return 1
+    ok(f"ship 완료. branch: {branch}")
+    return 0
+
+
+def cmd_hooks(args: argparse.Namespace) -> int:
+    """git hook 자동 설치/제거/점검.
+
+    pre-push: methodology manifest-check + wrap --strict
+    """
+    target = Path(args.path or ".").resolve()
+    # .git이 디렉터리 또는 파일(worktree) 일 수 있음 → git CLI로 hooks 경로 조회
+    try:
+        hooks_path = Path(subprocess.check_output(
+            ["git", "-C", str(target), "rev-parse", "--git-path", "hooks"],
+            text=True,
+        ).strip())
+    except subprocess.CalledProcessError:
+        err("git 저장소가 아닙니다.")
+        return 2
+    if not hooks_path.is_absolute():
+        hooks_path = (target / hooks_path).resolve()
+    hooks_path.mkdir(parents=True, exist_ok=True)
+
+    pre_push = hooks_path / "pre-push"
+    hook_body = """#!/bin/sh
+# methodology pre-push hook — installed by `methodology hooks install`
+# push 직전 4 라이브 파일 갱신 + 격리 안전망 검증.
+# 우회: git push --no-verify
+
+set -e
+if [ -f "50_tools/methodology.py" ]; then
+  python3 50_tools/methodology.py manifest-check
+  python3 50_tools/methodology.py wrap --strict
+else
+  echo "[methodology hook] 50_tools/methodology.py 미발견 — 검증 skip"
+fi
+"""
+
+    if args.action == "install":
+        if pre_push.exists() and not args.force:
+            warn(f"이미 존재: {pre_push}  (--force 로 덮어쓰기)")
+            return 1
+        pre_push.write_text(hook_body, encoding="utf-8")
+        pre_push.chmod(0o755)
+        ok(f"pre-push hook 설치: {pre_push}")
+        print("  검증 우회 (예외 상황): git push --no-verify")
+        return 0
+    elif args.action == "uninstall":
+        if pre_push.exists():
+            pre_push.unlink()
+            ok(f"pre-push hook 제거: {pre_push}")
+        else:
+            warn("설치된 pre-push hook 없음.")
+        return 0
+    elif args.action == "status":
+        if pre_push.exists():
+            ok(f"pre-push hook 활성: {pre_push}")
+        else:
+            warn(f"pre-push hook 비활성. install: methodology hooks install")
+        return 0
+    err(f"unknown action: {args.action}")
+    return 2
+
+
 def cmd_dashboard(args: argparse.Namespace) -> int:
     """대시보드 빌드 + 서빙 + URL 출력.
 
@@ -1360,6 +1585,23 @@ def main(argv: list[str] | None = None) -> int:
     pw.add_argument("--path", help="대상 폴더 (기본: 현재)")
     pw.add_argument("--strict", action="store_true", help="누락 시 exit 1 (CI/hook용)")
     pw.set_defaults(func=cmd_wrap)
+
+    psh = sub.add_parser("ship", help="작업 종료 통합 — wrap+manifest-check+sensitive 검사+(test/build)+commit+push")
+    psh.add_argument("--message", "-m", help="commit 메시지 (필수, --no-commit 면 생략)")
+    psh.add_argument("--path", help="대상 폴더 (기본: 현재)")
+    psh.add_argument("--no-test", action="store_true", help="test 단계 skip")
+    psh.add_argument("--no-build", action="store_true", help="build 단계 skip")
+    psh.add_argument("--no-add-all", action="store_true", help="git add -A 안 함 (사용자가 미리 staging)")
+    psh.add_argument("--no-commit", action="store_true", help="commit 단계 skip (검증만)")
+    psh.add_argument("--no-push", action="store_true", help="push 단계 skip (commit까지만)")
+    psh.add_argument("--allow-sensitive", action="store_true", help="sensitive 파일 의심 패턴 차단 우회")
+    psh.set_defaults(func=cmd_ship)
+
+    phk = sub.add_parser("hooks", help="git hook 자동 설치 (pre-push 검증)")
+    phk.add_argument("action", choices=["install", "uninstall", "status"], help="동작")
+    phk.add_argument("--path", help="대상 저장소 (기본: 현재)")
+    phk.add_argument("--force", action="store_true", help="기존 hook 덮어쓰기")
+    phk.set_defaults(func=cmd_hooks)
 
     pdb = sub.add_parser("dashboard", help="대시보드 빌드 + 서빙 + URL 출력 (현재 브랜치·시점 반영)")
     pdb.add_argument("--path", help="대상 프로젝트 폴더 (기본: 현재)")

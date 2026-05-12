@@ -19,17 +19,16 @@
   - [ ] GitHub에서 첫 push 시 워크플로 실행 결과 확인 (60_meta 미주입, manifest-check, observation lint 통과)
   - [ ] 실패 시 워크플로 또는 검증 로직 조정
 
-### METH-017
-- **title**: `methodology ship` 신설 — 검증+commit+push 통합 단일 명령
+### METH-018
+- **title**: 사용자 환경에 hooks 설치 + ship 첫 일상 사용 검증
 - **mode**: fullstack
 - **change-class**: A
-- **owner**: AI
+- **owner**: Human + AI
 - **acceptance criteria**:
-  - [ ] `cmd_ship` 신설: wrap --strict → manifest-check → (있으면) pnpm test/build → commit + push
-  - [ ] `--message` 인자로 commit 메시지 받음
-  - [ ] 실패 시 push 안 함, 사용자에게 명확한 에러 보고
-  - [ ] CLAUDE/AGENTS 의 (α) 패턴 흐름이 자동으로 ship 호출하도록 권고 라인 추가
-- **notes**: 사용자 일상 명령 1줄로 작업 종료 흐름 압축. methodology dashboard와 짝을 이룸(부팅: dashboard, 종료: ship).
+  - [ ] 사용자가 본 저장소·icons·gamblescan·talmocom 각각에서 `methodology hooks install` 1회 실행
+  - [ ] 다음 작업 종료 시 `methodology ship -m "..."` 사용 — git add/commit/push 직접 호출 없이 통과
+  - [ ] sensitive 파일 차단·테스트 실패 차단 동작 1회씩 우연히 시연되면 학습 신호 누적
+- **notes**: hooks는 worktree마다 별도 설치 필요 (git의 hooks는 추적되지 않음). 적용 프로젝트는 다음 sync로 ship CLI를 받지만 hooks는 *그 다음 단계*에서 사용자가 1회 실행.
 
 ### METH-016
 - **title**: SessionEnd hook 활성화 — Claude Code 환경에서 wrap 자동 호출

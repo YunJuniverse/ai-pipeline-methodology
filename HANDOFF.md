@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- **Working on**: 세션 부팅 마지막 단계에 `methodology dashboard` 의무 호출 도입. dashboard HTML에 branch/commit 자동 표시. (α) 패턴 — AI가 부팅 시 URL 자동 보고, 사용자는 클릭만.
+- **Working on**: 작업 종료 자동화 완성 — `methodology ship` (검증+commit+push 통합) + `methodology hooks install` (pre-push 자동 강제) + auto-merge 워크플로 (PR 모델 전환 시). (α) 패턴 완성형.
 - **Current mode**: fullstack
-- **Next TODO**: METH-015 (3개 적용 프로젝트에 다음 sync 시 새 dashboard CLI + applied-ci 자동 전파), METH-017 (`methodology ship` 신설 — 검증+commit+push 통합)
+- **Next TODO**: METH-015 (3개 적용 프로젝트에 다음 sync 시 ship/hooks/auto-merge 자동 전파), METH-018 (사용자 환경에서 hooks 설치 + ship 첫 일상 사용 검증)
 - **Blockers**: none
 
 ## Active Links
@@ -34,7 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
-- 2026-05-12: **세션 부팅 dashboard CLI** — `methodology dashboard` 신설(빌드+background 서빙+URL 출력, 포트 중복 회피), `generate-dashboard.py`에 git branch/commit 헤더 자동 표시, CLAUDE/AGENTS managed 마커 안 *세션 부팅 마지막 단계 의무 호출* 규칙 추가, `.ai/adapters/claude.md` 첫 메시지 형식·도구 매핑 갱신. file:// 직접 열기 오해 해소.
+- 2026-05-12: **ship + hooks + auto-merge** 3축 자동화 — `methodology ship -m "..."` 7단계 통합 명령(wrap → manifest-check → sensitive → test → build → add+commit → push), `methodology hooks install` (pre-push 우회 차단), `.github/workflows/methodology-auto-merge.yml` (PR 라벨 기반 자동 머지, 외부 action 무의존). MANIFEST shared_paths에 auto-merge 워크플로 추가. CLAUDE/AGENTS managed 마커에 ship 사용 권고 명문화.
+- 2026-05-12: 세션 부팅 dashboard CLI — `methodology dashboard` 신설(빌드+background 서빙+URL 출력, 포트 중복 회피), `generate-dashboard.py`에 git branch/commit 헤더 자동 표시, CLAUDE/AGENTS managed 마커 안 *세션 부팅 마지막 단계 의무 호출* 규칙 추가, `.ai/adapters/claude.md` 첫 메시지 형식·도구 매핑 갱신. file:// 직접 열기 오해 해소.
 - 2026-05-12: 세션 종료 자동화 + GitHub Actions CI — `methodology wrap` CLI 신설(4개 라이브 파일 갱신 검증), CLAUDE/AGENTS에 (α) 패턴 규칙 명문화, `.github/workflows/methodology-{source,applied}-ci.yml` 워크플로 2종, MANIFEST에 applied-ci 추가(source-ci 격리 실측 ✅), `.ai/adapters/claude.md`에 SessionEnd hook 가이드.
 - 2026-05-12: MP-001/MP-002 메타 카탈로그 pending 시드 + RFC-001 (accepted) + `cmd_status` upstream commit 격차 검출 구현. 3개 적용 프로젝트 모두 "behind upstream" 정확 표시 검증. icons/gamblescan/talmocom `.ai/context.json` domain → webapp-next 설정·푸시.
 - 2026-05-12: v3.1 → v3.2 마이그레이션 작성 + 3개 외부 프로젝트(icons/gamblescan/talmocom) 적용 완료 — `migrations/v3.1_to_v3.2.py` (이동·디렉터리·`_materialize_l0` 임베디드 템플릿) + MANIFEST 확장 + 60_meta 격리 실측 ✅. 본 작업의 메타 관찰 5건(F-001~005)을 `60_meta/observations/2026-05-12_*.md`에 기록.
