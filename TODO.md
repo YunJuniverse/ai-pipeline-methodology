@@ -9,6 +9,27 @@
 
 ## Ready
 
+### METH-013
+- **title**: 메타-방법론 격리(`60_meta/`)의 ADR 후속화 — RFC-001 → ADR-002
+- **mode**: planning-only
+- **change-class**: B (구조 결정)
+- **owner**: Human + AI
+- **acceptance criteria**:
+  - [ ] `60_meta/rfc/RFC-001_meta-folder-introduction.md` 작성 (Context/Proposal/Alternatives/Risks/Rollout 5섹션)
+  - [ ] `30_dev/adr/ADR-002_meta-folder-isolation.md` 작성 (RFC-001 머지 후)
+  - [ ] 백서 §13 / §부록 C·A 정합성 확인
+- **notes**: 본 격리는 2026-05-12에 *코드·구조 차원에서 적용 완료*. 결정 기록만 후속.
+
+### METH-014
+- **title**: 메타-카탈로그 첫 시드 (MC-001~003 후보 탐색)
+- **mode**: planning-only
+- **change-class**: A
+- **owner**: AI
+- **acceptance criteria**:
+  - [ ] 본 저장소 운영 이력에서 N≥2 목격된 메타 마찰 3건 식별
+  - [ ] 각 후보를 `60_meta/catalog/_pending/MP-NNN_*.md`로 시드 (또는 N≥2이면 직접 `MC-NNN_*.md`)
+  - [ ] 분류 실수 (도메인↔메타) 점검 통과
+
 ## InProgress
 
 ## Blocked

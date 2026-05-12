@@ -98,6 +98,12 @@ MANIFEST = {
         "CLAUDE.md",
         "AGENTS.md",
     ],
+    # 절대로 외부 프로젝트에 주입되면 안 되는 경로 (메타-방법론 등)
+    # MANIFEST는 whitelist 방식이라 1차 안전 — excluded_paths는 2차 안전망.
+    # init/sync 시작 시 검증되며, shared_paths/init_paths/init_files와 겹치면 즉시 fail.
+    "excluded_paths": [
+        "60_meta",
+    ],
 }
 
 MARKER_RE = re.compile(
@@ -106,6 +112,7 @@ MARKER_RE = re.compile(
 )
 
 VERSION_FILE_NAME = ".methodology-version"
+META_ROOT = Path("60_meta")
 OBSERVATION_DIR = Path("40_resources/ai_observations")
 CATALOG_DIR = Path("40_resources/catalog")
 SKELETONS_DIR = Path("40_resources/skeletons")
@@ -848,10 +855,53 @@ def merge_managed_file(src: Path, dst: Path, dry_run: bool) -> dict:
     return stats
 
 
+# ─── 안전망: excluded_paths 검증 ────────────────────────────────────────────
+
+
+def assert_excluded_paths_safe() -> None:
+    """MANIFEST.excluded_paths가 shared/init_paths/init_files와 겹치지 않는지 검증.
+
+    겹치면 즉시 fail — 메타-방법론 등 격리되어야 하는 경로가
+    실수로 주입 대상에 추가된 사고를 차단한다.
+    """
+    excluded = set(MANIFEST.get("excluded_paths", []))
+    if not excluded:
+        return
+
+    def violates(path: str) -> str | None:
+        for ex in excluded:
+            if path == ex or path.startswith(ex + "/"):
+                return ex
+        return None
+
+    offenders: list[tuple[str, str]] = []
+    for rel in MANIFEST["shared_paths"]:
+        ex = violates(rel)
+        if ex:
+            offenders.append((f"shared_paths:{rel}", ex))
+    for rel in MANIFEST["init_paths"]:
+        ex = violates(rel)
+        if ex:
+            offenders.append((f"init_paths:{rel}", ex))
+    for src_rel, dst_rel, _ in MANIFEST["init_files"]:
+        for tag, p in (("init_files.src", src_rel), ("init_files.dst", dst_rel)):
+            ex = violates(p)
+            if ex:
+                offenders.append((f"{tag}:{p}", ex))
+
+    if offenders:
+        err("MANIFEST excluded_paths 위반 — 다음 경로가 격리 디렉터리 안에 있습니다:")
+        for where, ex in offenders:
+            err(f"  {where}  ⊂  {ex}/")
+        err("60_meta/ 같은 메타-방법론 자산이 외부 프로젝트에 주입되면 안 됩니다.")
+        raise SystemExit(3)
+
+
 # ─── 명령: init ─────────────────────────────────────────────────────────────
 
 
 def cmd_init(args: argparse.Namespace) -> int:
+    assert_excluded_paths_safe()
     target = Path(args.path).resolve()
     label = args.label or target.name
     mode = args.type
@@ -921,6 +971,7 @@ def cmd_init(args: argparse.Namespace) -> int:
 
 
 def cmd_sync(args: argparse.Namespace) -> int:
+    assert_excluded_paths_safe()
     target = Path(args.path or ".").resolve()
     apply = args.apply
     dry = not apply
@@ -1060,6 +1111,23 @@ def cmd_version(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_manifest_check(args: argparse.Namespace) -> int:
+    """MANIFEST excluded_paths 안전망을 명시적으로 검증.
+
+    겹침이 있으면 SystemExit(3)으로 fail. CI에서 호출 권장.
+    """
+    excluded = MANIFEST.get("excluded_paths", [])
+    info(f"checking MANIFEST safety net — excluded_paths: {excluded or '(empty)'}")
+    assert_excluded_paths_safe()
+    ok("excluded_paths 검증 통과 — 격리된 경로가 주입 대상에 포함되어 있지 않음.")
+    # 추가 정보 — 격리 디렉터리 실제 존재 여부
+    for ex in excluded:
+        p = METHODOLOGY_ROOT / ex
+        marker = "✓ 존재" if p.exists() else "○ 미존재(선택)"
+        print(f"  {ex}: {marker}")
+    return 0
+
+
 # ─── main ──────────────────────────────────────────────────────────────────
 
 
@@ -1090,6 +1158,9 @@ def main(argv: list[str] | None = None) -> int:
 
     pv = sub.add_parser("version", help="메소돌로지 버전 출력")
     pv.set_defaults(func=cmd_version)
+
+    pmc = sub.add_parser("manifest-check", help="MANIFEST excluded_paths 안전망 검증")
+    pmc.set_defaults(func=cmd_manifest_check)
 
     po = sub.add_parser("observe", help="L1 AI 관찰 로그 생성·검증")
     po.add_argument("--slug", help="파일명 slug (영문 소문자/숫자/kebab-case)")

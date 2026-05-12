@@ -6,10 +6,10 @@
 
 ## Current Focus
 
-- Working on: L0~L4 v0 implementation complete; waiting for real repeated friction evidence
-- Current mode: fullstack
-- Next TODO: none in Ready; next candidate is a real active Catalog promotion when N>=2 evidence exists
-- Blockers: none
+- **Working on**: Meta-methodology 격리 인프라(`60_meta/`) 신설 완료. 다음은 실 데이터 누적.
+- **Current mode**: fullstack
+- **Next TODO**: METH-013 (RFC-001 신설 — 본 격리 결정의 ADR 후속화), METH-014 (메타 카탈로그 첫 시드)
+- **Blockers**: none
 
 ## Active Links
 
@@ -34,8 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
+- 2026-05-12: **`60_meta/` 메타-방법론 격리 인프라 신설** — `_README` + rfc/retrospectives/experiments/observations/catalog + `methodology.py` MANIFEST `excluded_paths` 안전망 + `manifest-check` CLI + 백서 §13/§부록 C·A 갱신. `init` 격리 동작 검증 완료.
 - 2026-05-08: `METH-008`~`METH-012` v0 — Catalog/Skeleton/Thinktank/Dashboard CLI + transfer drill #2 (Pass for v0)
 - 2026-05-07: `WHITEPAPER` v0.2.0 — executable constitution으로 개정 + ADR-001 신설
 - 2026-05-07: `METH-007` L1 observation CLI flow (`methodology observe` + validation)
 - 2026-05-07: `METH-006` L0 portable boot context (`.ai/context.json`, schema, checkpoint, adapters)
-- 2026-05-07: `METH-002` `.gitignore` 정책 확정 (`.claude/worktrees/`, `.codex/` 제외; `.ai/` 추적 유지)

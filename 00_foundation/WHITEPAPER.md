@@ -332,6 +332,9 @@ supersedes: none
 | **Verified vs Tentative** | Catalog 엔트리가 둘 이상의 AI 모델에서 검증되었는가의 상태. |
 | **Vendor Lock Score** | `.ai/`와 공통 CLI 표면에 특정 AI/도구 종속 코드가 섞인 개수. 목표는 0. |
 | **Class A/B/C** | 변경의 위험도 분류. `CLAUDE.md` §3 참조. |
+| **Meta-Methodology** | 본 저장소를 진화시키는 *방법론에 대한 방법론*. `60_meta/`에 격리되며 외부 프로젝트에 주입되지 않음. §13 참조. |
+| **RFC** | `60_meta/rfc/RFC-NNN_*.md` — 백서·운영 규칙 변경 *제안*. 머지 시 ADR로 승급. |
+| **Meta Catalog (MC-NNN)** | `60_meta/catalog/` — 방법론 운영 자체의 반복 마찰. 도메인 Catalog(`C-NNN`)와 분리. 주입 안 됨. |
 
 ---
 
@@ -350,6 +353,65 @@ supersedes: none
 
 ---
 
+## 13. 메타-방법론 (Meta-Methodology)
+
+본 저장소는 **두 역할을 동시에** 갖는 *재귀 구조* 다:
+
+1. **외부 프로젝트들이 적용하는 방법론의 원천** — `methodology init` / `sync` 로 외부에 주입되는 모든 자산
+2. **자기 자신을 진화시키는 메타-방법론의 운영 공간** — `60_meta/` (외부 주입 안 됨)
+
+이 분리는 *주입 안전성*과 *원천성 보존*을 위한 결정적 보장이다.
+방법론 자체의 운영에서 발생하는 마찰·결정·실험이 *외부 프로젝트의 도메인 자산*과 섞이지 않도록 한다.
+
+### 13-1. 격리 보장 (이중 안전망)
+
+| 계층 | 메커니즘 |
+|---|---|
+| **1차 (whitelist)** | `50_tools/methodology.py` MANIFEST는 *명시된 경로만* 복사. `60_meta/`가 어디에도 명시되지 않으면 *애초에* 복사 안 됨. |
+| **2차 (excluded_paths)** | MANIFEST의 `excluded_paths: ["60_meta"]`. init/sync 시작 시 *겹침 검증* 통과해야 진행. 실수로 다른 카테고리에 추가해도 차단됨. |
+
+검증 명령:
+```bash
+python3 50_tools/methodology.py manifest-check
+```
+
+CI에서 본 검증이 실패하면 **반드시** 배포 차단 — 실패는 격리 깨짐을 의미.
+
+### 13-2. `60_meta/` 내부 구조
+
+```
+60_meta/
+├── _README.md          ← 메타-방법론 운영 규칙 (단일 출처)
+├── rfc/                ← 방법론 변경 제안 (RFC-NNN)
+├── retrospectives/     ← 분기 회고 (YYYY-QN)
+├── experiments/        ← 실험 (EXP-NNN)
+├── observations/       ← 본 저장소 운영 관찰 (메타-L1)
+└── catalog/            ← 메타-Catalog (MC-NNN)
+    ├── _pending/
+    └── archived/
+```
+
+상세 규칙은 [`60_meta/_README.md`](../60_meta/_README.md).
+
+### 13-3. 도메인 자산 vs 메타 자산 판정
+
+판정 기준 한 줄: **"외부 프로젝트가 이 자산의 혜택을 받는가?"**
+
+| Yes (도메인) | No (메타) |
+|---|---|
+| `40_resources/catalog/` (`C-NNN`) | `60_meta/catalog/` (`MC-NNN`) |
+| `40_resources/ai_observations/` | `60_meta/observations/` |
+| `40_resources/skeletons/` | (해당 없음 — 스켈레톤은 본질적으로 도메인 자산) |
+| `30_dev/adr/` (방법론 적용 결정) | `60_meta/rfc/` (방법론 자체 변경 제안) |
+
+분류 실수는 분기 회고(`60_meta/retrospectives/`)에서 점검.
+
+### 13-4. 본 §의 변경
+
+본 §은 백서 §12 변경 절차를 따른다. *메타-방법론의 격리 자체* 를 깨는 변경은 **Class C** (이식성·원천성에 영향).
+
+---
+
 ## 부록 A — 다른 문서들과의 관계
 
 | 문서 | 위상 | 백서와의 관계 |
@@ -365,6 +427,7 @@ supersedes: none
 | `40_resources/skeletons/*` | L2 Skeleton | 백서 §5 활성 자산. |
 | `40_resources/ai_observations/*` | L1 Raw 데이터 | 백서 §5 관찰 로그. |
 | `50_tools/*` | 도구·그래프 데이터 | `methodology.py`(CLI)·`generate-dashboard.py`·`methodology-graph.json`. |
+| `60_meta/*` *(주입 제외)* | 메타-방법론 | 본 저장소에만 존재. RFC/회고/실험/메타 관찰·Catalog. §13 참조. |
 | `30_dev/adr/*` | 결정 기록 | 백서·하위 문서 변경의 근거. |
 | `30_dev/snapshots/*` | 스냅샷 | 절대 살아있는 문서로 승격 금지(백서 §8-3). |
 
@@ -396,7 +459,8 @@ supersedes: none
 | **30** | Build (개발) | `30_dev/` | MASTER_PLAN, SPRINTS, ADR, snapshots |
 | **40** | Resources (자원) | `40_resources/` | templates, prompts, catalog, skeletons, ai_observations |
 | **50** | Tools (도구) | `50_tools/` | `methodology.py` CLI, `generate-dashboard.py`, `methodology-graph.json` |
-| **60–80** | (예약) | — | 확장 슬롯 |
+| **60** | Meta-Methodology *(주입 제외)* | `60_meta/` | 본 저장소를 진화시키는 메타-방법론 자산 — RFC/회고/실험/메타관찰/메타카탈로그. 외부 프로젝트 주입 안 됨 (§13 참조) |
+| **70–80** | (예약) | — | 확장 슬롯 |
 | **90** | Archive | `90_archive/` | legacy, decisions, harness |
 
 ### C.2 끝번호 페어링 규칙
