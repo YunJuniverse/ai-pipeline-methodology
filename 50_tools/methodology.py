@@ -1134,6 +1134,89 @@ def cmd_version(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_dashboard(args: argparse.Namespace) -> int:
+    """대시보드 빌드 + 서빙 + URL 출력.
+
+    동작:
+    - generate-dashboard.py 호출 (현재 브랜치/시점 반영)
+    - --serve (기본 True) 면 background 서버 시작
+    - URL을 사용자에게 명확히 출력 (브랜치·commit 포함)
+    - 이미 같은 포트에 떠 있으면 중복 시작 회피
+    """
+    target = Path(args.path or ".").resolve()
+    port = args.port
+    serve = not args.no_serve
+    out_path = Path(args.out) if args.out else target / "dashboard.html"
+
+    builder = METHODOLOGY_ROOT / "50_tools" / "generate-dashboard.py"
+    if not builder.exists():
+        # 적용 프로젝트의 경우 자기 위치 사용
+        builder = target / "50_tools" / "generate-dashboard.py"
+    if not builder.exists():
+        err(f"generate-dashboard.py 미발견 ({builder})")
+        return 2
+
+    # 1) 빌드
+    cmd = [sys.executable, str(builder), "--root", str(target), "--out", str(out_path)]
+    info(f"dashboard 빌드: {target}")
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as e:
+        err(f"빌드 실패: {e}")
+        return 1
+
+    # 2) 현재 git 정보 표시
+    branch = "unknown"
+    commit = "unknown"
+    try:
+        branch = subprocess.check_output(
+            ["git", "-C", str(target), "branch", "--show-current"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip() or "DETACHED"
+        commit = subprocess.check_output(
+            ["git", "-C", str(target), "rev-parse", "--short", "HEAD"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+    except Exception:
+        pass
+
+    if not serve:
+        ok(f"dashboard built: {out_path}  (branch: {branch}, commit: {commit})")
+        print(f"  파일 열기: open {out_path}")
+        return 0
+
+    # 3) 포트 중복 점검
+    url = f"http://localhost:{port}"
+    if _port_in_use(port):
+        ok(f"dashboard already serving: {url}  (branch: {branch}, commit: {commit})")
+        print(f"  ⌘+클릭으로 열기: {url}")
+        print(f"  파일 직접: {out_path}")
+        return 0
+
+    # 4) 백그라운드 서빙
+    serve_cmd = [sys.executable, str(builder), "--root", str(target), "--out", str(out_path), "--serve", "--port", str(port)]
+    info(f"serving at {url} (background, PID 표시 후 종료해도 서버는 유지)")
+    proc = subprocess.Popen(serve_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    # 잠시 대기해 서버 기동 확인
+    import time
+    time.sleep(0.5)
+    ok(f"dashboard serving: {url}  (branch: {branch}, commit: {commit}, pid: {proc.pid})")
+    print(f"  ⌘+클릭으로 열기: {url}")
+    print(f"  종료: kill {proc.pid}")
+    return 0
+
+
+def _port_in_use(port: int) -> bool:
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.2)
+        try:
+            s.connect(("127.0.0.1", port))
+            return True
+        except OSError:
+            return False
+
+
 def cmd_wrap(args: argparse.Namespace) -> int:
     """세션·작업 종료 검증 — 4개 라이브 파일 갱신 누락 점검.
 
@@ -1277,6 +1360,13 @@ def main(argv: list[str] | None = None) -> int:
     pw.add_argument("--path", help="대상 폴더 (기본: 현재)")
     pw.add_argument("--strict", action="store_true", help="누락 시 exit 1 (CI/hook용)")
     pw.set_defaults(func=cmd_wrap)
+
+    pdb = sub.add_parser("dashboard", help="대시보드 빌드 + 서빙 + URL 출력 (현재 브랜치·시점 반영)")
+    pdb.add_argument("--path", help="대상 프로젝트 폴더 (기본: 현재)")
+    pdb.add_argument("--out", help="출력 HTML 경로 (기본: <path>/dashboard.html)")
+    pdb.add_argument("--port", type=int, default=8765, help="서빙 포트 (기본 8765)")
+    pdb.add_argument("--no-serve", action="store_true", help="빌드만, 서빙 안 함")
+    pdb.set_defaults(func=cmd_dashboard)
 
     po = sub.add_parser("observe", help="L1 AI 관찰 로그 생성·검증")
     po.add_argument("--slug", help="파일명 slug (영문 소문자/숫자/kebab-case)")

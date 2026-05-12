@@ -19,6 +19,18 @@
   - [ ] GitHub에서 첫 push 시 워크플로 실행 결과 확인 (60_meta 미주입, manifest-check, observation lint 통과)
   - [ ] 실패 시 워크플로 또는 검증 로직 조정
 
+### METH-017
+- **title**: `methodology ship` 신설 — 검증+commit+push 통합 단일 명령
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI
+- **acceptance criteria**:
+  - [ ] `cmd_ship` 신설: wrap --strict → manifest-check → (있으면) pnpm test/build → commit + push
+  - [ ] `--message` 인자로 commit 메시지 받음
+  - [ ] 실패 시 push 안 함, 사용자에게 명확한 에러 보고
+  - [ ] CLAUDE/AGENTS 의 (α) 패턴 흐름이 자동으로 ship 호출하도록 권고 라인 추가
+- **notes**: 사용자 일상 명령 1줄로 작업 종료 흐름 압축. methodology dashboard와 짝을 이룸(부팅: dashboard, 종료: ship).
+
 ### METH-016
 - **title**: SessionEnd hook 활성화 — Claude Code 환경에서 wrap 자동 호출
 - **mode**: fullstack

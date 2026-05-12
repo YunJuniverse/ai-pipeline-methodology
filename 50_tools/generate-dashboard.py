@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -377,9 +378,26 @@ def assemble(root: Path) -> dict[str, Any]:
         else:
             node_contents[n["id"]] = {"kind": "missing", "text": f"(경로 없음: {rel})"}
 
+    # 현재 git 브랜치·HEAD short SHA — dashboard가 *어느 브랜치/시점*의 상태인지 명시
+    git_branch = "unknown"
+    git_commit = "unknown"
+    try:
+        git_branch = subprocess.check_output(
+            ["git", "-C", str(root), "branch", "--show-current"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip() or "DETACHED"
+        git_commit = subprocess.check_output(
+            ["git", "-C", str(root), "rev-parse", "--short", "HEAD"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+    except Exception:
+        pass
+
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "root": str(root),
+        "git_branch": git_branch,
+        "git_commit": git_commit,
         "graph": graph,
         "kanban": kanban,
         "sprints": sprints_json,
@@ -833,7 +851,7 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
 <script>
 const DATA = JSON.parse(document.getElementById('data').textContent);
 document.getElementById('meta').textContent =
-  `생성: ${DATA.generated_at} · ${DATA.root}`;
+  `branch: ${DATA.git_branch || 'unknown'} (${DATA.git_commit || 'unknown'}) · 생성: ${DATA.generated_at} · ${DATA.root}`;
 
 // ── 탭
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {

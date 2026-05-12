@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-12 (wrap CLI + CI 워크플로 도입)
+# Checkpoint — 2026-05-12 (dashboard CLI + 부팅 의무 호출)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,15 @@
 
 ## 방금 한 것 (정확히)
 
-1. **wrap CLI 신설** — `50_tools/methodology.py cmd_wrap` + 서브커맨드 등록.
+0. **dashboard CLI 신설** — `50_tools/methodology.py cmd_dashboard` + 서브커맨드 등록.
+   - `--port` (기본 8765), `--no-serve`, `--path`, `--out`, `--background` 옵션
+   - 빌드 → background 서빙 → URL + branch + commit + pid 출력
+   - 포트 중복 회피 (socket 점검). 이미 떠 있으면 기존 URL 보고.
+0a. **generate-dashboard.py 헤더 보강** — assemble()에 git branch + commit short SHA 자동 호출, HTML meta span 에 표시. file:// 직접 열기 시도에서도 *어느 브랜치/시점*인지 즉시 확인 가능.
+0b. **CLAUDE.md / AGENTS.md (managed 마커 안)** — 세션 부팅 *마지막 단계* 의무 호출 규칙 추가. 모든 AI 모델 공통. sync 시 적용 프로젝트 자동 전파.
+0c. **`.ai/adapters/claude.md`** — 첫 메시지 권장 형식·도구 매핑에 dashboard CLI 반영.
+
+1. (이전 세션) **wrap CLI 신설** — `50_tools/methodology.py cmd_wrap` + 서브커맨드 등록.
    - 4개 라이브 파일(`HANDOFF.md`, `TODO.md`, `.ai/checkpoint.md`, ai_observations) 오늘 갱신 여부 검증
    - git status 요약 출력
    - `--strict` 옵션: 누락 시 exit 1 (CI/hook용)

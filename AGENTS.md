@@ -35,6 +35,13 @@
 - Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.
 - Default boot context is `AGENTS.md` + `HANDOFF.md`.
 - Load `TODO.md`, related code/tests, and related ADRs only when needed.
+- **세션 부팅 마지막 단계 (의무, 모든 AI 모델 공통)**: `must_read` 로드 + checkpoint 확인 후, **반드시** 다음을 호출하고 결과 URL을 사용자에게 첫 보고 메시지에 포함:
+  ```
+  python3 50_tools/methodology.py dashboard
+  ```
+  - 출력: `http://localhost:8765 (branch: <name>, commit: <sha>)`. 사용자가 ⌘+클릭으로 즉시 열어 *현재 브랜치 상태*를 확인.
+  - 이미 떠 있으면 중복 시작하지 않고 기존 URL 보고.
+  - dashboard는 *현재 작업 디렉터리·현재 브랜치*를 반영. main 고정 아님 — 브랜치 전환 후 다시 호출하면 그 브랜치 상태로 재빌드.
 - `AI-LOG.md` is optional. Use it only for short collaboration notes not yet captured in `HANDOFF.md`, `TODO.md`, a PR, or an ADR.
 - Do not keep sprint summaries, deliverable tables, or open-issue lists in this file.
 

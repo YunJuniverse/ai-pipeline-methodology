@@ -16,11 +16,14 @@ Claude Code는 세션 시작 시 다음을 자동 컨텍스트에 포함:
 
 ## 첫 메시지 권장 형식
 
-새 세션을 열 때 사용자가 다음 한 줄을 보내면 충분:
+새 세션을 열 때 사용자가 다음 한 줄을 보내면 충분 — 실제로는 *"<프로젝트> 이어서"* 만 쳐도 AI가 본 절차를 알아서 수행:
 
 ```
-.ai/context.json을 읽고, must_read 배열의 파일들을 순서대로 읽어 부팅해줘. 그 다음 .ai/checkpoint.md의 "다음 사람에게" 첫 항목부터 시작.
+.ai/context.json을 읽고, must_read 배열의 파일들을 순서대로 읽어 부팅해줘.
+그 다음 .ai/checkpoint.md의 "다음 사람에게" 첫 항목 + methodology dashboard URL 을 보고해줘.
 ```
+
+AI는 부팅 마지막 단계로 *반드시* `python3 50_tools/methodology.py dashboard` 를 호출하고 URL을 첫 보고에 포함한다 (`CLAUDE.md` §2 의무 규칙).
 
 ## 세션 종료 자동화
 
@@ -65,7 +68,7 @@ methodology wrap 호출해서 4개 라이브 파일 갱신 누락 점검해줘. 
 |---|---|
 | 백서 검색 | `Read 00_foundation/WHITEPAPER.md` |
 | 폴더 컨벤션 확인 | 백서 §부록 C 참조 |
-| 대시보드 빌드·서빙 | `Bash python3 50_tools/generate-dashboard.py --serve` |
+| 대시보드 빌드·서빙 (URL 보고용) | `Bash python3 50_tools/methodology.py dashboard` (세션 부팅 의무 호출) |
 | 부팅·환경 검증 | `Bash python3 50_tools/methodology.py version` |
 | 새 프로젝트에 적용 | `Bash python3 50_tools/methodology.py init <path>` |
 | 기존 적용 프로젝트 갱신 | `Bash python3 50_tools/methodology.py sync --apply` |
