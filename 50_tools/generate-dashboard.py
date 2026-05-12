@@ -673,6 +673,36 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
     </div>
     <div id="ov-file-content" class="content-body"></div>
   </div>
+
+  <div class="card" id="dev-servers-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <h2 style="margin:0">Local Dev Servers</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="dev-refresh" type="button">Refresh</button>
+        <button id="dev-kill-all" type="button" style="background:#7f1d1d;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer">Kill all 3000-3099</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+      <input id="dev-cwd" placeholder="cwd (예: /Users/hayden/icons)" style="flex:1;min-width:240px;padding:6px;border:1px solid var(--line);border-radius:4px;background:var(--panel)" />
+      <input id="dev-cmd" value="pnpm dev" style="width:140px;padding:6px;border:1px solid var(--line);border-radius:4px;background:var(--panel)" />
+      <button id="dev-start" type="button" style="background:#065f46;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer">Start (auto-port 3000+)</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
+      포트 3000부터 자동 점검 → 비어 있는 첫 포트 할당. 추적되는 서버만 개별 Stop 가능. Kill all 은 *모든* 3000-3099 점유 프로세스 종료 (추적 외 포함).
+    </div>
+    <div id="dev-servers-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
+    <table id="dev-servers-table" style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Port</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">PID</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">CWD</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Cmd</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Started</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">—</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </section>
 
 <section class="page" id="page-guide">
@@ -1520,6 +1550,101 @@ const _origTabHandler = document.querySelectorAll('.tab');
 _origTabHandler.forEach(t => t.addEventListener('click', () => {
   if(t.dataset.page === 'exec') renderExec();
 }));
+
+// ── Dev Servers 패널 (HTTP API 통신) ──────────────────────────────
+const devApi = {
+  list: async () => (await fetch('/api/servers')).json(),
+  start: async (cwd, cmd) => {
+    const r = await fetch('/api/servers/start', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({cwd, cmd})
+    });
+    return {ok: r.ok, body: await r.json()};
+  },
+  stop: async (pid) => {
+    const r = await fetch(`/api/servers/${pid}/stop`, {method: 'POST'});
+    return {ok: r.ok, body: await r.json()};
+  },
+  killRange: async (from, to) => {
+    const r = await fetch('/api/servers/kill-range', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({from, to})
+    });
+    return {ok: r.ok, body: await r.json()};
+  },
+};
+
+const devStatus = document.getElementById('dev-servers-status');
+const devTbody = document.querySelector('#dev-servers-table tbody');
+const devCwdInput = document.getElementById('dev-cwd');
+if (devCwdInput && DATA.root) devCwdInput.placeholder = `cwd (기본: ${DATA.root})`;
+
+async function devRefresh() {
+  try {
+    const {servers} = await devApi.list();
+    devTbody.innerHTML = '';
+    if (!servers || servers.length === 0) {
+      devTbody.innerHTML = '<tr><td colspan="6" style="padding:8px;color:var(--muted)">추적 중인 서버 없음. 위에서 Start.</td></tr>';
+    } else {
+      for (const s of servers) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="padding:6px;border-bottom:1px solid var(--line)"><a href="http://localhost:${s.port}" target="_blank" style="color:#22d3ee;text-decoration:none;font-weight:600">${s.port} ↗</a></td>
+          <td style="padding:6px;border-bottom:1px solid var(--line)"><code>${s.pid}</code></td>
+          <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px"><code>${s.cwd}</code></td>
+          <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px"><code>${(s.cmd||[]).join(' ')}</code></td>
+          <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px">${s.started_at}</td>
+          <td style="padding:6px;border-bottom:1px solid var(--line)"><button data-pid="${s.pid}" class="dev-stop-btn" type="button" style="background:#991b1b;color:#fff;border:none;padding:4px 10px;border-radius:3px;cursor:pointer">Stop</button></td>
+        `;
+        devTbody.appendChild(tr);
+      }
+      devTbody.querySelectorAll('.dev-stop-btn').forEach(b => {
+        b.onclick = async (e) => {
+          const pid = e.target.dataset.pid;
+          e.target.disabled = true;
+          e.target.textContent = 'Stopping…';
+          const {ok, body} = await devApi.stop(pid);
+          if (!ok) alert(`stop 실패: ${body.error || 'unknown'}`);
+          devRefresh();
+        };
+      });
+    }
+    devStatus.textContent = `${(servers||[]).length}개 추적 중 · 마지막 갱신 ${new Date().toLocaleTimeString()}`;
+  } catch (e) {
+    devStatus.textContent = `갱신 실패: ${e.message}`;
+  }
+}
+
+document.getElementById('dev-start').onclick = async () => {
+  const cwd = devCwdInput.value.trim() || DATA.root;
+  const cmd = document.getElementById('dev-cmd').value.trim() || 'pnpm dev';
+  devStatus.textContent = `Starting ${cmd} in ${cwd} ...`;
+  const {ok, body} = await devApi.start(cwd, cmd);
+  if (!ok) {
+    devStatus.textContent = `start 실패: ${body.error || 'unknown'}`;
+    alert(`start 실패: ${body.error || 'unknown'}`);
+    return;
+  }
+  devStatus.textContent = `Started PID ${body.pid} on port ${body.port}`;
+  devRefresh();
+};
+
+document.getElementById('dev-kill-all').onclick = async () => {
+  if (!confirm('포트 3000-3099 의 모든 LISTEN 프로세스를 종료합니다. 진행할까요?')) return;
+  devStatus.textContent = 'Killing 3000-3099 ...';
+  const {ok, body} = await devApi.killRange(3000, 3099);
+  if (!ok) { alert(`kill 실패: ${body.error}`); return; }
+  devStatus.textContent = `${(body.killed||[]).length} 개 프로세스 종료`;
+  devRefresh();
+};
+
+document.getElementById('dev-refresh').onclick = devRefresh;
+
+// 초기 + 주기적 갱신 (5초)
+devRefresh();
+setInterval(devRefresh, 5000);
 </script>
 </body>
 </html>
@@ -1551,32 +1676,192 @@ def main() -> int:
           f"sprints={len(data['sprints'])}, nodes={len(data['graph'].get('nodes',[]))})", file=sys.stderr)
 
     if args.serve:
-        import http.server
-        import socketserver
-        os.chdir(out.parent)
-        handler = http.server.SimpleHTTPRequestHandler
-
-        class Server(socketserver.TCPServer):
-            allow_reuse_address = True
-
-        port = args.port
-        for attempt in range(20):
-            try:
-                with Server(("", port), handler) as httpd:
-                    print(f"[serve] http://localhost:{port}/{out.name}", file=sys.stderr)
-                    try:
-                        httpd.serve_forever()
-                    except KeyboardInterrupt:
-                        print("\n[stop]", file=sys.stderr)
-                    break
-            except OSError as e:
-                if e.errno == 48:  # Address already in use
-                    print(f"[warn] port {port} busy, trying {port+1}", file=sys.stderr)
-                    port += 1
-                    continue
-                raise
+        _serve_with_api(out, args.port)
 
     return 0
+
+
+# ───────────────────────────────────────────────────────────────────────
+# Dev-server 제어 API + 정적 파일 서빙
+# ───────────────────────────────────────────────────────────────────────
+
+_servers_lock = __import__("threading").Lock()
+_servers: dict[int, dict] = {}  # pid -> {pid, port, cwd, cmd, started_at}
+
+
+def _find_free_port(start: int = 3000, end: int = 3099) -> int | None:
+    import socket
+    for p in range(start, end + 1):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.1)
+            try:
+                s.bind(("127.0.0.1", p))
+                return p
+            except OSError:
+                continue
+    return None
+
+
+def _kill_port(port: int) -> list[int]:
+    """해당 포트 점유 프로세스 PID 들을 SIGTERM. 반환: 죽인 PID 목록."""
+    import signal
+    killed: list[int] = []
+    try:
+        out = subprocess.check_output(
+            ["lsof", "-ti", f":{port}", "-sTCP:LISTEN"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+    except subprocess.CalledProcessError:
+        return killed
+    for pid_str in out.splitlines():
+        try:
+            pid = int(pid_str.strip())
+            os.kill(pid, signal.SIGTERM)
+            killed.append(pid)
+        except (ValueError, ProcessLookupError, PermissionError):
+            pass
+    return killed
+
+
+def _serve_with_api(out: Path, start_port: int) -> None:
+    import http.server
+    import json as _json
+    import signal as _signal
+    import socketserver
+    import urllib.parse
+
+    os.chdir(out.parent)
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def log_message(self, fmt, *args):
+            # 노이즈 줄이기
+            return
+
+        def _send_json(self, status: int, payload: dict) -> None:
+            body = _json.dumps(payload).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            parsed = urllib.parse.urlparse(self.path)
+            if parsed.path == "/api/servers":
+                with _servers_lock:
+                    # 죽은 프로세스 정리
+                    alive: dict[int, dict] = {}
+                    for pid, e in _servers.items():
+                        try:
+                            os.kill(pid, 0)
+                            alive[pid] = e
+                        except ProcessLookupError:
+                            pass
+                    _servers.clear()
+                    _servers.update(alive)
+                    return self._send_json(200, {"servers": list(_servers.values())})
+            return super().do_GET()
+
+        def do_POST(self):
+            parsed = urllib.parse.urlparse(self.path)
+            length = int(self.headers.get("Content-Length", 0))
+            raw = self.rfile.read(length).decode("utf-8") if length else ""
+            try:
+                payload = _json.loads(raw) if raw else {}
+            except _json.JSONDecodeError:
+                return self._send_json(400, {"error": "invalid JSON"})
+
+            if parsed.path == "/api/servers/start":
+                cwd = payload.get("cwd", "").strip()
+                cmd_raw = payload.get("cmd", "pnpm dev")
+                cmd = cmd_raw.split() if isinstance(cmd_raw, str) else list(cmd_raw)
+                if not cwd or not Path(cwd).is_dir():
+                    return self._send_json(400, {"error": f"invalid cwd: {cwd}"})
+                port = _find_free_port()
+                if port is None:
+                    return self._send_json(503, {"error": "포트 3000-3099 모두 점유"})
+                env = os.environ.copy()
+                env["PORT"] = str(port)
+                try:
+                    proc = subprocess.Popen(
+                        cmd,
+                        cwd=cwd,
+                        env=env,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        start_new_session=True,
+                    )
+                except FileNotFoundError as e:
+                    return self._send_json(500, {"error": f"명령 미발견: {cmd[0]} ({e})"})
+                entry = {
+                    "pid": proc.pid,
+                    "port": port,
+                    "cwd": cwd,
+                    "cmd": cmd,
+                    "started_at": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+                }
+                with _servers_lock:
+                    _servers[proc.pid] = entry
+                return self._send_json(200, entry)
+
+            if parsed.path.startswith("/api/servers/") and parsed.path.endswith("/stop"):
+                try:
+                    pid = int(parsed.path.split("/")[3])
+                except (ValueError, IndexError):
+                    return self._send_json(400, {"error": "invalid pid in path"})
+                with _servers_lock:
+                    entry = _servers.get(pid)
+                if not entry:
+                    return self._send_json(404, {"error": "추적 안 됨"})
+                try:
+                    os.killpg(os.getpgid(pid), _signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+                except Exception as e:
+                    return self._send_json(500, {"error": str(e)})
+                with _servers_lock:
+                    _servers.pop(pid, None)
+                return self._send_json(200, {"stopped": pid})
+
+            if parsed.path == "/api/servers/kill-range":
+                p_from = int(payload.get("from", 3000))
+                p_to = int(payload.get("to", 3099))
+                killed_all: list[dict] = []
+                for port in range(p_from, p_to + 1):
+                    for pid in _kill_port(port):
+                        killed_all.append({"pid": pid, "port": port})
+                # 추적 dict 정리
+                killed_pids = {k["pid"] for k in killed_all}
+                with _servers_lock:
+                    for pid in list(_servers.keys()):
+                        if pid in killed_pids:
+                            _servers.pop(pid, None)
+                return self._send_json(200, {"killed": killed_all})
+
+            return self._send_json(404, {"error": "unknown endpoint"})
+
+    class Server(socketserver.ThreadingTCPServer):
+        allow_reuse_address = True
+        daemon_threads = True
+
+    port = start_port
+    for _ in range(20):
+        try:
+            with Server(("127.0.0.1", port), Handler) as httpd:
+                print(f"[serve] http://localhost:{port}/{out.name}", file=sys.stderr)
+                print(f"[serve] dev-server API: /api/servers (GET/POST start|stop|kill-range)", file=sys.stderr)
+                try:
+                    httpd.serve_forever()
+                except KeyboardInterrupt:
+                    print("\n[stop]", file=sys.stderr)
+                return
+        except OSError as e:
+            if e.errno == 48:  # Address already in use
+                print(f"[warn] port {port} busy, trying {port+1}", file=sys.stderr)
+                port += 1
+                continue
+            raise
 
 
 if __name__ == "__main__":

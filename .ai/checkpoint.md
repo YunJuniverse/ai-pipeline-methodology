@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-12 (ship + hooks + auto-merge — 작업 종료 자동화 완성)
+# Checkpoint — 2026-05-12 (Dashboard dev-server 제어 패널)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,15 @@
 
 ## 방금 한 것 (정확히)
 
-**A. ship + hooks + auto-merge** (이번 세션):
+**0. Dashboard dev-server 제어 패널** (이번 세션):
+- `generate-dashboard.py --serve` 가 BaseHTTPRequestHandler 기반 커스텀 핸들러로 진화
+- API 엔드포인트 4개: GET /api/servers, POST /api/servers/start, POST /api/servers/{pid}/stop, POST /api/servers/kill-range
+- UI 카드: cwd/cmd 입력 → Start (포트 3000부터 자동) / 행별 Stop / Kill all 3000-3099 (추적 외 포함) / 5초 자동 갱신
+- 보안: bind 127.0.0.1 only, CORS 미설정, 죽은 PID 자동 정리
+- 자식 프로세스: start_new_session=True + os.killpg(getpgid, SIGTERM) — pnpm/node child 함께 정리
+- 외부 패키지 0개
+
+**A. ship + hooks + auto-merge** (이전 세션):
 - `methodology ship -m "..."` — 7단계 통합 (wrap → manifest-check → sensitive → test → build → add+commit → push). 각 옵션 (--no-test/build/push/commit/add-all/allow-sensitive)
 - `methodology hooks install` — `.git/hooks/pre-push` 자동 설치 (manifest-check + wrap --strict). 우회 `git push --no-verify`
 - `.github/workflows/methodology-auto-merge.yml` — PR 'auto-merge' 라벨 시 자동 squash 머지 (외부 action 무의존)

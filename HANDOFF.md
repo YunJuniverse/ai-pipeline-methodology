@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- **Working on**: 작업 종료 자동화 완성 — `methodology ship` (검증+commit+push 통합) + `methodology hooks install` (pre-push 자동 강제) + auto-merge 워크플로 (PR 모델 전환 시). (α) 패턴 완성형.
+- **Working on**: 대시보드에 dev-server 제어 패널 도입 — Start (3000~3099 자동 포트) / Stop (추적 PID) / Kill all (3000~3099 전체). Python http.server + JS 페치로 외부 의존성 0.
 - **Current mode**: fullstack
-- **Next TODO**: METH-015 (3개 적용 프로젝트에 다음 sync 시 ship/hooks/auto-merge 자동 전파), METH-018 (사용자 환경에서 hooks 설치 + ship 첫 일상 사용 검증)
+- **Next TODO**: METH-015 (3개 적용 프로젝트에 다음 sync 시 ship/hooks/auto-merge/dev-server API 자동 전파), METH-018 (사용자 환경에서 hooks 설치 + ship + dev-server 첫 일상 사용 검증)
 - **Blockers**: none
 
 ## Active Links
@@ -34,7 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
-- 2026-05-12: **ship + hooks + auto-merge** 3축 자동화 — `methodology ship -m "..."` 7단계 통합 명령(wrap → manifest-check → sensitive → test → build → add+commit → push), `methodology hooks install` (pre-push 우회 차단), `.github/workflows/methodology-auto-merge.yml` (PR 라벨 기반 자동 머지, 외부 action 무의존). MANIFEST shared_paths에 auto-merge 워크플로 추가. CLAUDE/AGENTS managed 마커에 ship 사용 권고 명문화.
+- 2026-05-12: **Dashboard dev-server 제어** — `generate-dashboard.py --serve` 가 정적 서빙 외에 `/api/servers/{list,start,stop,kill-range}` 4 엔드포인트 제공. UI 카드(`Local Dev Servers`)에서 Start(자동 포트 3000+) / Stop(추적 PID) / Kill all 3000-3099 버튼. start_new_session=True 로 자식 프로세스 격리, localhost-only bind 로 외부 차단. 5초 자동 갱신.
+- 2026-05-12: ship + hooks + auto-merge 3축 자동화 — `methodology ship -m "..."` 7단계 통합 명령, `methodology hooks install` (pre-push 우회 차단), `.github/workflows/methodology-auto-merge.yml` (PR 라벨 기반 자동 머지, 외부 action 무의존). MANIFEST shared_paths에 auto-merge 워크플로 추가. CLAUDE/AGENTS managed 마커에 ship 사용 권고 명문화.
 - 2026-05-12: 세션 부팅 dashboard CLI — `methodology dashboard` 신설(빌드+background 서빙+URL 출력, 포트 중복 회피), `generate-dashboard.py`에 git branch/commit 헤더 자동 표시, CLAUDE/AGENTS managed 마커 안 *세션 부팅 마지막 단계 의무 호출* 규칙 추가, `.ai/adapters/claude.md` 첫 메시지 형식·도구 매핑 갱신. file:// 직접 열기 오해 해소.
 - 2026-05-12: 세션 종료 자동화 + GitHub Actions CI — `methodology wrap` CLI 신설(4개 라이브 파일 갱신 검증), CLAUDE/AGENTS에 (α) 패턴 규칙 명문화, `.github/workflows/methodology-{source,applied}-ci.yml` 워크플로 2종, MANIFEST에 applied-ci 추가(source-ci 격리 실측 ✅), `.ai/adapters/claude.md`에 SessionEnd hook 가이드.
 - 2026-05-12: MP-001/MP-002 메타 카탈로그 pending 시드 + RFC-001 (accepted) + `cmd_status` upstream commit 격차 검출 구현. 3개 적용 프로젝트 모두 "behind upstream" 정확 표시 검증. icons/gamblescan/talmocom `.ai/context.json` domain → webapp-next 설정·푸시.
