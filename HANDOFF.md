@@ -32,14 +32,10 @@
 
 ## Recent Changes
 
-- 2026-05-07: merged repository structure normalization to `main` (`00_foundation`, `10_guides`, `20_planning`, `30_dev`, `40_resources`, `50_tools`, `90_archive`)
-- 2026-05-07: reserved numeric slot `50` for tools and aligned implementation paths to `50_tools/` per Whitepaper Appendix C
-- 2026-05-07: created `40_resources/catalog/`, `40_resources/skeletons/`, and `40_resources/ai_observations/` with schema `_README.md` files
-- 2026-05-07: added `10_guides/03_AI_관찰_로그_작성_규칙.md` as the single-source rule for L1 observation logs
-- 2026-05-07: moved onboarding docs into `40_resources/onboarding/` and evaluation notes into `90_archive/evaluation/`
-- 2026-05-07: revised `00_foundation/WHITEPAPER.md` to v0.2.0 as an executable constitution
-- 2026-05-07: added implementation roadmap snapshot for L0/L1 first execution path
-- 2026-05-07: completed `METH-006` L0 portable boot context refresh (`.ai/context.json`, schema, checkpoint, adapters)
-- 2026-05-07: completed `METH-007` L1 observation CLI flow (`methodology observe`, validation, sample log)
-- 2026-05-07: completed `METH-002` by ignoring local tool metadata paths while keeping `.ai/` tracked
-- 2026-05-08: completed `METH-008` through `METH-012` v0 flows for Catalog, Skeleton, Thinktank, Dashboard assets, and transfer drill
+> 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
+
+- 2026-05-08: `METH-008`~`METH-012` v0 — Catalog/Skeleton/Thinktank/Dashboard CLI + transfer drill #2 (Pass for v0)
+- 2026-05-07: `WHITEPAPER` v0.2.0 — executable constitution으로 개정 + ADR-001 신설
+- 2026-05-07: `METH-007` L1 observation CLI flow (`methodology observe` + validation)
+- 2026-05-07: `METH-006` L0 portable boot context (`.ai/context.json`, schema, checkpoint, adapters)
+- 2026-05-07: `METH-002` `.gitignore` 정책 확정 (`.claude/worktrees/`, `.codex/` 제외; `.ai/` 추적 유지)
