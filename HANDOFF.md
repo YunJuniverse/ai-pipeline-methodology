@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- **Working on**: 대시보드에 dev-server 제어 패널 도입 — Start (3000~3099 자동 포트) / Stop (추적 PID) / Kill all (3000~3099 전체). Python http.server + JS 페치로 외부 의존성 0.
+- **Working on**: METH-015 완료 — 3개 적용 프로젝트(icons/gamblescan/talmocom) 모두 본 저장소 v3.2 commit 83a48e0 동기화. 자가발전 루프 첫 진짜 회전 발생 (F-003 N=2) → METH-019 (MC-001 승급) 활성.
 - **Current mode**: fullstack
-- **Next TODO**: METH-015 (3개 적용 프로젝트에 다음 sync 시 ship/hooks/auto-merge/dev-server API 자동 전파), METH-018 (사용자 환경에서 hooks 설치 + ship + dev-server 첫 일상 사용 검증)
+- **Next TODO**: METH-019 (talmocom 이미지 add 패턴 MC-001 승급), METH-018 (사용자 일상 ship/hooks 사용 검증)
 - **Blockers**: none
 
 ## Active Links
@@ -34,7 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
-- 2026-05-12: **Dashboard dev-server 제어** — `generate-dashboard.py --serve` 가 정적 서빙 외에 `/api/servers/{list,start,stop,kill-range}` 4 엔드포인트 제공. UI 카드(`Local Dev Servers`)에서 Start(자동 포트 3000+) / Stop(추적 PID) / Kill all 3000-3099 버튼. start_new_session=True 로 자식 프로세스 격리, localhost-only bind 로 외부 차단. 5초 자동 갱신.
+- 2026-05-12: **METH-015 완료 — 적용 프로젝트 3개에 v3.2 자산 일괄 전파**. icons(385326a→f11a988), gamblescan(63c7abe→8b5531d), talmocom(d447eaa→f94a4e9) 모두 본 저장소 83a48e0 동기화. 7 파일/프로젝트, 60_meta 격리 3/3 ✅. F-003(talmocom 이미지 add 패턴) N=2 도달 — 자가발전 루프 첫 진짜 회전.
+- 2026-05-12: Dashboard dev-server 제어 — `generate-dashboard.py --serve` 가 `/api/servers/{list,start,stop,kill-range}` 4 엔드포인트 제공. UI 카드 Start(자동 포트 3000+) / Stop(추적 PID) / Kill all 3000-3099. start_new_session + localhost-only bind. 5초 자동 갱신.
 - 2026-05-12: ship + hooks + auto-merge 3축 자동화 — `methodology ship -m "..."` 7단계 통합 명령, `methodology hooks install` (pre-push 우회 차단), `.github/workflows/methodology-auto-merge.yml` (PR 라벨 기반 자동 머지, 외부 action 무의존). MANIFEST shared_paths에 auto-merge 워크플로 추가. CLAUDE/AGENTS managed 마커에 ship 사용 권고 명문화.
 - 2026-05-12: 세션 부팅 dashboard CLI — `methodology dashboard` 신설(빌드+background 서빙+URL 출력, 포트 중복 회피), `generate-dashboard.py`에 git branch/commit 헤더 자동 표시, CLAUDE/AGENTS managed 마커 안 *세션 부팅 마지막 단계 의무 호출* 규칙 추가, `.ai/adapters/claude.md` 첫 메시지 형식·도구 매핑 갱신. file:// 직접 열기 오해 해소.
 - 2026-05-12: 세션 종료 자동화 + GitHub Actions CI — `methodology wrap` CLI 신설(4개 라이브 파일 갱신 검증), CLAUDE/AGENTS에 (α) 패턴 규칙 명문화, `.github/workflows/methodology-{source,applied}-ci.yml` 워크플로 2종, MANIFEST에 applied-ci 추가(source-ci 격리 실측 ✅), `.ai/adapters/claude.md`에 SessionEnd hook 가이드.

@@ -9,15 +9,17 @@
 
 ## Ready
 
-### METH-015
-- **title**: 적용 프로젝트 3개에 applied-ci 워크플로 자동 주입 검증
-- **mode**: fullstack
-- **change-class**: A
-- **owner**: AI
+
+### METH-019
+- **title**: MC-001 승급 — talmocom 이미지 add 패턴 (N=2 도달)
+- **mode**: planning-only
+- **change-class**: B (Catalog 활성 승급 — PR rationale/impact/rollback 필수)
+- **owner**: AI → Human 머지
 - **acceptance criteria**:
-  - [ ] icons/gamblescan/talmocom에 `sync --apply` 호출 — `.github/workflows/methodology-applied-ci.yml` 신규 생성 확인
-  - [ ] GitHub에서 첫 push 시 워크플로 실행 결과 확인 (60_meta 미주입, manifest-check, observation lint 통과)
-  - [ ] 실패 시 워크플로 또는 검증 로직 조정
+  - [ ] `60_meta/catalog/_pending/MP-003_*.md` 신설 또는 즉시 `60_meta/catalog/MC-001_*.md` 활성 승급 (N≥2 충족)
+  - [ ] 솔루션: "방법론 sync 시 *명시 add 패턴* — `git add -u` + 신규 폴더 명시. `git add -A` 회피."
+  - [ ] 다음 sync 자동화 후보로 ship/sync 흐름에 반영
+- **notes**: 본 마찰 *재발*은 자가발전 루프의 진짜 첫 회전. 60_meta/observations/2026-05-12_meth-015-propagation.md F-003 의 repeat_of: F-004(2026-05-12_v3.1-to-v3.2-migration). 시스템이 학습한 결과를 *코드/문서로* 박는 단계.
 
 ### METH-018
 - **title**: 사용자 환경에 hooks 설치 + ship 첫 일상 사용 검증
@@ -63,17 +65,17 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `30_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-015
+- **title**: 적용 프로젝트 3개에 applied-ci/auto-merge 워크플로 + 신규 CLI 자동 전파
+- **notes**: Completed 2026-05-12. icons/gamblescan/talmocom 3개 모두 v3.2 본 저장소 commit 83a48e0 동기화. ship/hooks/dashboard/wrap CLI + dev-server API + workflow 2종 + managed 규칙 갱신 자동 전파. 격리 3/3 ✅. 자가발전 루프 첫 진짜 회전 (F-003 repeat_of) → METH-019 트리거.
+
 ### METH-012
 - **title**: 인계 시뮬레이션과 온보딩 검증
-- **notes**: Completed 2026-05-08. Added `30_dev/snapshots/transfer-drill-2026-05-08.md` and verified portable state inputs for current v0 scope.
+- **notes**: Completed 2026-05-08. Added `30_dev/snapshots/transfer-drill-2026-05-08.md`.
 
 ### METH-011
 - **title**: Dashboard L0~L4 패널 통합
 - **notes**: Completed 2026-05-08. Dashboard data now includes L0 adapters, observations, Catalog counts, Skeleton counts, and Thinktank reports.
 
-### METH-010
-- **title**: Thinktank v0 마이닝 리포트 구현
-- **notes**: Completed 2026-05-08. Added `methodology thinktank` and generated `30_dev/snapshots/insights/2026-W19_thinktank.md`.
-
-<!-- Archived: METH-001 ~ METH-009 (2026-05-07 ~ 2026-05-08). See git history. -->
+<!-- Archived: METH-001 ~ METH-010 (2026-05-07 ~ 2026-05-08). See git history. -->
 

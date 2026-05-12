@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-12 (Dashboard dev-server 제어 패널)
+# Checkpoint — 2026-05-12 (METH-015 — 3 프로젝트 v3.2 자산 전파 + 자가발전 첫 회전)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,14 @@
 
 ## 방금 한 것 (정확히)
 
-**0. Dashboard dev-server 제어 패널** (이번 세션):
+**🆕 METH-015 적용 프로젝트 일괄 전파 (방금)**:
+- icons sync → commit f11a988 → push 385326a..f11a988
+- gamblescan sync → commit 8b5531d → push 63c7abe..8b5531d
+- talmocom sync → commit f94a4e9 (이미지 제외 명시 add) → push d447eaa..f94a4e9
+- 3/3 60_meta 격리 ✅, applied-ci/auto-merge 워크플로 주입 ✅
+- 자가발전 루프 첫 진짜 회전: F-003(talmocom 이미지 add 패턴) N=2 도달 → METH-019(MC-001 승급) 활성
+
+**0. Dashboard dev-server 제어 패널** (이전 세션):
 - `generate-dashboard.py --serve` 가 BaseHTTPRequestHandler 기반 커스텀 핸들러로 진화
 - API 엔드포인트 4개: GET /api/servers, POST /api/servers/start, POST /api/servers/{pid}/stop, POST /api/servers/kill-range
 - UI 카드: cwd/cmd 입력 → Start (포트 3000부터 자동) / 행별 Stop / Kill all 3000-3099 (추적 외 포함) / 5초 자동 갱신
