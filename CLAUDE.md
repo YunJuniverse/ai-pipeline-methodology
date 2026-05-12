@@ -24,7 +24,12 @@
 - ADR is the source of truth for decisions that code cannot explain.
 - `HANDOFF.md` is the only live state file. Keep it under 150 lines.
 - `TODO.md` is the active backlog. Use stable IDs and acceptance criteria.
-- **After every task**: update `TODO.md` (mark completed items) and `HANDOFF.md` (current state, next actions). The Kanban board reads these files and will not reflect changes until they are updated.
+- **세션·작업 종료 절차 (의무, 모든 AI 모델 공통)**: 자연스러운 작업 단위가 끝나면 다음 4개 라이브 파일을 *AI가 자동으로* 갱신한 뒤 `python3 50_tools/methodology.py wrap` 으로 검증 → 결과를 사용자에게 보고. 사용자는 다음 turn에서 결과를 보고 수정 요청 가능.
+  1. `TODO.md` — 완료 항목 Done 이동, 새 항목 추가
+  2. `HANDOFF.md` — Current Focus + Recent Changes 갱신 (최근 5건 유지)
+  3. `.ai/checkpoint.md` — 다음 사람·다른 AI를 위한 인계서 갱신 (백서 §2-2 형식)
+  4. `40_resources/ai_observations/YYYY-MM-DD_<slug>.md` 또는 `60_meta/observations/...` — L1 관찰 로그 1건 작성 (`10_guides/03_AI_관찰_로그_작성_규칙.md` 준수)
+  wrap 출력이 `4/4 ✓` 일 때만 종료. `✗` 가 있으면 누락 갱신 후 다시 호출.
 - Identifier and versioning rules (phase M0/M1, sprint S-NNN, TODO ID, ADR, doc version, AI feature ID) are defined in `10_guides/02_식별자_및_버전_관리_규칙.md`. Follow that file before creating any new identifier.
 - `30_dev/snapshots/` contains dated artifacts. Snapshots are never live source.
 - Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.

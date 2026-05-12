@@ -1,65 +1,58 @@
-# Checkpoint — 2026-05-07 15:05 UTC
+# Checkpoint — 2026-05-12 (wrap CLI + CI 워크플로 도입)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
+> 형식 정의: `00_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
 
-- Agent: gpt-5
-- Tool: codex-desktop
-- Host: darwin-26.4.1-arm64
-- Workspace: repository root
+- Agent: claude-sonnet-4-6
+- Tool: claude-code-cli
+- Host: darwin-25.4
+- Worktree: `.claude/worktrees/lucid-grothendieck-5a6562` (branch `claude/lucid-grothendieck-5a6562`)
 
 ## 부팅 계약
 
 1. Read `.ai/context.json`.
 2. Read every path in `must_read` in order.
-3. Use `last_session.checkpoint_file` as the immediate handoff.
-4. Start from the first actionable item in "다음 사람에게".
+3. Use `last_session.checkpoint_file` (= 이 파일)를 즉시 인계로.
+4. "다음 사람에게" 첫 항목부터 시작.
 
 ## 방금 한 것 (정확히)
 
-- `00_foundation/WHITEPAPER.md`를 v0.2.0으로 정리해 실행 가능한 헌법으로 다듬었다.
-- `30_dev/snapshots/implementation-plan-2026-05-07.md`를 추가해 L0/L1 우선 구현 계획을 만들었다.
-- `HANDOFF.md`와 `TODO.md`를 갱신해 다음 작업을 `METH-006`으로 지정했다.
-- `.ai/context.json`, `.ai/schema/context.schema.json`, `.ai/checkpoint.md`, `.ai/adapters/*`를 L0 이식성 코어 기준으로 갱신했다.
-- `METH-006` 검증을 완료하고 `TODO.md`에서 Done으로 이동했다.
-- `METH-007` 구현을 완료했다. `50_tools/methodology.py observe` 생성/검증 명령을 추가하고 `40_resources/ai_observations/2026-05-07_l1-observe-flow.md` 샘플을 검증했다.
-- `METH-002`를 완료했다. `.claude/worktrees/`와 `.codex/`를 `.gitignore`에 추가하고 `.ai/`는 L0 portable state로 추적 대상에 남겼다.
-- `METH-008`부터 `METH-012`까지 v0 구현을 완료했다. Catalog/Pending, Skeleton, Thinktank, Dashboard asset summary, Transfer Drill이 동작한다.
+1. **wrap CLI 신설** — `50_tools/methodology.py cmd_wrap` + 서브커맨드 등록.
+   - 4개 라이브 파일(`HANDOFF.md`, `TODO.md`, `.ai/checkpoint.md`, ai_observations) 오늘 갱신 여부 검증
+   - git status 요약 출력
+   - `--strict` 옵션: 누락 시 exit 1 (CI/hook용)
+2. **CLAUDE.md / AGENTS.md 보강** — managed 마커 안에 "세션·작업 종료 절차" 규칙 명문화 (모든 AI 모델 공통). (α) 패턴: AI 자동 작성 → wrap 검증 → 사용자 다음 turn에서 수정 가능.
+3. **GitHub Actions 워크플로 2종 신설**:
+   - `.github/workflows/methodology-source-ci.yml` — 본 저장소 전용 (manifest-check, 60_meta 격리 실측, observation lint, idempotency, dashboard build)
+   - `.github/workflows/methodology-applied-ci.yml` — 적용 프로젝트 주입용 (60_meta 미주입, manifest-check, observation lint, dashboard build, wrap/status warn-only)
+4. **MANIFEST 확장** — applied-ci 워크플로를 `shared_paths`에 추가. source-ci는 격리(실측 검증 완료).
+5. **`.ai/adapters/claude.md` 갱신** — SessionEnd hook 설정 가이드 추가.
+6. 본 세션 메타-관찰 기록 (`60_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md`).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. `TODO.md`의 Ready 섹션이 비어 있으므로, 다음 작업은 반복 friction N>=2 증거가 생겼을 때 active Catalog 승급을 Ready로 올리는 것이다.
-2. 커밋이 필요하면 로컬 터미널에서 `.git/` 쓰기 권한이 있는 상태로 브랜치 생성, 스테이징, 커밋, 푸시를 수행한다.
-3. active Catalog 승급은 Class B이므로 PR 설명에 rationale, impact scope, rollback plan을 포함한다.
+1. **METH-015 — 적용 프로젝트 3개에 applied-ci 워크플로 주입**:
+   - 본 커밋 후 `cd ~/icons && python3 50_tools/methodology.py sync --apply` (gamblescan/talmocom 동일)
+   - 단, 각 적용 프로젝트의 *로컬 50_tools/methodology.py가 옛 버전*일 수 있음 — 본 저장소 methodology.py로 sync 호출 권장: `python3 /Users/hayden/methodology/50_tools/methodology.py sync --path ~/icons --apply`
+   - GitHub에서 워크플로 첫 실행 결과 점검 — 60_meta 미주입 / manifest-check / observation lint 모두 ✅이어야
+   - 실패 시 워크플로 또는 검증 로직 조정
+2. **METH-016 — SessionEnd hook 활성화**: 사용자 결정 영역. `.claude/settings.json`에 `SessionEnd` hook 등록 안내 (`.ai/adapters/claude.md` 참조).
+3. (선택) 분기 회고 시점 — `60_meta/retrospectives/2026-Q2_methodology-review.md` 작성. 단, 백서 §10 Stage 1~2 단계라 *지표 누적 부족* — 회고 가치 낮음. 데이터 더 쌓인 후 진행.
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
-- `.git/` 쓰기 권한이 차단된 환경에서는 커밋과 스테이징이 실패할 수 있다. 파일 변경은 가능하므로 Git 작업은 사용자가 로컬 터미널에서 실행해야 할 수 있다.
-- `py_compile` 검증 중 `50_tools/__pycache__/`가 생성되었으나 삭제 명령은 정책상 차단되었다. `.gitignore`의 `__pycache__/` 규칙으로 무시된다.
+- 없음. 본 세션은 두 가지 통증(TODO 미갱신 + CI 부재)을 단일 패치로 해소.
 
 ## 미해결 결정사항 (Open Questions)
 
-- `methodology observe`를 어댑터 hook에 연결하는 자동화는 아직 구현하지 않았다.
-- `meta`가 아닌 실제 개발 도메인 Skeleton은 아직 없다.
+- wrap CLI의 `--strict` 모드 CI 도입 — 현재 warn-only. 신선도 강제 시점은 데이터 누적 후 분기 회고에서 결정.
+- 다른 AI 도구(Cursor, Codex CLI 등)의 SessionEnd 등가물 — `.ai/adapters/{cursor,codex}.md` 신설 시 동일 가이드 추가 후보.
 
 ## 환경 메모
 
-- Python: system `python3`
-- Shell: zsh
-- OS: Darwin 25.4.0 kernel, macOS 26.4.1 product version
-- Time policy: UTC ISO 8601 only in `.ai/context.json` and observation metadata
-
-## 검증 메모
-
-- `python3 -m json.tool .ai/context.json` 통과.
-- `.ai/context.json`의 `must_read` + `must_read_optional` + schema/checkpoint 경로 14개 존재 확인.
-- `.ai/checkpoint.md` 필수 섹션 8개 존재 확인.
-- `python3 -m py_compile 50_tools/methodology.py` 통과.
-- `python3 50_tools/methodology.py observe --validate 40_resources/ai_observations/2026-05-07_l1-observe-flow.md` 통과.
-- `python3 50_tools/methodology.py version` 통과.
-- `python3 50_tools/methodology.py catalog status` 통과.
-- `python3 50_tools/methodology.py skeleton build/apply meta` 통과.
-- `python3 50_tools/methodology.py thinktank` 통과.
-- `python3 50_tools/generate-dashboard.py --out <temp-html>` 통과.
+- 본 저장소 main 현재 head: 곧 새 커밋 (f1a993f → 다음).
+- 적용 프로젝트 3개 모두 `applied_commit: 6c99091` — 본 커밋 후 격차 더 커짐. `methodology status` 가 자동으로 "behind upstream" 표시.
+- 60_meta 격리 안전망: init/sync/source-ci 모두 격리 실측 통과.

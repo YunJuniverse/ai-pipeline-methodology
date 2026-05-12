@@ -9,26 +9,39 @@
 
 ## Ready
 
+### METH-015
+- **title**: 적용 프로젝트 3개에 applied-ci 워크플로 자동 주입 검증
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI
+- **acceptance criteria**:
+  - [ ] icons/gamblescan/talmocom에 `sync --apply` 호출 — `.github/workflows/methodology-applied-ci.yml` 신규 생성 확인
+  - [ ] GitHub에서 첫 push 시 워크플로 실행 결과 확인 (60_meta 미주입, manifest-check, observation lint 통과)
+  - [ ] 실패 시 워크플로 또는 검증 로직 조정
+
+### METH-016
+- **title**: SessionEnd hook 활성화 — Claude Code 환경에서 wrap 자동 호출
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: Human (settings.json 사용자 결정 영역)
+- **acceptance criteria**:
+  - [ ] 사용자 `.claude/settings.json` 또는 `.claude/settings.local.json`에 `SessionEnd` hook 등록
+  - [ ] 다음 세션 종료 시 wrap 자동 호출 확인
+- **notes**: 가이드 위치 `.ai/adapters/claude.md`. 본 항목은 *사용자 설정 변경*이라 AI가 직접 적용하지 않음.
+
 ### METH-013
 - **title**: 메타-방법론 격리(`60_meta/`)의 ADR 후속화 — RFC-001 → ADR-002
 - **mode**: planning-only
 - **change-class**: B (구조 결정)
 - **owner**: Human + AI
-- **acceptance criteria**:
-  - [ ] `60_meta/rfc/RFC-001_meta-folder-introduction.md` 작성 (Context/Proposal/Alternatives/Risks/Rollout 5섹션)
-  - [ ] `30_dev/adr/ADR-002_meta-folder-isolation.md` 작성 (RFC-001 머지 후)
-  - [ ] 백서 §13 / §부록 C·A 정합성 확인
-- **notes**: 본 격리는 2026-05-12에 *코드·구조 차원에서 적용 완료*. 결정 기록만 후속.
+- **notes**: RFC-001은 status 개선용으로 *재사용됨* (2026-05-12 accepted). 격리 결정의 별도 RFC/ADR은 추후 *변경 발생 시점*에 작성. 본 TODO는 *대기*.
 
 ### METH-014
-- **title**: 메타-카탈로그 첫 시드 (MC-001~003 후보 탐색)
+- **title**: 메타-카탈로그 첫 시드 — MP-001/MP-002 완료
 - **mode**: planning-only
 - **change-class**: A
 - **owner**: AI
-- **acceptance criteria**:
-  - [ ] 본 저장소 운영 이력에서 N≥2 목격된 메타 마찰 3건 식별
-  - [ ] 각 후보를 `60_meta/catalog/_pending/MP-NNN_*.md`로 시드 (또는 N≥2이면 직접 `MC-NNN_*.md`)
-  - [ ] 분류 실수 (도메인↔메타) 점검 통과
+- **notes**: 2026-05-12 MP-001(status 버전 문자열만 비교) + MP-002(sync init_files 누락) 시드 완료. N≥2 목격 시 active(MC) 승급. 본 TODO는 *지속 모니터링* 상태로 남음.
 
 ## InProgress
 

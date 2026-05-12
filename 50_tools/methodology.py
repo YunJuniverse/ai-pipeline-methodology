@@ -89,6 +89,7 @@ MANIFEST = {
         ".ai/schema",
         ".ai/adapters",
         "ONBOARDING.md",
+        ".github/workflows/methodology-applied-ci.yml",
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
@@ -1133,6 +1134,94 @@ def cmd_version(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_wrap(args: argparse.Namespace) -> int:
+    """세션·작업 종료 검증 — 4개 라이브 파일 갱신 누락 점검.
+
+    동작: 오늘(UTC) 갱신된 파일을 확인하고 누락이 있으면 표시한다.
+    이 명령은 *AI가 4개 파일을 직접 갱신한 뒤* 호출되어야 한다.
+    누락이 있으면 AI가 *다시 갱신해야 함*을 의미.
+
+    --strict: 누락 1건이라도 있으면 exit code 1 (CI 또는 hook에서 사용).
+    """
+    target = Path(args.path or ".").resolve()
+    today = date.today().isoformat()
+
+    info(f"wrap check: {target}  (today={today} UTC)")
+    print()
+
+    checks: list[tuple[str, bool, str]] = []
+
+    def _mtime_today(p: Path) -> bool:
+        if not p.exists():
+            return False
+        from datetime import datetime, timezone
+        m = datetime.fromtimestamp(p.stat().st_mtime, tz=timezone.utc).date().isoformat()
+        return m == today
+
+    # 1. HANDOFF.md
+    handoff = target / "HANDOFF.md"
+    handoff_ok = handoff.exists() and _mtime_today(handoff)
+    checks.append(("HANDOFF.md", handoff_ok, "Current Focus + Recent Changes 갱신"))
+
+    # 2. TODO.md
+    todo = target / "TODO.md"
+    todo_ok = todo.exists() and _mtime_today(todo)
+    checks.append(("TODO.md", todo_ok, "Ready/InProgress/Done 갱신"))
+
+    # 3. .ai/checkpoint.md
+    cp = target / ".ai" / "checkpoint.md"
+    cp_ok = cp.exists() and _mtime_today(cp)
+    checks.append((".ai/checkpoint.md", cp_ok, "다음 사람을 위한 인계서 갱신"))
+
+    # 4. ai_observations — 오늘 날짜의 파일 1건 이상
+    obs_dir = target / "40_resources" / "ai_observations"
+    meta_obs_dir = target / "60_meta" / "observations"
+    obs_today = []
+    for d in (obs_dir, meta_obs_dir):
+        if d.is_dir():
+            obs_today.extend(d.glob(f"{today}_*.md"))
+    obs_ok = len(obs_today) >= 1
+    checks.append((
+        "ai_observations/",
+        obs_ok,
+        f"{today}_<slug>.md (현재 {len(obs_today)}건)",
+    ))
+
+    # 출력
+    missing = 0
+    for name, ok_flag, hint in checks:
+        mark = "\033[32m✓\033[0m" if ok_flag else "\033[31m✗\033[0m"
+        if not ok_flag:
+            missing += 1
+        print(f"  {mark} {name:<28} — {hint}")
+
+    # git status 요약
+    print()
+    info("git status 요약:")
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "status", "--short"], text=True
+        )
+        if out.strip():
+            for line in out.strip().split("\n")[:15]:
+                print(f"    {line}")
+            count = len(out.strip().split("\n"))
+            if count > 15:
+                print(f"    ... 총 {count}건")
+        else:
+            print("    (변경 없음)")
+    except Exception as e:
+        warn(f"git status 실패: {e}")
+
+    print()
+    if missing == 0:
+        ok("4/4 라이브 파일 모두 오늘 갱신됨. 사용자에게 결과 보고 후 종료 가능.")
+        return 0
+    else:
+        err(f"{missing}/4 파일 갱신 누락. AI는 누락된 파일을 갱신한 뒤 wrap을 다시 호출.")
+        return 1 if args.strict else 0
+
+
 def cmd_manifest_check(args: argparse.Namespace) -> int:
     """MANIFEST excluded_paths 안전망을 명시적으로 검증.
 
@@ -1183,6 +1272,11 @@ def main(argv: list[str] | None = None) -> int:
 
     pmc = sub.add_parser("manifest-check", help="MANIFEST excluded_paths 안전망 검증")
     pmc.set_defaults(func=cmd_manifest_check)
+
+    pw = sub.add_parser("wrap", help="작업·세션 종료 검증 — 4개 라이브 파일(HANDOFF/TODO/checkpoint/observation) 갱신 누락 점검")
+    pw.add_argument("--path", help="대상 폴더 (기본: 현재)")
+    pw.add_argument("--strict", action="store_true", help="누락 시 exit 1 (CI/hook용)")
+    pw.set_defaults(func=cmd_wrap)
 
     po = sub.add_parser("observe", help="L1 AI 관찰 로그 생성·검증")
     po.add_argument("--slug", help="파일명 slug (영문 소문자/숫자/kebab-case)")

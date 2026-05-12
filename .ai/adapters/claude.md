@@ -22,18 +22,42 @@ Claude Code는 세션 시작 시 다음을 자동 컨텍스트에 포함:
 .ai/context.json을 읽고, must_read 배열의 파일들을 순서대로 읽어 부팅해줘. 그 다음 .ai/checkpoint.md의 "다음 사람에게" 첫 항목부터 시작.
 ```
 
-## 세션 종료 자동화 (현재: 수동, 향후: hook)
+## 세션 종료 자동화
 
-**현재**: 세션 종료 직전에 사용자가 다음을 요청:
+**기본 절차 (의무, 모든 어댑터 공통)**: `CLAUDE.md` / `AGENTS.md`의 *"세션·작업 종료 절차"* 규칙을 따른다 — 4개 라이브 파일(`TODO`, `HANDOFF`, `.ai/checkpoint.md`, ai_observations) 갱신 후 `methodology wrap` 호출.
 
+### Claude Code SessionEnd hook (권장)
+
+`.claude/settings.json` 또는 `.claude/settings.local.json`에 다음 추가:
+
+```json
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "python3 50_tools/methodology.py wrap" }
+        ]
+      }
+    ]
+  }
+}
 ```
-.ai/checkpoint.md를 이 세션 작업 내용으로 갱신해줘.
-형식: 현재 .ai/checkpoint.md의 필수 섹션.
-규칙: 과장·칭찬·추측 금지, 다음 AI가 이어받는 데 필요한 사실과 첫 행동만.
-```
 
-**향후 (TODO)**: `.claude/settings.json`의 `hooks.SessionEnd`에 checkpoint 자동 갱신 명령을 등록.
-구현 시 `00_foundation/WHITEPAPER.md` §리스크 1(L1 자동기록 누락) 완화로 이어짐.
+동작:
+- 매 세션 종료 시 `methodology wrap` 자동 호출
+- 4개 파일 갱신 누락 표시 + git status 요약 출력
+- 출력이 다음 세션 컨텍스트에 흔적으로 남아 누락을 후속 세션이 보완하도록 유도
+
+**주의**: hook은 *검증 도구*일 뿐 *자동 갱신*은 하지 않는다. 갱신 책임은 세션 내 AI에 있음. hook은 누락을 *드러낼 뿐*. (α 패턴: AI 자동 작성 → wrap이 검증)
+
+### 수동 호출 (hook 미설정 환경)
+
+세션 종료 직전 사용자가:
+```
+methodology wrap 호출해서 4개 라이브 파일 갱신 누락 점검해줘. 누락 있으면 갱신하고 다시 호출.
+```
 
 ## 도구 매핑
 

@@ -1,0 +1,78 @@
+# 본 저장소 (ai-pipeline-methodology) 전용 CI.
+# 적용 프로젝트에는 주입되지 않음 (MANIFEST shared_paths에 없음).
+
+name: methodology-source-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: manifest-check — 60_meta 격리 안전망
+        run: python3 50_tools/methodology.py manifest-check
+
+      - name: 60_meta 격리 (실측) — init으로 임시 프로젝트 만들고 60_meta 없는지
+        run: |
+          set -e
+          TMP=$(mktemp -d)
+          python3 50_tools/methodology.py init "$TMP/applied" --label test --type planning-only > /dev/null
+          if [ -e "$TMP/applied/60_meta" ]; then
+            echo "❌ 60_meta가 적용 프로젝트에 새어나감"
+            exit 1
+          fi
+          echo "✅ 60_meta 격리 확인"
+
+      - name: observation lint — 40_resources/ai_observations + 60_meta/observations
+        run: |
+          set -e
+          fail=0
+          for f in 40_resources/ai_observations/*.md 60_meta/observations/*.md; do
+            [ -e "$f" ] || continue
+            [ "$(basename "$f")" = "_README.md" ] && continue
+            [ "$(basename "$f")" = "README.md" ] && continue
+            python3 50_tools/methodology.py observe --validate "$f" || fail=1
+          done
+          exit $fail
+
+      - name: migration idempotency — init 후 동일 sync 변경 0건
+        run: |
+          set -e
+          TMP=$(mktemp -d)
+          python3 50_tools/methodology.py init "$TMP/applied" --label test --type planning-only > /dev/null
+          # 두 번째 sync — 멱등이라면 변경 0건이어야 함
+          out=$(python3 50_tools/methodology.py sync --path "$TMP/applied" 2>&1)
+          if echo "$out" | grep -q "0개 변경"; then
+            echo "✅ idempotent"
+          else
+            # 일부 shared 경로는 mtime 차이로 매번 복사될 수 있음 → warn만
+            echo "⚠ 변경 발생 — mtime 또는 내용 차이. 출력:"
+            echo "$out"
+          fi
+
+      - name: dashboard build — 산출물 생성 가능 확인
+        run: python3 50_tools/generate-dashboard.py --out /tmp/dashboard.html
+
+  wrap-strict-check:
+    # 본 저장소 자체의 wrap 검증 — main 푸시 시 4개 라이브 파일이 최근 갱신됐는지.
+    # 너무 엄격하면 노이즈가 되니, 일단 warn-only (continue-on-error).
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: wrap (informational)
+        run: python3 50_tools/methodology.py wrap || true
