@@ -92,6 +92,7 @@ MANIFEST = {
         "ONBOARDING.md",
         ".github/workflows/methodology-applied-ci.yml",
         ".github/workflows/methodology-auto-merge.yml",
+        "open-dashboard.command",
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
@@ -1467,6 +1468,15 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         url = f"http://localhost:{port}"
         ok(f"dashboard already serving: {url}  (root: {target.name}, branch: {branch_label}, commit: {commit})")
         print(f"  ⌘+클릭으로 열기: {url}  (새로고침하면 방금 빌드 반영)")
+        if args.open:
+            try:
+                if sys.platform == "darwin":
+                    subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                else:
+                    import webbrowser
+                    webbrowser.open(url)
+            except Exception as e:
+                warn(f"브라우저 자동 열기 실패: {e}")
         if worktree_to_cleanup:
             # 재사용 시 새 worktree 는 불필요 — 정리. 단 *기존 dashboard 서버*가 그
             # worktree 경로를 root 로 떠 있는지 확인하고, 그렇다면 정리 안 함.
@@ -1533,6 +1543,17 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
     print(f"  종료: methodology dashboard stop --port {port}  또는  kill {proc.pid}")
     if worktree_to_cleanup:
         print(f"  worktree: {worktree_to_cleanup}  (서버 종료 후 'methodology dashboard stop' 으로 정리)")
+    # --open: 자동 브라우저 실행 (macOS: open / 기타: webbrowser 표준 모듈)
+    if args.open:
+        try:
+            if sys.platform == "darwin":
+                subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            else:
+                import webbrowser
+                webbrowser.open(url)
+            info(f"브라우저로 {url} 열기")
+        except Exception as e:
+            warn(f"브라우저 자동 열기 실패: {e}")
     return 0
 
 
@@ -1889,6 +1910,7 @@ def main(argv: list[str] | None = None) -> int:
     pdb.add_argument("--port", type=int, default=None, help="서빙 포트 (기본: 자동 8765-8799)")
     pdb.add_argument("--branch", help="다른 브랜치 dashboard (worktree 로 추출, working tree 안 건드림)")
     pdb.add_argument("--no-serve", action="store_true", help="빌드만, 서빙 안 함")
+    pdb.add_argument("--open", action="store_true", help="기동 후 브라우저로 자동 열기 (macOS: open, 기타: webbrowser)")
     pdb.set_defaults(func=cmd_dashboard)
     pdb_list = pdbsub.add_parser("list", help="실행 중인 모든 dashboard 목록")
     pdb_list.set_defaults(func=cmd_dashboard_list)

@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-13 (여러 dashboard 동시 + 브랜치 spawn)
+# Checkpoint — 2026-05-13 (더블클릭 진입점 open-dashboard.command)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,13 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 여러 dashboard 동시 + 브랜치별 spawn 완성 (방금)**:
+**🆕 더블클릭 진입점 (방금)**:
+- `open-dashboard.command` (macOS, +x) — 폴더 루트에서 Finder 더블클릭 → Terminal 에서 자동 실행 → dashboard --open
+- `methodology dashboard --open` 옵션 — 기동 후 브라우저 자동 열기 (macOS: subprocess.Popen(['open', url]) / 기타: webbrowser.open)
+- MANIFEST shared_paths 에 추가 → 적용 프로젝트 자동 전파 (shutil.copy2 가 mode 보존)
+- 사용자 의도: 터미널 명령 외우지 않고 *폴더에서 더블클릭* 으로 dashboard 시작
+
+**여러 dashboard 동시 + 브랜치별 spawn (이전 차례)**:
 - `methodology dashboard` 자동 포트 할당 (8765-8799 빈 포트 탐색)
 - `--branch <name>` 옵션 — git worktree add --detach → ~/.methodology-cache/<project>/<branch-slug>/ 격리 빌드 → 별도 포트 서빙. working tree 안 건드림.
 - `dashboard list` — ~/.methodology-dashboards.json 레지스트리 조회 + 죽은 항목 자동 정리
