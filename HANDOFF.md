@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- **Working on**: 더블클릭 진입점 추가 — `open-dashboard.command` (macOS) + `methodology dashboard --open` 옵션. 터미널 명령 없이 Finder 더블클릭으로 dashboard 시작.
+- **Working on**: in-spire 브랜드 첫 시각 자산 — `_start/` 폴더 + macOS .app / Windows .bat+.ico+.ps1 / Linux .sh+.desktop+setup.sh + 원본 PNG 3장 + README. Pillow 픽셀 swap 으로 1 PNG → 3 OS 색상 변형. macOS .app 더블클릭 시뮬 통과 ✅.
 - **Current mode**: fullstack
-- **Next TODO**: 3개 적용 프로젝트에 multi-dashboard + open-dashboard.command 일괄 sync, METH-020 (MC-002 승급)
+- **Next TODO**: 3개 적용 프로젝트에 _start/ 전파, 루트 README.md 를 in-spire 브랜드로 갱신, METH-020 (MC-002 승급)
 - **Blockers**: none
 
 ## Active Links
@@ -34,7 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
-- 2026-05-13: **더블클릭 진입점 — open-dashboard.command** — macOS Finder 더블클릭으로 dashboard 시작. `methodology dashboard --open` 옵션 추가(macOS: open, 기타: webbrowser). MANIFEST shared_paths 로 적용 프로젝트 자동 전파. chmod +x.
+- 2026-05-13: **in-spire 브랜드 + `_start/` 3 OS 진입점** — `swap-icon-color.py` (Pillow 픽셀 swap: 흰색 보호 + 그라데이션 위치 보간) → mac teal/win blue/linux amber 3장 PNG. `build-launchers.py` 로 `_start/{in-spire.app, in-spire.bat+ico+setup.ps1, in-spire.sh+desktop+setup.sh, icons/, README.md}` 일괄 빌드. macOS .app 더블클릭 시뮬 통과 ✅ (dashboard + 자동 포트 + 브라우저). MANIFEST shared 등록, .app 실행권한 보존, 60_meta 격리 검증.
+- 2026-05-13: 더블클릭 진입점 — open-dashboard.command — macOS Finder 더블클릭으로 dashboard 시작. `methodology dashboard --open` 옵션 추가(macOS: open, 기타: webbrowser). MANIFEST shared_paths 로 적용 프로젝트 자동 전파. chmod +x.
 - 2026-05-13: 여러 dashboard 동시 + 브랜치별 spawn — methodology dashboard 자동 포트 할당(8765-8799), `--branch <name>` 옵션(git worktree add --detach 로 ~/.methodology-cache/ 격리 추출 후 빌드), `dashboard list/stop` 서브커맨드, ~/.methodology-dashboards.json 레지스트리. generate-dashboard.py API 4종(/api/dashboards, /api/branches, /api/dashboard/spawn, /api/dashboard/stop) + UI 카드 2종(Local Dashboards, Branches 라디오). 검증: 2 dashboard 동시(8765 main + 8766 codex-methodology-v2) + stop 시 worktree 자동 정리.
 - 2026-05-13: dashboard 포트 충돌 버그 수정 + 3개 프로젝트 전파 — `cmd_dashboard` 가 포트 점유 시 root HTTP 확인 → 같은 프로젝트면 재사용, 다른 프로젝트면 종료 후 재시작. `import os` 누락 수정. 본 저장소 push dbbb82e → icons(f11a988→9ff8d6a)/gamblescan(8b5531d→ff18d1d)/talmocom(f94a4e9→602e2a1) sync 전파(--no-verify, F-005 참조). talmocom dashboard 새 로직 재시작 검증 ✅. 신규 마찰: F-004(wrap 날짜경계)→METH-021, F-005(hooks↔wrap 충돌)→METH-022, "적용 프로젝트 CLI fix 지연" N=3→METH-020(MC-002).
 - 2026-05-12: METH-015 완료 — 적용 프로젝트 3개에 v3.2 자산 일괄 전파. icons(385326a→f11a988), gamblescan(63c7abe→8b5531d), talmocom(d447eaa→f94a4e9) 모두 본 저장소 83a48e0 동기화. 60_meta 격리 3/3 ✅. F-003 N=2 — 자가발전 루프 첫 진짜 회전.

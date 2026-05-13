@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-13 (더블클릭 진입점 open-dashboard.command)
+# Checkpoint — 2026-05-13 (in-spire 브랜드 + _start/ 3 OS 진입점)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,19 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 더블클릭 진입점 (방금)**:
+**🆕 in-spire 브랜드 첫 시각 자산 (방금)**:
+- 사용자 결정: 브랜드명 **in-spire** (이중 의미: in spire + inspire), 배경색만 차등 (옵션 A), 실행파일만 폴더로 (옵션 3)
+- AI 생성: macOS teal/navy 나선 1장 (Recraft) → 의외의 행운: 두 갈래 나선 (DNA double helix, 자가복제 메타포)
+- `50_tools/swap-icon-color.py` — Pillow 픽셀 swap (흰색 stroke·외부 배경 보호 + 그라데이션 위치 보간) → win blue/linux amber 2장 자동 생성
+- `50_tools/build-launchers.py` — 3 PNG → `_start/` 전체 자산 일괄:
+  - macOS: in-spire.app (Info.plist + AppIcon.icns 10 사이즈 + MacOS/in-spire 셸 스크립트)
+  - Windows: in-spire.bat + in-spire.ico (7 사이즈) + setup-windows.ps1 (.lnk 자동 생성)
+  - Linux: in-spire.sh + in-spire.desktop (템플릿) + setup-linux.sh (Exec/Icon 절대경로 치환) + 256 PNG
+  - icons/ 원본 PNG 4장 + README.md
+- macOS .app 더블클릭 시뮬 실측 통과 ✅
+- MANIFEST shared_paths 에 _start/ 추가 → 적용 프로젝트 자동 전파 (.app 실행권한·.icns 멀티사이즈 보존)
+
+**더블클릭 진입점 open-dashboard.command (이전 차례)**:
 - `open-dashboard.command` (macOS, +x) — 폴더 루트에서 Finder 더블클릭 → Terminal 에서 자동 실행 → dashboard --open
 - `methodology dashboard --open` 옵션 — 기동 후 브라우저 자동 열기 (macOS: subprocess.Popen(['open', url]) / 기타: webbrowser.open)
 - MANIFEST shared_paths 에 추가 → 적용 프로젝트 자동 전파 (shutil.copy2 가 mode 보존)

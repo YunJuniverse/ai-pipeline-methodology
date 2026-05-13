@@ -93,6 +93,7 @@ MANIFEST = {
         ".github/workflows/methodology-applied-ci.yml",
         ".github/workflows/methodology-auto-merge.yml",
         "open-dashboard.command",
+        "_start",
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
