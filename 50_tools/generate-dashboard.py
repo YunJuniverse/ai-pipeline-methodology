@@ -674,6 +674,44 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
     <div id="ov-file-content" class="content-body"></div>
   </div>
 
+  <div class="card" id="dashboards-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <h2 style="margin:0">Local Dashboards</h2>
+      <button id="dashboards-refresh" type="button">Refresh</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
+      현재 컴퓨터에서 떠 있는 모든 dashboard 인스턴스. 같은 (프로젝트, 브랜치) 는 재사용 — 다른 조합은 자동 포트 8765-8799 할당.
+    </div>
+    <table id="dashboards-table" style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Port</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Project</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Branch</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Commit</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Started</th>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">—</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="branches-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <h2 style="margin:0">Branches</h2>
+      <button id="branches-refresh" type="button">Refresh</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
+      이 프로젝트의 git 브랜치 목록. 라디오 선택 후 <strong>Open dashboard</strong> 누르면 그 브랜치의 dashboard 가 *별도 포트*에 spawn (working tree 안 건드림 — git worktree 격리).
+    </div>
+    <div id="branches-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
+    <div id="branches-list" style="display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;padding:8px;background:var(--panel2)">
+      <span style="color:var(--muted);font-size:12px">Refresh 누르면 로드</span>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      <button id="branches-spawn" type="button" style="background:#065f46;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer">Open selected branch dashboard →</button>
+    </div>
+  </div>
+
   <div class="card" id="dev-servers-card">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       <h2 style="margin:0">Local Dev Servers</h2>
@@ -1645,6 +1683,130 @@ document.getElementById('dev-refresh').onclick = devRefresh;
 // 초기 + 주기적 갱신 (5초)
 devRefresh();
 setInterval(devRefresh, 5000);
+
+// ── Local Dashboards 패널 ─────────────────────────────────────────
+const dashApi = {
+  list: async () => (await fetch('/api/dashboards')).json(),
+  stop: async (port) => {
+    const r = await fetch('/api/dashboard/stop', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({port})
+    });
+    return {ok: r.ok, body: await r.json()};
+  },
+};
+
+const dashTbody = document.querySelector('#dashboards-table tbody');
+async function dashboardsRefresh() {
+  try {
+    const {dashboards} = await dashApi.list();
+    dashTbody.innerHTML = '';
+    if (!dashboards || dashboards.length === 0) {
+      dashTbody.innerHTML = '<tr><td colspan="6" style="padding:8px;color:var(--muted)">등록된 dashboard 없음 (또는 모두 종료됨).</td></tr>';
+      return;
+    }
+    for (const d of dashboards) {
+      const tr = document.createElement('tr');
+      const isCurrent = d.root === DATA.root && d.branch === (DATA.git_branch || '');
+      const projName = (d.root || '').split('/').pop() || '?';
+      tr.innerHTML = `
+        <td style="padding:6px;border-bottom:1px solid var(--line)">
+          <a href="http://localhost:${d.port}" target="_blank" style="color:#22d3ee;text-decoration:none;font-weight:600">${d.port} ↗</a>
+          ${isCurrent ? '<span style="font-size:10px;color:#22d3ee;margin-left:4px">(현재)</span>' : ''}
+        </td>
+        <td style="padding:6px;border-bottom:1px solid var(--line)"><code>${projName}</code></td>
+        <td style="padding:6px;border-bottom:1px solid var(--line);font-size:12px"><code>${d.branch || '?'}</code></td>
+        <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px"><code>${d.commit || '?'}</code></td>
+        <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px">${d.started_at || ''}</td>
+        <td style="padding:6px;border-bottom:1px solid var(--line)">
+          <button data-port="${d.port}" class="dash-stop-btn" type="button" style="background:#991b1b;color:#fff;border:none;padding:4px 10px;border-radius:3px;cursor:pointer">Stop</button>
+        </td>
+      `;
+      dashTbody.appendChild(tr);
+    }
+    dashTbody.querySelectorAll('.dash-stop-btn').forEach(b => {
+      b.onclick = async (e) => {
+        const port = parseInt(e.target.dataset.port);
+        if (!confirm(`포트 ${port} dashboard 를 종료할까요? (worktree 도 정리됨)`)) return;
+        e.target.disabled = true;
+        e.target.textContent = 'Stopping…';
+        const {ok, body} = await dashApi.stop(port);
+        if (!ok) alert(`stop 실패: ${body.error || 'unknown'}`);
+        dashboardsRefresh();
+      };
+    });
+  } catch (e) {
+    dashTbody.innerHTML = `<tr><td colspan="6" style="padding:8px;color:#f87171">갱신 실패: ${e.message}</td></tr>`;
+  }
+}
+
+document.getElementById('dashboards-refresh').onclick = dashboardsRefresh;
+dashboardsRefresh();
+setInterval(dashboardsRefresh, 5000);
+
+// ── Branches 패널 ────────────────────────────────────────────────
+const branchApi = {
+  list: async () => (await fetch('/api/branches')).json(),
+  spawn: async (branch) => {
+    const r = await fetch('/api/dashboard/spawn', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({branch})
+    });
+    return {ok: r.ok, body: await r.json()};
+  },
+};
+
+const branchesList = document.getElementById('branches-list');
+const branchesStatus = document.getElementById('branches-status');
+
+async function branchesRefresh() {
+  branchesStatus.textContent = 'Loading…';
+  try {
+    const {current, branches} = await branchApi.list();
+    if (!branches || branches.length === 0) {
+      branchesList.innerHTML = '<span style="color:var(--muted);font-size:12px">git 브랜치 미발견.</span>';
+      branchesStatus.textContent = '';
+      return;
+    }
+    branchesList.innerHTML = '';
+    for (const b of branches) {
+      const id = 'br_' + b.replace(/[^a-zA-Z0-9]/g, '_');
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;padding:3px 6px;border-radius:3px';
+      label.innerHTML = `
+        <input type="radio" name="branch-select" value="${b}" id="${id}"${b === current ? ' checked' : ''} />
+        <code style="flex:1">${b}</code>
+        ${b === current ? '<span style="font-size:10px;color:#22d3ee">(current)</span>' : ''}
+      `;
+      branchesList.appendChild(label);
+    }
+    branchesStatus.textContent = `${branches.length}개 브랜치 (current: ${current || '?'})`;
+  } catch (e) {
+    branchesList.innerHTML = `<span style="color:#f87171">로드 실패: ${e.message}</span>`;
+    branchesStatus.textContent = '';
+  }
+}
+
+document.getElementById('branches-refresh').onclick = branchesRefresh;
+document.getElementById('branches-spawn').onclick = async () => {
+  const selected = document.querySelector('input[name="branch-select"]:checked');
+  if (!selected) { alert('브랜치를 선택하세요.'); return; }
+  const branch = selected.value;
+  branchesStatus.textContent = `Spawning dashboard for ${branch} ...`;
+  const {ok, body} = await branchApi.spawn(branch);
+  if (!ok) {
+    alert(`spawn 실패: ${body.error || 'unknown'}\n\n${body.output || ''}`);
+    branchesStatus.textContent = `spawn 실패: ${body.error}`;
+    return;
+  }
+  branchesStatus.textContent = `Spawned: ${body.url}`;
+  window.open(body.url, '_blank');
+  dashboardsRefresh();
+};
+
+branchesRefresh();
 </script>
 </body>
 </html>
@@ -1761,6 +1923,66 @@ def _serve_with_api(out: Path, start_port: int) -> None:
                     _servers.clear()
                     _servers.update(alive)
                     return self._send_json(200, {"servers": list(_servers.values())})
+
+            if parsed.path == "/api/dashboards":
+                # ~/.methodology-dashboards.json 레지스트리 + 죽은 항목 정리
+                import pathlib as _pl
+                reg_file = _pl.Path.home() / ".methodology-dashboards.json"
+                entries: list[dict] = []
+                if reg_file.exists():
+                    try:
+                        entries = _json.loads(reg_file.read_text(encoding="utf-8"))
+                    except Exception:
+                        entries = []
+                alive_dash: list[dict] = []
+                for e in entries:
+                    pid = e.get("pid")
+                    if pid:
+                        try:
+                            os.kill(int(pid), 0)
+                            alive_dash.append(e)
+                        except (ProcessLookupError, ValueError, PermissionError):
+                            continue
+                    else:
+                        alive_dash.append(e)
+                if len(alive_dash) != len(entries):
+                    try:
+                        reg_file.write_text(_json.dumps(alive_dash, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                    except Exception:
+                        pass
+                return self._send_json(200, {"dashboards": alive_dash})
+
+            if parsed.path == "/api/branches":
+                # 현재 root 의 git branch 목록 (로컬 + 원격)
+                root = str(Path.cwd())
+                try:
+                    out = subprocess.check_output(
+                        ["git", "-C", root, "branch", "-a", "--no-color"],
+                        text=True, stderr=subprocess.DEVNULL,
+                    )
+                except Exception:
+                    return self._send_json(200, {"current": None, "branches": []})
+                current = None
+                branches: list[str] = []
+                for line in out.splitlines():
+                    s = line.strip()
+                    if not s:
+                        continue
+                    is_current = s.startswith("* ")
+                    # *  현재 브랜치 / +  다른 worktree 에서 체크아웃 / -- detached HEAD
+                    name = re.sub(r"^[*+-]\s+", "", s).strip()
+                    # remotes/origin/HEAD -> origin/main 같은 심볼릭 참조 제외
+                    if " -> " in name:
+                        continue
+                    # remotes/ 접두 제거 (선택적 표시용으로 유지)
+                    if name.startswith("remotes/"):
+                        name = name[len("remotes/"):]
+                    if is_current:
+                        current = name
+                    if name not in branches:
+                        branches.append(name)
+                return self._send_json(200, {"current": current, "branches": branches})
+
             return super().do_GET()
 
         def do_POST(self):
@@ -1838,6 +2060,49 @@ def _serve_with_api(out: Path, start_port: int) -> None:
                         if pid in killed_pids:
                             _servers.pop(pid, None)
                 return self._send_json(200, {"killed": killed_all})
+
+            if parsed.path == "/api/dashboard/spawn":
+                # body: {"branch": "<name>"} — 그 브랜치 dashboard 를 별도 포트에 spawn
+                branch_name = (payload.get("branch") or "").strip()
+                if not branch_name:
+                    return self._send_json(400, {"error": "branch 필요"})
+                root = Path.cwd()
+                meth = root / "50_tools" / "methodology.py"
+                if not meth.exists():
+                    return self._send_json(500, {"error": f"50_tools/methodology.py 미발견 ({meth})"})
+                try:
+                    out = subprocess.check_output(
+                        [sys.executable, str(meth), "dashboard", "--branch", branch_name],
+                        cwd=str(root), text=True, stderr=subprocess.STDOUT, timeout=30,
+                    )
+                except subprocess.CalledProcessError as e:
+                    return self._send_json(500, {"error": "spawn 실패", "output": e.output})
+                except subprocess.TimeoutExpired:
+                    return self._send_json(504, {"error": "spawn 30초 초과"})
+                # 출력에서 URL 추출
+                m = re.search(r"http://localhost:(\d+)", out)
+                if not m:
+                    return self._send_json(500, {"error": "URL 미발견", "output": out})
+                port = int(m.group(1))
+                return self._send_json(200, {"port": port, "url": f"http://localhost:{port}", "branch": branch_name, "output": out})
+
+            if parsed.path == "/api/dashboard/stop":
+                # body: {"port": N} — 해당 dashboard 종료 (methodology dashboard stop)
+                port = payload.get("port")
+                if not port:
+                    return self._send_json(400, {"error": "port 필요"})
+                root = Path.cwd()
+                meth = root / "50_tools" / "methodology.py"
+                try:
+                    subprocess.check_output(
+                        [sys.executable, str(meth), "dashboard", "stop", "--port", str(int(port))],
+                        cwd=str(root), text=True, stderr=subprocess.STDOUT, timeout=10,
+                    )
+                except subprocess.CalledProcessError as e:
+                    return self._send_json(500, {"error": "stop 실패", "output": e.output})
+                except subprocess.TimeoutExpired:
+                    return self._send_json(504, {"error": "stop 10초 초과"})
+                return self._send_json(200, {"stopped": int(port)})
 
             return self._send_json(404, {"error": "unknown endpoint"})
 

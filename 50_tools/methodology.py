@@ -1363,83 +1363,319 @@ fi
 def cmd_dashboard(args: argparse.Namespace) -> int:
     """대시보드 빌드 + 서빙 + URL 출력.
 
-    동작:
-    - generate-dashboard.py 호출 (현재 브랜치/시점 반영)
-    - --serve (기본 True) 면 background 서버 시작
-    - URL을 사용자에게 명확히 출력 (브랜치·commit 포함)
-    - 이미 같은 포트에 떠 있으면 중복 시작 회피
+    동작 (v2):
+    - 포트 자동 할당 (8765~8799 빈 포트) — 여러 dashboard 동시 운영
+    - --branch <name> 지정 시 git worktree 로 그 브랜치 추출 → 캐시 디렉터리에서 빌드 (working tree 안 건드림)
+    - 같은 (root, branch) 가 이미 떠 있으면 그 URL 재사용
+    - 레지스트리(~/.methodology-dashboards.json)에 등록
     """
+    import time as _time
     target = Path(args.path or ".").resolve()
-    port = args.port
+    branch_arg: str | None = args.branch
+    explicit_port: int | None = args.port if args.port else None
     serve = not args.no_serve
-    out_path = Path(args.out) if args.out else target / "dashboard.html"
 
     builder = METHODOLOGY_ROOT / "50_tools" / "generate-dashboard.py"
     if not builder.exists():
-        # 적용 프로젝트의 경우 자기 위치 사용
         builder = target / "50_tools" / "generate-dashboard.py"
     if not builder.exists():
         err(f"generate-dashboard.py 미발견 ({builder})")
         return 2
 
-    # 1) 빌드
-    cmd = [sys.executable, str(builder), "--root", str(target), "--out", str(out_path)]
-    info(f"dashboard 빌드: {target}")
+    # 1) 빌드 root 결정 — branch 지정 시 worktree
+    build_root: Path
+    worktree_to_cleanup: Path | None = None
+    branch_label: str
+    if branch_arg:
+        # git worktree 로 임시 추출
+        cache_dir = _cache_dir_for(target, branch_arg)
+        cache_dir.parent.mkdir(parents=True, exist_ok=True)
+        # 기존 cache_dir 정리 (이전 worktree 가 남아 있을 수 있음)
+        if cache_dir.exists():
+            subprocess.call(
+                ["git", "-C", str(target), "worktree", "remove", "--force", str(cache_dir)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            shutil.rmtree(cache_dir, ignore_errors=True)
+        info(f"git worktree add (branch={branch_arg}) → {cache_dir}")
+        try:
+            subprocess.check_call(
+                ["git", "-C", str(target), "worktree", "add", "--detach", str(cache_dir), branch_arg],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        except subprocess.CalledProcessError:
+            err(f"git worktree add 실패 — branch '{branch_arg}' 존재 확인.")
+            return 1
+        build_root = cache_dir
+        worktree_to_cleanup = cache_dir
+        branch_label = branch_arg
+        out_path = cache_dir / "dashboard.html"
+    else:
+        build_root = target
+        out_path = Path(args.out) if args.out else target / "dashboard.html"
+        try:
+            branch_label = subprocess.check_output(
+                ["git", "-C", str(target), "branch", "--show-current"],
+                text=True, stderr=subprocess.DEVNULL,
+            ).strip() or "DETACHED"
+        except Exception:
+            branch_label = "unknown"
+
+    # 2) 빌드
+    info(f"dashboard 빌드: {build_root}  (branch: {branch_label})")
     try:
-        subprocess.check_call(cmd)
+        subprocess.check_call(
+            [sys.executable, str(builder), "--root", str(build_root), "--out", str(out_path)],
+        )
     except subprocess.CalledProcessError as e:
         err(f"빌드 실패: {e}")
+        if worktree_to_cleanup:
+            subprocess.call(
+                ["git", "-C", str(target), "worktree", "remove", "--force", str(worktree_to_cleanup)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
         return 1
 
-    # 2) 현재 git 정보 표시
-    branch = "unknown"
+    # commit 정보
     commit = "unknown"
     try:
-        branch = subprocess.check_output(
-            ["git", "-C", str(target), "branch", "--show-current"],
-            text=True, stderr=subprocess.DEVNULL,
-        ).strip() or "DETACHED"
         commit = subprocess.check_output(
-            ["git", "-C", str(target), "rev-parse", "--short", "HEAD"],
+            ["git", "-C", str(build_root), "rev-parse", "--short", "HEAD"],
             text=True, stderr=subprocess.DEVNULL,
         ).strip()
     except Exception:
         pass
 
     if not serve:
-        ok(f"dashboard built: {out_path}  (branch: {branch}, commit: {commit})")
+        ok(f"dashboard built: {out_path}  (branch: {branch_label}, commit: {commit})")
         print(f"  파일 열기: open {out_path}")
         return 0
 
-    # 3) 포트 중복 점검 — 이미 떠 있는 서버가 *어느 프로젝트*를 서빙하는지 확인
-    import time as _time
-    url = f"http://localhost:{port}"
-    if _port_in_use(port):
-        running_root = _running_dashboard_root(port)
-        if running_root and Path(running_root).resolve() == target.resolve():
-            # 같은 프로젝트 — 재사용. 다만 dashboard.html 은 방금 새로 빌드했으니
-            # 사용자가 새로고침하면 최신 반영됨.
-            ok(f"dashboard already serving (same project): {url}  (branch: {branch}, commit: {commit})")
-            print(f"  ⌘+클릭으로 열기: {url}  (새로고침하면 방금 빌드 반영)")
-            return 0
-        # 다른 프로젝트의 dashboard 가 떠 있음 — 종료 후 이 프로젝트로 재시작
-        warn(f"포트 {port} 에 다른 dashboard 가 떠 있음 (root: {running_root or 'unknown'}) — 종료 후 {target} 로 재시작")
-        _kill_port_listeners(port)
-        _time.sleep(0.6)
+    # 3) 레지스트리 정리 + 재사용 점검
+    registry = _registry_cleanup()
+    reused_entry: dict | None = None
+    for e in registry:
+        same_root = Path(e.get("root", "")).resolve() == target.resolve()
+        same_branch = (e.get("branch") or "") == branch_label
+        if same_root and same_branch:
+            # 이미 떠 있음 — 재사용
+            reused_entry = e
+            break
 
-    # 4) 백그라운드 서빙
-    serve_cmd = [sys.executable, str(builder), "--root", str(target), "--out", str(out_path), "--serve", "--port", str(port)]
-    info(f"serving at {url} (background, PID 표시 후 종료해도 서버는 유지)")
-    proc = subprocess.Popen(serve_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    if reused_entry:
+        port = reused_entry["port"]
+        url = f"http://localhost:{port}"
+        ok(f"dashboard already serving: {url}  (root: {target.name}, branch: {branch_label}, commit: {commit})")
+        print(f"  ⌘+클릭으로 열기: {url}  (새로고침하면 방금 빌드 반영)")
+        if worktree_to_cleanup:
+            # 재사용 시 새 worktree 는 불필요 — 정리. 단 *기존 dashboard 서버*가 그
+            # worktree 경로를 root 로 떠 있는지 확인하고, 그렇다면 정리 안 함.
+            existing_root = Path(reused_entry.get("root_at_serve", "")) if reused_entry.get("root_at_serve") else None
+            if not existing_root or existing_root.resolve() != worktree_to_cleanup.resolve():
+                subprocess.call(
+                    ["git", "-C", str(target), "worktree", "remove", "--force", str(worktree_to_cleanup)],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+        return 0
+
+    # 4) 포트 할당
+    if explicit_port:
+        if _port_in_use(explicit_port):
+            err(f"--port {explicit_port} 이미 점유됨. 자동 할당을 원하면 --port 생략.")
+            if worktree_to_cleanup:
+                subprocess.call(
+                    ["git", "-C", str(target), "worktree", "remove", "--force", str(worktree_to_cleanup)],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+            return 1
+        port = explicit_port
+    else:
+        port = _find_free_dashboard_port(registry)
+        if port is None:
+            err(f"포트 {DASHBOARD_PORT_START}-{DASHBOARD_PORT_END} 모두 점유. methodology dashboard list 로 확인.")
+            if worktree_to_cleanup:
+                subprocess.call(
+                    ["git", "-C", str(target), "worktree", "remove", "--force", str(worktree_to_cleanup)],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                )
+            return 1
+
+    # 5) 백그라운드 서빙
+    url = f"http://localhost:{port}"
+    serve_cmd = [
+        sys.executable, str(builder),
+        "--root", str(build_root),
+        "--out", str(out_path),
+        "--serve", "--port", str(port),
+    ]
+    info(f"serving at {url} (background, root: {build_root})")
+    proc = subprocess.Popen(
+        serve_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True,
+    )
     _time.sleep(0.6)
-    # 기동 확인 — root 가 맞는지
-    actual_root = _running_dashboard_root(port)
-    if actual_root and Path(actual_root).resolve() != target.resolve():
-        warn(f"서빙된 dashboard root({actual_root}) 가 의도({target})와 다름 — 포트 충돌 가능. 다른 --port 로 재시도 권장.")
-    ok(f"dashboard serving: {url}  (root: {target.name}, branch: {branch}, commit: {commit}, pid: {proc.pid})")
+
+    # 6) 레지스트리 등록
+    entry = {
+        "port": port,
+        "root": str(target),
+        "root_at_serve": str(build_root),
+        "branch": branch_label,
+        "commit": commit,
+        "pid": proc.pid,
+        "started_at": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+        "is_worktree": worktree_to_cleanup is not None,
+    }
+    registry.append(entry)
+    _save_registry(registry)
+
+    ok(f"dashboard serving: {url}  (root: {target.name}, branch: {branch_label}, commit: {commit}, pid: {proc.pid})")
     print(f"  ⌘+클릭으로 열기: {url}")
-    print(f"  종료: kill {proc.pid}")
+    print(f"  종료: methodology dashboard stop --port {port}  또는  kill {proc.pid}")
+    if worktree_to_cleanup:
+        print(f"  worktree: {worktree_to_cleanup}  (서버 종료 후 'methodology dashboard stop' 으로 정리)")
     return 0
+
+
+def cmd_dashboard_list(args: argparse.Namespace) -> int:
+    """떠 있는 모든 dashboard 목록 출력."""
+    registry = _registry_cleanup()
+    if not registry:
+        info("실행 중인 dashboard 없음.")
+        return 0
+    print(f"{'PORT':<6}  {'PROJECT':<18}  {'BRANCH':<28}  {'COMMIT':<10}  {'PID':<8}  STARTED")
+    print("─" * 100)
+    for e in registry:
+        proj = Path(e.get("root", "?")).name[:18]
+        branch = (e.get("branch") or "?")[:28]
+        commit = (e.get("commit") or "?")[:10]
+        pid = str(e.get("pid", "?"))[:8]
+        started = e.get("started_at", "?")
+        print(f"{e.get('port', '?'):<6}  {proj:<18}  {branch:<28}  {commit:<10}  {pid:<8}  {started}")
+    return 0
+
+
+def cmd_dashboard_stop(args: argparse.Namespace) -> int:
+    """특정 dashboard 또는 모두 종료."""
+    import signal as _signal
+    registry = _registry_cleanup()
+    if not registry:
+        info("실행 중인 dashboard 없음.")
+        return 0
+
+    targets: list[dict] = []
+    if args.all:
+        targets = list(registry)
+    elif args.port:
+        targets = [e for e in registry if e.get("port") == args.port]
+        if not targets:
+            err(f"port {args.port} 에 dashboard 없음.")
+            return 1
+    else:
+        err("--port <N> 또는 --all 명시 필요.")
+        return 2
+
+    stopped = 0
+    for e in targets:
+        pid = e.get("pid")
+        port = e.get("port")
+        is_worktree = e.get("is_worktree", False)
+        root_at_serve = e.get("root_at_serve")
+        try:
+            if pid:
+                try:
+                    os.killpg(os.getpgid(pid), _signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+        except Exception as ex:
+            warn(f"port {port} pid {pid} 종료 실패: {ex}")
+        # worktree 정리
+        if is_worktree and root_at_serve:
+            target = Path(e.get("root", "."))
+            subprocess.call(
+                ["git", "-C", str(target), "worktree", "remove", "--force", str(root_at_serve)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        stopped += 1
+        ok(f"stopped: port {port}, pid {pid}, branch {e.get('branch')}")
+
+    # registry 갱신 (정지된 것 제외)
+    remaining = [e for e in registry if e not in targets]
+    _save_registry(remaining)
+    return 0
+
+
+# ─── 대시보드 레지스트리 ───────────────────────────────────────────────────
+# ~/.methodology-dashboards.json 에 떠 있는 dashboard 들의 (port, root, branch, pid) 기록.
+# 여러 프로젝트·브랜치 dashboard 를 동시 운영하기 위함.
+
+DASHBOARD_REGISTRY_FILE = Path.home() / ".methodology-dashboards.json"
+DASHBOARD_PORT_START = 8765
+DASHBOARD_PORT_END = 8799
+
+
+def _load_registry() -> list[dict]:
+    if not DASHBOARD_REGISTRY_FILE.exists():
+        return []
+    try:
+        return json.loads(DASHBOARD_REGISTRY_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def _save_registry(entries: list[dict]) -> None:
+    try:
+        DASHBOARD_REGISTRY_FILE.write_text(
+            json.dumps(entries, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
+
+
+def _registry_cleanup() -> list[dict]:
+    """죽은 PID·안 떠 있는 포트 제거. 반환: 살아있는 entries."""
+    entries = _load_registry()
+    alive: list[dict] = []
+    for e in entries:
+        pid = e.get("pid")
+        port = e.get("port")
+        is_alive = False
+        if pid:
+            try:
+                os.kill(pid, 0)
+                is_alive = True
+            except ProcessLookupError:
+                pass
+            except PermissionError:
+                is_alive = _port_in_use(port) if port else False
+        elif port:
+            is_alive = _port_in_use(port)
+        if is_alive:
+            alive.append(e)
+    if len(alive) != len(entries):
+        _save_registry(alive)
+    return alive
+
+
+def _find_free_dashboard_port(registry: list[dict]) -> int | None:
+    """레지스트리·실제 점유를 모두 고려해 빈 포트 반환."""
+    used = {e["port"] for e in registry if e.get("port")}
+    for p in range(DASHBOARD_PORT_START, DASHBOARD_PORT_END + 1):
+        if p in used:
+            continue
+        if _port_in_use(p):
+            continue
+        return p
+    return None
+
+
+def _slugify_branch(branch: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9._-]+", "-", branch).strip("-") or "branch"
+
+
+def _cache_dir_for(target: Path, branch: str) -> Path:
+    """브랜치별 dashboard 빌드 캐시 위치 — 프로젝트 폴더 안 어지럽히지 않음."""
+    return Path.home() / ".methodology-cache" / target.name / _slugify_branch(branch)
 
 
 def _port_in_use(port: int) -> bool:
@@ -1646,12 +1882,20 @@ def main(argv: list[str] | None = None) -> int:
     phk.add_argument("--force", action="store_true", help="기존 hook 덮어쓰기")
     phk.set_defaults(func=cmd_hooks)
 
-    pdb = sub.add_parser("dashboard", help="대시보드 빌드 + 서빙 + URL 출력 (현재 브랜치·시점 반영)")
+    pdb = sub.add_parser("dashboard", help="대시보드 빌드 + 서빙 + URL 출력 (자동 포트, --branch 지원)")
+    pdbsub = pdb.add_subparsers(dest="dashboard_cmd")
     pdb.add_argument("--path", help="대상 프로젝트 폴더 (기본: 현재)")
-    pdb.add_argument("--out", help="출력 HTML 경로 (기본: <path>/dashboard.html)")
-    pdb.add_argument("--port", type=int, default=8765, help="서빙 포트 (기본 8765)")
+    pdb.add_argument("--out", help="출력 HTML 경로 (--branch 미지정 시. 기본: <path>/dashboard.html)")
+    pdb.add_argument("--port", type=int, default=None, help="서빙 포트 (기본: 자동 8765-8799)")
+    pdb.add_argument("--branch", help="다른 브랜치 dashboard (worktree 로 추출, working tree 안 건드림)")
     pdb.add_argument("--no-serve", action="store_true", help="빌드만, 서빙 안 함")
     pdb.set_defaults(func=cmd_dashboard)
+    pdb_list = pdbsub.add_parser("list", help="실행 중인 모든 dashboard 목록")
+    pdb_list.set_defaults(func=cmd_dashboard_list)
+    pdb_stop = pdbsub.add_parser("stop", help="dashboard 종료 (worktree 정리 포함)")
+    pdb_stop.add_argument("--port", type=int, help="해당 포트 dashboard 만 종료")
+    pdb_stop.add_argument("--all", action="store_true", help="모든 dashboard 종료")
+    pdb_stop.set_defaults(func=cmd_dashboard_stop)
 
     po = sub.add_parser("observe", help="L1 AI 관찰 로그 생성·검증")
     po.add_argument("--slug", help="파일명 slug (영문 소문자/숫자/kebab-case)")

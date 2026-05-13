@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-12 (dashboard 포트 충돌 버그 수정)
+# Checkpoint — 2026-05-13 (여러 dashboard 동시 + 브랜치 spawn)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,16 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 dashboard 포트 충돌 버그 수정 (방금)**:
+**🆕 여러 dashboard 동시 + 브랜치별 spawn 완성 (방금)**:
+- `methodology dashboard` 자동 포트 할당 (8765-8799 빈 포트 탐색)
+- `--branch <name>` 옵션 — git worktree add --detach → ~/.methodology-cache/<project>/<branch-slug>/ 격리 빌드 → 별도 포트 서빙. working tree 안 건드림.
+- `dashboard list` — ~/.methodology-dashboards.json 레지스트리 조회 + 죽은 항목 자동 정리
+- `dashboard stop --port N | --all` — 종료 + worktree remove --force 자동
+- generate-dashboard.py API: /api/dashboards, /api/branches, /api/dashboard/spawn, /api/dashboard/stop
+- UI 카드 2종 신설: Local Dashboards (포트별 표 + Stop 버튼), Branches (라디오 + Open dashboard 버튼)
+- 검증: 본 저장소 main(8765) + codex-methodology-v2(8766) 동시 운영 ✅. stop --all 후 worktree·레지스트리 정리 ✅.
+
+**dashboard 포트 충돌 버그 수정 (이전 차례)**:
 - 증상: talmocom 에서 `methodology dashboard` 호출했는데 8765 에 떠 있던 *본 저장소* dashboard 가 표시됨
 - 원인: cmd_dashboard 가 포트 점유 시 "어느 프로젝트인지" 무시하고 무조건 "기존 URL 보고"
 - 수정: `_running_dashboard_root(port)` (HTTP GET → "root": 추출) + `_kill_port_listeners(port)` — 다른 프로젝트면 종료 후 재시작. `import os` 누락도 수정.
