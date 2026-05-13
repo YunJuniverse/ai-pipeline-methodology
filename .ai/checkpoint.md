@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-13 (dashboard root rewrite)
+# Checkpoint — 2026-05-13 (dashboard.html → _start/.cache/ 격리)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,16 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 dashboard root rewrite (방금)**:
+**🆕 dashboard.html → _start/.cache/ 격리 (방금)**:
+- 사용자 통증: 루트의 dashboard.html 을 *직접 더블클릭* 하면 file:// 로 열려 fetch 차단 → 정적·반쪽 작동. 휴먼에러 우려.
+- 수정: cmd_dashboard 기본 out_path 를 _start/.cache/dashboard.html 로 변경
+  · _start/ 미존재 환경 fallback: 루트 (legacy)
+  · cmd_dashboard 가 *옛 루트 dashboard.html* 자동 unlink (자가 정리)
+- .gitignore 에 `_start/.cache/` 추가
+- 검증: 빌드 → _start/.cache/dashboard.html (437,870 bytes), 루트 깨끗, http://localhost:8765 정상 200
+- Finder 기본 숨김(.접두) + SimpleHTTPRequestHandler path traversal 차단 → *사용자가 dashboard.html 볼 가능성 0*
+
+**dashboard root rewrite (이전 차례)**:
 - 사용자 보고: `http://localhost:8765/` 가 'Directory listing for /' 페이지로 랜딩
 - 원인: SimpleHTTPRequestHandler 기본 동작 — index.html 미존재 시 directory listing. 우리는 dashboard.html 이름이라 미매칭.
 - 수정: do_GET 첫 줄에서 `self.path == "/"` 시 `/dashboard.html` 로 rewrite. 쿼리스트링도 보존.

@@ -1414,7 +1414,25 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         out_path = cache_dir / "dashboard.html"
     else:
         build_root = target
-        out_path = Path(args.out) if args.out else target / "dashboard.html"
+        # 기본 빌드 위치: _start/.cache/ (사용자가 직접 dashboard.html 더블클릭하는 휴먼에러 차단)
+        # fallback: 루트 (legacy)
+        if args.out:
+            out_path = Path(args.out)
+        else:
+            start_cache = target / "_start" / ".cache"
+            if (target / "_start").exists():
+                start_cache.mkdir(parents=True, exist_ok=True)
+                out_path = start_cache / "dashboard.html"
+                # 옛 루트 dashboard.html 정리 (있으면)
+                legacy = target / "dashboard.html"
+                if legacy.exists():
+                    try:
+                        legacy.unlink()
+                        info(f"옛 루트 dashboard.html 제거 (cache 로 이동)")
+                    except Exception:
+                        pass
+            else:
+                out_path = target / "dashboard.html"  # _start 없는 환경 fallback
         try:
             branch_label = subprocess.check_output(
                 ["git", "-C", str(target), "branch", "--show-current"],

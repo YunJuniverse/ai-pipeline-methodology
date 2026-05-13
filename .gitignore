@@ -9,3 +9,6 @@ dashboard.html
 # Python cache
 __pycache__/
 *.pyc
+
+# in-spire dashboard build cache (사용자가 직접 더블클릭하는 휴먼에러 차단)
+_start/.cache/

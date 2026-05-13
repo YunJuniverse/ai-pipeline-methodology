@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- **Working on**: dashboard root path rewrite — `http://localhost:8765/` 가 SimpleHTTPRequestHandler 기본 directory listing 표시하던 버그 해결. do_GET 첫 줄에서 self.path "/" → "/dashboard.html" rewrite.
+- **Working on**: dashboard.html 빌드 위치를 _start/.cache/ 로 격리 — 사용자가 *루트의 dashboard.html 을 직접 더블클릭* 하는 휴먼에러 차단 (file:// = 정적, .app 만 http:// = 동적).
 - **Current mode**: fullstack
-- **Next TODO**: 3개 적용 프로젝트에 sync 전파, 루트 README.md 를 in-spire 브랜드로 리브랜딩, METH-020 (MC-002 승급)
+- **Next TODO**: 3개 적용 프로젝트에 sync 전파 (legacy 루트 dashboard.html 자동 정리), 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=6 승급)
 - **Blockers**: none
 
 ## Active Links
@@ -34,7 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
-- 2026-05-13: **dashboard root rewrite** — `do_GET` 에서 `/` 요청을 `/dashboard.html` 로 자동 rewrite. directory listing 노출 버그 해결. 사용자 진입점 URL `http://localhost:8765` 그대로 OK.
+- 2026-05-13: **dashboard.html → _start/.cache/ 격리** — 사용자가 *루트 dashboard.html 직접 더블클릭(file://)* 하는 휴먼에러 원천 차단. .cache/ 는 Finder 숨김 + .gitignore. cmd_dashboard 가 legacy 루트 dashboard.html 자동 제거.
+- 2026-05-13: dashboard root rewrite — `do_GET` 에서 `/` 요청을 `/dashboard.html` 로 자동 rewrite. directory listing 노출 버그 해결. 사용자 진입점 URL `http://localhost:8765` 그대로 OK.
 - 2026-05-13: `_start/` 구조 재편 + 루트 클러터 정리 — 사용자 명시 표기 파일명: `in-spire (mac).app` / `(windows).bat` / `(linux).sh`. 보조 자산(ico/desktop/icons)은 `_start/assets/` 하위로 정리. 루트의 4 PNG(원본 AI + 3 OS 변형) → `_start/assets/icons/` 이동·rename (원본은 `app-icon-source.png`). `dashboard.html` 제거. `build-launchers.py` clean_legacy() 로 멱등 빌드 보장.
 - 2026-05-13: in-spire 브랜드 + `_start/` 3 OS 진입점 (1차 빌드) — `swap-icon-color.py` (Pillow 픽셀 swap: 흰색 보호 + 그라데이션 위치 보간) → mac teal/win blue/linux amber 3장 PNG. `build-launchers.py` 로 `_start/{in-spire.app, in-spire.bat+ico+setup.ps1, in-spire.sh+desktop+setup.sh, icons/, README.md}` 일괄 빌드. macOS .app 더블클릭 시뮬 통과 ✅ (dashboard + 자동 포트 + 브라우저). MANIFEST shared 등록, .app 실행권한 보존, 60_meta 격리 검증.
 - 2026-05-13: 더블클릭 진입점 — open-dashboard.command — macOS Finder 더블클릭으로 dashboard 시작. `methodology dashboard --open` 옵션 추가(macOS: open, 기타: webbrowser). MANIFEST shared_paths 로 적용 프로젝트 자동 전파. chmod +x.
