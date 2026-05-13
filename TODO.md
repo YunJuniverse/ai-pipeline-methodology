@@ -10,6 +10,28 @@
 ## Ready
 
 
+### METH-021
+- **title**: wrap 날짜 경계 완화 — 자정 넘긴 세션 대응
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI
+- **acceptance criteria**:
+  - [ ] `cmd_wrap` 의 `_mtime_today` / ai_observations 파일명 매칭을 *최근 N일*(기본 2일) 허용으로 완화
+  - [ ] `--days N` 옵션 추가 (CI 는 엄격하게 1일 가능)
+  - [ ] 자정 넘긴 세션에서 ship 이 false-fail 안 하는지 검증
+- **notes**: 2026-05-13 dashboard fix 작업 중 발견 (F-004). 세션 resume 으로 자정 넘기면 관찰 파일이 어제 날짜라 wrap 이 못 찾음. 장시간 세션은 흔함.
+
+### METH-020
+- **title**: "적용 프로젝트가 CLI fix 즉시 못 받음" 패턴 — MC-002 승급 후보 (N=3)
+- **mode**: planning-only
+- **change-class**: B (Catalog 활성 승급)
+- **owner**: AI → Human 머지
+- **acceptance criteria**:
+  - [ ] N≥3 목격 확인 (meth-015 F-001, meth-015 F-003, dashboard-port-conflict-fix F-003)
+  - [ ] `60_meta/catalog/MC-002_*.md` 활성 승급 — "본 저장소 CLI 변경 시 적용 프로젝트는 *다음 sync 전까지* 옛 동작. fix 가 시급하면 본 저장소 절대경로 CLI 직접 호출 (`python3 /path/to/methodology/50_tools/methodology.py <cmd> --path <project>`)"
+  - [ ] 솔루션 후보: methodology 명령에 `--use-upstream` 플래그 (본 저장소 CLI 강제 사용) 또는 적용 프로젝트가 본 저장소 CLI 를 symlink
+- **notes**: dashboard 포트 충돌 fix 도 같은 패턴 — 3개 적용 프로젝트가 옛 dashboard 코드라 fix 못 받음.
+
 ### METH-019
 - **title**: MC-001 승급 — talmocom 이미지 add 패턴 (N=2 도달)
 - **mode**: planning-only

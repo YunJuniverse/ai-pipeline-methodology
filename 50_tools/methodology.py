@@ -55,6 +55,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -1410,22 +1411,32 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         print(f"  파일 열기: open {out_path}")
         return 0
 
-    # 3) 포트 중복 점검
+    # 3) 포트 중복 점검 — 이미 떠 있는 서버가 *어느 프로젝트*를 서빙하는지 확인
+    import time as _time
     url = f"http://localhost:{port}"
     if _port_in_use(port):
-        ok(f"dashboard already serving: {url}  (branch: {branch}, commit: {commit})")
-        print(f"  ⌘+클릭으로 열기: {url}")
-        print(f"  파일 직접: {out_path}")
-        return 0
+        running_root = _running_dashboard_root(port)
+        if running_root and Path(running_root).resolve() == target.resolve():
+            # 같은 프로젝트 — 재사용. 다만 dashboard.html 은 방금 새로 빌드했으니
+            # 사용자가 새로고침하면 최신 반영됨.
+            ok(f"dashboard already serving (same project): {url}  (branch: {branch}, commit: {commit})")
+            print(f"  ⌘+클릭으로 열기: {url}  (새로고침하면 방금 빌드 반영)")
+            return 0
+        # 다른 프로젝트의 dashboard 가 떠 있음 — 종료 후 이 프로젝트로 재시작
+        warn(f"포트 {port} 에 다른 dashboard 가 떠 있음 (root: {running_root or 'unknown'}) — 종료 후 {target} 로 재시작")
+        _kill_port_listeners(port)
+        _time.sleep(0.6)
 
     # 4) 백그라운드 서빙
     serve_cmd = [sys.executable, str(builder), "--root", str(target), "--out", str(out_path), "--serve", "--port", str(port)]
     info(f"serving at {url} (background, PID 표시 후 종료해도 서버는 유지)")
     proc = subprocess.Popen(serve_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-    # 잠시 대기해 서버 기동 확인
-    import time
-    time.sleep(0.5)
-    ok(f"dashboard serving: {url}  (branch: {branch}, commit: {commit}, pid: {proc.pid})")
+    _time.sleep(0.6)
+    # 기동 확인 — root 가 맞는지
+    actual_root = _running_dashboard_root(port)
+    if actual_root and Path(actual_root).resolve() != target.resolve():
+        warn(f"서빙된 dashboard root({actual_root}) 가 의도({target})와 다름 — 포트 충돌 가능. 다른 --port 로 재시도 권장.")
+    ok(f"dashboard serving: {url}  (root: {target.name}, branch: {branch}, commit: {commit}, pid: {proc.pid})")
     print(f"  ⌘+클릭으로 열기: {url}")
     print(f"  종료: kill {proc.pid}")
     return 0
@@ -1440,6 +1451,38 @@ def _port_in_use(port: int) -> bool:
             return True
         except OSError:
             return False
+
+
+def _running_dashboard_root(port: int) -> str | None:
+    """포트에 떠 있는 dashboard 서버가 서빙하는 root 경로를 반환 (없으면 None)."""
+    import urllib.request
+    for name in ("dashboard.html", ""):
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/{name}", timeout=0.6) as r:
+                html = r.read().decode("utf-8", errors="ignore")
+            m = re.search(r'"root":\s*"([^"]*)"', html)
+            if m:
+                return m.group(1)
+        except Exception:
+            continue
+    return None
+
+
+def _kill_port_listeners(port: int) -> None:
+    """해당 포트의 LISTEN 프로세스를 SIGTERM."""
+    import signal
+    try:
+        out = subprocess.check_output(
+            ["lsof", "-ti", f":{port}", "-sTCP:LISTEN"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+    except subprocess.CalledProcessError:
+        return
+    for pid_str in out.splitlines():
+        try:
+            os.kill(int(pid_str.strip()), signal.SIGTERM)
+        except (ValueError, ProcessLookupError, PermissionError):
+            pass
 
 
 def cmd_wrap(args: argparse.Namespace) -> int:

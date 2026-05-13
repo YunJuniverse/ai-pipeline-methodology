@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-12 (METH-015 — 3 프로젝트 v3.2 자산 전파 + 자가발전 첫 회전)
+# Checkpoint — 2026-05-12 (dashboard 포트 충돌 버그 수정)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,14 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 METH-015 적용 프로젝트 일괄 전파 (방금)**:
+**🆕 dashboard 포트 충돌 버그 수정 (방금)**:
+- 증상: talmocom 에서 `methodology dashboard` 호출했는데 8765 에 떠 있던 *본 저장소* dashboard 가 표시됨
+- 원인: cmd_dashboard 가 포트 점유 시 "어느 프로젝트인지" 무시하고 무조건 "기존 URL 보고"
+- 수정: `_running_dashboard_root(port)` (HTTP GET → "root": 추출) + `_kill_port_listeners(port)` — 다른 프로젝트면 종료 후 재시작. `import os` 누락도 수정.
+- 검증: 본 저장소 ↔ talmocom 전환 시 자동 kill+재시작 동작 확인 (단, 적용 프로젝트의 옛 methodology.py 는 아직 fix 없음 — sync 전파 필요)
+- 임시 우회: `python3 /Users/hayden/methodology/50_tools/methodology.py dashboard --path ~/talmocom --port 8765` (본 저장소 새 코드 사용)
+
+**METH-015 적용 프로젝트 일괄 전파 (이전)**:
 - icons sync → commit f11a988 → push 385326a..f11a988
 - gamblescan sync → commit 8b5531d → push 63c7abe..8b5531d
 - talmocom sync → commit f94a4e9 (이미지 제외 명시 add) → push d447eaa..f94a4e9

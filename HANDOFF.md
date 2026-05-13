@@ -6,9 +6,9 @@
 
 ## Current Focus
 
-- **Working on**: METH-015 완료 — 3개 적용 프로젝트(icons/gamblescan/talmocom) 모두 본 저장소 v3.2 commit 83a48e0 동기화. 자가발전 루프 첫 진짜 회전 발생 (F-003 N=2) → METH-019 (MC-001 승급) 활성.
+- **Working on**: dashboard 포트 충돌 버그 수정 — `methodology dashboard` 가 포트 점유 시 그 서버의 root 를 HTTP 로 확인, 다른 프로젝트면 종료 후 재시작. import os 누락도 수정. 적용 프로젝트 3개에 sync 전파 필요.
 - **Current mode**: fullstack
-- **Next TODO**: METH-019 (talmocom 이미지 add 패턴 MC-001 승급), METH-018 (사용자 일상 ship/hooks 사용 검증)
+- **Next TODO**: 3개 적용 프로젝트에 dashboard fix sync 전파 (즉시), METH-019 (MC-001 승급), METH-020 ("적용 프로젝트가 CLI fix 즉시 못 받음" 패턴 N=3 → MC-002 후보)
 - **Blockers**: none
 
 ## Active Links
@@ -34,7 +34,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `30_dev/snapshots/` 참조.
 
-- 2026-05-12: **METH-015 완료 — 적용 프로젝트 3개에 v3.2 자산 일괄 전파**. icons(385326a→f11a988), gamblescan(63c7abe→8b5531d), talmocom(d447eaa→f94a4e9) 모두 본 저장소 83a48e0 동기화. 7 파일/프로젝트, 60_meta 격리 3/3 ✅. F-003(talmocom 이미지 add 패턴) N=2 도달 — 자가발전 루프 첫 진짜 회전.
+- 2026-05-12: **dashboard 포트 충돌 버그 수정** — `cmd_dashboard` 가 포트 점유 시 `_running_dashboard_root(port)` 로 HTTP 확인 → 같은 프로젝트면 재사용, 다른 프로젝트면 `_kill_port_listeners` 후 재시작. `import os` 누락 수정. talmocom 에서 호출했는데 본 저장소 dashboard 가 떠 있던 문제 해결. 적용 프로젝트 sync 전파 필요.
+- 2026-05-12: METH-015 완료 — 적용 프로젝트 3개에 v3.2 자산 일괄 전파. icons(385326a→f11a988), gamblescan(63c7abe→8b5531d), talmocom(d447eaa→f94a4e9) 모두 본 저장소 83a48e0 동기화. 60_meta 격리 3/3 ✅. F-003 N=2 — 자가발전 루프 첫 진짜 회전.
 - 2026-05-12: Dashboard dev-server 제어 — `generate-dashboard.py --serve` 가 `/api/servers/{list,start,stop,kill-range}` 4 엔드포인트 제공. UI 카드 Start(자동 포트 3000+) / Stop(추적 PID) / Kill all 3000-3099. start_new_session + localhost-only bind. 5초 자동 갱신.
 - 2026-05-12: ship + hooks + auto-merge 3축 자동화 — `methodology ship -m "..."` 7단계 통합 명령, `methodology hooks install` (pre-push 우회 차단), `.github/workflows/methodology-auto-merge.yml` (PR 라벨 기반 자동 머지, 외부 action 무의존). MANIFEST shared_paths에 auto-merge 워크플로 추가. CLAUDE/AGENTS managed 마커에 ship 사용 권고 명문화.
 - 2026-05-12: 세션 부팅 dashboard CLI — `methodology dashboard` 신설(빌드+background 서빙+URL 출력, 포트 중복 회피), `generate-dashboard.py`에 git branch/commit 헤더 자동 표시, CLAUDE/AGENTS managed 마커 안 *세션 부팅 마지막 단계 의무 호출* 규칙 추가, `.ai/adapters/claude.md` 첫 메시지 형식·도구 매핑 갱신. file:// 직접 열기 오해 해소.
