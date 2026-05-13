@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-13 (_start/ 구조 재편 + 루트 정리)
+# Checkpoint — 2026-05-13 (dashboard root rewrite)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,14 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 _start/ 구조 재편 + 루트 정리 (방금)**:
+**🆕 dashboard root rewrite (방금)**:
+- 사용자 보고: `http://localhost:8765/` 가 'Directory listing for /' 페이지로 랜딩
+- 원인: SimpleHTTPRequestHandler 기본 동작 — index.html 미존재 시 directory listing. 우리는 dashboard.html 이름이라 미매칭.
+- 수정: do_GET 첫 줄에서 `self.path == "/"` 시 `/dashboard.html` 로 rewrite. 쿼리스트링도 보존.
+- 검증: HTTP 200 size=437,542 (dashboard.html 전체 응답), 'Directory listing' 매칭 0건 ✅
+- 디버깅 비용 6분 — closure 캡처 의심했으나 진짜 원인은 *background server 재시작 누락*. 코드 수정 후 stop --all + 새 dashboard 호출 필수.
+
+**_start/ 구조 재편 + 루트 정리 (이전 차례)**:
 - 사용자 명시 표기 적용 — 파일명에 OS 식별자 괄호 포함:
   - `in-spire (mac).app`
   - `in-spire (windows).bat`

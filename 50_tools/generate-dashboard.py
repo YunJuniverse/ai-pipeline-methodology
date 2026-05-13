@@ -1909,6 +1909,10 @@ def _serve_with_api(out: Path, start_port: int) -> None:
             self.wfile.write(body)
 
         def do_GET(self):
+            # 루트 요청을 dashboard.html 로 자동 rewrite (디렉터리 listing 회피)
+            # urllib.parse 가 ? 쿼리스트링 분리하므로 self.path 직접 비교
+            if self.path == "/" or self.path == "" or self.path.startswith("/?"):
+                self.path = "/dashboard.html" + self.path[1:]
             parsed = urllib.parse.urlparse(self.path)
             if parsed.path == "/api/servers":
                 with _servers_lock:
