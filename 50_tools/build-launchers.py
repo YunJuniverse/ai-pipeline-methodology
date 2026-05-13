@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """build-launchers.py — in-spire 아이콘 3장으로 OS별 실행파일·아이콘 일괄 생성.
 
-입력:
-  <project_root>/in-spire-mac.png
-  <project_root>/in-spire-win.png
-  <project_root>/in-spire-linux.png
+입력 (탐색 순서):
+  1. <project_root>/_start/assets/icons/in-spire-{mac,win,linux}.png  (영구 원본)
+  2. <project_root>/in-spire-{mac,win,linux}.png                     (최초 빌드 시)
 
-출력:
+출력 구조 (clean rebuild — 기존 _start 의 옛 파일은 자동 제거):
   <project_root>/_start/
-  ├── in-spire.app/                 (macOS .app 번들 + .icns)
-  ├── in-spire.bat                  (Windows 실행 스크립트)
-  ├── in-spire.ico                  (Windows 아이콘 — 멀티 사이즈)
-  ├── setup-windows.ps1             (Windows 사용자 1회 실행 — .lnk 생성)
-  ├── in-spire.sh                   (Linux 실행 스크립트)
-  ├── in-spire.desktop              (Linux 데스크톱 항목 템플릿)
-  ├── setup-linux.sh                (Linux 사용자 1회 실행 — Exec/Icon 경로 갱신)
-  ├── icons/
-  │   ├── in-spire-mac.png          (원본 보관)
-  │   ├── in-spire-win.png
-  │   ├── in-spire-linux.png
-  │   └── in-spire-256-linux.png    (Linux desktop 항목용 256×256)
-  └── README.md                     (설치·실행 안내)
+  ├── in-spire (mac).app/        ← macOS 더블클릭 진입점
+  ├── in-spire (windows).bat     ← Windows 직접 실행
+  ├── in-spire (linux).sh        ← Linux 실행
+  ├── setup-windows.ps1          ← Windows 1회 (.lnk 생성)
+  ├── setup-linux.sh             ← Linux 1회 (.desktop 경로 갱신)
+  ├── README.md                  ← 사용 안내
+  └── assets/                    ← 아이콘·메타·원본
+      ├── icons/
+      │   ├── in-spire-mac.png         (1024×1024)
+      │   ├── in-spire-win.png         (1024×1024)
+      │   ├── in-spire-linux.png       (1024×1024)
+      │   └── in-spire-256-linux.png   (256×256 — .desktop 표준)
+      ├── in-spire.ico               (Windows 멀티 사이즈)
+      └── in-spire.desktop           (Linux 데스크톱 항목 템플릿)
 """
 from __future__ import annotations
 
@@ -47,67 +47,76 @@ ICONSET_SIZES_MAC = [
 
 ICO_SIZES = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
 
-
-def info(msg: str) -> None:
-    print(f"\033[36m[info]\033[0m {msg}")
-
-
-def ok(msg: str) -> None:
-    print(f"\033[32m[ok]\033[0m {msg}")
+# 파일명 — 사용자 명시 표기: (mac) (windows) (linux)
+NAME_APP = "in-spire (mac).app"
+NAME_BAT = "in-spire (windows).bat"
+NAME_SH = "in-spire (linux).sh"
 
 
-def err(msg: str) -> None:
-    print(f"\033[31m[err]\033[0m {msg}", file=sys.stderr)
+def info(msg: str) -> None: print(f"\033[36m[info]\033[0m {msg}")
+def ok(msg: str) -> None: print(f"\033[32m[ok]\033[0m {msg}")
+def warn(msg: str) -> None: print(f"\033[33m[warn]\033[0m {msg}")
+def err(msg: str) -> None: print(f"\033[31m[err]\033[0m {msg}", file=sys.stderr)
+
+
+def find_source_pngs(root: Path) -> dict[str, Path]:
+    """3장 원본 PNG 탐색 — assets/icons 우선, 루트 fallback."""
+    persistent = root / "_start" / "assets" / "icons"
+    legacy_root = root
+    sources: dict[str, Path] = {}
+    for variant in ("mac", "win", "linux"):
+        candidates = [
+            persistent / f"in-spire-{variant}.png",
+            legacy_root / f"in-spire-{variant}.png",
+        ]
+        for c in candidates:
+            if c.exists():
+                sources[variant] = c
+                break
+        else:
+            err(f"in-spire-{variant}.png 미발견. 다음 중 하나여야: {[str(c) for c in candidates]}")
+            sys.exit(1)
+    return sources
 
 
 def build_icns(src_png: Path, dst_icns: Path) -> None:
-    """macOS .icns 생성 — iconset 디렉터리 + iconutil."""
     iconset = dst_icns.parent / (dst_icns.stem + ".iconset")
     if iconset.exists():
         shutil.rmtree(iconset)
     iconset.mkdir(parents=True)
-
     img = Image.open(src_png).convert("RGBA")
     for name, size in ICONSET_SIZES_MAC:
-        out = iconset / name
-        resized = img.resize((size, size), Image.LANCZOS)
-        resized.save(out, "PNG")
-
+        img.resize((size, size), Image.LANCZOS).save(iconset / name, "PNG")
     subprocess.check_call(
         ["iconutil", "-c", "icns", str(iconset), "-o", str(dst_icns)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
     shutil.rmtree(iconset)
-    ok(f"macOS .icns: {dst_icns}")
+    ok(f"macOS .icns: {dst_icns.name}")
 
 
 def build_ico(src_png: Path, dst_ico: Path) -> None:
-    """Windows .ico 생성 — 멀티 사이즈 임베드."""
     img = Image.open(src_png).convert("RGBA")
     img.save(dst_ico, format="ICO", sizes=ICO_SIZES)
-    ok(f"Windows .ico: {dst_ico}")
+    ok(f"Windows .ico: {dst_ico.name}")
 
 
 def build_macos_app(start_dir: Path, src_icns: Path) -> None:
-    """macOS .app 번들 생성."""
-    app = start_dir / "in-spire.app"
+    app = start_dir / NAME_APP
     if app.exists():
         shutil.rmtree(app)
     (app / "Contents" / "MacOS").mkdir(parents=True)
     (app / "Contents" / "Resources").mkdir(parents=True)
 
-    # AppIcon.icns
     shutil.copy(src_icns, app / "Contents" / "Resources" / "AppIcon.icns")
 
-    # Info.plist
     info_plist = textwrap.dedent("""\
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
         <dict>
             <key>CFBundleName</key><string>in-spire</string>
-            <key>CFBundleDisplayName</key><string>in-spire</string>
+            <key>CFBundleDisplayName</key><string>in-spire (mac)</string>
             <key>CFBundleIdentifier</key><string>com.in-spire.dashboard</string>
             <key>CFBundleVersion</key><string>1.0</string>
             <key>CFBundleShortVersionString</key><string>1.0</string>
@@ -121,14 +130,13 @@ def build_macos_app(start_dir: Path, src_icns: Path) -> None:
     """)
     (app / "Contents" / "Info.plist").write_text(info_plist, encoding="utf-8")
 
-    # MacOS/in-spire — shell script
     script = textwrap.dedent("""\
         #!/bin/bash
         # in-spire — methodology dashboard launcher (macOS)
-        # 더블클릭 진입점. .app 번들 위치를 기준으로 프로젝트 루트 탐색.
+        # 더블클릭 진입점. .app 번들 위치 기준 프로젝트 루트 탐색.
 
         APP_BIN="${BASH_SOURCE[0]}"
-        # APP_BIN: <ROOT>/_start/in-spire.app/Contents/MacOS/in-spire
+        # APP_BIN: <ROOT>/_start/in-spire (mac).app/Contents/MacOS/in-spire
         # 4단계 위 = 프로젝트 루트
         PROJECT_ROOT="$(cd "$(dirname "$APP_BIN")/../../../.." && pwd)"
 
@@ -142,18 +150,15 @@ def build_macos_app(start_dir: Path, src_icns: Path) -> None:
           exit 1
         fi
 
-        # 백그라운드 서빙 + 브라우저 자동 열기
         exec /usr/bin/env python3 50_tools/methodology.py dashboard --open
     """)
     script_path = app / "Contents" / "MacOS" / "in-spire"
     script_path.write_text(script, encoding="utf-8")
     script_path.chmod(0o755)
+    ok(f"macOS .app: {app.name}")
 
-    ok(f"macOS .app: {app}")
 
-
-def build_windows(start_dir: Path, src_ico: Path) -> None:
-    """Windows .bat + setup-windows.ps1 (.lnk 자동 생성)."""
+def build_windows(start_dir: Path) -> None:
     bat = textwrap.dedent("""\
         @echo off
         REM in-spire — methodology dashboard launcher (Windows)
@@ -174,23 +179,23 @@ def build_windows(start_dir: Path, src_ico: Path) -> None:
         echo   python 50_tools\\methodology.py dashboard stop --all
         pause
     """)
-    (start_dir / "in-spire.bat").write_text(bat, encoding="utf-8")
-    ok(f"Windows .bat: {start_dir / 'in-spire.bat'}")
+    (start_dir / NAME_BAT).write_text(bat, encoding="utf-8")
+    ok(f"Windows: {NAME_BAT}")
 
-    # PowerShell setup — .lnk 바로가기 자동 생성 (아이콘 박힘)
+    # setup-windows.ps1 — .lnk 자동 생성 (assets/in-spire.ico 참조)
     ps1 = textwrap.dedent(r"""
-        # setup-windows.ps1 — in-spire.lnk 바로가기 자동 생성 (아이콘 임베드)
+        # setup-windows.ps1 — in-spire (windows).lnk 바로가기 자동 생성 (아이콘 임베드)
         # 사용자 1회 실행:
         #   1. _start 폴더에서 우클릭 → PowerShell 에서 실행
         #   2. 또는: powershell -ExecutionPolicy Bypass -File .\setup-windows.ps1
 
         $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-        $batPath = Join-Path $here "in-spire.bat"
-        $icoPath = Join-Path $here "in-spire.ico"
-        $lnkPath = Join-Path $here "in-spire.lnk"
+        $batPath = Join-Path $here "in-spire (windows).bat"
+        $icoPath = Join-Path $here "assets\in-spire.ico"
+        $lnkPath = Join-Path $here "in-spire (windows).lnk"
 
         if (-not (Test-Path $batPath)) {
-            Write-Host "[err] in-spire.bat not found in $here" -ForegroundColor Red
+            Write-Host "[err] in-spire (windows).bat not found in $here" -ForegroundColor Red
             exit 1
         }
 
@@ -201,25 +206,24 @@ def build_windows(start_dir: Path, src_ico: Path) -> None:
         if (Test-Path $icoPath) {
             $lnk.IconLocation = "$icoPath,0"
         }
-        $lnk.Description = "in-spire — methodology dashboard launcher"
+        $lnk.Description = "in-spire — methodology dashboard launcher (Windows)"
         $lnk.Save()
 
-        Write-Host "[ok] Created in-spire.lnk with icon at $lnkPath" -ForegroundColor Green
-        Write-Host "Double-click in-spire.lnk to launch the dashboard."
+        Write-Host "[ok] Created 'in-spire (windows).lnk' with icon at $lnkPath" -ForegroundColor Green
+        Write-Host "Double-click the .lnk to launch the dashboard."
     """).strip() + "\n"
     (start_dir / "setup-windows.ps1").write_text(ps1, encoding="utf-8")
-    ok(f"Windows setup: {start_dir / 'setup-windows.ps1'}")
+    ok("Windows setup: setup-windows.ps1")
 
 
-def build_linux(start_dir: Path, src_png_linux: Path) -> None:
-    """Linux .sh + .desktop + setup-linux.sh."""
-    # 256×256 PNG (.desktop 표준 사이즈)
+def build_linux(start_dir: Path, src_png_linux: Path, assets_dir: Path) -> None:
+    # 256×256 PNG (.desktop 표준)
     img = Image.open(src_png_linux).convert("RGBA")
-    icon_256 = start_dir / "icons" / "in-spire-256-linux.png"
+    icon_256 = assets_dir / "icons" / "in-spire-256-linux.png"
     icon_256.parent.mkdir(parents=True, exist_ok=True)
     img.resize((256, 256), Image.LANCZOS).save(icon_256, "PNG")
 
-    # in-spire.sh
+    # in-spire (linux).sh — 셸 스크립트
     sh = textwrap.dedent("""\
         #!/bin/bash
         # in-spire — methodology dashboard launcher (Linux)
@@ -232,25 +236,25 @@ def build_linux(start_dir: Path, src_png_linux: Path) -> None:
         fi
         exec /usr/bin/env python3 50_tools/methodology.py dashboard --open
     """)
-    sh_path = start_dir / "in-spire.sh"
+    sh_path = start_dir / NAME_SH
     sh_path.write_text(sh, encoding="utf-8")
     sh_path.chmod(0o755)
-    ok(f"Linux .sh: {sh_path}")
+    ok(f"Linux: {NAME_SH}")
 
-    # .desktop 템플릿 — setup-linux.sh 가 절대경로로 변환
+    # .desktop 템플릿 — Exec/Icon 토큰, setup-linux.sh 가 sed 로 치환
     desktop = textwrap.dedent("""\
         [Desktop Entry]
         Type=Application
         Version=1.0
-        Name=in-spire
+        Name=in-spire (linux)
         Comment=Methodology dashboard launcher
         Exec=__EXEC__
         Icon=__ICON__
         Terminal=false
         Categories=Development;
     """)
-    (start_dir / "in-spire.desktop").write_text(desktop, encoding="utf-8")
-    ok(f"Linux .desktop template: {start_dir / 'in-spire.desktop'}")
+    (assets_dir / "in-spire.desktop").write_text(desktop, encoding="utf-8")
+    ok("Linux .desktop template: assets/in-spire.desktop")
 
     # setup-linux.sh — Exec/Icon 절대경로 자동 갱신
     setup = textwrap.dedent("""\
@@ -258,60 +262,71 @@ def build_linux(start_dir: Path, src_png_linux: Path) -> None:
         # setup-linux.sh — in-spire.desktop 의 Exec/Icon 을 현재 절대경로로 갱신.
         # 사용자 1회 실행:
         #   bash setup-linux.sh
-        # 그 후 in-spire.desktop 을 ~/.local/share/applications/ 에 복사하면 메뉴 등록.
+        # 그 후 assets/in-spire.desktop 을 ~/.local/share/applications/ 에 복사.
 
         HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-        EXEC_PATH="$HERE/in-spire.sh"
-        ICON_PATH="$HERE/icons/in-spire-256-linux.png"
+        EXEC_PATH="$HERE/in-spire (linux).sh"
+        ICON_PATH="$HERE/assets/icons/in-spire-256-linux.png"
+        DESKTOP_FILE="$HERE/assets/in-spire.desktop"
 
+        if [ ! -f "$DESKTOP_FILE" ]; then
+          echo "[err] $DESKTOP_FILE not found"
+          exit 1
+        fi
+
+        # 공백 포함 경로 안전 처리 — | 구분자
         sed -e "s|__EXEC__|$EXEC_PATH|" -e "s|__ICON__|$ICON_PATH|" \\
-          "$HERE/in-spire.desktop" > "$HERE/in-spire.desktop.tmp"
-        mv "$HERE/in-spire.desktop.tmp" "$HERE/in-spire.desktop"
+          "$DESKTOP_FILE" > "$DESKTOP_FILE.tmp"
+        mv "$DESKTOP_FILE.tmp" "$DESKTOP_FILE"
 
-        echo "[ok] in-spire.desktop updated:"
+        echo "[ok] $DESKTOP_FILE updated:"
         echo "  Exec=$EXEC_PATH"
         echo "  Icon=$ICON_PATH"
         echo ""
         echo "To register in app menu:"
-        echo "  cp $HERE/in-spire.desktop ~/.local/share/applications/"
-        echo "  chmod +x $HERE/in-spire.sh"
+        echo "  cp \\"$DESKTOP_FILE\\" ~/.local/share/applications/"
     """)
     setup_path = start_dir / "setup-linux.sh"
     setup_path.write_text(setup, encoding="utf-8")
     setup_path.chmod(0o755)
-    ok(f"Linux setup: {setup_path}")
+    ok("Linux setup: setup-linux.sh")
 
 
 def write_start_readme(start_dir: Path) -> None:
     readme = textwrap.dedent("""\
         # _start/ — in-spire 진입점
 
-        > **더블클릭하면 dashboard 가 자동으로 열립니다.** 자기 OS에 맞는 파일만 사용.
+        > **자기 OS 에 맞는 파일을 더블클릭하면 dashboard 가 자동으로 열립니다.**
 
-        ## 사용법
+        ## 진입점
+
+        | OS | 파일 | 사용법 |
+        |---|---|---|
+        | **macOS** | `in-spire (mac).app` | 더블클릭 ⭐ |
+        | **Windows** | `in-spire (windows).bat` (또는 `.lnk` setup 후) | 더블클릭 |
+        | **Linux** | `in-spire (linux).sh` | 실행 또는 `.desktop` 메뉴 등록 |
+
+        ## OS 별 1회 설치 (필요한 경우만)
 
         ### macOS
-        - `in-spire.app` 더블클릭
-        - 첫 실행 시 *"확인되지 않은 개발자"* 경고:
-          - **우클릭 → 열기 → 열기** (1회만)
-          - 또는 시스템 설정 → 보안 및 개인정보 보호 → *"그래도 열기"*
+        첫 실행 시 *"확인되지 않은 개발자"* 경고:
+        - **우클릭 → 열기 → 열기** (1회만)
+        - 또는 시스템 설정 → 보안 및 개인정보 → *"그래도 열기"*
 
         ### Windows
-        - **첫 실행 1회**: `setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
-          → `in-spire.lnk` (아이콘 박힌 바로가기) 자동 생성
-        - 이후: **`in-spire.lnk` 더블클릭**
-        - (대안) `in-spire.bat` 직접 더블클릭도 가능 (아이콘 없음)
+        1. `setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
+        2. `in-spire (windows).lnk` (아이콘 박힌 바로가기) 자동 생성
+        3. 이후: `.lnk` 또는 `.bat` 더블클릭
 
         ### Linux
-        - **첫 실행 1회**: `bash setup-linux.sh`
-          → `in-spire.desktop` 의 절대경로 자동 설정
-        - 이후 두 가지 선택:
-          - `in-spire.sh` 직접 실행
-          - `in-spire.desktop` 을 `~/.local/share/applications/` 에 복사 → 시스템 메뉴에서 검색
+        1. `bash setup-linux.sh` 실행 (`.desktop` 의 절대경로 갱신)
+        2. 다음 중 선택:
+           - `./in-spire (linux).sh` 직접 실행
+           - `cp assets/in-spire.desktop ~/.local/share/applications/` (시스템 메뉴 등록)
 
         ## 동작
 
-        모든 실행파일은 동일한 명령을 호출합니다:
+        모든 실행파일은 동일한 명령을 호출:
         ```
         python3 50_tools/methodology.py dashboard --open
         ```
@@ -333,65 +348,90 @@ def write_start_readme(start_dir: Path) -> None:
 
         ```
         _start/
-        ├── in-spire.app/        ← macOS 더블클릭
-        ├── in-spire.bat         ← Windows 실행 스크립트
-        ├── in-spire.ico         ← Windows 아이콘
-        ├── setup-windows.ps1    ← Windows 1회 setup (.lnk 생성)
-        ├── in-spire.lnk         ← (setup 후 생성됨) Windows 더블클릭
-        ├── in-spire.sh          ← Linux 실행 스크립트
-        ├── in-spire.desktop     ← Linux 데스크톱 항목
-        ├── setup-linux.sh       ← Linux 1회 setup (경로 갱신)
-        └── icons/               ← 원본 PNG 보관 (1024×1024)
+        ├── in-spire (mac).app/          ← macOS 더블클릭
+        ├── in-spire (windows).bat       ← Windows 더블클릭
+        ├── in-spire (linux).sh          ← Linux 실행
+        ├── setup-windows.ps1            ← Windows 1회 (.lnk 생성)
+        ├── setup-linux.sh               ← Linux 1회 (.desktop 경로)
+        ├── README.md                    ← 본 문서
+        └── assets/                      ← 아이콘·메타·원본
+            ├── icons/
+            │   ├── in-spire-mac.png     (1024×1024)
+            │   ├── in-spire-win.png
+            │   ├── in-spire-linux.png
+            │   └── in-spire-256-linux.png  (Linux .desktop 용)
+            ├── in-spire.ico             (Windows 멀티 사이즈)
+            └── in-spire.desktop         (Linux 데스크톱 항목)
         ```
 
         ## 문제 해결
 
-        - **"50_tools/methodology.py not found"**: 본 `_start/` 폴더가 *방법론이 적용된 프로젝트 루트* 안에 있는지 확인.
-        - **dashboard 가 안 열림**: Python 3 설치 확인 (`python3 --version` / `python --version`).
-        - **이미 열려 있던 dashboard 와 충돌**: `python3 50_tools/methodology.py dashboard stop --all` 로 정리.
+        - **"50_tools/methodology.py not found"**: 본 `_start/` 폴더가 *방법론 적용 프로젝트 루트* 안에 있는지 확인.
+        - **Python 3 미설치**: `python3 --version` 으로 확인.
+        - **이미 떠 있던 dashboard 충돌**: `python3 50_tools/methodology.py dashboard stop --all` 로 정리.
         """)
     (start_dir / "README.md").write_text(readme, encoding="utf-8")
-    ok(f"_start/README.md")
+    ok("README.md")
+
+
+def clean_legacy(start_dir: Path) -> None:
+    """기존 _start/ 의 옛 파일·구조 제거 (clean rebuild)."""
+    legacy_items = [
+        "in-spire.app",
+        "in-spire.bat",
+        "in-spire.sh",
+        "in-spire.desktop",
+        "in-spire.ico",
+        "icons",  # 옛 위치 (assets/icons 로 이동)
+    ]
+    for item in legacy_items:
+        p = start_dir / item
+        if p.exists():
+            if p.is_dir():
+                shutil.rmtree(p)
+            else:
+                p.unlink()
+            info(f"  removed legacy: {item}")
 
 
 def main(argv: list[str]) -> int:
     root = Path(argv[1]).resolve() if len(argv) > 1 else Path.cwd().resolve()
     info(f"project root: {root}")
 
-    sources = {
-        "mac": root / "in-spire-mac.png",
-        "win": root / "in-spire-win.png",
-        "linux": root / "in-spire-linux.png",
-    }
-    for name, p in sources.items():
-        if not p.exists():
-            err(f"미발견: {p}")
-            return 1
+    sources = find_source_pngs(root)
+    info(f"sources: {[str(p.relative_to(root)) for p in sources.values()]}")
 
     start_dir = root / "_start"
     start_dir.mkdir(exist_ok=True)
-    icons_dir = start_dir / "icons"
-    icons_dir.mkdir(exist_ok=True)
+    assets = start_dir / "assets"
+    assets.mkdir(exist_ok=True)
+    (assets / "icons").mkdir(exist_ok=True)
 
-    # 원본 PNG 보관
-    for name, p in sources.items():
-        shutil.copy(p, icons_dir / p.name)
-    ok(f"원본 PNG 3장 보관: {icons_dir}")
+    # 1) 기존 옛 구조 정리
+    info("cleaning legacy structure...")
+    clean_legacy(start_dir)
 
-    # macOS — .icns + .app
-    icns = start_dir / "AppIcon.icns"
-    build_icns(sources["mac"], icns)
-    build_macos_app(start_dir, icns)
-    icns.unlink()  # .app 내부로 이동했으니 정리
+    # 2) 원본 PNG 영구 보관 (assets/icons/)
+    for variant, src in sources.items():
+        dst = assets / "icons" / f"in-spire-{variant}.png"
+        if src.resolve() != dst.resolve():
+            shutil.copy(src, dst)
+    ok(f"원본 PNG 영구 보관: assets/icons/")
 
-    # Windows — .ico + .bat + setup.ps1
-    build_ico(sources["win"], start_dir / "in-spire.ico")
-    build_windows(start_dir, start_dir / "in-spire.ico")
+    # 3) macOS — .icns + .app
+    icns_tmp = assets / "AppIcon.icns"
+    build_icns(assets / "icons" / "in-spire-mac.png", icns_tmp)
+    build_macos_app(start_dir, icns_tmp)
+    icns_tmp.unlink()  # .app 내부로 복사됨
 
-    # Linux — .sh + .desktop + setup.sh + 256 PNG
-    build_linux(start_dir, sources["linux"])
+    # 4) Windows — .ico + .bat + setup.ps1
+    build_ico(assets / "icons" / "in-spire-win.png", assets / "in-spire.ico")
+    build_windows(start_dir)
 
-    # README
+    # 5) Linux — .sh + .desktop + setup.sh + 256 PNG
+    build_linux(start_dir, assets / "icons" / "in-spire-linux.png", assets)
+
+    # 6) README
     write_start_readme(start_dir)
 
     print()

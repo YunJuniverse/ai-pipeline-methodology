@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-13 (in-spire 브랜드 + _start/ 3 OS 진입점)
+# Checkpoint — 2026-05-13 (_start/ 구조 재편 + 루트 정리)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,25 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 in-spire 브랜드 첫 시각 자산 (방금)**:
+**🆕 _start/ 구조 재편 + 루트 정리 (방금)**:
+- 사용자 명시 표기 적용 — 파일명에 OS 식별자 괄호 포함:
+  - `in-spire (mac).app`
+  - `in-spire (windows).bat`
+  - `in-spire (linux).sh`
+- 보조 자산을 `_start/assets/` 하위로 분리: `in-spire.ico`, `in-spire.desktop`, `icons/`
+- `_start/` 루트에는 진입점 5개 + README — 6개 항목만 노출
+- 루트 클러터 정리:
+  - `app-icon--1024x1024-png--squircle-rounded-square-b.png` → `_start/assets/icons/app-icon-source.png` (원본 보존, rename)
+  - `in-spire-{mac,win,linux}.png` 루트 → 루트에서 삭제 (assets/icons/ 에 이미 있음)
+  - `dashboard.html` 제거 (빌드 산출물)
+- `build-launchers.py` 갱신:
+  - `find_source_pngs()` — assets/icons 우선·루트 fallback
+  - `clean_legacy()` — 옛 _start 구조 자동 제거 (멱등 빌드)
+  - setup-windows.ps1 / setup-linux.sh 내부 파일명·경로 갱신
+
+격리 검증 ✅ (init 시 새 구조 + .app 실행권한 보존 + 60_meta 격리 모두 통과).
+
+**in-spire 브랜드 첫 시각 자산 (이전 차례)**:
 - 사용자 결정: 브랜드명 **in-spire** (이중 의미: in spire + inspire), 배경색만 차등 (옵션 A), 실행파일만 폴더로 (옵션 3)
 - AI 생성: macOS teal/navy 나선 1장 (Recraft) → 의외의 행운: 두 갈래 나선 (DNA double helix, 자가복제 메타포)
 - `50_tools/swap-icon-color.py` — Pillow 픽셀 swap (흰색 stroke·외부 배경 보호 + 그라데이션 위치 보간) → win blue/linux amber 2장 자동 생성

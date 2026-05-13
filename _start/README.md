@@ -1,31 +1,36 @@
 # _start/ — in-spire 진입점
 
-> **더블클릭하면 dashboard 가 자동으로 열립니다.** 자기 OS에 맞는 파일만 사용.
+> **자기 OS 에 맞는 파일을 더블클릭하면 dashboard 가 자동으로 열립니다.**
 
-## 사용법
+## 진입점
+
+| OS | 파일 | 사용법 |
+|---|---|---|
+| **macOS** | `in-spire (mac).app` | 더블클릭 ⭐ |
+| **Windows** | `in-spire (windows).bat` (또는 `.lnk` setup 후) | 더블클릭 |
+| **Linux** | `in-spire (linux).sh` | 실행 또는 `.desktop` 메뉴 등록 |
+
+## OS 별 1회 설치 (필요한 경우만)
 
 ### macOS
-- `in-spire.app` 더블클릭
-- 첫 실행 시 *"확인되지 않은 개발자"* 경고:
-  - **우클릭 → 열기 → 열기** (1회만)
-  - 또는 시스템 설정 → 보안 및 개인정보 보호 → *"그래도 열기"*
+첫 실행 시 *"확인되지 않은 개발자"* 경고:
+- **우클릭 → 열기 → 열기** (1회만)
+- 또는 시스템 설정 → 보안 및 개인정보 → *"그래도 열기"*
 
 ### Windows
-- **첫 실행 1회**: `setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
-  → `in-spire.lnk` (아이콘 박힌 바로가기) 자동 생성
-- 이후: **`in-spire.lnk` 더블클릭**
-- (대안) `in-spire.bat` 직접 더블클릭도 가능 (아이콘 없음)
+1. `setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
+2. `in-spire (windows).lnk` (아이콘 박힌 바로가기) 자동 생성
+3. 이후: `.lnk` 또는 `.bat` 더블클릭
 
 ### Linux
-- **첫 실행 1회**: `bash setup-linux.sh`
-  → `in-spire.desktop` 의 절대경로 자동 설정
-- 이후 두 가지 선택:
-  - `in-spire.sh` 직접 실행
-  - `in-spire.desktop` 을 `~/.local/share/applications/` 에 복사 → 시스템 메뉴에서 검색
+1. `bash setup-linux.sh` 실행 (`.desktop` 의 절대경로 갱신)
+2. 다음 중 선택:
+   - `./in-spire (linux).sh` 직접 실행
+   - `cp assets/in-spire.desktop ~/.local/share/applications/` (시스템 메뉴 등록)
 
 ## 동작
 
-모든 실행파일은 동일한 명령을 호출합니다:
+모든 실행파일은 동일한 명령을 호출:
 ```
 python3 50_tools/methodology.py dashboard --open
 ```
@@ -47,19 +52,24 @@ python3 50_tools/methodology.py dashboard stop --all
 
 ```
 _start/
-├── in-spire.app/        ← macOS 더블클릭
-├── in-spire.bat         ← Windows 실행 스크립트
-├── in-spire.ico         ← Windows 아이콘
-├── setup-windows.ps1    ← Windows 1회 setup (.lnk 생성)
-├── in-spire.lnk         ← (setup 후 생성됨) Windows 더블클릭
-├── in-spire.sh          ← Linux 실행 스크립트
-├── in-spire.desktop     ← Linux 데스크톱 항목
-├── setup-linux.sh       ← Linux 1회 setup (경로 갱신)
-└── icons/               ← 원본 PNG 보관 (1024×1024)
+├── in-spire (mac).app/          ← macOS 더블클릭
+├── in-spire (windows).bat       ← Windows 더블클릭
+├── in-spire (linux).sh          ← Linux 실행
+├── setup-windows.ps1            ← Windows 1회 (.lnk 생성)
+├── setup-linux.sh               ← Linux 1회 (.desktop 경로)
+├── README.md                    ← 본 문서
+└── assets/                      ← 아이콘·메타·원본
+    ├── icons/
+    │   ├── in-spire-mac.png     (1024×1024)
+    │   ├── in-spire-win.png
+    │   ├── in-spire-linux.png
+    │   └── in-spire-256-linux.png  (Linux .desktop 용)
+    ├── in-spire.ico             (Windows 멀티 사이즈)
+    └── in-spire.desktop         (Linux 데스크톱 항목)
 ```
 
 ## 문제 해결
 
-- **"50_tools/methodology.py not found"**: 본 `_start/` 폴더가 *방법론이 적용된 프로젝트 루트* 안에 있는지 확인.
-- **dashboard 가 안 열림**: Python 3 설치 확인 (`python3 --version` / `python --version`).
-- **이미 열려 있던 dashboard 와 충돌**: `python3 50_tools/methodology.py dashboard stop --all` 로 정리.
+- **"50_tools/methodology.py not found"**: 본 `_start/` 폴더가 *방법론 적용 프로젝트 루트* 안에 있는지 확인.
+- **Python 3 미설치**: `python3 --version` 으로 확인.
+- **이미 떠 있던 dashboard 충돌**: `python3 50_tools/methodology.py dashboard stop --all` 로 정리.

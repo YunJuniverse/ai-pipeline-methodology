@@ -1,9 +1,9 @@
 #!/bin/bash
 # in-spire — methodology dashboard launcher (macOS)
-# 더블클릭 진입점. .app 번들 위치를 기준으로 프로젝트 루트 탐색.
+# 더블클릭 진입점. .app 번들 위치 기준 프로젝트 루트 탐색.
 
 APP_BIN="${BASH_SOURCE[0]}"
-# APP_BIN: <ROOT>/_start/in-spire.app/Contents/MacOS/in-spire
+# APP_BIN: <ROOT>/_start/in-spire (mac).app/Contents/MacOS/in-spire
 # 4단계 위 = 프로젝트 루트
 PROJECT_ROOT="$(cd "$(dirname "$APP_BIN")/../../../.." && pwd)"
 
@@ -17,5 +17,4 @@ if [ ! -f "50_tools/methodology.py" ]; then
   exit 1
 fi
 
-# 백그라운드 서빙 + 브라우저 자동 열기
 exec /usr/bin/env python3 50_tools/methodology.py dashboard --open
