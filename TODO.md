@@ -10,6 +10,17 @@
 ## Ready
 
 
+### METH-022
+- **title**: pre-push hook ↔ wrap 충돌 — 방법론 sync commit 면제
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI
+- **acceptance criteria**:
+  - [ ] pre-push hook 이 직전 commit 메시지가 `chore(methodology): sync` 로 시작하면 wrap --strict 면제 (manifest-check 는 유지)
+  - [ ] 또는 wrap 에 `--allow-sync-only` — diff 가 50_tools/ + .methodology-version + .github/workflows/methodology-* + .ai/adapters/ 만이면 통과
+  - [ ] 적용 프로젝트에서 sync commit push 가 --no-verify 없이 통과하는지 검증
+- **notes**: 2026-05-13 fix 전파 중 발견 (F-005). hooks install 한 적용 프로젝트는 방법론 sync 마다 --no-verify 필요 — 불편 + 우회 습관화 위험.
+
 ### METH-021
 - **title**: wrap 날짜 경계 완화 — 자정 넘긴 세션 대응
 - **mode**: fullstack
