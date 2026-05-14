@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://methodology.local/schema/context.schema.json",
   "title": ".ai/context.json — L0 Portable Boot Context",
-  "description": "어떤 AI 모델·어떤 PC에서든 저장소 하나로 부팅 가능하게 하는 정형 컨텍스트. 00_foundation/WHITEPAPER.md §5 L0 참조.",
+  "description": "어떤 AI 모델·어떤 PC에서든 저장소 하나로 부팅 가능하게 하는 정형 컨텍스트. 10_foundation/WHITEPAPER.md §5 L0 참조.",
   "type": "object",
   "required": [
     "schema_version",

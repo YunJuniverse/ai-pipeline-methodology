@@ -17,7 +17,7 @@ AI에게 다음과 같이 요청:
 > ".ai/checkpoint.md를 현재 파일의 필수 섹션 형식으로 갱신해줘. 과장·칭찬·추측 없이, 다음 AI가 이어받는 데 필요한 사실과 첫 행동만 남겨줘."
 
 응답을 `.ai/checkpoint.md`에 저장(덮어쓰기).
-이전 checkpoint를 보존하려면 `30_dev/snapshots/checkpoints/YYYY-MM-DD_HHMM.md`로 복사 후 갱신.
+이전 checkpoint를 보존하려면 `40_dev/snapshots/checkpoints/YYYY-MM-DD_HHMM.md`로 복사 후 갱신.
 
 ## 한계 (이 어댑터의 정직 모드)
 

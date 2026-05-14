@@ -19,29 +19,29 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: manifest-check — 60_meta 격리 안전망
-        run: python3 50_tools/methodology.py manifest-check
+      - name: manifest-check — 70_meta 격리 안전망
+        run: python3 60_tools/methodology.py manifest-check
 
-      - name: 60_meta 격리 (실측) — init으로 임시 프로젝트 만들고 60_meta 없는지
+      - name: 70_meta 격리 (실측) — init으로 임시 프로젝트 만들고 70_meta 없는지
         run: |
           set -e
           TMP=$(mktemp -d)
-          python3 50_tools/methodology.py init "$TMP/applied" --label test --type planning-only > /dev/null
-          if [ -e "$TMP/applied/60_meta" ]; then
+          python3 60_tools/methodology.py init "$TMP/applied" --label test --type planning-only > /dev/null
+          if [ -e "$TMP/applied/70_meta" ]; then
             echo "❌ 60_meta가 적용 프로젝트에 새어나감"
             exit 1
           fi
-          echo "✅ 60_meta 격리 확인"
+          echo "✅ 70_meta 격리 확인"
 
-      - name: observation lint — 40_resources/ai_observations + 60_meta/observations
+      - name: observation lint — 50_resources/ai_observations + 70_meta/observations
         run: |
           set -e
           fail=0
-          for f in 40_resources/ai_observations/*.md 60_meta/observations/*.md; do
+          for f in 50_resources/ai_observations/*.md 70_meta/observations/*.md; do
             [ -e "$f" ] || continue
             [ "$(basename "$f")" = "_README.md" ] && continue
             [ "$(basename "$f")" = "README.md" ] && continue
-            python3 50_tools/methodology.py observe --validate "$f" || fail=1
+            python3 60_tools/methodology.py observe --validate "$f" || fail=1
           done
           exit $fail
 
@@ -49,9 +49,9 @@ jobs:
         run: |
           set -e
           TMP=$(mktemp -d)
-          python3 50_tools/methodology.py init "$TMP/applied" --label test --type planning-only > /dev/null
+          python3 60_tools/methodology.py init "$TMP/applied" --label test --type planning-only > /dev/null
           # 두 번째 sync — 멱등이라면 변경 0건이어야 함
-          out=$(python3 50_tools/methodology.py sync --path "$TMP/applied" 2>&1)
+          out=$(python3 60_tools/methodology.py sync --path "$TMP/applied" 2>&1)
           if echo "$out" | grep -q "0개 변경"; then
             echo "✅ idempotent"
           else
@@ -61,7 +61,7 @@ jobs:
           fi
 
       - name: dashboard build — 산출물 생성 가능 확인
-        run: python3 50_tools/generate-dashboard.py --out /tmp/dashboard.html
+        run: python3 60_tools/generate-dashboard.py --out /tmp/dashboard.html
 
   wrap-strict-check:
     # 본 저장소 자체의 wrap 검증 — main 푸시 시 4개 라이브 파일이 최근 갱신됐는지.
@@ -75,4 +75,4 @@ jobs:
         with:
           python-version: '3.x'
       - name: wrap (informational)
-        run: python3 50_tools/methodology.py wrap || true
+        run: python3 60_tools/methodology.py wrap || true

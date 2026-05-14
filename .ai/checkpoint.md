@@ -1,8 +1,8 @@
-# Checkpoint — 2026-05-13 (setup → _start/settings/ 분리)
+# Checkpoint — 2026-05-14 (방법론 v4.0 — 00_briefs + NN_ shift)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
-> 형식 정의: `00_foundation/WHITEPAPER.md` §2-2.
+> 형식 정의: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
 
@@ -20,7 +20,19 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 setup → _start/settings/ 분리 (방금)**:
+**🆕 방법론 v4.0 — 00_briefs/ + NN_ +10 shift (방금)**:
+- 사용자 요구: 인간 입력 채널 신설 (리서치·아이디어·회의록), AI 가 *매 세션 자동 로드*
+- 00_briefs/{current,archived,meetings} 신설 (.gitkeep 으로 빈 디렉터리 init 보장)
+- 옛 NN_ → 새 NN_ +10 shift: 00_foundation→10, 10_guides→20, ..., 60_meta→70
+- migrations/v3.2_to_v4.0.py — PATH_MAP + re 매칭 + chr() 우회로 self-replace 회피 (7 폴더 rename, 121 파일 path replace)
+- METHODOLOGY_VERSION → v4.0
+- MANIFEST 갱신: 00_briefs/_README.md → shared_paths, current/archived/meetings → init_paths
+- .ai/context.json must_read_optional 에 00_briefs/current/*.md 추가
+- CLAUDE.md / AGENTS.md managed 마커: 세션 부팅 시 brief 자동 로드 규칙 명시
+- 백서 §부록 C 표 갱신 — 00=Briefs, 10=Foundation, ..., 70=Meta
+- 검증: version v4.0 ✅, manifest-check ✅, init 격리 (00_briefs 전파 + 70_meta 미주입) ✅
+
+**setup → _start/settings/ 분리 (이전 차례)**:
 - 사용자 요구: setup-windows.ps1 + setup-linux.sh 를 settings/ 하위 폴더에 모음
 - build_windows / build_linux: settings 디렉터리 mkdir + 거기에 setup 작성
 - 스크립트 내부 경로 보정:
@@ -63,13 +75,13 @@
   - `clean_legacy()` — 옛 _start 구조 자동 제거 (멱등 빌드)
   - setup-windows.ps1 / setup-linux.sh 내부 파일명·경로 갱신
 
-격리 검증 ✅ (init 시 새 구조 + .app 실행권한 보존 + 60_meta 격리 모두 통과).
+격리 검증 ✅ (init 시 새 구조 + .app 실행권한 보존 + 70_meta 격리 모두 통과).
 
 **in-spire 브랜드 첫 시각 자산 (이전 차례)**:
 - 사용자 결정: 브랜드명 **in-spire** (이중 의미: in spire + inspire), 배경색만 차등 (옵션 A), 실행파일만 폴더로 (옵션 3)
 - AI 생성: macOS teal/navy 나선 1장 (Recraft) → 의외의 행운: 두 갈래 나선 (DNA double helix, 자가복제 메타포)
-- `50_tools/swap-icon-color.py` — Pillow 픽셀 swap (흰색 stroke·외부 배경 보호 + 그라데이션 위치 보간) → win blue/linux amber 2장 자동 생성
-- `50_tools/build-launchers.py` — 3 PNG → `_start/` 전체 자산 일괄:
+- `60_tools/swap-icon-color.py` — Pillow 픽셀 swap (흰색 stroke·외부 배경 보호 + 그라데이션 위치 보간) → win blue/linux amber 2장 자동 생성
+- `60_tools/build-launchers.py` — 3 PNG → `_start/` 전체 자산 일괄:
   - macOS: in-spire.app (Info.plist + AppIcon.icns 10 사이즈 + MacOS/in-spire 셸 스크립트)
   - Windows: in-spire.bat + in-spire.ico (7 사이즈) + setup-windows.ps1 (.lnk 자동 생성)
   - Linux: in-spire.sh + in-spire.desktop (템플릿) + setup-linux.sh (Exec/Icon 절대경로 치환) + 256 PNG
@@ -97,7 +109,7 @@
 - 원인: cmd_dashboard 가 포트 점유 시 "어느 프로젝트인지" 무시하고 무조건 "기존 URL 보고"
 - 수정: `_running_dashboard_root(port)` (HTTP GET → "root": 추출) + `_kill_port_listeners(port)` — 다른 프로젝트면 종료 후 재시작. `import os` 누락도 수정.
 - 검증: 본 저장소 ↔ talmocom 전환 시 자동 kill+재시작 동작 확인 (단, 적용 프로젝트의 옛 methodology.py 는 아직 fix 없음 — sync 전파 필요)
-- 임시 우회: `python3 /Users/hayden/methodology/50_tools/methodology.py dashboard --path ~/talmocom --port 8765` (본 저장소 새 코드 사용)
+- 임시 우회: `python3 /Users/hayden/methodology/60_tools/methodology.py dashboard --path ~/talmocom --port 8765` (본 저장소 새 코드 사용)
 - 전파 완료: 본 저장소 push dbbb82e → icons 9ff8d6a / gamblescan ff18d1d / talmocom 602e2a1 (sync --no-verify, F-005)
 - talmocom dashboard 새 로직 재시작 검증 ✅ ("포트 8765에 다른 dashboard(root: methodology) — 종료 후 talmocom 로 재시작")
 - 신규 마찰: F-004(wrap 날짜경계)→METH-021, F-005(hooks↔wrap)→METH-022, "적용프로젝트 CLI fix 지연" N=3→METH-020(MC-002)
@@ -110,7 +122,7 @@
 - icons sync → commit f11a988 → push 385326a..f11a988
 - gamblescan sync → commit 8b5531d → push 63c7abe..8b5531d
 - talmocom sync → commit f94a4e9 (이미지 제외 명시 add) → push d447eaa..f94a4e9
-- 3/3 60_meta 격리 ✅, applied-ci/auto-merge 워크플로 주입 ✅
+- 3/3 70_meta 격리 ✅, applied-ci/auto-merge 워크플로 주입 ✅
 - 자가발전 루프 첫 진짜 회전: F-003(talmocom 이미지 add 패턴) N=2 도달 → METH-019(MC-001 승급) 활성
 
 **0. Dashboard dev-server 제어 패널** (이전 세션):
@@ -131,7 +143,7 @@
 **B. dashboard CLI** (이전 세션):
 - `methodology dashboard` — 빌드 + background 서빙 + URL 출력 (branch/commit/pid). 포트 중복 회피.
 
-0. **dashboard CLI 신설** — `50_tools/methodology.py cmd_dashboard` + 서브커맨드 등록.
+0. **dashboard CLI 신설** — `60_tools/methodology.py cmd_dashboard` + 서브커맨드 등록.
    - `--port` (기본 8765), `--no-serve`, `--path`, `--out`, `--background` 옵션
    - 빌드 → background 서빙 → URL + branch + commit + pid 출력
    - 포트 중복 회피 (socket 점검). 이미 떠 있으면 기존 URL 보고.
@@ -139,27 +151,27 @@
 0b. **CLAUDE.md / AGENTS.md (managed 마커 안)** — 세션 부팅 *마지막 단계* 의무 호출 규칙 추가. 모든 AI 모델 공통. sync 시 적용 프로젝트 자동 전파.
 0c. **`.ai/adapters/claude.md`** — 첫 메시지 권장 형식·도구 매핑에 dashboard CLI 반영.
 
-1. (이전 세션) **wrap CLI 신설** — `50_tools/methodology.py cmd_wrap` + 서브커맨드 등록.
+1. (이전 세션) **wrap CLI 신설** — `60_tools/methodology.py cmd_wrap` + 서브커맨드 등록.
    - 4개 라이브 파일(`HANDOFF.md`, `TODO.md`, `.ai/checkpoint.md`, ai_observations) 오늘 갱신 여부 검증
    - git status 요약 출력
    - `--strict` 옵션: 누락 시 exit 1 (CI/hook용)
 2. **CLAUDE.md / AGENTS.md 보강** — managed 마커 안에 "세션·작업 종료 절차" 규칙 명문화 (모든 AI 모델 공통). (α) 패턴: AI 자동 작성 → wrap 검증 → 사용자 다음 turn에서 수정 가능.
 3. **GitHub Actions 워크플로 2종 신설**:
-   - `.github/workflows/methodology-source-ci.yml` — 본 저장소 전용 (manifest-check, 60_meta 격리 실측, observation lint, idempotency, dashboard build)
-   - `.github/workflows/methodology-applied-ci.yml` — 적용 프로젝트 주입용 (60_meta 미주입, manifest-check, observation lint, dashboard build, wrap/status warn-only)
+   - `.github/workflows/methodology-source-ci.yml` — 본 저장소 전용 (manifest-check, 70_meta 격리 실측, observation lint, idempotency, dashboard build)
+   - `.github/workflows/methodology-applied-ci.yml` — 적용 프로젝트 주입용 (70_meta 미주입, manifest-check, observation lint, dashboard build, wrap/status warn-only)
 4. **MANIFEST 확장** — applied-ci 워크플로를 `shared_paths`에 추가. source-ci는 격리(실측 검증 완료).
 5. **`.ai/adapters/claude.md` 갱신** — SessionEnd hook 설정 가이드 추가.
-6. 본 세션 메타-관찰 기록 (`60_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md`).
+6. 본 세션 메타-관찰 기록 (`70_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md`).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
 1. **METH-015 — 적용 프로젝트 3개에 applied-ci 워크플로 주입**:
-   - 본 커밋 후 `cd ~/icons && python3 50_tools/methodology.py sync --apply` (gamblescan/talmocom 동일)
-   - 단, 각 적용 프로젝트의 *로컬 50_tools/methodology.py가 옛 버전*일 수 있음 — 본 저장소 methodology.py로 sync 호출 권장: `python3 /Users/hayden/methodology/50_tools/methodology.py sync --path ~/icons --apply`
-   - GitHub에서 워크플로 첫 실행 결과 점검 — 60_meta 미주입 / manifest-check / observation lint 모두 ✅이어야
+   - 본 커밋 후 `cd ~/icons && python3 60_tools/methodology.py sync --apply` (gamblescan/talmocom 동일)
+   - 단, 각 적용 프로젝트의 *로컬 60_tools/methodology.py가 옛 버전*일 수 있음 — 본 저장소 methodology.py로 sync 호출 권장: `python3 /Users/hayden/methodology/60_tools/methodology.py sync --path ~/icons --apply`
+   - GitHub에서 워크플로 첫 실행 결과 점검 — 70_meta 미주입 / manifest-check / observation lint 모두 ✅이어야
    - 실패 시 워크플로 또는 검증 로직 조정
 2. **METH-016 — SessionEnd hook 활성화**: 사용자 결정 영역. `.claude/settings.json`에 `SessionEnd` hook 등록 안내 (`.ai/adapters/claude.md` 참조).
-3. (선택) 분기 회고 시점 — `60_meta/retrospectives/2026-Q2_methodology-review.md` 작성. 단, 백서 §10 Stage 1~2 단계라 *지표 누적 부족* — 회고 가치 낮음. 데이터 더 쌓인 후 진행.
+3. (선택) 분기 회고 시점 — `70_meta/retrospectives/2026-Q2_methodology-review.md` 작성. 단, 백서 §10 Stage 1~2 단계라 *지표 누적 부족* — 회고 가치 낮음. 데이터 더 쌓인 후 진행.
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
@@ -174,4 +186,4 @@
 
 - 본 저장소 main 현재 head: 곧 새 커밋 (f1a993f → 다음).
 - 적용 프로젝트 3개 모두 `applied_commit: 6c99091` — 본 커밋 후 격차 더 커짐. `methodology status` 가 자동으로 "behind upstream" 표시.
-- 60_meta 격리 안전망: init/sync/source-ci 모두 격리 실측 통과.
+- 70_meta 격리 안전망: init/sync/source-ci 모두 격리 실측 통과.

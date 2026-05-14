@@ -3,36 +3,36 @@
 변경 요약 (옛 v3.1 구조 → 새 v3.2 구조):
 
 이동 (옛 → 새):
-- methodology.py             →  50_tools/methodology.py
-- generate-dashboard.py      →  50_tools/generate-dashboard.py
-- methodology-graph.json     →  50_tools/methodology-graph.json
-- DIAGRAM.md                 →  00_foundation/DIAGRAM.md
-- HOW_TO_APPLY.md            →  00_foundation/HOW_TO_APPLY.md
-- KICKOFF_PROMPT.md          →  00_foundation/KICKOFF_PROMPT.md
-- 40_resources/onboarding/   →  00_foundation/  (경쟁 안 — 중간 경로 정리)
+- methodology.py             →  60_tools/methodology.py
+- generate-dashboard.py      →  60_tools/generate-dashboard.py
+- methodology-graph.json     →  60_tools/methodology-graph.json
+- DIAGRAM.md                 →  10_foundation/DIAGRAM.md
+- HOW_TO_APPLY.md            →  10_foundation/HOW_TO_APPLY.md
+- KICKOFF_PROMPT.md          →  10_foundation/KICKOFF_PROMPT.md
+- 50_resources/onboarding/   →  10_foundation/  (경쟁 안 — 중간 경로 정리)
 
 신규 디렉터리 생성 (sync가 다음 단계에서 shared 파일 채움):
-- 00_foundation/
-- 50_tools/
+- 10_foundation/
+- 60_tools/
 - .ai/schema/
 - .ai/adapters/
-- 40_resources/catalog/{_pending,archived}/
-- 40_resources/skeletons/
-- 40_resources/ai_observations/
+- 50_resources/catalog/{_pending,archived}/
+- 50_resources/skeletons/
+- 50_resources/ai_observations/
 
 신규 파일은 sync가 shared_paths/init_files를 통해 자동 채움:
-- 00_foundation/WHITEPAPER.md (shared)
+- 10_foundation/WHITEPAPER.md (shared)
 - ONBOARDING.md (shared)
 - .ai/context.json, .ai/checkpoint.md (init_files — *기존에 없을 때만* 생성)
 - .ai/schema/*, .ai/adapters/* (shared)
 
 보존 (절대 안 건드림):
 - CLAUDE.md, AGENTS.md, HANDOFF.md, TODO.md  — 사용자 콘텐츠
-- 20_planning/, 30_dev/  — 사용자 산출물
+- 30_planning/, 40_dev/  — 사용자 산출물
 - 적용 프로젝트 고유 파일 (src/, tests/, package.json 등)
 
 멱등성: 새 위치에 이미 콘텐츠가 있으면 이동을 skip.
-주입 격리: 60_meta/는 본 마이그레이션이 절대 *생성*하지 않는다 (메타-방법론 격리).
+주입 격리: 70_meta/는 본 마이그레이션이 절대 *생성*하지 않는다 (메타-방법론 격리).
 """
 
 from __future__ import annotations
@@ -44,35 +44,35 @@ from pathlib import Path
 
 # (old_relative, new_relative) — 단일 파일 또는 디렉터리 이동
 MOVES = [
-    # 옛 루트 CLI/데이터 → 50_tools/
-    ("methodology.py", "50_tools/methodology.py"),
-    ("generate-dashboard.py", "50_tools/generate-dashboard.py"),
-    ("methodology-graph.json", "50_tools/methodology-graph.json"),
-    # 옛 루트 온보딩·다이어그램 → 00_foundation/
-    ("DIAGRAM.md", "00_foundation/DIAGRAM.md"),
-    ("HOW_TO_APPLY.md", "00_foundation/HOW_TO_APPLY.md"),
-    ("KICKOFF_PROMPT.md", "00_foundation/KICKOFF_PROMPT.md"),
-    # 중간 경쟁 경로(있을 수 있는 옛 시도) → 00_foundation/
-    ("40_resources/onboarding/DIAGRAM.md", "00_foundation/DIAGRAM.md"),
-    ("40_resources/onboarding/HOW_TO_APPLY.md", "00_foundation/HOW_TO_APPLY.md"),
-    ("40_resources/onboarding/KICKOFF_PROMPT.md", "00_foundation/KICKOFF_PROMPT.md"),
+    # 옛 루트 CLI/데이터 → 60_tools/
+    ("methodology.py", "60_tools/methodology.py"),
+    ("generate-dashboard.py", "60_tools/generate-dashboard.py"),
+    ("methodology-graph.json", "60_tools/methodology-graph.json"),
+    # 옛 루트 온보딩·다이어그램 → 10_foundation/
+    ("DIAGRAM.md", "10_foundation/DIAGRAM.md"),
+    ("HOW_TO_APPLY.md", "10_foundation/HOW_TO_APPLY.md"),
+    ("KICKOFF_PROMPT.md", "10_foundation/KICKOFF_PROMPT.md"),
+    # 중간 경쟁 경로(있을 수 있는 옛 시도) → 10_foundation/
+    ("50_resources/onboarding/DIAGRAM.md", "10_foundation/DIAGRAM.md"),
+    ("50_resources/onboarding/HOW_TO_APPLY.md", "10_foundation/HOW_TO_APPLY.md"),
+    ("50_resources/onboarding/KICKOFF_PROMPT.md", "10_foundation/KICKOFF_PROMPT.md"),
 ]
 
 # 빈 디렉터리 보장 (sync 가 shared_paths/init_paths 로 채움)
 ENSURE_DIRS = [
-    "00_foundation",
-    "50_tools",
+    "10_foundation",
+    "60_tools",
     ".ai/schema",
     ".ai/adapters",
-    "40_resources/catalog/_pending",
-    "40_resources/catalog/archived",
-    "40_resources/skeletons",
-    "40_resources/ai_observations",
+    "50_resources/catalog/_pending",
+    "50_resources/catalog/archived",
+    "50_resources/skeletons",
+    "50_resources/ai_observations",
 ]
 
 # 절대 *생성하지 않는* 경로 — 메타-방법론 격리.
 # 방어적 검증: 본 마이그레이션이 실수로 이 경로를 만들지 않도록 한다.
-NEVER_CREATE = ["60_meta"]
+NEVER_CREATE = ["70_meta"]
 
 
 def _log(msg: str, dry: bool) -> None:
@@ -190,14 +190,14 @@ _CONTEXT_TEMPLATE = """\
   },
   "must_read": [
     "ONBOARDING.md",
-    "00_foundation/WHITEPAPER.md",
+    "10_foundation/WHITEPAPER.md",
     "CLAUDE.md",
     "HANDOFF.md",
     ".ai/checkpoint.md"
   ],
   "must_read_optional": [
     "README.md",
-    "10_guides/README.md"
+    "20_guides/README.md"
   ],
   "active_todos": [],
   "active_catalog_hits": [],
@@ -210,7 +210,7 @@ _CHECKPOINT_TEMPLATE = """\
 # Checkpoint — [PROJECT_NAME] v3.2 업그레이드 직후
 
 > Live handoff for the next AI or person.
-> 형식 정의: `00_foundation/WHITEPAPER.md` §2-2.
+> 형식 정의: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
 
@@ -228,9 +228,9 @@ _CHECKPOINT_TEMPLATE = """\
 ## 방금 한 것 (정확히)
 
 - 방법론 v3.1 → v3.2 마이그레이션 적용 ([YYYY-MM-DD]).
-- 폴더 재구조화: `00_foundation/`, `50_tools/`, `.ai/` 신설.
+- 폴더 재구조화: `10_foundation/`, `60_tools/`, `.ai/` 신설.
 - L0 이식성 코어 도입 — `context.json`, `checkpoint.md`, schema/, adapters/.
-- `40_resources/{catalog,skeletons,ai_observations}/` 골격 신설.
+- `50_resources/{catalog,skeletons,ai_observations}/` 골격 신설.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
@@ -238,7 +238,7 @@ _CHECKPOINT_TEMPLATE = """\
    (예: `webapp-next`, `data-pipeline`, `slack-bot`).
 2. `HANDOFF.md` 의 *Current Focus* 를 본 프로젝트의 실제 첫 작업으로 갱신.
 3. 첫 작업이 끝나면 본 checkpoint 를 갱신
-   — 형식: `00_foundation/WHITEPAPER.md` §2-2.
+   — 형식: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 막혔던 지점
 
@@ -252,7 +252,7 @@ _CHECKPOINT_TEMPLATE = """\
 ## 환경 메모
 
 - 본 프로젝트는 `applied-project` 종류로 운영 중.
-- 60_meta/ 는 본 프로젝트에 *주입되지 않음* (메타-방법론 격리).
+- 70_meta/ 는 본 프로젝트에 *주입되지 않음* (메타-방법론 격리).
 """
 
 
@@ -285,18 +285,18 @@ def migrate(target: Path, dry_run: bool = False) -> None:
                 dry_run,
             )
 
-    # 빈 40_resources/onboarding/ 정리 (이동 후 잔재)
-    onboarding_dir = target / "40_resources" / "onboarding"
+    # 빈 50_resources/onboarding/ 정리 (이동 후 잔재)
+    onboarding_dir = target / "50_resources" / "onboarding"
     if onboarding_dir.exists():
         has_files = any(p.is_file() for p in onboarding_dir.rglob("*"))
         if not has_files:
-            _log("remove empty 40_resources/onboarding/", dry_run)
+            _log("remove empty 50_resources/onboarding/", dry_run)
             if not dry_run:
                 try:
                     shutil.rmtree(onboarding_dir)
                 except Exception as e:
-                    _log(f"40_resources/onboarding/ 정리 실패: {e}", dry_run)
+                    _log(f"50_resources/onboarding/ 정리 실패: {e}", dry_run)
         else:
-            _log("40_resources/onboarding/ 에 다른 파일이 남아있음 — 수동 확인 필요", dry_run)
+            _log("50_resources/onboarding/ 에 다른 파일이 남아있음 — 수동 확인 필요", dry_run)
 
     _log(f"완료 — {moved}개 경로 이동", dry_run)

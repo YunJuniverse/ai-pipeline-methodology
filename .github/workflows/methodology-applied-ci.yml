@@ -2,7 +2,7 @@
 # 본 워크플로는 *방법론이 적용된 외부 프로젝트* 의 main/PR에서 동작한다.
 #
 # 검증 범위:
-#  - 60_meta 미주입 (격리 보증)
+#  - 70_meta 미주입 (격리 보증)
 #  - manifest-check (MANIFEST 안전망)
 #  - L1 observation lint (있을 때만)
 #  - HANDOFF.md 신선도 (warn-only)
@@ -26,30 +26,30 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: 60_meta 미주입 검증 (격리 보증)
+      - name: 70_meta 미주입 검증 (격리 보증)
         run: |
-          if [ -e 60_meta ]; then
-            echo "❌ 60_meta/ 가 적용 프로젝트에 존재 — 메타-방법론이 새어나감"
+          if [ -e 70_meta ]; then
+            echo "❌ 70_meta/ 가 적용 프로젝트에 존재 — 메타-방법론이 새어나감"
             exit 1
           fi
-          echo "✅ 60_meta 미주입"
+          echo "✅ 70_meta 미주입"
 
       - name: manifest-check (excluded_paths 안전망)
-        run: python3 50_tools/methodology.py manifest-check
+        run: python3 60_tools/methodology.py manifest-check
 
       - name: L1 observation lint (있을 때만)
         run: |
           set -e
           fail=0
-          for f in 40_resources/ai_observations/*.md; do
+          for f in 50_resources/ai_observations/*.md; do
             [ -e "$f" ] || continue
             [ "$(basename "$f")" = "_README.md" ] && continue
-            python3 50_tools/methodology.py observe --validate "$f" || fail=1
+            python3 60_tools/methodology.py observe --validate "$f" || fail=1
           done
           exit $fail
 
       - name: dashboard build — 산출물 생성 가능 확인
-        run: python3 50_tools/generate-dashboard.py --out /tmp/dashboard.html
+        run: python3 60_tools/generate-dashboard.py --out /tmp/dashboard.html
 
   methodology-freshness:
     # warn-only — HANDOFF/TODO/checkpoint 신선도. fail로 머지 차단은 하지 않음.
@@ -62,6 +62,6 @@ jobs:
         with:
           python-version: '3.x'
       - name: wrap (informational)
-        run: python3 50_tools/methodology.py wrap || true
+        run: python3 60_tools/methodology.py wrap || true
       - name: status (upstream commit 격차 표시)
-        run: python3 50_tools/methodology.py status || true
+        run: python3 60_tools/methodology.py status || true

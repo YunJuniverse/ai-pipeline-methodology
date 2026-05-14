@@ -1,14 +1,14 @@
 """v3.0 → v3.1 마이그레이션.
 
 변경 요약:
-- docs/archive/planning-guides/  →  10_guides/
-- docs/templates/                →  40_resources/templates/
-- docs/prompts/                  →  40_resources/prompts/
+- docs/archive/planning-guides/  →  20_guides/
+- docs/templates/                →  50_resources/templates/
+- docs/prompts/                  →  50_resources/prompts/
 - docs/archive/{decisions,harness,legacy-methodology}/  →  90_archive/...
 - docs/methodology-graph.json    →  methodology-graph.json (루트)
-- docs/adr/                      →  30_dev/adr/
-- docs/snapshots/                →  30_dev/snapshots/
-- 신규 폴더 20_planning/, 30_dev/는 sync가 shared로 채움 (빈 디렉터리만 보장)
+- docs/adr/                      →  40_dev/adr/
+- docs/snapshots/                →  40_dev/snapshots/
+- 신규 폴더 30_planning/, 40_dev/는 sync가 shared로 채움 (빈 디렉터리만 보장)
 
 멱등성: 새 위치에 이미 콘텐츠가 있으면 이동을 skip.
 """
@@ -20,18 +20,18 @@ from pathlib import Path
 
 MOVES = [
     # (old_relative, new_relative)
-    ("docs/archive/planning-guides", "10_guides"),
-    ("docs/templates",               "40_resources/templates"),
-    ("docs/prompts",                 "40_resources/prompts"),
+    ("docs/archive/planning-guides", "20_guides"),
+    ("docs/templates",               "50_resources/templates"),
+    ("docs/prompts",                 "50_resources/prompts"),
     ("docs/archive/decisions",       "90_archive/decisions"),
     ("docs/archive/harness",         "90_archive/harness"),
     ("docs/archive/legacy-methodology", "90_archive/legacy-methodology"),
     ("docs/methodology-graph.json",  "methodology-graph.json"),
-    ("docs/adr",                     "30_dev/adr"),
-    ("docs/snapshots",               "30_dev/snapshots"),
+    ("docs/adr",                     "40_dev/adr"),
+    ("docs/snapshots",               "40_dev/snapshots"),
 ]
 
-ENSURE_DIRS = ["20_planning", "30_dev/adr", "30_dev/snapshots", "40_resources/templates", "40_resources/prompts"]
+ENSURE_DIRS = ["30_planning", "40_dev/adr", "40_dev/snapshots", "50_resources/templates", "50_resources/prompts"]
 
 
 def _log(msg: str, dry: bool) -> None:

@@ -25,22 +25,28 @@
   },
   "must_read": [
     "ONBOARDING.md",
-    "00_foundation/WHITEPAPER.md",
+    "10_foundation/WHITEPAPER.md",
     "AGENTS.md",
     "HANDOFF.md",
     "TODO.md",
     ".ai/checkpoint.md"
   ],
   "must_read_optional": [
+    "00_briefs/current/*.md",
     "README.md",
     "CLAUDE.md",
-    "10_guides/00_AI_기획_프로젝트_운영_원칙.md",
-    "10_guides/03_AI_관찰_로그_작성_규칙.md",
-    "30_dev/snapshots/implementation-plan-2026-05-07.md",
-    "30_dev/snapshots/transfer-drill-2026-05-08.md",
-    "30_dev/snapshots/2026-05-07_handoff_simulation_baseline.md"
+    "20_guides/00_AI_기획_프로젝트_운영_원칙.md",
+    "20_guides/03_AI_관찰_로그_작성_규칙.md",
+    "40_dev/snapshots/implementation-plan-2026-05-07.md",
+    "40_dev/snapshots/transfer-drill-2026-05-08.md",
+    "40_dev/snapshots/2026-05-07_handoff_simulation_baseline.md"
   ],
   "active_todos": [],
   "active_catalog_hits": [],
-  "adapters_present": ["generic", "claude", "codex", "gpt"]
+  "adapters_present": [
+    "generic",
+    "claude",
+    "codex",
+    "gpt"
+  ]
 }

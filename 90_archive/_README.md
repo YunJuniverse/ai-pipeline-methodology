@@ -4,4 +4,4 @@
 
 - `legacy-methodology/` — 구 방법론 자료
 - `harness/` — 초기 harness 설계 메모
-- `decisions/` — 과거 결정 기록 (현재 ADR은 `30_dev/adr/`)
+- `decisions/` — 과거 결정 기록 (현재 ADR은 `40_dev/adr/`)

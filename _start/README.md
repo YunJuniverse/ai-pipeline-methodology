@@ -32,7 +32,7 @@
 
 모든 실행파일은 동일한 명령을 호출:
 ```
-python3 50_tools/methodology.py dashboard --open
+python3 60_tools/methodology.py dashboard --open
 ```
 
 즉:
@@ -44,7 +44,7 @@ python3 50_tools/methodology.py dashboard --open
 ## 종료
 
 ```bash
-python3 50_tools/methodology.py dashboard stop --all
+python3 60_tools/methodology.py dashboard stop --all
 ```
 또는 dashboard UI 의 **Local Dashboards** 카드에서 Stop 버튼.
 
@@ -71,6 +71,6 @@ _start/
 
 ## 문제 해결
 
-- **"50_tools/methodology.py not found"**: 본 `_start/` 폴더가 *방법론 적용 프로젝트 루트* 안에 있는지 확인.
+- **"60_tools/methodology.py not found"**: 본 `_start/` 폴더가 *방법론 적용 프로젝트 루트* 안에 있는지 확인.
 - **Python 3 미설치**: `python3 --version` 으로 확인.
-- **이미 떠 있던 dashboard 충돌**: `python3 50_tools/methodology.py dashboard stop --all` 로 정리.
+- **이미 떠 있던 dashboard 충돌**: `python3 60_tools/methodology.py dashboard stop --all` 로 정리.

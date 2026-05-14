@@ -23,7 +23,7 @@ Claude Code는 세션 시작 시 다음을 자동 컨텍스트에 포함:
 그 다음 .ai/checkpoint.md의 "다음 사람에게" 첫 항목 + methodology dashboard URL 을 보고해줘.
 ```
 
-AI는 부팅 마지막 단계로 *반드시* `python3 50_tools/methodology.py dashboard` 를 호출하고 URL을 첫 보고에 포함한다 (`CLAUDE.md` §2 의무 규칙).
+AI는 부팅 마지막 단계로 *반드시* `python3 60_tools/methodology.py dashboard` 를 호출하고 URL을 첫 보고에 포함한다 (`CLAUDE.md` §2 의무 규칙).
 
 ## 세션 종료 자동화
 
@@ -40,7 +40,7 @@ AI는 부팅 마지막 단계로 *반드시* `python3 50_tools/methodology.py da
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "python3 50_tools/methodology.py wrap" }
+          { "type": "command", "command": "python3 60_tools/methodology.py wrap" }
         ]
       }
     ]
@@ -66,13 +66,13 @@ methodology wrap 호출해서 4개 라이브 파일 갱신 누락 점검해줘. 
 
 | 본 방법론 동작 | Claude Code 구현 |
 |---|---|
-| 백서 검색 | `Read 00_foundation/WHITEPAPER.md` |
+| 백서 검색 | `Read 10_foundation/WHITEPAPER.md` |
 | 폴더 컨벤션 확인 | 백서 §부록 C 참조 |
-| 대시보드 빌드·서빙 (URL 보고용) | `Bash python3 50_tools/methodology.py dashboard` (세션 부팅 의무 호출) |
-| 부팅·환경 검증 | `Bash python3 50_tools/methodology.py version` |
-| 새 프로젝트에 적용 | `Bash python3 50_tools/methodology.py init <path>` |
-| 기존 적용 프로젝트 갱신 | `Bash python3 50_tools/methodology.py sync --apply` |
-| 폴더 단위 탐색 | `Glob "10_guides/*.md"` 등 |
+| 대시보드 빌드·서빙 (URL 보고용) | `Bash python3 60_tools/methodology.py dashboard` (세션 부팅 의무 호출) |
+| 부팅·환경 검증 | `Bash python3 60_tools/methodology.py version` |
+| 새 프로젝트에 적용 | `Bash python3 60_tools/methodology.py init <path>` |
+| 기존 적용 프로젝트 갱신 | `Bash python3 60_tools/methodology.py sync --apply` |
+| 폴더 단위 탐색 | `Glob "20_guides/*.md"` 등 |
 
 ## 주의
 

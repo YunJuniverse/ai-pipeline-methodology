@@ -1,7 +1,7 @@
 # ONBOARDING — 15분 부팅
 
 > 어떤 AI 모델·어떤 PC·어떤 도구에서 시작했든 이 한 페이지만 따르면 된다.
-> 본 문서의 위상은 [00_foundation/WHITEPAPER.md](00_foundation/WHITEPAPER.md) §3-G1 (단일 진입점, 15분 첫 작업).
+> 본 문서의 위상은 [10_foundation/WHITEPAPER.md](10_foundation/WHITEPAPER.md) §3-G1 (단일 진입점, 15분 첫 작업).
 
 ---
 
@@ -18,7 +18,7 @@
 ## 2단계 — 환경 검증 (2분)
 
 ```bash
-python3 50_tools/methodology.py version
+python3 60_tools/methodology.py version
 # → "methodology vX.Y  (<commit>)  @ <repo root>" 출력되면 OK
 ```
 
@@ -29,10 +29,10 @@ python3 50_tools/methodology.py version
 `.ai/checkpoint.md` §"다음 사람에게"의 1번 항목을 수행한다.
 중간에 막히면:
 
-- 헌법(철학·원칙·게이트): [00_foundation/WHITEPAPER.md](00_foundation/WHITEPAPER.md)
+- 헌법(철학·원칙·게이트): [10_foundation/WHITEPAPER.md](10_foundation/WHITEPAPER.md)
 - AI 운영 규칙(Class A/B/C, 게이트 절차): [CLAUDE.md](CLAUDE.md)
 - 폴더 번호 의미: 백서 §부록 C
-- 도메인별 작성 지침: [10_guides/README.md](10_guides/README.md)
+- 도메인별 작성 지침: [20_guides/README.md](20_guides/README.md)
 
 ---
 
@@ -40,15 +40,15 @@ python3 50_tools/methodology.py version
 
 | 명령 | 시점 | 의미 |
 |---|---|---|
-| `python3 50_tools/methodology.py version` | 부팅 시 | 환경 작동 검증 |
-| `python3 50_tools/generate-dashboard.py --serve` | 작업 중 | 단일 페이지 가시성 (NOW/NEXT/LIBRARY/THINKTANK) |
+| `python3 60_tools/methodology.py version` | 부팅 시 | 환경 작동 검증 |
+| `python3 60_tools/generate-dashboard.py --serve` | 작업 중 | 단일 페이지 가시성 (NOW/NEXT/LIBRARY/THINKTANK) |
 | (수동) `.ai/checkpoint.md` 갱신 | 세션 종료 시 | 다음 사람을 위한 인계서 |
 
 ## 외워야 할 파일 3개
 
 | 파일 | 위상 |
 |---|---|
-| [00_foundation/WHITEPAPER.md](00_foundation/WHITEPAPER.md) | 헌법 — 충돌 시 가장 강함 |
+| [10_foundation/WHITEPAPER.md](10_foundation/WHITEPAPER.md) | 헌법 — 충돌 시 가장 강함 |
 | [CLAUDE.md](CLAUDE.md) | 운영 규칙 — Change Class·게이트·Workflow |
 | [.ai/checkpoint.md](.ai/checkpoint.md) | 살아있는 인계서 |
 
@@ -56,7 +56,7 @@ python3 50_tools/methodology.py version
 
 ## 자주 하는 실수 (출시 시점)
 
-- **루트에서 `python3 methodology.py` 실행** — 이전 구조의 잔재. 현재는 `50_tools/methodology.py`.
+- **루트에서 `python3 methodology.py` 실행** — 이전 구조의 잔재. 현재는 `60_tools/methodology.py`.
 - **`HANDOFF.md`를 루트에서 찾음** — 현재 상태의 단일 live handoff다. 150줄 이하를 유지한다.
 - **변경 직접 커밋** — `CLAUDE.md` §운영 규칙: 사용자 명시 승인 없이 커밋 금지.
 

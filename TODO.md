@@ -17,7 +17,7 @@
 - **owner**: AI
 - **acceptance criteria**:
   - [ ] pre-push hook 이 직전 commit 메시지가 `chore(methodology): sync` 로 시작하면 wrap --strict 면제 (manifest-check 는 유지)
-  - [ ] 또는 wrap 에 `--allow-sync-only` — diff 가 50_tools/ + .methodology-version + .github/workflows/methodology-* + .ai/adapters/ 만이면 통과
+  - [ ] 또는 wrap 에 `--allow-sync-only` — diff 가 60_tools/ + .methodology-version + .github/workflows/methodology-* + .ai/adapters/ 만이면 통과
   - [ ] 적용 프로젝트에서 sync commit push 가 --no-verify 없이 통과하는지 검증
 - **notes**: 2026-05-13 fix 전파 중 발견 (F-005). hooks install 한 적용 프로젝트는 방법론 sync 마다 --no-verify 필요 — 불편 + 우회 습관화 위험.
 
@@ -39,7 +39,7 @@
 - **owner**: AI → Human 머지
 - **acceptance criteria**:
   - [ ] N≥4 목격 확인 (meth-015 F-001, meth-015 F-003, dashboard-port-conflict-fix F-003, multi-dashboard F-005)
-  - [ ] `60_meta/catalog/MC-002_*.md` 활성 승급 — "본 저장소 CLI 변경 시 적용 프로젝트는 *다음 sync 전까지* 옛 동작. fix 가 시급하면 본 저장소 절대경로 CLI 직접 호출 (`python3 /path/to/methodology/50_tools/methodology.py <cmd> --path <project>`)"
+  - [ ] `70_meta/catalog/MC-002_*.md` 활성 승급 — "본 저장소 CLI 변경 시 적용 프로젝트는 *다음 sync 전까지* 옛 동작. fix 가 시급하면 본 저장소 절대경로 CLI 직접 호출 (`python3 /path/to/methodology/60_tools/methodology.py <cmd> --path <project>`)"
   - [ ] 솔루션 후보: methodology 명령에 `--use-upstream` 플래그 (본 저장소 CLI 강제 사용) 또는 적용 프로젝트가 본 저장소 CLI 를 symlink
 - **notes**: dashboard 포트 충돌 fix 도 같은 패턴 — 3개 적용 프로젝트가 옛 dashboard 코드라 fix 못 받음.
 
@@ -49,10 +49,10 @@
 - **change-class**: B (Catalog 활성 승급 — PR rationale/impact/rollback 필수)
 - **owner**: AI → Human 머지
 - **acceptance criteria**:
-  - [ ] `60_meta/catalog/_pending/MP-003_*.md` 신설 또는 즉시 `60_meta/catalog/MC-001_*.md` 활성 승급 (N≥2 충족)
+  - [ ] `70_meta/catalog/_pending/MP-003_*.md` 신설 또는 즉시 `70_meta/catalog/MC-001_*.md` 활성 승급 (N≥2 충족)
   - [ ] 솔루션: "방법론 sync 시 *명시 add 패턴* — `git add -u` + 신규 폴더 명시. `git add -A` 회피."
   - [ ] 다음 sync 자동화 후보로 ship/sync 흐름에 반영
-- **notes**: 본 마찰 *재발*은 자가발전 루프의 진짜 첫 회전. 60_meta/observations/2026-05-12_meth-015-propagation.md F-003 의 repeat_of: F-004(2026-05-12_v3.1-to-v3.2-migration). 시스템이 학습한 결과를 *코드/문서로* 박는 단계.
+- **notes**: 본 마찰 *재발*은 자가발전 루프의 진짜 첫 회전. 70_meta/observations/2026-05-12_meth-015-propagation.md F-003 의 repeat_of: F-004(2026-05-12_v3.1-to-v3.2-migration). 시스템이 학습한 결과를 *코드/문서로* 박는 단계.
 
 ### METH-018
 - **title**: 사용자 환경에 hooks 설치 + ship 첫 일상 사용 검증
@@ -76,7 +76,7 @@
 - **notes**: 가이드 위치 `.ai/adapters/claude.md`. 본 항목은 *사용자 설정 변경*이라 AI가 직접 적용하지 않음.
 
 ### METH-013
-- **title**: 메타-방법론 격리(`60_meta/`)의 ADR 후속화 — RFC-001 → ADR-002
+- **title**: 메타-방법론 격리(`70_meta/`)의 ADR 후속화 — RFC-001 → ADR-002
 - **mode**: planning-only
 - **change-class**: B (구조 결정)
 - **owner**: Human + AI
@@ -95,7 +95,7 @@
 
 ## Done
 
-> 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `30_dev/snapshots/` 참조.
+> 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
 ### METH-015
@@ -104,7 +104,7 @@
 
 ### METH-012
 - **title**: 인계 시뮬레이션과 온보딩 검증
-- **notes**: Completed 2026-05-08. Added `30_dev/snapshots/transfer-drill-2026-05-08.md`.
+- **notes**: Completed 2026-05-08. Added `40_dev/snapshots/transfer-drill-2026-05-08.md`.
 
 ### METH-011
 - **title**: Dashboard L0~L4 패널 통합
