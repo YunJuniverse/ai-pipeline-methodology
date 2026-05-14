@@ -1306,12 +1306,41 @@ function initGraph(){
   const KIND_COLOR={meta:'oklch(0.78 0.05 75)',guides:'oklch(0.78 0.13 155)',planning:'oklch(0.74 0.17 25)',dev:'oklch(0.78 0.14 60)',resources:'oklch(0.75 0.11 240)',tools:'oklch(0.72 0.13 300)','root-doc':'oklch(0.78 0.05 75)','live-state':'oklch(0.78 0.10 75)',guide:'oklch(0.78 0.13 155)'};
   const catColors={};(graph.categories||[]).forEach(c=>catColors[c.id]=c.color||'#888');
   function nodeColor(n){return KIND_COLOR[n.kind]||KIND_COLOR[n.category]||catColors[n.category]||'oklch(0.60 0.02 75)';}
-  function nodePos(n){
-    if(n.x!=null&&n.y!=null)return{x:n.x*W,y:n.y*H};
-    const cats=['meta','guides','planning','dev','resources'];
-    const ci=cats.indexOf(n.category);
-    return{x:ci>=0?(ci+1)/(cats.length+1)*W:W/2,y:n.tier!=null?(n.tier+1)/8*H:H/2};
-  }
+  // Precompute positions: bucket by (category, tier), then spread within each bucket
+  const CATS=['meta','guides','planning','dev','resources'];
+  const posMap=new Map();
+  const bucketSizeMap=new Map(); // nodeId → bucket size
+  (function(){
+    const buckets=new Map();
+    nodes.forEach(n=>{
+      let bx,by;
+      if(n.x!=null&&n.y!=null){bx=n.x*W;by=n.y*H;}
+      else{const ci=CATS.indexOf(n.category);bx=ci>=0?(ci+1)/(CATS.length+1)*W:W/2;by=n.tier!=null?(n.tier+1)/8*H:H/2;}
+      const key=`${Math.round(bx)},${Math.round(by)}`;
+      if(!buckets.has(key))buckets.set(key,[]);
+      buckets.get(key).push({n,bx,by});
+    });
+    buckets.forEach(group=>{
+      const cnt=group.length;
+      group.forEach(({n,bx,by},i)=>{
+        let ox=0,oy=0;
+        if(cnt===1){ox=0;oy=0;}
+        else if(cnt<=3){ox=(i/(cnt-1)-0.5)*2*50;oy=0;}
+        else{
+          // 2-row grid: ceil(cnt/2) nodes in top row, rest in bottom
+          const cols=Math.ceil(cnt/2);
+          const row=Math.floor(i/cols),col=i%cols;
+          const rowCnt=row===0?cols:cnt-cols;
+          const gap=32; // px between node centres
+          ox=rowCnt>1?(col-(rowCnt-1)/2)*gap:0;
+          oy=row===0?-18:18;
+        }
+        posMap.set(n.id,{x:bx+ox,y:by+oy});
+        bucketSizeMap.set(n.id,cnt);
+      });
+    });
+  })();
+  function nodePos(n){return posMap.get(n.id)||{x:W/2,y:H/2};}
   let selId=nodes[0].id;
   function render(){
     svg.innerHTML=`<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-dim)"/></marker><marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/></marker></defs>`;
@@ -1336,13 +1365,18 @@ function initGraph(){
       const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
       c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',active?16:11);
       c.setAttribute('fill',active?color:'var(--surface-2)');c.setAttribute('stroke',color);c.setAttribute('stroke-width',active?3:1.5);
-      const label=n.label||n.id;
-      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tx.setAttribute('x',p.x);tx.setAttribute('y',p.y+28);tx.setAttribute('text-anchor','middle');
-      tx.setAttribute('font-family','var(--font-mono)');tx.setAttribute('font-size','9.5');
-      tx.setAttribute('fill',active?'var(--text)':'var(--text-dim)');
-      tx.textContent=label.length>20?label.slice(0,19)+'…':label;
-      g.appendChild(c);g.appendChild(tx);
+      // Show label only for selected node or singleton buckets (avoids text-collision in dense clusters)
+      const showLabel=active||(bucketSizeMap.get(n.id)||1)===1;
+      if(showLabel){
+        const label=n.label||n.id;
+        const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+        tx.setAttribute('x',p.x);tx.setAttribute('y',p.y+(active?28:24));tx.setAttribute('text-anchor','middle');
+        tx.setAttribute('font-family','var(--font-mono)');tx.setAttribute('font-size','9');
+        tx.setAttribute('fill',active?'var(--text)':'var(--text-dim)');
+        tx.textContent=label.length>16?label.slice(0,15)+'…':label;
+        g.appendChild(tx);
+      }
+      g.appendChild(c);
       g.onclick=()=>{selId=n.id;render();updateDetail(n);};
       svg.appendChild(g);
     });
