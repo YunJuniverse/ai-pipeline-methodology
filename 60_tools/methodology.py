@@ -88,6 +88,8 @@ MANIFEST = {
         "10_foundation/HOW_TO_APPLY.md",
         "10_foundation/KICKOFF_PROMPT.md",
         "10_foundation/DIAGRAM.md",
+        "10_foundation/USER_GUIDE.md",
+        "60_tools/commands.json",
         ".ai/schema",
         ".ai/adapters",
         "ONBOARDING.md",

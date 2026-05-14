@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: `methodology export` CLI — 외주 인계 자동화. 제외 목록 3축(DIRS/FILES/BASENAMES) + sensitive 차단 + 결과 검증. icons/gamblescan/talmocom 모두 90%+ 노이즈 제거 dry-run 통과.
+- **Working on**: USER_GUIDE.md + commands.json + dashboard Commands 카드 — 인간 사용자 워크플로 단일 매뉴얼 + 자주 사용 명령 5 카테고리 × 23개 + 클릭 클립보드 복사 UX.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,7 +32,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-05-14: **`methodology export` CLI** — 외주 인계용 코드 추출. 제외 목록 3축(NN_ 방법론 폴더 + _start/.ai/.claude/.codex + 빌드 산출물 node_modules/.next/dist 등 + .DS_Store 같은 OS 캐시). sensitive(.env/credentials) 기본 차단, --allow-sensitive 명시 우회. dry-run + 결과 검증(방법론 흔적 잔존 0). icons 467 / gamblescan 1,459 / talmocom 487 파일 (90%+ 노이즈 제거). CLAUDE/AGENTS managed 에 외주 인계 워크플로 명문화.
+- 2026-05-14: **USER_GUIDE.md + commands.json + Commands 카드** — 인간 워크플로 11섹션 매뉴얼 (시작·매일·brief·작업·종료·인계·명령·Class·문제해결·다이어그램·참조), commands.json 5 카테고리 × 23명령 (boot/end/ops/observe/export), dashboard Overview 탭 최상단 Commands 카드 — 카테고리 탭 + 클릭 클립보드 복사. MANIFEST shared 에 USER_GUIDE/commands.json 추가.
+- 2026-05-14: `methodology export` CLI — 외주 인계용 코드 추출. 제외 목록 3축(NN_ 방법론 폴더 + _start/.ai/.claude/.codex + 빌드 산출물 node_modules/.next/dist 등 + .DS_Store 같은 OS 캐시). sensitive(.env/credentials) 기본 차단, --allow-sensitive 명시 우회. dry-run + 결과 검증(방법론 흔적 잔존 0). icons 467 / gamblescan 1,459 / talmocom 487 파일 (90%+ 노이즈 제거). CLAUDE/AGENTS managed 에 외주 인계 워크플로 명문화.
 - 2026-05-14: 방법론 v4.0 — 00_briefs/ 신설 + 모든 NN_ 폴더 +10 shift — 인간 raw 입력 채널 (리서치·아이디어·회의록) 명문화, AI 가 매 세션 자동 로드. migration script (7 폴더 rename + 121 파일 path replace, chr() 우회로 self-replace 회피), MANIFEST·.ai/context.json·CLAUDE.md/AGENTS.md managed·백서 §부록 C 일괄 갱신. init 격리 검증 ✅. METHODOLOGY_VERSION v4.0.
 - 2026-05-13: setup 두 파일 → _start/settings/ 이동 — 진입점(3개) 과 *1회 setup 스크립트* 시각적 분리. PowerShell/bash 내부 경로 보정 (`$root`/`$ROOT`). `.lnk` 는 _start/ 루트에 생성 유지 (사용자 진입점). build-launchers.py clean_legacy 에 옛 위치 자동 정리 추가.
 - 2026-05-13: dashboard.html → _start/.cache/ 격리 — 사용자가 *루트 dashboard.html 직접 더블클릭(file://)* 하는 휴먼에러 원천 차단. .cache/ 는 Finder 숨김 + .gitignore. cmd_dashboard 가 legacy 루트 dashboard.html 자동 제거.

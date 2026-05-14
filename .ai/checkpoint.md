@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-14 (methodology export 외주 인계 CLI)
+# Checkpoint — 2026-05-14 (USER_GUIDE + Commands 카드)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,20 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 methodology export — 외주 인계 자동화 (방금)**:
+**🆕 USER_GUIDE + commands.json + Commands 카드 (방금)**:
+- 사용자 요청: 사람 워크플로 기준 사용자 가이드 (시작부터 코드 인계까지) + 자주 사용 명령 미리 저장 + 대시보드 표시
+- 신설 파일:
+  · `10_foundation/USER_GUIDE.md` — 11 섹션 (시작·매일·brief·작업·종료·인계·명령·Class·문제해결·다이어그램·참조)
+  · `60_tools/commands.json` — 5 카테고리 × 23 명령:
+    boot (6) / end (5) / ops (5) / observe (4) / export (5)
+- dashboard 갱신:
+  · assemble() 에 commands.json 자동 로드
+  · Overview 탭 최상단 *Commands 카드* — 카테고리 탭 + 명령 클릭 → 클립보드 복사 + 2.5s toast
+  · USER_GUIDE.md 링크 카드 헤더에 명시
+- MANIFEST shared 에 USER_GUIDE + commands.json 추가 → 적용 프로젝트 자동 전파
+- 검증: HTML 마크업 9건 매칭, "commands" 데이터 JSON 포함 ✅
+
+**methodology export — 외주 인계 자동화 (이전 차례)**:
 - 사용자 통증: 외주 인계 시 방법론·메타·브리프 자산이 코드와 섞임 → 수동 정리 + 기밀 유출 위험
 - 옵션 검토: A/B (코드를 `app/` 하위로) — Next.js 충돌 비용 큼 / D (방법론을 `.methodology/` 로) — 자동 로드 깨짐 → **옵션 C (export CLI)** 채택
 - `cmd_export`: source walk + 제외 목록(DIRS/FILES/BASENAMES) + sensitive 차단 + 결과 검증

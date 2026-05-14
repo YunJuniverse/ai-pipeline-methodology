@@ -393,11 +393,21 @@ def assemble(root: Path) -> dict[str, Any]:
     except Exception:
         pass
 
+    # 자주 사용 명령 메타데이터 (Commands 카드용)
+    commands_data: dict = {}
+    cmds_path = root / "60_tools" / "commands.json"
+    if cmds_path.exists():
+        try:
+            commands_data = json.loads(cmds_path.read_text(encoding="utf-8"))
+        except Exception:
+            commands_data = {}
+
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "root": str(root),
         "git_branch": git_branch,
         "git_commit": git_commit,
+        "commands": commands_data,
         "graph": graph,
         "kanban": kanban,
         "sprints": sprints_json,
@@ -672,6 +682,16 @@ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
       <div id="ov-file-tabs" class="ov-file-tabs"></div>
     </div>
     <div id="ov-file-content" class="content-body"></div>
+  </div>
+
+  <div class="card" id="commands-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <h2 style="margin:0">Commands <span style="font-size:11px;font-weight:normal;color:var(--muted)">(클릭으로 클립보드 복사)</span></h2>
+      <a href="10_foundation/USER_GUIDE.md" target="_blank" style="font-size:12px;color:#22d3ee;text-decoration:none">📖 USER_GUIDE.md</a>
+    </div>
+    <div id="commands-tabs" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px"></div>
+    <div id="commands-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div id="commands-toast" style="font-size:12px;color:#22d3ee;margin-top:8px;min-height:1em"></div>
   </div>
 
   <div class="card" id="dashboards-card">
@@ -1683,6 +1703,65 @@ document.getElementById('dev-refresh').onclick = devRefresh;
 // 초기 + 주기적 갱신 (5초)
 devRefresh();
 setInterval(devRefresh, 5000);
+
+// ── Commands 카드 (commands.json 기반) ───────────────────────────
+(function setupCommands() {
+  const cmdData = DATA.commands;
+  if (!cmdData || !cmdData.categories) return;
+  const tabsEl = document.getElementById('commands-tabs');
+  const listEl = document.getElementById('commands-list');
+  const toastEl = document.getElementById('commands-toast');
+
+  function renderTab(cat, active) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = (cat.icon || '') + ' ' + cat.label;
+    b.dataset.catId = cat.id;
+    b.style.cssText = 'background:' + (active ? '#0e7490' : 'var(--panel2)') + ';color:#fff;border:1px solid var(--line);padding:4px 10px;border-radius:14px;cursor:pointer;font-size:12px';
+    b.onclick = () => render(cat.id);
+    return b;
+  }
+
+  function renderCommands(cat) {
+    listEl.innerHTML = '';
+    for (const c of (cat.commands || [])) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;padding:8px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;cursor:pointer';
+      row.onclick = () => {
+        navigator.clipboard.writeText(c.command).then(() => {
+          toastEl.textContent = '✓ 복사됨: ' + c.command;
+          setTimeout(() => { toastEl.textContent = ''; }, 2500);
+        }, () => {
+          toastEl.textContent = '❌ 복사 실패 (브라우저 권한)';
+        });
+      };
+      const label = document.createElement('div');
+      label.style.cssText = 'flex:1;min-width:0';
+      label.innerHTML = '<div style="font-weight:600;font-size:13px">' + c.label + '</div>' +
+        '<div style="font-family:monospace;font-size:11px;color:#22d3ee;margin-top:2px;word-break:break-all">' + c.command + '</div>' +
+        (c.description ? '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + c.description + '</div>' : '');
+      const copy = document.createElement('span');
+      copy.style.cssText = 'font-size:10px;color:var(--muted);align-self:center;flex-shrink:0';
+      copy.textContent = '📋';
+      row.appendChild(label);
+      row.appendChild(copy);
+      listEl.appendChild(row);
+    }
+  }
+
+  function render(activeId) {
+    tabsEl.innerHTML = '';
+    let activeCat = cmdData.categories[0];
+    for (const cat of cmdData.categories) {
+      const isActive = cat.id === activeId;
+      if (isActive) activeCat = cat;
+      tabsEl.appendChild(renderTab(cat, isActive));
+    }
+    renderCommands(activeCat);
+  }
+
+  render(cmdData.categories[0].id);
+})();
 
 // ── Local Dashboards 패널 ─────────────────────────────────────────
 const dashApi = {
