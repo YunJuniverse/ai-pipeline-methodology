@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "f6b3487f4323e42cba88fadaab925853be5a72d4",
-  "last_validated_at": null,
+  "last_validated_commit": "e811addf0c18717b29ef9b379dbafb057e2664dd",
+  "last_validated_at": "2026-05-14T16:10:22Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "29863eaaf4e226cfee0a72ce5f72e511381ec6923a30ecd13e56b9c5a7108739"
+      "sha256": "338f03e4684d67e3e852d880d8ee646e911a2ad6e2998bda52808dfd54f05980"
     },
     "TODO.md": {
-      "sha256": "d623604daccdfe538c3a44b463717812e38ba157f7fc586fe6a7ad781de55612"
+      "sha256": "0aed62aeb42382e151e7d3a27e27bc1cec257cb9ba28571293e5ce665162ec81"
     },
     ".ai/checkpoint.md": {
-      "sha256": "eec9aa570af54ba46f6553fea36ace8b77cb76b240f30bc622488f4fe165d080"
+      "sha256": "342635e12764dcd37839a8edc2d6a27aaf3d75aa53aa3eddcf0bc9f40f660a91"
     }
   },
   "observations": {
@@ -34,6 +34,8 @@
       "70_meta/observations/2026-05-14_setup-to-settings-folder.md",
       "70_meta/observations/2026-05-14_user-guide-and-commands.md",
       "70_meta/observations/2026-05-14_v4-briefs-and-shift.md",
+      "70_meta/observations/2026-05-14_wrap-content-hash-validation.md",
+      "70_meta/observations/2026-05-14_wrap-state-commit-pre-step.md",
       "70_meta/observations/README.md"
     ]
   }

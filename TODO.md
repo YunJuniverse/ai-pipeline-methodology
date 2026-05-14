@@ -100,7 +100,7 @@
 
 ### METH-023
 - **title**: `wrap` 콘텐츠 해시 검증 — 동일 날짜 다중 ship 오탐 차단
-- **notes**: Completed 2026-05-15. mtime-only → sha256 콘텐츠 해시. `.ai/wrap-state.json` baseline + 부트스트랩 + ship push 성공 시 자동 갱신. `touch` 만으로는 통과 못 함. 원인: S-007/S-008/S-009 동일 날짜 ship 시 옛 wrap 이 옛 콘텐츠를 *오늘 mtime* 만으로 통과시켜 다음 세션이 누락 작업을 발견 — root cause 차단.
+- **notes**: Completed 2026-05-15. mtime-only → sha256 콘텐츠 해시. `.ai/wrap-state.json` baseline + 부트스트랩 + ship commit 직전 wrap-state 동기화 (push 후 갱신은 clone/pull 후 wrap 오탐 유발 → commit 직전으로 이동). `touch` 만으로는 통과 못 함. 원인: S-007/S-008/S-009 동일 날짜 ship 시 옛 wrap 이 옛 콘텐츠를 *오늘 mtime* 만으로 통과시켜 다음 세션이 누락 작업을 발견 — root cause 차단.
 
 ### METH-015
 - **title**: 적용 프로젝트 3개에 applied-ci/auto-merge 워크플로 + 신규 CLI 자동 전파

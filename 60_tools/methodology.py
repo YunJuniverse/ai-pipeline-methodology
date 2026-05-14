@@ -1271,6 +1271,14 @@ def cmd_ship(args: argparse.Namespace) -> int:
         return 0
 
     info("ship: 6/7 — commit")
+    # commit 직전에 wrap-state.json 을 *현재 라이브 파일 상태* 로 재생성.
+    # 이렇게 해야 wrap-state 와 라이브 파일이 동일 commit 에 패키징되어
+    # 새 clone/pull 후의 wrap 검증이 일관됨 (sha matches → 다음 ship 은 *진짜
+    # 변경*만 통과).
+    try:
+        commit_wrap_state(target)
+    except Exception as e:
+        warn(f"wrap-state 사전 갱신 실패: {e}")
     if not args.no_add_all:
         rc = subprocess.call(["git", "-C", str(target), "add", "-A"])
         if rc != 0:
@@ -1305,12 +1313,6 @@ def cmd_ship(args: argparse.Namespace) -> int:
     if rc != 0:
         err(f"push 실패 (branch: {branch})")
         return 1
-    # push 성공 → wrap-state 를 새 baseline 으로 저장 (다음 ship 의 wrap 가
-    # 이 상태를 기준으로 콘텐츠 변경 여부를 검증).
-    try:
-        commit_wrap_state(target)
-    except Exception as e:
-        warn(f"wrap-state 저장 실패 (push 는 성공): {e}")
     ok(f"ship 완료. branch: {branch}")
     return 0
 
@@ -1982,7 +1984,7 @@ def cmd_wrap(args: argparse.Namespace) -> int:
     if missing == 0:
         ok(
             "4/4 라이브 파일 콘텐츠 갱신 확인됨. "
-            "ship 의 push 성공 시 wrap-state 가 새 baseline 으로 저장됩니다."
+            "ship 의 commit 직전 wrap-state 가 새 baseline 으로 저장됩니다."
         )
         return 0
     else:
