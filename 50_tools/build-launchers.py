@@ -10,9 +10,10 @@
   ├── in-spire (mac).app/        ← macOS 더블클릭 진입점
   ├── in-spire (windows).bat     ← Windows 직접 실행
   ├── in-spire (linux).sh        ← Linux 실행
-  ├── setup-windows.ps1          ← Windows 1회 (.lnk 생성)
-  ├── setup-linux.sh             ← Linux 1회 (.desktop 경로 갱신)
   ├── README.md                  ← 사용 안내
+  ├── settings/                  ← OS 1회 setup 스크립트
+  │   ├── setup-windows.ps1      ← .lnk 자동 생성
+  │   └── setup-linux.sh         ← .desktop 절대경로 치환
   └── assets/                    ← 아이콘·메타·원본
       ├── icons/
       │   ├── in-spire-mac.png         (1024×1024)
@@ -182,27 +183,33 @@ def build_windows(start_dir: Path) -> None:
     (start_dir / NAME_BAT).write_text(bat, encoding="utf-8")
     ok(f"Windows: {NAME_BAT}")
 
-    # setup-windows.ps1 — .lnk 자동 생성 (assets/in-spire.ico 참조)
+    # setup-windows.ps1 — settings/ 안에서 실행, .lnk 는 _start/ 루트에 생성
+    settings = start_dir / "settings"
+    settings.mkdir(exist_ok=True)
     ps1 = textwrap.dedent(r"""
         # setup-windows.ps1 — in-spire (windows).lnk 바로가기 자동 생성 (아이콘 임베드)
+        # 위치: _start/settings/setup-windows.ps1
         # 사용자 1회 실행:
-        #   1. _start 폴더에서 우클릭 → PowerShell 에서 실행
+        #   1. settings 폴더에서 우클릭 → PowerShell 에서 실행
         #   2. 또는: powershell -ExecutionPolicy Bypass -File .\setup-windows.ps1
+        #
+        # 결과: _start/in-spire (windows).lnk (부모 디렉터리에 생성)
 
-        $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-        $batPath = Join-Path $here "in-spire (windows).bat"
-        $icoPath = Join-Path $here "assets\in-spire.ico"
-        $lnkPath = Join-Path $here "in-spire (windows).lnk"
+        $here = Split-Path -Parent $MyInvocation.MyCommand.Path       # _start/settings/
+        $root = Split-Path -Parent $here                                # _start/
+        $batPath = Join-Path $root "in-spire (windows).bat"
+        $icoPath = Join-Path $root "assets\in-spire.ico"
+        $lnkPath = Join-Path $root "in-spire (windows).lnk"
 
         if (-not (Test-Path $batPath)) {
-            Write-Host "[err] in-spire (windows).bat not found in $here" -ForegroundColor Red
+            Write-Host "[err] in-spire (windows).bat not found in $root" -ForegroundColor Red
             exit 1
         }
 
         $shell = New-Object -ComObject WScript.Shell
         $lnk = $shell.CreateShortcut($lnkPath)
         $lnk.TargetPath = $batPath
-        $lnk.WorkingDirectory = $here
+        $lnk.WorkingDirectory = $root
         if (Test-Path $icoPath) {
             $lnk.IconLocation = "$icoPath,0"
         }
@@ -210,10 +217,10 @@ def build_windows(start_dir: Path) -> None:
         $lnk.Save()
 
         Write-Host "[ok] Created 'in-spire (windows).lnk' with icon at $lnkPath" -ForegroundColor Green
-        Write-Host "Double-click the .lnk to launch the dashboard."
+        Write-Host "Double-click the .lnk in _start/ to launch the dashboard."
     """).strip() + "\n"
-    (start_dir / "setup-windows.ps1").write_text(ps1, encoding="utf-8")
-    ok("Windows setup: setup-windows.ps1")
+    (settings / "setup-windows.ps1").write_text(ps1, encoding="utf-8")
+    ok("Windows setup: settings/setup-windows.ps1")
 
 
 def build_linux(start_dir: Path, src_png_linux: Path, assets_dir: Path) -> None:
@@ -256,18 +263,22 @@ def build_linux(start_dir: Path, src_png_linux: Path, assets_dir: Path) -> None:
     (assets_dir / "in-spire.desktop").write_text(desktop, encoding="utf-8")
     ok("Linux .desktop template: assets/in-spire.desktop")
 
-    # setup-linux.sh — Exec/Icon 절대경로 자동 갱신
+    # setup-linux.sh — settings/ 안에서 실행, 부모(_start) 의 .sh / assets 의 .desktop 참조
+    settings_dir = start_dir / "settings"
+    settings_dir.mkdir(exist_ok=True)
     setup = textwrap.dedent("""\
         #!/bin/bash
-        # setup-linux.sh — in-spire.desktop 의 Exec/Icon 을 현재 절대경로로 갱신.
+        # setup-linux.sh — _start/assets/in-spire.desktop 의 Exec/Icon 을 현재 절대경로로 갱신.
+        # 위치: _start/settings/setup-linux.sh
         # 사용자 1회 실행:
-        #   bash setup-linux.sh
-        # 그 후 assets/in-spire.desktop 을 ~/.local/share/applications/ 에 복사.
+        #   bash _start/settings/setup-linux.sh
+        # 그 후 _start/assets/in-spire.desktop 을 ~/.local/share/applications/ 에 복사.
 
-        HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-        EXEC_PATH="$HERE/in-spire (linux).sh"
-        ICON_PATH="$HERE/assets/icons/in-spire-256-linux.png"
-        DESKTOP_FILE="$HERE/assets/in-spire.desktop"
+        HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # _start/settings/
+        ROOT="$(dirname "$HERE")"                              # _start/
+        EXEC_PATH="$ROOT/in-spire (linux).sh"
+        ICON_PATH="$ROOT/assets/icons/in-spire-256-linux.png"
+        DESKTOP_FILE="$ROOT/assets/in-spire.desktop"
 
         if [ ! -f "$DESKTOP_FILE" ]; then
           echo "[err] $DESKTOP_FILE not found"
@@ -286,10 +297,10 @@ def build_linux(start_dir: Path, src_png_linux: Path, assets_dir: Path) -> None:
         echo "To register in app menu:"
         echo "  cp \\"$DESKTOP_FILE\\" ~/.local/share/applications/"
     """)
-    setup_path = start_dir / "setup-linux.sh"
+    setup_path = settings_dir / "setup-linux.sh"
     setup_path.write_text(setup, encoding="utf-8")
     setup_path.chmod(0o755)
-    ok("Linux setup: setup-linux.sh")
+    ok("Linux setup: settings/setup-linux.sh")
 
 
 def write_start_readme(start_dir: Path) -> None:
@@ -314,12 +325,12 @@ def write_start_readme(start_dir: Path) -> None:
         - 또는 시스템 설정 → 보안 및 개인정보 → *"그래도 열기"*
 
         ### Windows
-        1. `setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
+        1. `settings/setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
         2. `in-spire (windows).lnk` (아이콘 박힌 바로가기) 자동 생성
         3. 이후: `.lnk` 또는 `.bat` 더블클릭
 
         ### Linux
-        1. `bash setup-linux.sh` 실행 (`.desktop` 의 절대경로 갱신)
+        1. `bash settings/setup-linux.sh` 실행 (`.desktop` 의 절대경로 갱신)
         2. 다음 중 선택:
            - `./in-spire (linux).sh` 직접 실행
            - `cp assets/in-spire.desktop ~/.local/share/applications/` (시스템 메뉴 등록)
@@ -351,8 +362,9 @@ def write_start_readme(start_dir: Path) -> None:
         ├── in-spire (mac).app/          ← macOS 더블클릭
         ├── in-spire (windows).bat       ← Windows 더블클릭
         ├── in-spire (linux).sh          ← Linux 실행
-        ├── setup-windows.ps1            ← Windows 1회 (.lnk 생성)
-        ├── setup-linux.sh               ← Linux 1회 (.desktop 경로)
+        ├── settings/                    ← 1회 setup 스크립트
+        │   ├── setup-windows.ps1        ← Windows .lnk 생성
+        │   └── setup-linux.sh           ← Linux .desktop 경로 치환
         ├── README.md                    ← 본 문서
         └── assets/                      ← 아이콘·메타·원본
             ├── icons/
@@ -382,7 +394,9 @@ def clean_legacy(start_dir: Path) -> None:
         "in-spire.sh",
         "in-spire.desktop",
         "in-spire.ico",
-        "icons",  # 옛 위치 (assets/icons 로 이동)
+        "icons",            # 옛 위치 (assets/icons 로 이동)
+        "setup-windows.ps1",  # 옛 위치 (settings/ 로 이동)
+        "setup-linux.sh",     # 옛 위치 (settings/ 로 이동)
     ]
     for item in legacy_items:
         p = start_dir / item

@@ -18,12 +18,12 @@
 - 또는 시스템 설정 → 보안 및 개인정보 → *"그래도 열기"*
 
 ### Windows
-1. `setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
+1. `settings/setup-windows.ps1` 우클릭 → *PowerShell 에서 실행*
 2. `in-spire (windows).lnk` (아이콘 박힌 바로가기) 자동 생성
 3. 이후: `.lnk` 또는 `.bat` 더블클릭
 
 ### Linux
-1. `bash setup-linux.sh` 실행 (`.desktop` 의 절대경로 갱신)
+1. `bash settings/setup-linux.sh` 실행 (`.desktop` 의 절대경로 갱신)
 2. 다음 중 선택:
    - `./in-spire (linux).sh` 직접 실행
    - `cp assets/in-spire.desktop ~/.local/share/applications/` (시스템 메뉴 등록)
@@ -55,8 +55,9 @@ _start/
 ├── in-spire (mac).app/          ← macOS 더블클릭
 ├── in-spire (windows).bat       ← Windows 더블클릭
 ├── in-spire (linux).sh          ← Linux 실행
-├── setup-windows.ps1            ← Windows 1회 (.lnk 생성)
-├── setup-linux.sh               ← Linux 1회 (.desktop 경로)
+├── settings/                    ← 1회 setup 스크립트
+│   ├── setup-windows.ps1        ← Windows .lnk 생성
+│   └── setup-linux.sh           ← Linux .desktop 경로 치환
 ├── README.md                    ← 본 문서
 └── assets/                      ← 아이콘·메타·원본
     ├── icons/

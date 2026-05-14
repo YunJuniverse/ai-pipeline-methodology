@@ -33,7 +33,7 @@
 - **notes**: 2026-05-13 dashboard fix 작업 중 발견 (F-004). 세션 resume 으로 자정 넘기면 관찰 파일이 어제 날짜라 wrap 이 못 찾음. 장시간 세션은 흔함.
 
 ### METH-020
-- **title**: "적용 프로젝트가 CLI fix 즉시 못 받음" 패턴 — MC-002 승급 후보 (N=4)
+- **title**: "적용 프로젝트가 CLI fix 즉시 못 받음" 패턴 — MC-002 승급 후보 (N=7+ 패턴 확정)
 - **mode**: planning-only
 - **change-class**: B (Catalog 활성 승급)
 - **owner**: AI → Human 머지

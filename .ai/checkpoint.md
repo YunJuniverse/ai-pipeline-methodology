@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-13 (dashboard.html → _start/.cache/ 격리)
+# Checkpoint — 2026-05-13 (setup → _start/settings/ 분리)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,18 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 dashboard.html → _start/.cache/ 격리 (방금)**:
+**🆕 setup → _start/settings/ 분리 (방금)**:
+- 사용자 요구: setup-windows.ps1 + setup-linux.sh 를 settings/ 하위 폴더에 모음
+- build_windows / build_linux: settings 디렉터리 mkdir + 거기에 setup 작성
+- 스크립트 내부 경로 보정:
+  · PowerShell: `$here = settings/`, `$root = parent`, $batPath = root/.bat, $lnkPath = root/.lnk
+  · bash: HERE=settings/, ROOT=parent, EXEC=ROOT/.sh, DESKTOP=ROOT/assets/.desktop
+- clean_legacy() 에 옛 위치 setup-*.{ps1,sh} 추가 (멱등)
+- README.md: settings/ 경로 명시
+- 빌드 검증: _start/{진입점 3 + README + assets/ + settings/ + .cache/} ✅
+- .app 더블클릭 시뮬 정상 (HTTP 200 size=438442)
+
+**dashboard.html → _start/.cache/ 격리 (이전 차례)**:
 - 사용자 통증: 루트의 dashboard.html 을 *직접 더블클릭* 하면 file:// 로 열려 fetch 차단 → 정적·반쪽 작동. 휴먼에러 우려.
 - 수정: cmd_dashboard 기본 out_path 를 _start/.cache/dashboard.html 로 변경
   · _start/ 미존재 환경 fallback: 루트 (legacy)
