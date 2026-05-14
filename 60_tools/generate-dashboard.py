@@ -441,1454 +441,1213 @@ def assemble(root: Path) -> dict[str, Any]:
 # ──────────────────────────────────── HTML rendering ───────────────────────────────────
 
 
-HTML_TEMPLATE = r"""<!doctype html>
+HTML_TEMPLATE = r"""
+<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>방법론 대시보드</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>in-spire · 방법론 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Noto+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <style>
 :root{
-  --bg:#0B0F1A; --panel:#111827; --panel2:#0F172A; --line:#1F2937;
-  --text:#E5E7EB; --muted:#9CA3AF; --accent:#60A5FA; --accent2:#34D399;
-  --warn:#F59E0B; --danger:#EF4444; --violet:#A78BFA; --cyan:#22D3EE;
+  --bg:        oklch(0.165 0.006 70);
+  --surface:   oklch(0.205 0.006 70);
+  --surface-2: oklch(0.235 0.006 70);
+  --hairline:  oklch(0.32  0.008 70);
+  --hairline-soft: oklch(0.27 0.006 70);
+  --text:      oklch(0.95  0.012 80);
+  --text-dim:  oklch(0.78  0.010 75);
+  --muted:     oklch(0.58  0.010 75);
+  --faint:     oklch(0.42  0.008 75);
+  --accent:    oklch(0.80  0.15  75);
+  --accent-ink:oklch(0.20  0.04  75);
+  --ok:        oklch(0.78  0.13  155);
+  --warn:      oklch(0.80  0.14  60);
+  --danger:    oklch(0.68  0.18  25);
+  --info:      oklch(0.75  0.11  240);
+  --violet:    oklch(0.72  0.13  300);
+  --font-display:"Noto Sans","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-ui:"Noto Sans","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-mono:"Noto Sans Mono",ui-monospace,Menlo,monospace;
+  --pad-section:56px; --pad-card:24px; --gap-card:16px;
 }
+[data-theme="paper"]{
+  --bg:oklch(0.96 0.008 85);--surface:oklch(0.99 0.006 85);--surface-2:oklch(0.93 0.008 85);
+  --hairline:oklch(0.80 0.010 80);--hairline-soft:oklch(0.88 0.008 80);
+  --text:oklch(0.20 0.012 70);--text-dim:oklch(0.35 0.010 70);
+  --muted:oklch(0.50 0.010 75);--faint:oklch(0.65 0.008 75);--accent-ink:oklch(0.98 0.01 85);
+}
+[data-theme="cool"]{
+  --bg:oklch(0.17 0.012 250);--surface:oklch(0.21 0.012 250);--surface-2:oklch(0.24 0.012 250);
+  --hairline:oklch(0.33 0.014 250);--hairline-soft:oklch(0.27 0.012 250);
+  --text:oklch(0.95 0.015 230);--text-dim:oklch(0.78 0.013 230);
+  --muted:oklch(0.58 0.012 230);--faint:oklch(0.42 0.012 230);
+}
+[data-accent="cyan"]{--accent:oklch(0.82 0.12 200);--accent-ink:oklch(0.20 0.04 200);}
+[data-accent="lime"]{--accent:oklch(0.86 0.18 130);--accent-ink:oklch(0.20 0.04 130);}
+[data-accent="rose"]{--accent:oklch(0.74 0.17 15);--accent-ink:oklch(0.98 0.02 15);}
+[data-density="compact"]{--pad-section:36px;--pad-card:16px;--gap-card:10px;}
+
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Pretendard","Noto Sans KR",sans-serif;
-  font-size:14px;line-height:1.55}
-header{display:flex;align-items:baseline;gap:16px;padding:16px 24px;border-bottom:1px solid var(--line);
-  position:sticky;top:0;background:rgba(11,15,26,.85);backdrop-filter:blur(8px);z-index:10}
-h1{font-size:18px;margin:0;font-weight:600;letter-spacing:-.01em}
-.muted{color:var(--muted)}
-.tabs{display:flex;gap:4px;padding:8px 24px;border-bottom:1px solid var(--line);background:var(--panel2);
-  position:sticky;top:53px;z-index:9}
-.tab{padding:8px 14px;border-radius:8px;cursor:pointer;color:var(--muted);user-select:none;font-weight:500}
-.tab:hover{background:var(--panel);color:var(--text)}
-.tab.active{background:var(--accent);color:#0B1220}
-.page{display:none;padding:24px}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;padding:0}
+
+.app{max-width:1480px;margin:0 auto;padding:0 40px 80px;}
+
+/* Masthead */
+.masthead{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding:48px 0 28px;border-bottom:1px solid var(--hairline);position:relative;}
+.mast-eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.mast-eyebrow .dot{width:6px;height:6px;background:var(--accent);display:inline-block;}
+.mast-eyebrow .sep{color:var(--faint)}
+.mast-title{font-family:var(--font-display);font-weight:800;font-size:64px;line-height:0.98;letter-spacing:-0.035em;margin:0;color:var(--text);}
+.mast-title em{color:var(--accent);font-weight:800;font-style:normal;}
+.mast-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:var(--font-mono);font-size:11px;color:var(--muted);}
+.mast-right .branch{color:var(--text);display:flex;align-items:center;gap:8px;border:1px solid var(--hairline);padding:6px 10px;}
+.mast-right .branch::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px color-mix(in oklch,var(--ok) 18%,transparent);}
+.mast-right .commit{letter-spacing:0.02em}
+.mast-right .generated{color:var(--faint)}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--hairline);position:sticky;top:0;background:color-mix(in oklch,var(--bg) 92%,transparent);backdrop-filter:blur(12px);z-index:50;}
+.tab{font-family:var(--font-ui);font-size:13px;font-weight:500;padding:18px 0 16px;margin-right:32px;color:var(--muted);letter-spacing:-0.005em;position:relative;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.tab .num{font-family:var(--font-mono);font-size:10px;color:var(--faint);font-weight:400;}
+.tab:hover{color:var(--text-dim)}
+.tab.active{color:var(--text)}
+.tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent);}
+
+/* Pages */
+.page{display:none;padding:36px 0;}
 .page.active{display:block}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
-.card h3{margin:0 0 6px;font-size:14px}
-.row{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
-.pill{padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--panel2)}
-.pill.A{color:#86EFAC;border-color:#14532D} .pill.B{color:#FCD34D;border-color:#78350F}
-.pill.C{color:#FCA5A5;border-color:#7F1D1D}
-.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.col{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:200px}
-.col h2{font-size:13px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;
-  display:flex;justify-content:space-between;align-items:center}
-.col h2 .count{background:var(--panel);padding:1px 8px;border-radius:999px;font-size:11px;color:var(--text)}
-.timeline-controls{display:flex;gap:8px;margin-bottom:16px}
-.btn{padding:6px 12px;border-radius:6px;background:var(--panel);border:1px solid var(--line);
-  color:var(--text);cursor:pointer;font-size:12px}
-.btn.active{background:var(--accent);color:#0B1220;border-color:var(--accent)}
-.timeline{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto}
-.timeline-grid{display:grid;gap:2px;min-width:max-content}
-.tcell{padding:6px 8px;font-size:11px;color:var(--muted);border-right:1px solid var(--line);min-width:80px;text-align:center}
-.tbar{height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;padding:0 10px;
-  color:#0B1220;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tbar.done{background:var(--accent2);opacity:.7}
-.tbar.planned{background:var(--violet)} .tbar.cancelled{background:var(--danger);opacity:.5}
-.tbar.active{background:var(--warn);color:#0B1220}
-.graph-layout{display:grid;grid-template-columns:1fr 320px;gap:12px}
-@media(max-width:900px){ .graph-layout{grid-template-columns:1fr} }
-#graph{width:100%;height:640px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
-.graph-detail{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;
-  max-height:640px;overflow-y:auto;font-size:13px}
-.graph-detail h4{margin:0 0 4px;font-size:15px;color:var(--text)}
-.graph-detail .kind-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
-  font-weight:600;color:#0B1220;margin-bottom:8px}
-.graph-detail code{background:var(--panel);padding:2px 6px;border-radius:4px;font-size:11px;color:#CBD5E1}
-.graph-detail .role{margin:8px 0;color:var(--text);line-height:1.6}
-.graph-detail .conn{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
-.graph-detail .conn h5{margin:0 0 6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.graph-detail .conn ul{margin:0;padding-left:16px}
-.graph-detail .conn li{margin-bottom:3px;color:var(--text)}
-.graph-detail .conn li .edge-kind{color:var(--muted);font-size:11px}
-.role-table{width:100%;border-collapse:collapse;font-size:12px}
-.role-table th,.role-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-.role-table th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;background:var(--panel2)}
-.role-table tr:hover td{background:var(--panel2)}
-.role-table .label{font-weight:600;color:var(--text);white-space:nowrap}
-.role-table .path{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#94A3B8}
-.role-table .role-cell{color:var(--text);max-width:520px}
-.node-circle{cursor:pointer;transition:stroke-width .15s}
-.node-circle:hover{stroke-width:4}
-.node-circle.selected{stroke:#FBBF24;stroke-width:4}
-.content-body{background:var(--panel2);border:1px solid var(--line);border-radius:8px;
-  padding:18px 22px;max-height:560px;overflow-y:auto;font-size:13px;line-height:1.7;color:#CBD5E1}
-.content-body h1{font-size:20px;color:#F1F5F9;margin:8px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-.content-body h2{font-size:16px;color:#E2E8F0;margin:18px 0 8px}
-.content-body h3{font-size:14px;color:#CBD5E1;margin:14px 0 6px}
-.content-body h4,.content-body h5{font-size:13px;color:#94A3B8;margin:10px 0 4px}
-.content-body p{margin:6px 0}
-.content-body ul,.content-body ol{margin:6px 0;padding-left:22px}
-.content-body li{margin:2px 0}
-.content-body code{background:#1E293B;color:#FCD34D;padding:1px 5px;border-radius:3px;font-size:12px}
-.content-body pre{background:#0B1220;border:1px solid var(--line);border-radius:6px;padding:10px;
-  overflow-x:auto;margin:8px 0}
-.content-body pre code{background:transparent;color:#CBD5E1;padding:0}
-.content-body table{border-collapse:collapse;margin:8px 0;font-size:12px;width:100%}
-.content-body th,.content-body td{border:1px solid var(--line);padding:5px 9px;text-align:left}
-.content-body th{background:var(--panel);color:#E5E7EB;font-weight:600}
-.content-body blockquote{border-left:3px solid var(--accent);padding:2px 12px;margin:8px 0;
-  color:#94A3B8;background:rgba(96,165,250,.06)}
-.content-body hr{border:none;border-top:1px solid var(--line);margin:14px 0}
-.content-body a{color:var(--accent);text-decoration:none}
-.content-body a:hover{text-decoration:underline}
-.content-dir-list{list-style:none;padding:0;margin:0}
-.content-dir-list li{padding:4px 8px;border-bottom:1px solid var(--line);font-family:ui-monospace,Menlo,monospace;font-size:12px}
-.content-dir-list li:last-child{border-bottom:none}
-.content-dir-list .dir-icon{color:#F59E0B;margin-right:6px}
-.content-dir-list .file-icon{color:#94A3B8;margin-right:6px}
-.content-dir-list .file-size{color:#64748B;font-size:11px;float:right}
-.mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;margin-top:12px}
-.mp-card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;
-  max-height:340px;overflow-y:auto}
-.mp-card h4{margin:0 0 10px;font-size:13px;color:var(--accent);font-weight:600;
-  padding-bottom:6px;border-bottom:1px solid var(--line)}
-.mp-card .mp-content{font-size:12px;line-height:1.65;color:#CBD5E1}
-.mp-card .mp-content p{margin:4px 0}
-.mp-card .mp-content ul,.mp-card .mp-content ol{padding-left:18px;margin:4px 0}
-.mp-card .mp-content table{border-collapse:collapse;font-size:11px;width:100%;margin:6px 0}
-.mp-card .mp-content th,.mp-card .mp-content td{border:1px solid var(--line);padding:3px 6px;text-align:left}
-.mp-card .mp-content th{background:var(--panel);color:#E5E7EB}
-.mp-card .mp-content code{background:var(--panel);color:#FCD34D;padding:1px 4px;border-radius:3px;font-size:11px}
-.mp-card .mp-content h2,.mp-card .mp-content h3{font-size:13px;color:#E5E7EB;margin:8px 0 4px}
-.mp-card.empty{opacity:.5}
-.mp-card.empty .mp-content::after{content:"(아직 내용 없음 — TODO)";color:#64748B;font-style:italic}
-.sprint-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
-.sprint-table th,.sprint-table td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
-.sprint-table th{background:var(--panel2);color:#94A3B8;font-weight:500;text-transform:uppercase;
-  letter-spacing:.04em;font-size:11px;white-space:nowrap}
-.sprint-table tr:hover td{background:var(--panel2)}
-.sprint-table .s-id{font-weight:600;color:var(--text);white-space:nowrap}
-.sprint-table .s-status{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;
-  display:inline-block;text-transform:uppercase}
-.sprint-table .s-status.planned{background:#A78BFA;color:#0B1220}
-.sprint-table .s-status.active{background:#F59E0B;color:#0B1220}
-.sprint-table .s-status.done{background:#34D399;color:#0B1220}
-.sprint-table .s-status.cancelled{background:#EF4444;color:#FFF}
-.sprint-table .s-goals{margin:0;padding:0;list-style:none}
-.sprint-table .s-goals li{font-size:11px;color:#CBD5E1;line-height:1.5}
-.sprint-table .s-goals li.done{color:#64748B;text-decoration:line-through}
-.sprint-table .s-goals li::before{content:"☐ ";color:#64748B}
-.sprint-table .s-goals li.done::before{content:"☑ ";color:#34D399}
 
-/* ─── 프로젝트 개요 ─── */
-.ov-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.ov-title-row h2{margin:0;font-size:22px;color:#F1F5F9}
-.ov-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;
-  background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
-.ov-badge.type-fullstack{background:#065F46;color:#A7F3D0;border-color:#047857}
-.ov-badge.type-planning-only{background:#1E40AF;color:#BFDBFE;border-color:#2563EB}
-.ov-badge.phase{background:#78350F;color:#FCD34D;border-color:#92400E}
-.ov-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:12px 0}
-.ov-stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
-.ov-stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.ov-stat .value{font-size:20px;font-weight:700;color:var(--text);margin-top:4px}
-.ov-stat .sub{font-size:11px;color:var(--muted);margin-top:2px}
-.ov-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:800px){.ov-row{grid-template-columns:1fr}}
-.ov-list{list-style:none;padding:0;margin:0}
-.ov-list li{padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;font-size:13px}
-.ov-list li:last-child{border-bottom:none}
-.ov-list .k{color:var(--muted);font-weight:500}
-.ov-list .v{color:var(--text);text-align:right;max-width:60%;word-break:break-word}
-.ov-list code{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:12px;color:#FCD34D}
-.ov-link{color:var(--accent);text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-size:12px}
-.ov-link:hover{text-decoration:underline}
-.ov-progress-bar{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:6px;display:flex}
-.ov-progress-bar > div{height:100%}
-.ov-progress-bar .done{background:#34D399}
-.ov-progress-bar .progress{background:#F59E0B}
-.ov-progress-bar .ready{background:#60A5FA}
-.ov-progress-bar .blocked{background:#EF4444}
-.ov-progress-bar .backlog{background:#475569}
-.ov-file-tabs{display:flex;gap:4px;flex-wrap:wrap}
-.ov-file-tab{padding:5px 11px;border-radius:6px;cursor:pointer;font-size:12px;
-  background:var(--panel2);border:1px solid var(--line);color:var(--muted);user-select:none}
-.ov-file-tab.active{background:var(--accent);color:#0B1220;border-color:var(--accent)}
-.ov-file-tab:hover{color:var(--text)}
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--hairline-soft);padding:var(--pad-card);}
+.card+.card{margin-top:var(--gap-card)}
+.card-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--hairline-soft);}
+.card-head h3{margin:0;font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.015em;color:var(--text);}
+.card-head h3 em{color:var(--accent);font-style:normal;font-weight:700;}
+.card-head .meta{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block;}
 
-/* ─── 가이드 백서 ─── */
-.paper-list{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.7}
-.paper-list li{margin:4px 0}
-.paper-list b{color:var(--text)}
-.paper-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
-.paper-table th,.paper-table td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
-.paper-table th{background:var(--panel2);color:#94A3B8;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-.paper-table td{color:#CBD5E1}
-.paper-table code{background:var(--panel2);color:#FCD34D;padding:1px 5px;border-radius:3px;font-size:11px}
-.cat-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
-.cat-dot.meta{background:#1E293B;border:1px solid #334155}
-.cat-dot.guides{background:#065F46}
-.cat-dot.planning{background:#7C2D12}
-.cat-dot.dev{background:#78350F}
-.cat-dot.resources{background:#1E40AF}
-#flow{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:20px}
-.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.guide-grid pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;
-  overflow:auto;max-height:520px;font-size:12px;color:#CBD5E1;white-space:pre-wrap;word-break:break-word}
-.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--muted)}
-.legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
-@media(max-width:1100px){ .kanban{grid-template-columns:1fr 1fr} .guide-grid{grid-template-columns:1fr} }
-@media(max-width:700px){ .kanban{grid-template-columns:1fr} }
+/* Hero */
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:0;border-bottom:1px solid var(--hairline);padding:36px 0 40px;}
+.hero-left{padding-right:48px;border-right:1px solid var(--hairline-soft);}
+.hero-right{padding-left:48px;display:flex;flex-direction:column;justify-content:center;gap:18px;}
+.hero h2{font-family:var(--font-display);font-weight:800;font-size:42px;line-height:1.04;letter-spacing:-0.03em;margin:8px 0 14px;}
+.hero h2 .ital{color:var(--accent);font-weight:800;}
+.hero-desc{color:var(--text-dim);font-weight:300;font-size:15px;line-height:1.6;max-width:54ch;}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+.badge{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--hairline);padding:5px 9px;color:var(--text-dim);}
+.badge.accent{border-color:var(--accent);color:var(--accent);}
+.badge.solid{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+
+/* Readout / stat row */
+.stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--hairline-soft);margin-top:28px;}
+.stat{padding:20px 22px;border-right:1px solid var(--hairline-soft);display:flex;flex-direction:column;gap:6px;}
+.stat:last-child{border-right:none;}
+.stat .l{font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.stat .n{font-family:var(--font-display);font-weight:700;font-size:36px;line-height:1;color:var(--text);letter-spacing:-0.035em;}
+.stat .s{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}
+
+/* Two-col rows */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-card);margin-top:var(--gap-card);}
+@media(max-width:1100px){.row2{grid-template-columns:1fr}}
+
+/* Key/value list */
+.kv{list-style:none;margin:0;padding:0;}
+.kv li{display:grid;grid-template-columns:160px 1fr;gap:18px;padding:11px 0;border-bottom:1px dashed var(--hairline-soft);font-size:13.5px;}
+.kv li:last-child{border-bottom:none;}
+.kv .k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);align-self:center;}
+.kv .v{color:var(--text);font-weight:400;}
+.kv .v code,.kv .v .mono{font-family:var(--font-mono);font-size:12.5px;color:var(--accent);background:transparent;padding:0;}
+
+/* Progress bar */
+.progress-wrap{margin-top:8px;}
+.progress-bar{display:flex;height:8px;background:var(--surface-2);border:1px solid var(--hairline-soft);}
+.progress-bar>div{height:100%;}
+.pb-done{background:var(--ok);}.pb-now{background:var(--accent);}.pb-next{background:var(--info);}.pb-block{background:var(--danger);}.pb-rest{background:var(--surface-2);}
+.progress-legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);}
+.progress-legend span{display:flex;align-items:center;gap:6px;}
+.progress-legend span::before{content:"";width:8px;height:8px;display:inline-block;background:var(--muted);}
+.progress-legend .pl-done::before{background:var(--ok);}.pl-now::before{background:var(--accent);}.pl-next::before{background:var(--info);}.pl-block::before{background:var(--danger);}.pl-back::before{background:var(--faint);}
+
+/* Mini bar */
+.mini-bar{height:6px;background:var(--surface-2);border:1px solid var(--hairline-soft);overflow:hidden;}
+.mini-bar>div{height:100%;background:var(--accent);}
+.mini-bar.done>div{background:var(--ok);}
+
+/* File viewer */
+.file-tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--hairline-soft);margin-bottom:18px;}
+.file-tab{font-family:var(--font-mono);font-size:11.5px;padding:10px 16px;border-right:1px solid var(--hairline-soft);color:var(--muted);cursor:pointer;letter-spacing:0.02em;}
+.file-tab:hover{color:var(--text-dim);background:color-mix(in oklch,var(--surface-2) 60%,transparent);}
+.file-tab.active{color:var(--text);background:var(--surface-2);}
+.file-tab .icon{color:var(--accent);margin-right:6px;}
+.file-body{font-family:var(--font-mono);font-size:12.5px;line-height:1.7;color:var(--text-dim);background:var(--surface-2);border:1px solid var(--hairline-soft);padding:24px 28px;max-height:520px;overflow:auto;font-weight:300;}
+.file-body .md-h1{display:block;font-family:var(--font-display);font-size:22px;color:var(--text);font-weight:800;margin:4px 0 16px;letter-spacing:-0.025em;padding-bottom:10px;border-bottom:1px solid var(--hairline-soft);}
+.file-body .md-h2{display:block;font-family:var(--font-display);font-size:16px;color:var(--text);font-weight:600;margin:20px 0 8px;letter-spacing:-0.01em;}
+.file-body .md-h3{display:block;color:var(--text);font-family:var(--font-ui);font-weight:600;font-size:12px;margin:16px 0 4px;letter-spacing:0.02em;text-transform:uppercase;}
+.file-body .md-li{display:list-item;margin-left:24px;}
+.file-body .md-code{color:var(--accent);}
+.file-body .md-hr{display:block;border-top:1px dashed var(--hairline);margin:18px 0;}
+.file-body .md-quote{display:block;padding:6px 14px;border-left:2px solid var(--accent);color:var(--text-dim);margin:6px 0;}
+
+/* Commands */
+.cmd-tabs{display:flex;gap:0;border-bottom:1px solid var(--hairline-soft);margin-bottom:14px;flex-wrap:wrap;}
+.cmd-cat{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.15em;text-transform:uppercase;padding:9px 14px;color:var(--muted);cursor:pointer;border-right:1px solid var(--hairline-soft);}
+.cmd-cat.active{color:var(--text);background:var(--surface-2);}
+.cmd-cat:hover{color:var(--text-dim);}
+.cmd-list{display:flex;flex-direction:column;}
+.cmd-item{display:grid;grid-template-columns:260px 1fr auto;gap:24px;align-items:center;padding:14px 0;border-bottom:1px dashed var(--hairline-soft);}
+.cmd-item:last-child{border-bottom:none;}
+.cmd-item .lbl{font-size:13.5px;color:var(--text);font-weight:500;}
+.cmd-item .desc{font-size:12.5px;color:var(--muted);font-weight:300;}
+.cmd-item .run{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);background:var(--surface-2);padding:6px 10px;border:1px solid var(--hairline-soft);white-space:nowrap;cursor:pointer;transition:all .15s;}
+.cmd-item .run:hover{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);}
+.cmd-item .run::before{content:"$ ";color:var(--accent);}
+.cmd-item .run:hover::before{color:var(--accent-ink);}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl thead th{text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:10px 16px 10px 0;border-bottom:1px solid var(--hairline);}
+.tbl tbody td{padding:14px 16px 14px 0;border-bottom:1px dashed var(--hairline-soft);vertical-align:middle;color:var(--text);}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover td{background:color-mix(in oklch,var(--surface-2) 50%,transparent);}
+.tbl .mono{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);}
+.tbl .port{color:var(--accent);font-family:var(--font-mono);font-weight:500;}
+.btn-row{display:flex;gap:6px;align-items:center;}
+.btn{font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border:1px solid var(--hairline);background:transparent;color:var(--text);cursor:pointer;transition:all .15s;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.btn-primary:hover{filter:brightness(1.08);color:var(--accent-ink);}
+.btn-danger{border-color:var(--hairline);color:var(--text-dim);}
+.btn-danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* Status dot */
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.dot.ok{background:var(--ok);box-shadow:0 0 0 3px color-mix(in oklch,var(--ok) 20%,transparent);}
+.dot.warn{background:var(--warn);}
+.dot.dim{background:var(--faint);}
+
+/* Kanban */
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--hairline-soft);border:1px solid var(--hairline-soft);}
+.k-col{background:var(--surface);padding:18px 16px;min-height:520px;}
+.k-col-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--hairline-soft);}
+.k-col-head .title{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text);}
+.k-col-head .count{font-family:var(--font-display);font-weight:700;font-size:22px;color:var(--accent);line-height:1;letter-spacing:-0.04em;}
+.k-col[data-col="now"] .count{color:var(--accent);}
+.k-col[data-col="next"] .count{color:var(--info);}
+.k-col[data-col="library"] .count{color:var(--ok);}
+.k-col[data-col="thinktank"] .count{color:var(--violet);}
+.k-col[data-col="blocked"] .count{color:var(--danger);}
+.k-card{background:var(--surface-2);border:1px solid var(--hairline-soft);padding:14px 14px 12px;margin-bottom:10px;cursor:pointer;}
+.k-card:hover{border-color:var(--accent);}
+.k-card .tag{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:6px;}
+.k-card .tag .id{color:var(--accent);}
+.k-card .title{font-size:13.5px;color:var(--text);line-height:1.4;margin-bottom:8px;font-weight:400;}
+.k-card .meta{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);display:flex;gap:10px;align-items:center;}
+.k-card .meta .sep{color:var(--faint);}
+.k-card .pri.a{color:var(--ok);}.k-card .pri.b{color:var(--warn);}.k-card .pri.c{color:var(--danger);}
+.k-col-head .collapse{font-family:var(--font-mono);font-size:14px;color:var(--muted);width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:1px solid var(--hairline-soft);cursor:pointer;line-height:1;}
+.k-col-head .collapse:hover{color:var(--accent);border-color:var(--accent);}
+.k-col.collapsed{min-height:auto;padding-bottom:12px;}
+.k-col.collapsed .k-card{display:none;}
+.k-col.collapsed .k-col-head{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.k-col-summary{display:none;margin-top:8px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);letter-spacing:0.05em;line-height:1.6;}
+.k-col.collapsed .k-col-summary{display:block;}
+
+/* Timeline / Gantt */
+.timeline-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.timeline-toolbar .seg{display:flex;border:1px solid var(--hairline);}
+.timeline-toolbar .seg button{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;padding:7px 14px;color:var(--muted);border-right:1px solid var(--hairline);}
+.timeline-toolbar .seg button:last-child{border-right:none;}
+.timeline-toolbar .seg button.active{background:var(--accent);color:var(--accent-ink);}
+.gantt{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid var(--hairline-soft);}
+.hcell{font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline);background:var(--surface-2);}
+.gantt-track{display:grid;position:relative;border-bottom:1px solid var(--hairline);background:var(--surface-2);}
+.tick{font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:12px 0 12px 8px;border-right:1px dashed var(--hairline-soft);}
+.tick:last-child{border-right:none;}
+.label{padding:18px 14px;border-bottom:1px dashed var(--hairline-soft);display:flex;flex-direction:column;gap:4px;cursor:pointer;}
+.label:hover,.lane:hover{background:color-mix(in oklch,var(--surface-2) 70%,transparent);}
+.label .id{font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);}
+.label .ttl{font-size:13px;color:var(--text);}
+.label .dt{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);}
+.lane{position:relative;border-bottom:1px dashed var(--hairline-soft);background:repeating-linear-gradient(to right,transparent 0,transparent calc(100%/12 - 1px),var(--hairline-soft) calc(100%/12 - 1px),var(--hairline-soft) calc(100%/12));cursor:pointer;min-height:66px;}
+.gantt-bar{position:absolute;top:50%;transform:translateY(-50%);height:30px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;gap:8px;padding:0 12px;font-size:12px;font-weight:500;border:1px solid color-mix(in oklch,var(--accent) 70%,black);overflow:hidden;min-width:0;}
+.gantt-bar>span:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gantt-bar.done{background:var(--ok);border-color:color-mix(in oklch,var(--ok) 70%,black);color:oklch(0.18 0.03 155);}
+.gantt-bar.planned{background:transparent;border:1px dashed var(--info);color:var(--info);}
+.gantt-bar.active{background:var(--accent);}
+.gantt-bar.cancelled{background:color-mix(in oklch,var(--danger) 40%,var(--surface-2));border-color:var(--danger);color:var(--text-dim);text-decoration:line-through;}
+.gantt-bar .perc{margin-left:auto;font-family:var(--font-mono);font-size:11px;opacity:.85;flex-shrink:0;}
+.now-line{position:absolute;top:0;bottom:0;width:1px;background:var(--accent);box-shadow:0 0 0 1px color-mix(in oklch,var(--accent) 30%,transparent);z-index:2;}
+.now-line::after{content:"NOW";position:absolute;top:-18px;left:-16px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.18em;color:var(--accent);}
+
+/* Graph */
+.graph-grid{display:grid;grid-template-columns:1fr 320px;gap:1px;background:var(--hairline-soft);border:1px solid var(--hairline-soft);}
+.graph-canvas{background:var(--surface);padding:24px;min-height:560px;position:relative;overflow:hidden;}
+.graph-detail{background:var(--surface);padding:24px;}
+.graph-detail .eyebrow{margin-bottom:8px;}
+.graph-detail h4{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-0.025em;margin:0 0 6px;color:var(--text);}
+.graph-detail .path{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-bottom:18px;}
+.graph-detail p{color:var(--text-dim);font-weight:300;font-size:13.5px;line-height:1.65;}
+.graph-detail .conn-block{margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline-soft);}
+.graph-detail .conn-block .eyebrow{margin-bottom:10px;}
+.graph-detail .conn-block ul{list-style:none;padding:0;margin:0;}
+.graph-detail .conn-block li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--hairline-soft);font-size:12.5px;}
+.graph-detail .conn-block li:last-child{border-bottom:none;}
+.graph-detail .conn-block li .ek{font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+.legend{display:flex;flex-wrap:wrap;gap:18px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;color:var(--text-dim);}
+.legend span{display:flex;align-items:center;gap:6px;text-transform:uppercase;}
+.legend .lg-dot{width:9px;height:9px;display:inline-block;border-radius:50%;}
+
+/* Section head */
+.section-head{margin-top:48px;display:flex;justify-content:space-between;align-items:end;margin-bottom:24px;}
+.section-head h2{font-family:var(--font-display);font-weight:800;font-size:32px;letter-spacing:-0.03em;margin:0;line-height:1;}
+.section-head h2 em{color:var(--accent);font-weight:800;font-style:normal;}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.divider{height:1px;background:var(--hairline);margin:48px 0 24px;position:relative;}
+.divider::after{content:"";position:absolute;left:0;top:-3px;width:32px;height:7px;background:var(--accent);}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;z-index:2000;background:color-mix(in oklch,black 55%,transparent);backdrop-filter:blur(3px);display:flex;animation:mo-fade .15s ease-out;}
+@keyframes mo-fade{from{opacity:0;}to{opacity:1;}}
+@keyframes mo-slide{from{transform:translateX(24px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.modal-overlay.side{justify-content:flex-end;}
+.modal{background:var(--surface);border:1px solid var(--hairline);display:flex;flex-direction:column;max-height:100vh;overflow:hidden;}
+.modal.side{width:560px;max-width:92vw;height:100vh;border-right:none;border-top:none;border-bottom:none;animation:mo-slide .22s ease-out;}
+.modal-head{padding:24px 28px 18px;border-bottom:1px solid var(--hairline-soft);display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-shrink:0;}
+.modal-head .eyebrow{margin-bottom:8px;}
+.modal-head h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-0.025em;color:var(--text);line-height:1.2;}
+.modal-close{width:32px;height:32px;border:1px solid var(--hairline);color:var(--text-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;line-height:1;}
+.modal-close:hover{border-color:var(--accent);color:var(--accent);}
+.modal-body{padding:24px 28px 28px;overflow:auto;flex:1;}
+.modal-body .section{margin-bottom:24px;}
+.modal-body .section:last-child{margin-bottom:0;}
+.modal-body .section .eyebrow{margin-bottom:10px;}
+.modal-foot{padding:16px 28px;border-top:1px solid var(--hairline-soft);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0;background:var(--surface-2);}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--hairline-soft);}
+.meta-grid .cell{padding:14px 18px;border-right:1px solid var(--hairline-soft);border-bottom:1px solid var(--hairline-soft);}
+.meta-grid .cell:nth-child(2n){border-right:none;}
+.meta-grid .cell:nth-last-child(-n+2){border-bottom:none;}
+.meta-grid .l{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);}
+.meta-grid .v{font-size:13.5px;color:var(--text);margin-top:4px;font-family:var(--font-mono);}
+.checklist{list-style:none;padding:0;margin:0;}
+.checklist li{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;padding:9px 0;border-bottom:1px dashed var(--hairline-soft);font-size:13.5px;}
+.checklist li:last-child{border-bottom:none;}
+.checklist li .box{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1.5px solid var(--hairline);margin-top:3px;color:var(--accent-ink);font-size:10px;}
+.checklist li.done .box{background:var(--ok);border-color:var(--ok);color:oklch(0.15 0.04 155);}
+.checklist li.done .t{color:var(--muted);text-decoration:line-through;}
+.checklist li .t{color:var(--text);line-height:1.5;}
+.rel-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;}
+.rel-list li{display:grid;grid-template-columns:80px 1fr auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--hairline-soft);font-size:13px;}
+.rel-list li:last-child{border-bottom:none;}
+.rel-list .rid{font-family:var(--font-mono);font-size:11px;color:var(--accent);}
+.rel-list .rttl{color:var(--text);}
+.rel-list .rpri{font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;color:var(--muted);}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;}
+.tag-row .tg{font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--hairline);padding:4px 8px;color:var(--text-dim);}
+.tag-row .tg.accent{border-color:var(--accent);color:var(--accent);}
+.tag-row .tg.ok{border-color:color-mix(in oklch,var(--ok) 60%,var(--hairline));color:var(--ok);}
+.tag-row .tg.warn{border-color:color-mix(in oklch,var(--warn) 60%,var(--hairline));color:var(--warn);}
+.tag-row .tg.danger{border-color:color-mix(in oklch,var(--danger) 60%,var(--hairline));color:var(--danger);}
+.modal-prose{color:var(--text-dim);font-weight:300;font-size:14px;line-height:1.6;}
+.modal-prose strong{color:var(--text);font-weight:600;}
+.modal-prose code{font-family:var(--font-mono);color:var(--accent);font-size:12.5px;}
+
+/* Responsive */
+@media(max-width:1100px){
+  .hero{grid-template-columns:1fr;}
+  .hero-left{padding-right:0;border-right:none;padding-bottom:32px;border-bottom:1px solid var(--hairline-soft);}
+  .hero-right{padding-left:0;padding-top:32px;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .kanban{grid-template-columns:repeat(2,1fr);}
+  .graph-grid{grid-template-columns:1fr;}
+}
+@media(max-width:680px){
+  .app{padding:0 20px 60px;}
+  .mast-title{font-size:44px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;}
+  .tab{flex-shrink:0;}
+  .kanban{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:1fr;}
+}
 </style>
 </head>
-<body>
-<header>
-  <h1>방법론 대시보드</h1>
-  <span class="muted" id="meta"></span>
-</header>
-<nav class="tabs" id="tabs">
-  <div class="tab active" data-page="overview">프로젝트 개요</div>
-  <div class="tab" data-page="guide">가이드 &amp; 플로우</div>
-  <div class="tab" data-page="graph">관계 그래프</div>
-  <div class="tab" data-page="timeline">타임라인</div>
-  <div class="tab" data-page="kanban">칸반보드</div>
-  <div class="tab" data-page="exec">통합 뷰</div>
-</nav>
+<body data-theme="warm" data-accent="amber" data-density="cozy">
+<div class="app">
 
-<section class="page active" id="page-overview">
-  <div class="card" id="ov-header">
-    <div class="ov-title-row">
-      <h2 id="ov-name">—</h2>
-      <span id="ov-type-badge" class="ov-badge">—</span>
-      <span id="ov-version-badge" class="ov-badge">—</span>
-      <span id="ov-phase-badge" class="ov-badge">—</span>
+  <!-- Masthead -->
+  <header class="masthead">
+    <div>
+      <div class="mast-eyebrow">
+        <span class="dot"></span>
+        <span id="mast-project-name">METHODOLOGY</span>
+        <span class="sep">·</span>
+        <span id="mast-phase">v3</span>
+        <span class="sep">·</span>
+        <span>EVIDENCE-DRIVEN AI DEVELOPMENT</span>
+      </div>
+      <h1 class="mast-title">in<em>-</em>spire</h1>
     </div>
-    <div id="ov-objective" class="muted" style="margin-top:6px;font-size:13px"></div>
-  </div>
+    <div class="mast-right">
+      <div class="branch" id="mast-branch"></div>
+      <div class="commit" id="mast-commit"></div>
+      <div class="generated" id="mast-generated"></div>
+    </div>
+  </header>
 
-  <div class="ov-stat-grid" id="ov-stats"></div>
+  <!-- Tabs -->
+  <nav class="tabs">
+    <div class="tab active" data-page="overview"><span class="num">01</span><span>프로젝트 개요</span></div>
+    <div class="tab" data-page="guide"><span class="num">02</span><span>가이드 · 백서</span></div>
+    <div class="tab" data-page="graph"><span class="num">03</span><span>관계 그래프</span></div>
+    <div class="tab" data-page="timeline"><span class="num">04</span><span>타임라인</span></div>
+    <div class="tab" data-page="kanban"><span class="num">05</span><span>칸반 보드</span></div>
+    <div class="tab" data-page="exec"><span class="num">06</span><span>통합 뷰</span></div>
+  </nav>
 
-  <div class="ov-row">
-    <div class="card">
-      <h3>스택 / 개발 정보</h3>
-      <div id="ov-stack"></div>
+  <!-- Page 01: Overview -->
+  <section class="page active" id="page-overview">
+    <section class="hero">
+      <div class="hero-left">
+        <span class="eyebrow">Project / <span id="hero-project-name">methodology</span></span>
+        <h2>Evidence-driven<br/><span class="ital">AI development</span></h2>
+        <p class="hero-desc" id="hero-objective"></p>
+        <div class="badge-row" id="hero-badges"></div>
+      </div>
+      <div class="hero-right">
+        <span class="eyebrow">Current sprint</span>
+        <div id="hero-sprint-content"><span style="color:var(--muted)">—</span></div>
+      </div>
+    </section>
+    <section class="stat-row" id="stat-row"></section>
+    <div class="row2" id="stack-progress-row"></div>
+    <div class="card" style="margin-top:var(--gap-card)">
+      <div class="card-head">
+        <h3>파일 <em>뷰어</em></h3>
+        <span class="meta">live state · meta files</span>
+      </div>
+      <div class="file-tabs" id="file-tabs"></div>
+      <div class="file-body" id="file-body"></div>
     </div>
-    <div class="card">
-      <h3>진행 상황</h3>
-      <div id="ov-progress"></div>
+    <div class="card" style="margin-top:var(--gap-card)">
+      <div class="card-head">
+        <h3>커맨드 <em>팔레트</em></h3>
+        <span class="meta">click to copy</span>
+      </div>
+      <div class="cmd-tabs" id="commands-tabs"></div>
+      <div class="cmd-list" id="commands-list"></div>
+      <div id="commands-toast" style="min-height:18px;margin-top:12px;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--accent)"></div>
     </div>
-  </div>
-
-  <div class="card">
-    <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:10px;flex-wrap:wrap">
-      <h3 style="margin:0">파일 보기</h3>
-      <div id="ov-file-tabs" class="ov-file-tabs"></div>
-    </div>
-    <div id="ov-file-content" class="content-body"></div>
-  </div>
-
-  <div class="card" id="commands-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <h2 style="margin:0">Commands <span style="font-size:11px;font-weight:normal;color:var(--muted)">(클릭으로 클립보드 복사)</span></h2>
-      <a href="10_foundation/USER_GUIDE.md" target="_blank" style="font-size:12px;color:#22d3ee;text-decoration:none">📖 USER_GUIDE.md</a>
-    </div>
-    <div id="commands-tabs" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px"></div>
-    <div id="commands-list" style="display:flex;flex-direction:column;gap:6px"></div>
-    <div id="commands-toast" style="font-size:12px;color:#22d3ee;margin-top:8px;min-height:1em"></div>
-  </div>
-
-  <div class="card" id="dashboards-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <h2 style="margin:0">Local Dashboards</h2>
-      <button id="dashboards-refresh" type="button">Refresh</button>
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
-      현재 컴퓨터에서 떠 있는 모든 dashboard 인스턴스. 같은 (프로젝트, 브랜치) 는 재사용 — 다른 조합은 자동 포트 8765-8799 할당.
-    </div>
-    <table id="dashboards-table" style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead><tr>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Port</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Project</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Branch</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Commit</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Started</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">—</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <div class="card" id="branches-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <h2 style="margin:0">Branches</h2>
-      <button id="branches-refresh" type="button">Refresh</button>
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
-      이 프로젝트의 git 브랜치 목록. 라디오 선택 후 <strong>Open dashboard</strong> 누르면 그 브랜치의 dashboard 가 *별도 포트*에 spawn (working tree 안 건드림 — git worktree 격리).
-    </div>
-    <div id="branches-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
-    <div id="branches-list" style="display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;padding:8px;background:var(--panel2)">
-      <span style="color:var(--muted);font-size:12px">Refresh 누르면 로드</span>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-      <button id="branches-spawn" type="button" style="background:#065f46;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer">Open selected branch dashboard →</button>
-    </div>
-  </div>
-
-  <div class="card" id="dev-servers-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <h2 style="margin:0">Local Dev Servers</h2>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button id="dev-refresh" type="button">Refresh</button>
-        <button id="dev-kill-all" type="button" style="background:#7f1d1d;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer">Kill all 3000-3099</button>
+    <div class="card" style="margin-top:var(--gap-card)">
+      <div class="card-head">
+        <h3>로컬 <em>대시보드</em></h3>
+        <span class="meta">~/.methodology-dashboards.json</span>
+      </div>
+      <table class="tbl" id="dashboards-table">
+        <thead><tr><th>Port</th><th>Project</th><th>Branch</th><th>Commit</th><th>Started</th><th></th></tr></thead>
+        <tbody><tr><td colspan="6" style="padding:14px;color:var(--muted)">Loading…</td></tr></tbody>
+      </table>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button class="btn" id="dashboards-refresh">↺ Refresh</button>
+        <span id="dashboards-status" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
       </div>
     </div>
-    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
-      <input id="dev-cwd" placeholder="cwd (예: /Users/hayden/icons)" style="flex:1;min-width:240px;padding:6px;border:1px solid var(--line);border-radius:4px;background:var(--panel)" />
-      <input id="dev-cmd" value="pnpm dev" style="width:140px;padding:6px;border:1px solid var(--line);border-radius:4px;background:var(--panel)" />
-      <button id="dev-start" type="button" style="background:#065f46;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer">Start (auto-port 3000+)</button>
+    <div class="card" style="margin-top:var(--gap-card)">
+      <div class="card-head">
+        <h3>브랜치 · <em>worktree</em></h3>
+        <span class="meta">spawn isolated dashboard</span>
+      </div>
+      <p style="color:var(--text-dim);font-weight:300;font-size:13px;margin:0 0 14px;max-width:68ch">라디오 선택 → <strong>Open →</strong> 누르면 그 브랜치의 dashboard가 별도 포트에 spawn됩니다.</p>
+      <div id="branches-list"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button class="btn btn-primary" id="branches-spawn">Open →</button>
+        <button class="btn" id="branches-refresh">↺ Refresh</button>
+        <span id="branches-status" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+      </div>
     </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
-      포트 3000부터 자동 점검 → 비어 있는 첫 포트 할당. 추적되는 서버만 개별 Stop 가능. Kill all 은 *모든* 3000-3099 점유 프로세스 종료 (추적 외 포함).
-    </div>
-    <div id="dev-servers-status" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
-    <table id="dev-servers-table" style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead><tr>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Port</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">PID</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">CWD</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Cmd</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">Started</th>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">—</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</section>
-
-<section class="page" id="page-guide">
-  <div class="card">
-    <h2 style="margin:0 0 6px">방법론 백서 — Evidence-Driven AI Development</h2>
-    <div class="muted" style="font-size:13px">
-      문서 연극을 줄이고, 코드·테스트·PR·결정 근거는 남긴다. 1인 + AI 개발에 맞춘 경량 운영 체계.
-    </div>
-  </div>
-
-  <div class="guide-grid">
-    <div class="card">
-      <h3>1. 목적</h3>
-      <ul class="paper-list">
-        <li><b>AI에게 작업 표준을 제공</b> — 어떤 문서를 언제·어떤 구조로 만들지의 단일 출처</li>
-        <li><b>사람·AI가 공유하는 계약</b> — 사람이 검토하고, AI가 실행하는 공용 산출물 표준</li>
-        <li><b>문서 간 경계 강제</b> — 원본 정보 중복을 막고 책임을 분명히 함</li>
-        <li><b>AI 시대 표준 통합</b> — Eval-First / Harness 분리 / Guardrails-by-Construction / EU AI Act</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>2. 5개 영역 설계</h3>
-      <table class="paper-table">
-        <thead><tr><th>영역</th><th>폴더</th><th>역할</th></tr></thead>
-        <tbody>
-          <tr><td><span class="cat-dot meta"></span>메타</td><td><code>(root)</code></td><td>CLAUDE/AGENTS/HANDOFF/TODO — AI 부트 컨텍스트</td></tr>
-          <tr><td><span class="cat-dot guides"></span>지침서</td><td><code>20_guides/</code></td><td><b>어떻게</b> 문서를 작성하는가의 표준 (00–18)</td></tr>
-          <tr><td><span class="cat-dot planning"></span>기획 산출물</td><td><code>30_planning/</code></td><td><b>무엇을 만드는가</b> — v0 스켈레톤이 미리 위치</td></tr>
-          <tr><td><span class="cat-dot dev"></span>개발 산출물</td><td><code>40_dev/</code></td><td><b>어떻게 빌드하는가</b> — MASTER_PLAN/SPRINTS/ADR/snapshots</td></tr>
-          <tr><td><span class="cat-dot resources"></span>재사용 자원</td><td><code>50_resources/</code></td><td>templates / prompts</td></tr>
-        </tbody>
+    <div class="card" style="margin-top:var(--gap-card)">
+      <div class="card-head">
+        <h3>Dev <em>servers</em></h3>
+        <span class="meta">auto-port 3000-3099</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <input id="dev-cwd" placeholder="cwd" style="flex:1;min-width:240px;background:var(--surface-2);border:1px solid var(--hairline);padding:9px 12px;color:var(--text);font-family:var(--font-mono);font-size:12px"/>
+        <input id="dev-cmd" value="pnpm dev" style="width:140px;background:var(--surface-2);border:1px solid var(--hairline);padding:9px 12px;color:var(--text);font-family:var(--font-mono);font-size:12px"/>
+        <button class="btn btn-primary" id="dev-start">Start ↗</button>
+        <button class="btn btn-danger" id="dev-kill-all">Kill 3000–3099</button>
+        <button class="btn" id="dev-refresh">↺</button>
+      </div>
+      <table class="tbl" id="dev-servers-table">
+        <thead><tr><th>Port</th><th>PID</th><th>CWD</th><th>Cmd</th><th>Started</th><th></th></tr></thead>
+        <tbody></tbody>
       </table>
+      <div id="dev-servers-status" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)"></div>
     </div>
+  </section>
 
-    <div class="card" style="grid-column:1/-1">
-      <h3>3. 라이프사이클 (브리프 → 빌드 → 환류)</h3>
-      <div id="flow"></div>
-      <div class="legend" id="flow-legend"></div>
+  <!-- Page 02: Guide -->
+  <section class="page" id="page-guide">
+    <div id="guide-content"></div>
+  </section>
+
+  <!-- Page 03: Graph -->
+  <section class="page" id="page-graph">
+    <div class="section-head" style="margin-top:0">
+      <h2>관계 <em>그래프</em>.</h2>
+      <div class="row">
+        <div class="timeline-toolbar" style="margin:0"><div class="seg"><button class="active">계층</button></div></div>
+      </div>
     </div>
-
-    <div class="card">
-      <h3>4. 핵심 원칙</h3>
-      <ul class="paper-list">
-        <li><b>Eval-First</b> — 작성보다 평가 정의를 먼저 (16/17이 동시 시작)</li>
-        <li><b>Harness 분리</b> — Plan / Generate / Evaluate를 같은 세션·에이전트로 묶지 않음</li>
-        <li><b>Guardrails-by-Construction</b> — 프롬프트가 아닌 시스템 컴포넌트로 강제</li>
-        <li><b>사람-AI 공용 산출물</b> — 자연어 + 기계 판독 형태 (OpenAPI/llms.txt/policy.yaml)</li>
-        <li><b>단일 출처 원칙</b> — 모든 정보는 정확히 한 군데에서만 산다 (12절 다른 문서와의 경계)</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>5. 변경 등급 (Change Class)</h3>
-      <ul class="paper-list">
-        <li><b>Class A</b> (기본) — 일반 기능·UI 카피·내부 리팩토링·버그 수정. 게이트: 머지된 PR.</li>
-        <li><b>Class B</b> — 스키마/auth/외부 계약/destructive/배경 잡 변경. 영향·롤백 명시 의무.</li>
-        <li><b>Class C</b> — 가격·법무·브랜드·공개 출시. 명시적 휴먼 승인 + ADR 필수.</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>6. 활용 가이드 — CLI</h3>
-      <pre style="font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0"><code># 새 프로젝트
-60_tools/methodology.py init my-project --type fullstack
-
-# 기존 프로젝트 갱신 (자동 마이그레이션)
-60_tools/methodology.py status               # 현재 vs 업스트림
-60_tools/methodology.py sync                 # 미리보기
-60_tools/methodology.py sync --apply         # 실제 적용
-
-# 단일 파일 변경 미리보기
-60_tools/methodology.py diff CLAUDE.md</code></pre>
-    </div>
-
-    <div class="card">
-      <h3>7. 파일 분류 (sync 정책)</h3>
-      <table class="paper-table">
-        <thead><tr><th>클래스</th><th>예시</th><th>정책</th></tr></thead>
-        <tbody>
-          <tr><td><b>shared</b></td><td>20_guides/, 50_resources/, graph, dashboard</td><td>sync가 항상 덮어씀</td></tr>
-          <tr><td><b>managed</b></td><td>CLAUDE.md, AGENTS.md</td><td><code>&lt;!-- methodology:managed --&gt;</code> 마커 사이만 머지</td></tr>
-          <tr><td><b>scaffolds</b></td><td>30_planning/, 40_dev/</td><td>init 1회, sync 무시</td></tr>
-          <tr><td><b>local</b></td><td>HANDOFF, TODO, MASTER_PLAN, ADR</td><td>절대 안 건드림</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card" style="grid-column:1/-1">
-      <h3>8. 외부 표준 (v3 통합)</h3>
-      <ul class="paper-list">
-        <li>Anthropic <i>Effective Harnesses for long-running agents</i></li>
-        <li>arXiv 2411.13768 — <i>Evaluation-Driven Development of LLM Agents</i></li>
-        <li>Spec-Driven Development (Kiro / EARS — Requirements/Design/Tasks)</li>
-        <li>EU AI Act (Regulation 2024/1689) — 2026-08 high-risk obligations 발효</li>
-        <li>Agent Experience (AX) — 사람·AI 동시 판독 가능 형태 병행</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<section class="page" id="page-graph">
-  <div class="card">
-    <h3>방법론 폴더·문서 관계 그래프</h3>
-    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
-      <button class="btn active" data-layout="hierarchy">계층 (상하위)</button>
-      <button class="btn" data-layout="force">자유 (force)</button>
-      <span class="muted" style="margin-left:8px">노드 클릭 → 오른쪽 패널에 역할 표시</span>
-    </div>
-    <div class="graph-layout">
-      <svg id="graph"></svg>
-      <aside id="graph-detail" class="graph-detail">
-        <div class="muted">노드를 클릭하면 여기에 역할·경로·연결이 표시됩니다.</div>
+    <div class="graph-grid">
+      <div class="graph-canvas">
+        <svg id="graph-svg" viewBox="0 0 720 540" width="100%" height="560" style="display:block"></svg>
+        <div class="legend" id="graph-legend" style="position:absolute;left:24px;bottom:18px"></div>
+      </div>
+      <aside class="graph-detail" id="graph-detail">
+        <span class="eyebrow">노드를 클릭하세요</span>
+        <h4 style="margin:8px 0 6px">—</h4>
+        <p style="color:var(--muted)">그래프 노드를 선택하면 상세 정보가 여기 표시됩니다.</p>
       </aside>
     </div>
-    <div class="legend" id="graph-legend"></div>
-  </div>
-  <div class="card" id="content-card" style="margin-top:12px">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px">
-      <h3 id="content-title" style="margin:0">파일 내용</h3>
-      <span id="content-meta" class="muted" style="font-size:12px"></span>
-    </div>
-    <div id="content-body" class="content-body">
-      <div class="muted">노드를 클릭하면 여기에 파일 내용이 표시됩니다.</div>
-    </div>
-  </div>
-  <div class="card" style="margin-top:12px">
-    <h3>전체 문서·폴더 역할 목록</h3>
-    <div id="role-table"></div>
-  </div>
-</section>
+    <div class="legend" style="margin-top:14px" id="graph-legend-bottom"></div>
+  </section>
 
-<section class="page" id="page-timeline">
-  <div class="card">
-    <h3>스프린트 타임라인</h3>
-    <div class="timeline-controls">
-      <button class="btn active" data-view="week">주간</button>
-      <button class="btn" data-view="month">월간</button>
-      <button class="btn" data-view="year">연간</button>
-    </div>
-    <div class="timeline"><div id="timeline-grid" class="timeline-grid"></div></div>
-    <div class="legend" style="margin-top:12px">
-      <span><span class="dot" style="background:#A78BFA"></span>planned</span>
-      <span><span class="dot" style="background:#F59E0B"></span>active</span>
-      <span><span class="dot" style="background:#34D399"></span>done</span>
-      <span><span class="dot" style="background:#EF4444"></span>cancelled</span>
-    </div>
-  </div>
-</section>
-
-<section class="page" id="page-kanban">
-  <div class="kanban" id="kanban"></div>
-</section>
-
-<section class="page" id="page-exec">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
-      <h3 style="margin:0">마스터플랜</h3>
-      <span class="muted" id="mp-meta" style="font-size:12px"></span>
-    </div>
-    <div id="mp-sections" class="mp-grid"></div>
-  </div>
-
-  <div class="card" style="margin-top:12px">
-    <h3>스프린트 (전체)</h3>
-    <div style="overflow-x:auto"><table class="sprint-table" id="sprint-table"></table></div>
-  </div>
-
-  <div class="card" style="margin-top:12px">
-    <h3>칸반보드</h3>
-    <div class="kanban" id="kanban-exec"></div>
-  </div>
-</section>
-
-<script id="data" type="application/json">__DATA__</script>
-<script>
-const DATA = JSON.parse(document.getElementById('data').textContent);
-document.getElementById('meta').textContent =
-  `branch: ${DATA.git_branch || 'unknown'} (${DATA.git_commit || 'unknown'}) · 생성: ${DATA.generated_at} · ${DATA.root}`;
-
-// ── 탭
-document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-  t.classList.add('active');
-  document.getElementById('page-' + t.dataset.page).classList.add('active');
-  if(t.dataset.page === 'graph') renderGraph();
-}));
-
-// (가이드 페이지는 이제 정적 백서 — JS 주입 없음. CLAUDE/HANDOFF는 프로젝트 개요로 이동)
-
-// ── 프로젝트 개요 렌더
-function renderOverview(){
-  const ov = DATA.project_overview || {};
-  const meta = ov.meta || {};
-  const pkg = ov.package || {};
-  const cfg = ov.config || {};
-  const mp  = ov.master_plan_meta || {};
-  const assets = ov.methodology_assets || {};
-
-  // 헤더
-  const name = meta['Project Name'] || meta['Project'] || pkg.name || '(이름 없음)';
-  document.getElementById('ov-name').textContent = name;
-  document.getElementById('ov-objective').textContent = meta['Objective'] || meta['Goal'] || '';
-
-  const typeEl = document.getElementById('ov-type-badge');
-  const t = (meta['Type'] || meta['Mode'] || '').toLowerCase();
-  typeEl.textContent = t || '—';
-  typeEl.className = 'ov-badge type-' + (t.includes('fullstack') ? 'fullstack' : t.includes('planning') ? 'planning-only' : '');
-
-  const verEl = document.getElementById('ov-version-badge');
-  verEl.textContent = pkg.version ? 'v' + pkg.version : (meta['Version'] || '—');
-
-  const phaseEl = document.getElementById('ov-phase-badge');
-  if(mp.current_phase){
-    phaseEl.textContent = 'Phase ' + mp.current_phase;
-    phaseEl.className = 'ov-badge phase';
-  } else {
-    phaseEl.textContent = 'no master plan';
-  }
-
-  // 통계 카드
-  const totalKanban = Object.values(ov.kanban_summary || {}).reduce((a,b)=>a+b,0);
-  const doneKanban = (ov.kanban_summary || {}).Done || 0;
-  const stats = [
-    { label: '진행 중 작업', value: (ov.kanban_summary||{}).InProgress || 0, sub: '칸반 InProgress' },
-    { label: '대기 작업', value: (ov.kanban_summary||{}).Ready || 0, sub: 'Ready 큐' },
-    { label: '차단됨', value: (ov.kanban_summary||{}).Blocked || 0, sub: '해소 필요' },
-    { label: '완료', value: doneKanban, sub: `${totalKanban}개 중` },
-    { label: '활성 스프린트', value: ov.sprint_active || 0, sub: `총 ${ov.sprint_total || 0}개` },
-    { label: 'ADR', value: ov.adr_count || 0, sub: '결정 기록' },
-    { label: 'Snapshots', value: ov.snapshot_count || 0, sub: '날짜별 산출물' },
-    { label: '의존성', value: pkg.dependencies_count || 0, sub: `${pkg.dev_dependencies_count || 0} dev` },
-    { label: 'L1 관찰', value: assets.observations || 0, sub: 'ai_observations' },
-    { label: 'Pending', value: assets.catalog_pending || 0, sub: 'Catalog 후보' },
-    { label: 'Skeleton', value: assets.skeleton_domains || 0, sub: `${assets.skeleton_locks || 0} locks` },
-    { label: 'Insights', value: assets.insight_reports || 0, sub: 'Thinktank' },
-  ];
-  document.getElementById('ov-stats').innerHTML = stats.map(s =>
-    `<div class="ov-stat"><div class="label">${escapeHtml(s.label)}</div><div class="value">${s.value}</div><div class="sub">${escapeHtml(s.sub)}</div></div>`
-  ).join('');
-
-  // 스택 / 개발 정보
-  const stackRows = [];
-  ['Stack','Type','Started On','Release Policy','Primary Approver','Mode'].forEach(k => {
-    if(meta[k]) stackRows.push([k, meta[k]]);
-  });
-  if(pkg.name) stackRows.push(['package', `<code>${escapeHtml(pkg.name)}@${escapeHtml(pkg.version||'')}</code>`]);
-  if(pkg.main_deps && pkg.main_deps.length){
-    stackRows.push(['주요 의존성', pkg.main_deps.map(d => `<code>${escapeHtml(d)}</code>`).join(' ')]);
-  }
-  if(ov.dev_url){
-    stackRows.push(['Dev URL', `<a class="ov-link" href="${escapeHtml(ov.dev_url)}" target="_blank" rel="noopener">${escapeHtml(ov.dev_url)} ↗</a>`]);
-  }
-  if(cfg.urls){
-    Object.entries(cfg.urls).forEach(([k,v]) => stackRows.push([k, `<a class="ov-link" href="${escapeHtml(v)}" target="_blank" rel="noopener">${escapeHtml(v)} ↗</a>`]));
-  }
-  if(pkg.scripts && Object.keys(pkg.scripts).length){
-    const scriptList = Object.entries(pkg.scripts).slice(0,6).map(([k,v]) => `<code>${escapeHtml(k)}</code>`).join(' ');
-    stackRows.push(['npm scripts', scriptList]);
-  }
-  stackRows.push(['L0 adapters', (assets.adapters || []).map(a => `<code>${escapeHtml(a)}</code>`).join(' ') || '—']);
-  stackRows.push(['Active TODOs', (assets.active_todos || []).map(a => `<code>${escapeHtml(a)}</code>`).join(' ') || 'none']);
-  document.getElementById('ov-stack').innerHTML = stackRows.length
-    ? '<ul class="ov-list">' + stackRows.map(([k,v]) => `<li><span class="k">${escapeHtml(k)}</span><span class="v">${v}</span></li>`).join('') + '</ul>'
-    : '<div class="muted">CLAUDE.md §1 Project Settings를 채워주세요.</div>';
-
-  // 진행 상황 (칸반 분포 + 마스터플랜 페이즈)
-  const ks = ov.kanban_summary || {};
-  const total = Math.max(1, Object.values(ks).reduce((a,b)=>a+b,0));
-  const bar = ['Done','InProgress','Ready','Blocked','Backlog'].map(s => {
-    const w = ((ks[s]||0) / total * 100).toFixed(1);
-    const cls = {Done:'done', InProgress:'progress', Ready:'ready', Blocked:'blocked', Backlog:'backlog'}[s];
-    return w > 0 ? `<div class="${cls}" style="width:${w}%" title="${s}: ${ks[s]||0}"></div>` : '';
-  }).join('');
-
-  const progRows = [];
-  if(mp.current_phase) progRows.push(['현재 페이즈', escapeHtml(mp.current_phase)]);
-  if(mp.next_gate) progRows.push(['다음 게이트', escapeHtml(mp.next_gate)]);
-  if(mp.last_replanning) progRows.push(['최근 환류', escapeHtml(mp.last_replanning)]);
-  progRows.push(['칸반 진행률', `${doneKanban}/${total - 1} 완료 (${((doneKanban/Math.max(1,total))*100).toFixed(0)}%)`]);
-
-  document.getElementById('ov-progress').innerHTML = `
-    <ul class="ov-list">${progRows.map(([k,v]) => `<li><span class="k">${k}</span><span class="v">${v}</span></li>`).join('')}</ul>
-    <div style="margin-top:10px">
-      <div class="muted" style="font-size:11px;margin-bottom:2px">칸반 분포</div>
-      <div class="ov-progress-bar">${bar}</div>
-      <div style="display:flex;gap:10px;margin-top:6px;font-size:10px;color:var(--muted);flex-wrap:wrap">
-        <span>● <span style="color:#34D399">Done</span> ${ks.Done||0}</span>
-        <span>● <span style="color:#F59E0B">InProgress</span> ${ks.InProgress||0}</span>
-        <span>● <span style="color:#60A5FA">Ready</span> ${ks.Ready||0}</span>
-        <span>● <span style="color:#EF4444">Blocked</span> ${ks.Blocked||0}</span>
-        <span>● <span style="color:#475569">Backlog</span> ${ks.Backlog||0}</span>
-      </div>
-    </div>`;
-
-  // 파일 보기 (탭 전환)
-  const files = [
-    { id: 'claude',  label: 'CLAUDE.md',  path: ov.claude_md_path,  text: ov.claude_md },
-    { id: 'agents',  label: 'AGENTS.md',  path: 'AGENTS.md',        text: ov.agents_md },
-    { id: 'handoff', label: 'HANDOFF.md', path: ov.handoff_md_path, text: ov.handoff_md },
-    { id: 'todo',    label: 'TODO.md',    path: ov.todo_md_path,    text: ov.todo_md },
-  ].filter(f => f.text);
-  const tabsEl = document.getElementById('ov-file-tabs');
-  const bodyEl = document.getElementById('ov-file-content');
-  tabsEl.innerHTML = files.map((f,i) =>
-    `<div class="ov-file-tab${i===0?' active':''}" data-file="${f.id}">${escapeHtml(f.label)}</div>`).join('');
-  function showFile(id){
-    const f = files.find(x => x.id === id);
-    if(!f){ bodyEl.innerHTML = '<div class="muted">파일 없음</div>'; return; }
-    if(window.marked){
-      try { bodyEl.innerHTML = marked.parse(f.text); return; } catch(e){}
-    }
-    bodyEl.innerHTML = `<pre>${escapeHtml(f.text)}</pre>`;
-  }
-  tabsEl.querySelectorAll('.ov-file-tab').forEach(t => t.addEventListener('click', () => {
-    tabsEl.querySelectorAll('.ov-file-tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    showFile(t.dataset.file);
-  }));
-  if(files.length) showFile(files[0].id);
-  else bodyEl.innerHTML = '<div class="muted">표시할 파일 없음</div>';
-}
-renderOverview();
-
-// ── 라이프사이클 플로우 (SVG)
-function renderFlow(){
-  const stages = DATA.graph.lifecycle?.stages || [];
-  if(!stages.length){ document.getElementById('flow').textContent = '(라이프사이클 데이터 없음)'; return; }
-  const W = 1080, BOX_W = 130, BOX_H = 64, GAP_X = 22, ROW_GAP = 48;
-  const perRow = Math.floor((W + GAP_X) / (BOX_W + GAP_X));
-  const rows = Math.ceil(stages.length / perRow);
-  const H = rows * (BOX_H + ROW_GAP) + 40;
-  const svg = d3.select('#flow').append('svg')
-    .attr('viewBox',`0 0 ${W} ${H}`).attr('width','100%').attr('height',H);
-
-  const defs = svg.append('defs');
-  defs.append('marker').attr('id','arr').attr('viewBox','0 -5 10 10')
-    .attr('refX',9).attr('refY',0).attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
-    .append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#60A5FA');
-
-  const pos = {};
-  stages.forEach((s, i) => {
-    const r = Math.floor(i / perRow), c = (r % 2 === 0) ? (i % perRow) : (perRow - 1 - (i % perRow));
-    pos[s.id] = { x: 20 + c*(BOX_W+GAP_X), y: 20 + r*(BOX_H+ROW_GAP), row: r, col: c };
-  });
-
-  // 박스
-  const g = svg.selectAll('.stage').data(stages).enter().append('g')
-    .attr('transform', d => `translate(${pos[d.id].x},${pos[d.id].y})`);
-  g.append('rect').attr('width',BOX_W).attr('height',BOX_H).attr('rx',8)
-    .attr('fill', d => d.human_gate ? '#1E293B' : '#0F172A')
-    .attr('stroke', d => d.human_gate ? '#F59E0B' : '#334155').attr('stroke-width',1.5);
-  g.append('text').attr('x',8).attr('y',16).attr('fill','#94A3B8').attr('font-size',10).text(d => d.id);
-  g.append('text').attr('x',8).attr('y',34).attr('fill','#E5E7EB').attr('font-size',12).attr('font-weight',600).text(d => d.label);
-  g.append('text').attr('x',8).attr('y',54).attr('fill','#F59E0B').attr('font-size',10)
-    .text(d => d.human_gate ? '⚑ ' + d.human_gate : '');
-
-  // 화살표
-  function path(a, b, isLoop){
-    const ax = pos[a].x + BOX_W/2, ay = pos[a].y + BOX_H/2;
-    const bx = pos[b].x + BOX_W/2, by = pos[b].y + BOX_H/2;
-    if(isLoop){
-      // 큰 곡선
-      return `M${pos[a].x + BOX_W},${ay} C${W-10},${ay} ${W-10},${by} ${pos[b].x + BOX_W},${by}`;
-    }
-    return `M${pos[a].x + BOX_W},${ay} L${pos[b].x},${by}`;
-  }
-  stages.forEach(s => {
-    if(s.next){
-      svg.append('path').attr('d', path(s.id, s.next, false))
-        .attr('stroke','#60A5FA').attr('stroke-width',1.5).attr('fill','none').attr('marker-end','url(#arr)');
-    }
-    if(s.loops_to){
-      svg.append('path').attr('d', path(s.id, s.loops_to, true))
-        .attr('stroke','#A78BFA').attr('stroke-width',1.5).attr('fill','none')
-        .attr('stroke-dasharray','4 4').attr('marker-end','url(#arr)');
-    }
-  });
-
-  document.getElementById('flow-legend').innerHTML =
-    `<span><span class="dot" style="background:#0F172A;border:1px solid #334155"></span>일반 단계</span>
-     <span><span class="dot" style="background:#1E293B;border:1px solid #F59E0B"></span>휴먼 게이트</span>
-     <span><span class="dot" style="background:#A78BFA"></span>루프 (재기획→개발)</span>`;
-}
-renderFlow();
-
-// ── 관계 그래프 (계층 / 자유 토글)
-let graphState = { rendered:false, layout:'hierarchy', selectedId:null };
-
-function renderGraph(layout){
-  layout = layout || graphState.layout || 'hierarchy';
-  graphState.layout = layout;
-
-  const nodes = (DATA.graph.nodes||[]).map(n => ({...n}));
-  const links = (DATA.graph.edges||[]).map(e => ({source:e.from, target:e.to, kind:e.kind, label:e.label}));
-  const kinds = DATA.graph.kinds || {};
-  const tiers = DATA.graph.tiers || [];
-
-  const svg = d3.select('#graph');
-  const w = svg.node().clientWidth, h = 640;
-  svg.selectAll('*').remove();
-
-  svg.append('defs').append('marker').attr('id','garr').attr('viewBox','0 -5 10 10')
-    .attr('refX',18).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
-    .append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#475569');
-
-  let sim = null;
-
-  if(layout === 'hierarchy'){
-    // 2D 계층 배치: 가로축=category(5개), 세로축=tier(category 내부 순서)
-    const categories = DATA.graph.categories || [];
-    const catOrder = categories.length ? categories.map(c => c.id) : [...new Set(nodes.map(n=>n.category||'misc'))];
-    const catLabel = Object.fromEntries((categories||[]).map(c => [c.id, c.label]));
-    const catColor = Object.fromEntries((categories||[]).map(c => [c.id, c.color]));
-
-    // 노드를 카테고리별로 분류 → 카테고리 안에서 tier 정렬
-    const byCat = {};
-    nodes.forEach(n => {
-      const c = n.category || 'misc';
-      (byCat[c] = byCat[c] || []).push(n);
-    });
-    Object.values(byCat).forEach(arr => arr.sort((a,b) => (a.tier||99) - (b.tier||99)));
-
-    // 가로: 카테고리별 컬럼 (균등)
-    const colW = w / Math.max(1, catOrder.length);
-    const padTop = 60, padBot = 30;
-
-    // 카테고리 배경 밴드 + 헤더
-    catOrder.forEach((cid, ci) => {
-      const x0 = ci * colW;
-      svg.append('rect').attr('class','cat-band')
-        .attr('x', x0+2).attr('y', padTop-4).attr('width', colW-4).attr('height', h-padTop-padBot+10)
-        .attr('rx', 8).attr('fill', catColor[cid]||'#1E293B').attr('opacity', 0.18);
-      svg.append('text').attr('class','cat-header')
-        .attr('x', x0 + colW/2).attr('y', 22).attr('text-anchor','middle')
-        .attr('fill','#E5E7EB').attr('font-size',13).attr('font-weight',700)
-        .text(catLabel[cid] || cid);
-      svg.append('text').attr('class','cat-folder')
-        .attr('x', x0 + colW/2).attr('y', 40).attr('text-anchor','middle')
-        .attr('fill','#94A3B8').attr('font-size',10).attr('font-family','ui-monospace,Menlo,monospace')
-        .text((categories.find(c => c.id===cid)||{}).folder || '');
-    });
-
-    // 노드 좌표: 컬럼 안에서 tier 순서대로 배치
-    catOrder.forEach((cid, ci) => {
-      const arr = byCat[cid] || [];
-      const x0 = ci * colW;
-      const innerH = h - padTop - padBot;
-      const stepY = arr.length > 1 ? innerH / (arr.length) : 0;
-      arr.forEach((n, i) => {
-        n.x = x0 + colW/2;
-        n.y = padTop + stepY * (i + 0.5);
-        n.fx = n.x; n.fy = n.y;
-      });
-    });
-  } else {
-    // 자유 force 시뮬레이션
-    sim = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(d=>d.id).distance(110).strength(0.6))
-      .force('charge', d3.forceManyBody().strength(-360))
-      .force('center', d3.forceCenter(w/2, h/2))
-      .force('collide', d3.forceCollide(38));
-  }
-
-  // 엣지: 계층 모드에서는 곡선(베지어), 자유 모드에서는 직선
-  const link = svg.append('g').selectAll('path').data(links).enter().append('path')
-    .attr('stroke','#475569').attr('stroke-opacity',.55).attr('stroke-width',1.2).attr('fill','none')
-    .attr('marker-end','url(#garr)');
-
-  function tickLinks(){
-    link.attr('d', d => {
-      const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y;
-      if(layout === 'hierarchy'){
-        const my = (sy + ty) / 2;
-        return `M${sx},${sy} C${sx},${my} ${tx},${my} ${tx},${ty}`;
-      }
-      return `M${sx},${sy} L${tx},${ty}`;
-    });
-  }
-
-  // 자유 모드는 source/target이 객체로 치환되는 시점 차이가 있어서 별도 처리
-  if(layout !== 'hierarchy'){
-    // links의 source/target 문자열을 객체 참조로 교체 (force가 알아서 해줌)
-  } else {
-    // 계층 모드는 source/target이 여전히 문자열이므로 노드 매핑
-    const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
-    links.forEach(l => { l.source = nodeById[l.source] || l.source; l.target = nodeById[l.target] || l.target; });
-    tickLinks();
-  }
-
-  const node = svg.append('g').selectAll('g').data(nodes).enter().append('g')
-    .call(d3.drag()
-      .on('start', (e,d) => { if(sim){ if(!e.active) sim.alphaTarget(.3).restart(); } d.fx=d.x; d.fy=d.y; })
-      .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; if(layout==='hierarchy'){ d.x=e.x; d.y=e.y; node.attr('transform', n=>`translate(${n.x},${n.y})`); tickLinks(); } })
-      .on('end',   (e,d) => { if(sim && !e.active) sim.alphaTarget(0); /* keep fx,fy in hierarchy mode */ }));
-
-  node.append('circle').attr('class','node-circle').attr('r',18)
-    .attr('fill', d => kinds[d.kind]?.color || '#64748B')
-    .attr('stroke','#0B0F1A').attr('stroke-width',2)
-    .on('click', (e, d) => { e.stopPropagation(); selectNode(d); });
-  node.append('text').attr('dy',34).attr('text-anchor','middle').attr('fill','#E5E7EB')
-    .attr('font-size',11).text(d => d.label).style('pointer-events','none');
-  node.append('title').text(d => `${d.label}\n${d.path||''}\n\n${d.role||''}`);
-
-  if(sim){
-    sim.on('tick', () => { tickLinks(); node.attr('transform', d=>`translate(${d.x},${d.y})`); });
-  } else {
-    node.attr('transform', d=>`translate(${d.x},${d.y})`);
-  }
-
-  const categories = DATA.graph.categories || [];
-  document.getElementById('graph-legend').innerHTML =
-    '<strong style="color:#94A3B8;margin-right:6px">카테고리:</strong>' +
-    categories.map(c => `<span><span class="dot" style="background:${c.color}"></span>${c.label} <code style="font-size:10px;color:#64748B">${c.folder}</code></span>`).join(' ') +
-    ' <span style="margin:0 8px;color:#475569">|</span> <strong style="color:#94A3B8;margin-right:6px">유형:</strong>' +
-    Object.entries(kinds).map(([k,v]) => `<span><span class="dot" style="background:${v.color}"></span>${k}</span>`).join('');
-
-  function selectNode(d){
-    graphState.selectedId = d.id;
-    svg.selectAll('.node-circle').classed('selected', n => n.id === d.id);
-    const incoming = (DATA.graph.edges||[]).filter(e => e.to === d.id);
-    const outgoing = (DATA.graph.edges||[]).filter(e => e.from === d.id);
-    const labelOf = id => (DATA.graph.nodes.find(n => n.id===id)||{}).label || id;
-    const kindMeta = kinds[d.kind] || {};
-    const tierLabel = tiers.find(t => t.id === d.tier)?.label;
-    const catMeta = (DATA.graph.categories||[]).find(c => c.id === d.category);
-    const html = `
-      ${catMeta ? `<span class="kind-tag" style="background:${catMeta.color};color:#E5E7EB">${escapeHtml(catMeta.label)}</span>` : ''}
-      <span class="kind-tag" style="background:${kindMeta.color||'#64748B'};margin-left:4px">${d.kind}</span>
-      ${tierLabel ? `<span class="kind-tag" style="background:#334155;color:#E5E7EB;margin-left:4px">T${d.tier}</span>` : ''}
-      <h4>${escapeHtml(d.label)}</h4>
-      ${d.path ? `<code>${escapeHtml(d.path)}</code>` : ''}
-      <div class="role">${escapeHtml(d.role||'(역할 미정)')}</div>
-      ${outgoing.length ? `<div class="conn"><h5>→ 연결 (out)</h5><ul>${
-        outgoing.map(e => `<li>${escapeHtml(labelOf(e.to))} <span class="edge-kind">· ${e.kind}${e.label?' · '+escapeHtml(e.label):''}</span></li>`).join('')
-      }</ul></div>` : ''}
-      ${incoming.length ? `<div class="conn"><h5>← 연결 (in)</h5><ul>${
-        incoming.map(e => `<li>${escapeHtml(labelOf(e.from))} <span class="edge-kind">· ${e.kind}${e.label?' · '+escapeHtml(e.label):''}</span></li>`).join('')
-      }</ul></div>` : ''}
-    `;
-    document.getElementById('graph-detail').innerHTML = html;
-    renderNodeContent(d);
-  }
-
-  const initId = graphState.selectedId || (nodes[0] && nodes[0].id);
-  const initNode = nodes.find(n => n.id === initId);
-  if(initNode) selectNode(initNode);
-  graphState.rendered = true;
-}
-
-document.querySelectorAll('[data-layout]').forEach(btn => btn.addEventListener('click', () => {
-  document.querySelectorAll('[data-layout]').forEach(x => x.classList.remove('active'));
-  btn.classList.add('active');
-  renderGraph(btn.dataset.layout);
-}));
-
-// ── 노드 클릭 시 파일 내용 렌더
-function renderNodeContent(node){
-  const titleEl = document.getElementById('content-title');
-  const metaEl  = document.getElementById('content-meta');
-  const bodyEl  = document.getElementById('content-body');
-  titleEl.textContent = node.label;
-  metaEl.innerHTML = node.path
-    ? `<code style="background:var(--panel);padding:2px 6px;border-radius:4px;color:#94A3B8">${escapeHtml(node.path)}</code>`
-    : '';
-
-  const data = (DATA.node_contents || {})[node.id];
-  if(!data){ bodyEl.innerHTML = '<div class="muted">(이 노드는 연결된 파일이 없습니다)</div>'; return; }
-
-  if(data.kind === 'file'){
-    const isMarkdown = node.path && node.path.toLowerCase().endsWith('.md');
-    const isJson     = node.path && node.path.toLowerCase().endsWith('.json');
-    metaEl.innerHTML += ` <span style="margin-left:6px;color:#64748B">${data.size.toLocaleString()} bytes</span>`;
-    if(isMarkdown && window.marked){
-      try {
-        marked.setOptions({ breaks:true, gfm:true });
-        bodyEl.innerHTML = marked.parse(data.text);
-      } catch(e){
-        bodyEl.innerHTML = `<pre>${escapeHtml(data.text)}</pre>`;
-      }
-    } else if(isJson){
-      let pretty = data.text;
-      try { pretty = JSON.stringify(JSON.parse(data.text), null, 2); } catch(e){}
-      bodyEl.innerHTML = `<pre><code>${escapeHtml(pretty)}</code></pre>`;
-    } else {
-      bodyEl.innerHTML = `<pre>${escapeHtml(data.text)}</pre>`;
-    }
-  } else if(data.kind === 'dir'){
-    const items = data.entries.map(e =>
-      `<li>
-        <span class="${e.is_dir ? 'dir-icon' : 'file-icon'}">${e.is_dir ? '▸' : '·'}</span>
-        ${escapeHtml(e.name)}${e.is_dir ? '/' : ''}
-        ${e.size != null ? `<span class="file-size">${e.size.toLocaleString()} B</span>` : ''}
-      </li>`
-    ).join('');
-    bodyEl.innerHTML = `<div class="muted" style="margin-bottom:8px">디렉터리 — ${data.entries.length}개 항목</div><ul class="content-dir-list">${items || '<li class="muted">(비어있음)</li>'}</ul>`;
-  } else {
-    bodyEl.innerHTML = `<div class="muted">${escapeHtml(data.text || '(없음)')}</div>`;
-  }
-}
-
-// ── 역할 테이블 (그래프 탭 하단)
-function renderRoleTable(){
-  const nodes = DATA.graph.nodes || [];
-  const kinds = DATA.graph.kinds || {};
-  const groupOrder = ['root-doc','live-state','live-state-optional','decisions','snapshots','templates','prompts','guide','guide-ai'];
-  const groupLabels = {
-    'root-doc':'루트 문서','live-state':'라이브 상태','live-state-optional':'선택적 라이브 상태',
-    'decisions':'결정 기록','snapshots':'스냅샷','templates':'템플릿','prompts':'프롬프트',
-    'guide':'기획 지침서','guide-ai':'AI 보조 지침서'
-  };
-  const grouped = {};
-  nodes.forEach(n => { (grouped[n.kind] = grouped[n.kind]||[]).push(n); });
-  let html = '<table class="role-table"><thead><tr><th style="width:80px">유형</th><th style="width:160px">문서/폴더</th><th style="width:280px">경로</th><th>역할</th></tr></thead><tbody>';
-  groupOrder.forEach(k => {
-    if(!grouped[k]) return;
-    const color = kinds[k]?.color || '#64748B';
-    grouped[k].forEach((n, i) => {
-      html += `<tr>
-        ${i===0 ? `<td rowspan="${grouped[k].length}"><span class="kind-tag" style="background:${color}">${groupLabels[k]||k}</span></td>` : ''}
-        <td class="label">${escapeHtml(n.label)}</td>
-        <td class="path">${escapeHtml(n.path||'—')}</td>
-        <td class="role-cell">${escapeHtml(n.role||'')}</td>
-      </tr>`;
-    });
-  });
-  html += '</tbody></table>';
-  document.getElementById('role-table').innerHTML = html;
-}
-renderRoleTable();
-
-// ── 타임라인
-function parseDate(s){ if(!s) return null; const m = s.match(/(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2]-1, +m[3]) : null; }
-function fmtMD(d){ return `${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`; }
-function isoWeek(d){
-  const target = new Date(d.valueOf()); const dayNr = (d.getDay()+6) % 7;
-  target.setDate(target.getDate() - dayNr + 3);
-  const firstThu = new Date(target.getFullYear(),0,4);
-  return 1 + Math.round(((target - firstThu)/86400000 - 3 + (firstThu.getDay()+6)%7) / 7);
-}
-
-function renderTimeline(view){
-  const grid = document.getElementById('timeline-grid');
-  grid.innerHTML = '';
-  const sprints = DATA.sprints.map(s => ({
-    id:s.id, title:s.fields.title || s.id, start:parseDate(s.fields.start), end:parseDate(s.fields.end),
-    status:(s.fields.status||'planned').toLowerCase()
-  })).filter(s => s.start && s.end);
-  if(!sprints.length){ grid.textContent = '(SPRINTS.md 데이터 없음)'; return; }
-
-  const minD = new Date(Math.min(...sprints.map(s=>s.start)));
-  const maxD = new Date(Math.max(...sprints.map(s=>s.end)));
-
-  let cells = [], cellOf = (d) => null;
-  if(view === 'week'){
-    const start = new Date(minD); start.setDate(start.getDate() - ((start.getDay()+6)%7));
-    for(let d = new Date(start); d <= maxD; d.setDate(d.getDate()+7)){
-      cells.push({ start:new Date(d), label:`W${isoWeek(d)} (${fmtMD(d)})` });
-    }
-    cellOf = (d) => cells.findIndex((c,i) => d >= c.start && (i===cells.length-1 || d < cells[i+1].start));
-  } else if(view === 'month'){
-    const start = new Date(minD.getFullYear(), minD.getMonth(), 1);
-    for(let d = new Date(start); d <= maxD; d.setMonth(d.getMonth()+1)){
-      cells.push({ start:new Date(d), label:`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}` });
-    }
-    cellOf = (d) => cells.findIndex((c,i) => d >= c.start && (i===cells.length-1 || d < cells[i+1].start));
-  } else { // year
-    const start = new Date(minD.getFullYear(),0,1);
-    for(let y = start.getFullYear(); y <= maxD.getFullYear(); y++){
-      cells.push({ start:new Date(y,0,1), label:`${y}` });
-    }
-    cellOf = (d) => d.getFullYear() - cells[0].start.getFullYear();
-  }
-
-  grid.style.gridTemplateColumns = `120px repeat(${cells.length}, minmax(80px,1fr))`;
-
-  // 헤더 row
-  const head = document.createElement('div'); head.className='tcell'; head.textContent='Sprint';
-  grid.appendChild(head);
-  cells.forEach(c => {
-    const el = document.createElement('div'); el.className='tcell'; el.textContent = c.label; grid.appendChild(el);
-  });
-
-  // 각 스프린트 row
-  sprints.forEach(s => {
-    const lab = document.createElement('div'); lab.className='tcell';
-    lab.style.textAlign='left'; lab.style.color='#E5E7EB'; lab.textContent = `${s.id} · ${s.title}`;
-    grid.appendChild(lab);
-    const si = Math.max(0, cellOf(s.start));
-    const ei = Math.max(si, cellOf(s.end));
-    for(let i=0; i<cells.length; i++){
-      const cell = document.createElement('div'); cell.className='tcell'; cell.style.padding='4px 2px';
-      if(i === si){
-        const span = ei - si + 1;
-        cell.style.gridColumn = `span ${span}`;
-        const bar = document.createElement('div'); bar.className = 'tbar ' + s.status;
-        bar.textContent = `${s.id} · ${s.title}`; cell.appendChild(bar);
-        grid.appendChild(cell); i = ei;
-      } else if(i < si || i > ei){
-        grid.appendChild(cell);
-      }
-    }
-  });
-}
-renderTimeline('week');
-document.querySelectorAll('.timeline-controls .btn').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.timeline-controls .btn').forEach(x => x.classList.remove('active'));
-  b.classList.add('active'); renderTimeline(b.dataset.view);
-}));
-
-// ── 칸반
-function renderKanban(){
-  const order = ['Backlog','Ready','InProgress','Blocked','Done'];
-  const labels = {Backlog:'백로그', Ready:'대기 (Ready)', InProgress:'진행 중', Blocked:'차단됨', Done:'완료'};
-  const root = document.getElementById('kanban');
-  order.forEach(sec => {
-    const cards = DATA.kanban[sec] || [];
-    const col = document.createElement('div'); col.className='col';
-    col.innerHTML = `<h2>${labels[sec]} <span class="count">${cards.length}</span></h2>`;
-    cards.forEach(c => {
-      const div = document.createElement('div'); div.className='card';
-      const cls = (c.fields['change-class']||'').replace(/\s/g,'').toUpperCase();
-      const done = c.criteria.filter(x=>x[0]).length, total = c.criteria.length;
-      div.innerHTML = `
-        <h3>${c.id}${c.fields.title ? ' · '+escapeHtml(c.fields.title) : ''}</h3>
-        <div class="row">
-          ${cls ? `<span class="pill ${cls}">Class ${cls}</span>` : ''}
-          ${c.fields.mode ? `<span class="pill">${escapeHtml(c.fields.mode)}</span>` : ''}
-          ${c.fields.owner ? `<span class="pill">${escapeHtml(c.fields.owner)}</span>` : ''}
-          ${c.fields.sprint ? `<span class="pill">${escapeHtml(c.fields.sprint)}</span>` : ''}
-          ${total ? `<span class="pill">${done}/${total}</span>` : ''}
+  <!-- Page 04: Timeline -->
+  <section class="page" id="page-timeline">
+    <div class="section-head" style="margin-top:0">
+      <h2>스프린트 <em>타임라인</em>.</h2>
+      <div class="timeline-toolbar" style="margin:0">
+        <div class="seg">
+          <button class="active" id="view-btn-month" data-view="month">Month</button>
+          <button id="view-btn-year" data-view="year">Year</button>
         </div>
-        ${c.fields.notes ? `<div class="muted" style="margin-top:6px;font-size:12px">${escapeHtml(c.fields.notes)}</div>` : ''}
-      `;
-      col.appendChild(div);
-    });
-    root.appendChild(col);
-  });
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="gantt" id="gantt"></div>
+    </div>
+    <div class="legend" style="margin-top:18px">
+      <span><span class="lg-dot" style="background:var(--ok)"></span>done</span>
+      <span><span class="lg-dot" style="background:var(--accent)"></span>active</span>
+      <span><span class="lg-dot" style="background:transparent;border:1px dashed var(--info)"></span>planned</span>
+      <span><span class="lg-dot" style="background:var(--danger);opacity:.4"></span>cancelled</span>
+    </div>
+  </section>
+
+  <!-- Page 05: Kanban -->
+  <section class="page" id="page-kanban">
+    <div class="section-head" style="margin-top:0">
+      <h2>칸반 <em>보드</em>.</h2>
+      <div class="row">
+        <span id="kanban-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase"></span>
+        <button class="btn" id="kanban-collapse-all">Collapse all</button>
+        <button class="btn" id="kanban-expand-all">Expand all</button>
+      </div>
+    </div>
+    <div class="kanban" id="kanban-board"></div>
+  </section>
+
+  <!-- Page 06: Exec -->
+  <section class="page" id="page-exec">
+    <div class="section-head" style="margin-top:0">
+      <h2>통합 <em>뷰</em>.</h2>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">quick scan · all surfaces</span>
+    </div>
+    <section class="stat-row" id="exec-stat-row"></section>
+    <div class="row2" style="margin-top:var(--gap-card)" id="exec-row"></div>
+    <div id="exec-dashboards" style="margin-top:var(--gap-card)"></div>
+    <div id="exec-branches" style="margin-top:var(--gap-card)"></div>
+  </section>
+
+</div><!-- .app -->
+
+<!-- Side-sheet modal -->
+<div id="modal-overlay" class="modal-overlay side" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal side">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow" id="modal-eyebrow"></span>
+        <h3 id="modal-title"></h3>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot">
+      <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">Esc / click outside to close</span>
+      <div class="btn-row">
+        <button class="btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = __DATA__;
+
+// ── Utilities ────────────────────────────────────────────────
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function renderInline(text){
+  return String(text)
+    .replace(/`([^`]+)`/g,'<span class="md-code">$1</span>')
+    .replace(/\b([A-Z]+-\d{3,}|S-\d{3}|T-\d{3}|M\d|METH-\d+)\b/g,'<span class="md-code">$&</span>')
+    .replace(/\[A\]/g,'<span style="color:var(--ok);font-weight:600">[A]</span>')
+    .replace(/\[B\]/g,'<span style="color:var(--warn);font-weight:600">[B]</span>')
+    .replace(/\[C\]/g,'<span style="color:var(--danger);font-weight:600">[C]</span>');
 }
-function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
-renderKanban();
-
-// ── 통합 뷰: 마스터플랜 섹션 카드 + 스프린트 표 + 칸반
-function renderExec(){
-  // 1) 마스터플랜
-  const text = DATA.master_plan_text || '';
-  const meta = document.getElementById('mp-meta');
-  meta.innerHTML = DATA.master_plan_path
-    ? `<code style="background:var(--panel);padding:2px 6px;border-radius:4px">${escapeHtml(DATA.master_plan_path)}</code>`
-    : '<span class="muted">(MASTER_PLAN.md 없음 — 템플릿 사용 중)</span>';
-
-  const sectionsRoot = document.getElementById('mp-sections');
-  sectionsRoot.innerHTML = '';
-  if(!text){
-    sectionsRoot.innerHTML = '<div class="muted">마스터플랜 내용 없음</div>';
-  } else {
-    // ## N 헤더로 분할
-    const lines = text.split('\n');
-    let buf = [], header = '(머리말)', sections = [];
-    function flush(){ if(buf.length || sections.length===0) sections.push({title:header, body:buf.join('\n').trim()}); }
-    for(const line of lines){
-      const m = /^##\s+(.+?)\s*$/.exec(line);
-      if(m){ flush(); header = m[1]; buf = []; }
-      else { buf.push(line); }
-    }
-    flush();
-
-    sections.forEach(s => {
-      // 머리말은 frontmatter라 스킵
-      if(s.title === '(머리말)' && s.body.startsWith('---')) return;
-      const isEmpty = !s.body.replace(/<!--[\s\S]*?-->/g, '').replace(/\s/g, '');
-      const card = document.createElement('div');
-      card.className = 'mp-card' + (isEmpty ? ' empty' : '');
-      let rendered = '';
-      if(window.marked && s.body){
-        try { rendered = marked.parse(s.body); } catch(e){ rendered = `<pre>${escapeHtml(s.body)}</pre>`; }
-      }
-      card.innerHTML = `<h4>${escapeHtml(s.title)}</h4><div class="mp-content">${rendered}</div>`;
-      sectionsRoot.appendChild(card);
-    });
-  }
-
-  // 2) 스프린트 표
-  const tbl = document.getElementById('sprint-table');
-  const sprints = DATA.sprints || [];
-  const headers = ['ID', '제목', '기간', 'cadence', '상태', 'owner', '게이트', '목표 (done/total)', 'TODO IDs', '메모'];
-  let html = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
-  if(!sprints.length){
-    html += `<tr><td colspan="${headers.length}" class="muted" style="text-align:center;padding:18px">스프린트 없음</td></tr>`;
-  } else {
-    sprints.forEach(s => {
-      const f = s.fields || {};
-      const status = (f.status || 'planned').toLowerCase();
-      const done = (s.goals || []).filter(g => g[0]).length;
-      const total = (s.goals || []).length;
-      const goalsHtml = (s.goals || []).map(g =>
-        `<li class="${g[0] ? 'done' : ''}">${escapeHtml(g[1])}</li>`
-      ).join('');
-      html += `<tr>
-        <td class="s-id">${escapeHtml(s.id)}</td>
-        <td>${escapeHtml(f.title || '—')}</td>
-        <td style="white-space:nowrap;font-size:11px">${escapeHtml(f.start || '?')} ~ ${escapeHtml(f.end || '?')}</td>
-        <td>${escapeHtml(f.cadence || '—')}</td>
-        <td><span class="s-status ${status}">${escapeHtml(status)}</span></td>
-        <td>${escapeHtml(f.owner || '—')}</td>
-        <td>${escapeHtml(f.gate || '—')}</td>
-        <td>${goalsHtml ? `<ul class="s-goals">${goalsHtml}</ul><div style="font-size:10px;color:#64748B;margin-top:4px">${done}/${total}</div>` : '—'}</td>
-        <td style="font-family:ui-monospace,Menlo,monospace;font-size:11px">${escapeHtml(f['todo-ids'] || '—')}</td>
-        <td style="font-size:11px;color:#94A3B8">${escapeHtml(f.notes || '—')}</td>
-      </tr>`;
-    });
-  }
-  html += '</tbody>';
-  tbl.innerHTML = html;
-
-  // 3) 칸반 (기존 renderKanban과 같은 로직, exec 컨테이너에 다시 그림)
-  const kbExec = document.getElementById('kanban-exec');
-  kbExec.innerHTML = '';
-  const order = ['Backlog','Ready','InProgress','Blocked','Done'];
-  const labels = {Backlog:'백로그', Ready:'대기', InProgress:'진행 중', Blocked:'차단됨', Done:'완료'};
-  order.forEach(sec => {
-    const cards = (DATA.kanban[sec] || []);
-    const col = document.createElement('div'); col.className='col';
-    col.innerHTML = `<h2>${labels[sec]} <span class="count">${cards.length}</span></h2>`;
-    cards.forEach(c => {
-      const div = document.createElement('div'); div.className='card';
-      const cls = (c.fields['change-class']||'').replace(/\s/g,'').toUpperCase();
-      const done = c.criteria.filter(x=>x[0]).length, total = c.criteria.length;
-      div.innerHTML = `
-        <h3 style="font-size:13px">${c.id}${c.fields.title ? ' · '+escapeHtml(c.fields.title) : ''}</h3>
-        <div class="row">
-          ${cls ? `<span class="pill ${cls}">Class ${cls}</span>` : ''}
-          ${c.fields.sprint ? `<span class="pill">${escapeHtml(c.fields.sprint)}</span>` : ''}
-          ${total ? `<span class="pill">${done}/${total}</span>` : ''}
-        </div>`;
-      col.appendChild(div);
-    });
-    kbExec.appendChild(col);
-  });
+function renderMd(text){
+  if(!text) return '<span style="color:var(--muted)">(없음)</span>';
+  return esc(text)
+    .replace(/^# (.+)$/mg,'<span class="md-h1">$1</span>')
+    .replace(/^## (.+)$/mg,'<span class="md-h2">$1</span>')
+    .replace(/^### (.+)$/mg,'<span class="md-h3">$1</span>')
+    .replace(/^&gt; (.+)$/mg,'<span class="md-quote">$1</span>')
+    .replace(/^---$/mg,'<span class="md-hr"></span>')
+    .replace(/^[-*] (.+)$/mg,'<span class="md-li">$1</span>')
+    .replace(/`([^`]+)`/g,'<span class="md-code">$1</span>');
 }
 
-// 탭 전환 시 그래프와 동일하게 lazy-render
-const _origTabHandler = document.querySelectorAll('.tab');
-_origTabHandler.forEach(t => t.addEventListener('click', () => {
-  if(t.dataset.page === 'exec') renderExec();
-}));
+// ── Tab switching ─────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('page-'+t.dataset.page).classList.add('active');
+    if(t.dataset.page==='graph') initGraph();
+    if(t.dataset.page==='exec') renderExec();
+  };
+});
 
-// ── Dev Servers 패널 (HTTP API 통신) ──────────────────────────────
-const devApi = {
-  list: async () => (await fetch('/api/servers')).json(),
-  start: async (cwd, cmd) => {
-    const r = await fetch('/api/servers/start', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({cwd, cmd})
-    });
-    return {ok: r.ok, body: await r.json()};
-  },
-  stop: async (pid) => {
-    const r = await fetch(`/api/servers/${pid}/stop`, {method: 'POST'});
-    return {ok: r.ok, body: await r.json()};
-  },
-  killRange: async (from, to) => {
-    const r = await fetch('/api/servers/kill-range', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({from, to})
-    });
-    return {ok: r.ok, body: await r.json()};
-  },
-};
-
-const devStatus = document.getElementById('dev-servers-status');
-const devTbody = document.querySelector('#dev-servers-table tbody');
-const devCwdInput = document.getElementById('dev-cwd');
-if (devCwdInput && DATA.root) devCwdInput.placeholder = `cwd (기본: ${DATA.root})`;
-
-async function devRefresh() {
-  try {
-    const {servers} = await devApi.list();
-    devTbody.innerHTML = '';
-    if (!servers || servers.length === 0) {
-      devTbody.innerHTML = '<tr><td colspan="6" style="padding:8px;color:var(--muted)">추적 중인 서버 없음. 위에서 Start.</td></tr>';
-    } else {
-      for (const s of servers) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="padding:6px;border-bottom:1px solid var(--line)"><a href="http://localhost:${s.port}" target="_blank" style="color:#22d3ee;text-decoration:none;font-weight:600">${s.port} ↗</a></td>
-          <td style="padding:6px;border-bottom:1px solid var(--line)"><code>${s.pid}</code></td>
-          <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px"><code>${s.cwd}</code></td>
-          <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px"><code>${(s.cmd||[]).join(' ')}</code></td>
-          <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px">${s.started_at}</td>
-          <td style="padding:6px;border-bottom:1px solid var(--line)"><button data-pid="${s.pid}" class="dev-stop-btn" type="button" style="background:#991b1b;color:#fff;border:none;padding:4px 10px;border-radius:3px;cursor:pointer">Stop</button></td>
-        `;
-        devTbody.appendChild(tr);
-      }
-      devTbody.querySelectorAll('.dev-stop-btn').forEach(b => {
-        b.onclick = async (e) => {
-          const pid = e.target.dataset.pid;
-          e.target.disabled = true;
-          e.target.textContent = 'Stopping…';
-          const {ok, body} = await devApi.stop(pid);
-          if (!ok) alert(`stop 실패: ${body.error || 'unknown'}`);
-          devRefresh();
-        };
-      });
-    }
-    devStatus.textContent = `${(servers||[]).length}개 추적 중 · 마지막 갱신 ${new Date().toLocaleTimeString()}`;
-  } catch (e) {
-    devStatus.textContent = `갱신 실패: ${e.message}`;
-  }
-}
-
-document.getElementById('dev-start').onclick = async () => {
-  const cwd = devCwdInput.value.trim() || DATA.root;
-  const cmd = document.getElementById('dev-cmd').value.trim() || 'pnpm dev';
-  devStatus.textContent = `Starting ${cmd} in ${cwd} ...`;
-  const {ok, body} = await devApi.start(cwd, cmd);
-  if (!ok) {
-    devStatus.textContent = `start 실패: ${body.error || 'unknown'}`;
-    alert(`start 실패: ${body.error || 'unknown'}`);
-    return;
-  }
-  devStatus.textContent = `Started PID ${body.pid} on port ${body.port}`;
-  devRefresh();
-};
-
-document.getElementById('dev-kill-all').onclick = async () => {
-  if (!confirm('포트 3000-3099 의 모든 LISTEN 프로세스를 종료합니다. 진행할까요?')) return;
-  devStatus.textContent = 'Killing 3000-3099 ...';
-  const {ok, body} = await devApi.killRange(3000, 3099);
-  if (!ok) { alert(`kill 실패: ${body.error}`); return; }
-  devStatus.textContent = `${(body.killed||[]).length} 개 프로세스 종료`;
-  devRefresh();
-};
-
-document.getElementById('dev-refresh').onclick = devRefresh;
-
-// 초기 + 주기적 갱신 (5초)
-devRefresh();
-setInterval(devRefresh, 5000);
-
-// ── Commands 카드 (commands.json 기반) ───────────────────────────
-(function setupCommands() {
-  const cmdData = DATA.commands;
-  if (!cmdData || !cmdData.categories) return;
-  const tabsEl = document.getElementById('commands-tabs');
-  const listEl = document.getElementById('commands-list');
-  const toastEl = document.getElementById('commands-toast');
-
-  function renderTab(cat, active) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = (cat.icon || '') + ' ' + cat.label;
-    b.dataset.catId = cat.id;
-    b.style.cssText = 'background:' + (active ? '#0e7490' : 'var(--panel2)') + ';color:#fff;border:1px solid var(--line);padding:4px 10px;border-radius:14px;cursor:pointer;font-size:12px';
-    b.onclick = () => render(cat.id);
-    return b;
-  }
-
-  function renderCommands(cat) {
-    listEl.innerHTML = '';
-    for (const c of (cat.commands || [])) {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;padding:8px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;cursor:pointer';
-      row.onclick = () => {
-        navigator.clipboard.writeText(c.command).then(() => {
-          toastEl.textContent = '✓ 복사됨: ' + c.command;
-          setTimeout(() => { toastEl.textContent = ''; }, 2500);
-        }, () => {
-          toastEl.textContent = '❌ 복사 실패 (브라우저 권한)';
-        });
-      };
-      const label = document.createElement('div');
-      label.style.cssText = 'flex:1;min-width:0';
-      label.innerHTML = '<div style="font-weight:600;font-size:13px">' + c.label + '</div>' +
-        '<div style="font-family:monospace;font-size:11px;color:#22d3ee;margin-top:2px;word-break:break-all">' + c.command + '</div>' +
-        (c.description ? '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + c.description + '</div>' : '');
-      const copy = document.createElement('span');
-      copy.style.cssText = 'font-size:10px;color:var(--muted);align-self:center;flex-shrink:0';
-      copy.textContent = '📋';
-      row.appendChild(label);
-      row.appendChild(copy);
-      listEl.appendChild(row);
-    }
-  }
-
-  function render(activeId) {
-    tabsEl.innerHTML = '';
-    let activeCat = cmdData.categories[0];
-    for (const cat of cmdData.categories) {
-      const isActive = cat.id === activeId;
-      if (isActive) activeCat = cat;
-      tabsEl.appendChild(renderTab(cat, isActive));
-    }
-    renderCommands(activeCat);
-  }
-
-  render(cmdData.categories[0].id);
+// ── Masthead ─────────────────────────────────────────────────
+(function(){
+  const meta = (DATA.project_overview||{}).meta||{};
+  document.getElementById('mast-branch').textContent = DATA.git_branch||'unknown';
+  document.getElementById('mast-commit').textContent = 'commit '+(DATA.git_commit||'unknown');
+  document.getElementById('mast-generated').textContent = 'generated '+(DATA.generated_at||'').replace('T',' ');
+  const name = meta['Project Name']||'methodology';
+  document.getElementById('mast-project-name').textContent = name.toUpperCase();
+  document.getElementById('hero-project-name').textContent = name;
+  document.getElementById('hero-objective').textContent = meta['Objective']||'';
+  const badges = document.getElementById('hero-badges');
+  badges.innerHTML = [
+    meta['Mode']&&`<span class="badge solid">${esc(meta['Mode'])}</span>`,
+    meta['Stack']&&`<span class="badge accent">${esc(meta['Stack'])}</span>`,
+    meta['Release Policy']&&`<span class="badge">${esc(meta['Release Policy'])}</span>`,
+    meta['Primary Approver']&&`<span class="badge">approver · ${esc(meta['Primary Approver'])}</span>`,
+    meta['Started On']&&`<span class="badge">started · ${esc(meta['Started On'])}</span>`,
+  ].filter(Boolean).join('');
 })();
 
-// ── Local Dashboards 패널 ─────────────────────────────────────────
-const dashApi = {
-  list: async () => (await fetch('/api/dashboards')).json(),
-  stop: async (port) => {
-    const r = await fetch('/api/dashboard/stop', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({port})
-    });
-    return {ok: r.ok, body: await r.json()};
-  },
-};
+// ── Hero sprint card ──────────────────────────────────────────
+(function(){
+  const cur = (DATA.sprints||[]).find(s=>(s.fields.status||'').toLowerCase()==='active');
+  const el = document.getElementById('hero-sprint-content');
+  if(!cur){el.innerHTML='<span style="color:var(--muted)">진행 중 스프린트 없음</span>';return;}
+  const goals=cur.goals||[], done=goals.filter(g=>g[0]).length;
+  const perc=goals.length?Math.round(done/goals.length*100):(cur.fields.status==='done'?100:0);
+  el.innerHTML=`
+    <div style="display:flex;align-items:baseline;gap:14px;margin-top:4px">
+      <div style="font-family:var(--font-display);font-weight:800;font-size:42px;line-height:1;letter-spacing:-0.035em;color:var(--accent)">${esc(cur.id)}</div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:36px;line-height:1;letter-spacing:-0.04em">${perc}<span style="font-family:var(--font-mono);font-size:13px;color:var(--muted);letter-spacing:.08em;margin-left:4px">%</span></div>
+    </div>
+    <div style="font-size:15px;color:var(--text);font-weight:500;margin-top:8px;line-height:1.4">${esc(cur.fields.title||'')}</div>
+    <div class="mini-bar" style="margin-top:12px"><div style="width:${perc}%"></div></div>
+    <ul class="kv" style="margin-top:14px">
+      <li><span class="k">window</span><span class="v"><span class="mono">${esc(cur.fields.start||'—')} → ${esc(cur.fields.end||'—')}</span></span></li>
+      <li><span class="k">cadence</span><span class="v">${esc(cur.fields.cadence||'—')}</span></li>
+      <li><span class="k">gate</span><span class="v" style="font-size:12.5px">${esc(cur.fields.gate||'—')}</span></li>
+    </ul>`;
+})();
 
-const dashTbody = document.querySelector('#dashboards-table tbody');
-async function dashboardsRefresh() {
-  try {
-    const {dashboards} = await dashApi.list();
-    dashTbody.innerHTML = '';
-    if (!dashboards || dashboards.length === 0) {
-      dashTbody.innerHTML = '<tr><td colspan="6" style="padding:8px;color:var(--muted)">등록된 dashboard 없음 (또는 모두 종료됨).</td></tr>';
-      return;
-    }
-    for (const d of dashboards) {
-      const tr = document.createElement('tr');
-      const isCurrent = d.root === DATA.root && d.branch === (DATA.git_branch || '');
-      const projName = (d.root || '').split('/').pop() || '?';
-      tr.innerHTML = `
-        <td style="padding:6px;border-bottom:1px solid var(--line)">
-          <a href="http://localhost:${d.port}" target="_blank" style="color:#22d3ee;text-decoration:none;font-weight:600">${d.port} ↗</a>
-          ${isCurrent ? '<span style="font-size:10px;color:#22d3ee;margin-left:4px">(현재)</span>' : ''}
-        </td>
-        <td style="padding:6px;border-bottom:1px solid var(--line)"><code>${projName}</code></td>
-        <td style="padding:6px;border-bottom:1px solid var(--line);font-size:12px"><code>${d.branch || '?'}</code></td>
-        <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px"><code>${d.commit || '?'}</code></td>
-        <td style="padding:6px;border-bottom:1px solid var(--line);font-size:11px">${d.started_at || ''}</td>
-        <td style="padding:6px;border-bottom:1px solid var(--line)">
-          <button data-port="${d.port}" class="dash-stop-btn" type="button" style="background:#991b1b;color:#fff;border:none;padding:4px 10px;border-radius:3px;cursor:pointer">Stop</button>
-        </td>
-      `;
-      dashTbody.appendChild(tr);
-    }
-    dashTbody.querySelectorAll('.dash-stop-btn').forEach(b => {
-      b.onclick = async (e) => {
-        const port = parseInt(e.target.dataset.port);
-        if (!confirm(`포트 ${port} dashboard 를 종료할까요? (worktree 도 정리됨)`)) return;
-        e.target.disabled = true;
-        e.target.textContent = 'Stopping…';
-        const {ok, body} = await dashApi.stop(port);
-        if (!ok) alert(`stop 실패: ${body.error || 'unknown'}`);
-        dashboardsRefresh();
+// ── Stat row ──────────────────────────────────────────────────
+function buildStatHtml(){
+  const ov=DATA.project_overview||{}, ks=ov.kanban_summary||{};
+  const total=Object.values(ks).reduce((a,b)=>a+b,0);
+  const now=ks.InProgress||0,next=ks.Ready||0,blocked=ks.Blocked||0;
+  return [
+    {label:'Sprints',value:ov.sprint_total||0,sub:`${ov.sprint_active||0} active`},
+    {label:'TODO',value:total,sub:`${now} NOW · ${next} NEXT · ${blocked} blocked`},
+    {label:'ADR',value:ov.adr_count||0,sub:'40_dev/adr/'},
+    {label:'Snapshots',value:ov.snapshot_count||0,sub:'40_dev/snapshots/'},
+    {label:'Guides',value:(ov.methodology_assets||{}).observations||0,sub:'L1 관찰 로그'},
+  ].map(s=>`<div class="stat"><span class="l">${s.label}</span><span class="n">${s.value}</span><span class="s">${s.sub}</span></div>`).join('');
+}
+document.getElementById('stat-row').innerHTML = buildStatHtml();
+
+// ── Stack + Progress row ──────────────────────────────────────
+(function(){
+  const ov=DATA.project_overview||{}, meta=ov.meta||{}, ks=ov.kanban_summary||{};
+  const total=Object.values(ks).reduce((a,b)=>a+b,0)||1;
+  const now=ks.InProgress||0,next=ks.Ready||0,blocked=ks.Blocked||0,done=ks.Done||0,backlog=ks.Backlog||0;
+  const pct=n=>(n/total*100).toFixed(1);
+  const rows=[
+    meta['Stack']&&`<li><span class="k">stack</span><span class="v"><span class="mono">${esc(meta['Stack'])}</span></span></li>`,
+    '<li><span class="k">cli</span><span class="v"><span class="mono">60_tools/methodology.py</span></span></li>',
+    ov.dev_url&&`<li><span class="k">dev url</span><span class="v"><a class="mono" style="color:var(--accent)" href="${esc(ov.dev_url)}">${esc(ov.dev_url)}</a></span></li>`,
+    meta['Mode']&&`<li><span class="k">mode</span><span class="v">${esc(meta['Mode'])}</span></li>`,
+    meta['Release Policy']&&`<li><span class="k">release</span><span class="v">${esc(meta['Release Policy'])}</span></li>`,
+  ].filter(Boolean).join('');
+  document.getElementById('stack-progress-row').innerHTML=`
+    <div class="card">
+      <div class="card-head"><h3>스택 · <em>개발 정보</em></h3><span class="meta">project / stack</span></div>
+      <ul class="kv">${rows}</ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>진행 <em>현황</em></h3><span class="meta">${total} todos</span></div>
+      <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:10px">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:60px;line-height:1;letter-spacing:-0.04em">${Math.round(done/total*100)}<span style="font-family:var(--font-mono);font-size:14px;color:var(--muted);letter-spacing:.1em;margin-left:4px">%</span></div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase">done /<br>${total} todos</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="pb-done" style="width:${pct(done)}%"></div>
+          <div class="pb-now" style="width:${pct(now)}%"></div>
+          <div class="pb-next" style="width:${pct(next)}%"></div>
+          <div class="pb-block" style="width:${pct(blocked)}%"></div>
+          <div class="pb-rest" style="width:${pct(backlog)}%"></div>
+        </div>
+        <div class="progress-legend">
+          <span class="pl-done">done · ${done}</span>
+          <span class="pl-now">now · ${now}</span>
+          <span class="pl-next">next · ${next}</span>
+          <span class="pl-block">blocked · ${blocked}</span>
+          <span class="pl-back">backlog · ${backlog}</span>
+        </div>
+      </div>
+    </div>`;
+})();
+
+// ── File viewer ───────────────────────────────────────────────
+(function(){
+  const ov=DATA.project_overview||{};
+  const files=[
+    {id:'claude',  label:'CLAUDE.md',     icon:'›', text:ov.claude_md},
+    {id:'handoff', label:'HANDOFF.md',    icon:'›', text:ov.handoff_md},
+    {id:'todo',    label:'TODO.md',       icon:'›', text:ov.todo_md},
+    {id:'plan',    label:'MASTER_PLAN.md',icon:'›', text:DATA.master_plan_text},
+    {id:'agents',  label:'AGENTS.md',     icon:'›', text:ov.agents_md},
+  ];
+  const tabsEl=document.getElementById('file-tabs');
+  const bodyEl=document.getElementById('file-body');
+  function show(id){
+    tabsEl.querySelectorAll('.file-tab').forEach(t=>t.classList.toggle('active',t.dataset.fid===id));
+    const f=files.find(x=>x.id===id);
+    bodyEl.innerHTML=f&&f.text?renderMd(f.text.slice(0,15000))+(f.text.length>15000?'<span class="md-hr"></span><span style="color:var(--muted)">(truncated)</span>':''):'<span style="color:var(--muted)">(파일 없음)</span>';
+  }
+  tabsEl.innerHTML=files.map(f=>`<div class="file-tab" data-fid="${f.id}"><span class="icon">${f.icon}</span>${f.label}</div>`).join('');
+  tabsEl.querySelectorAll('.file-tab').forEach(t=>t.onclick=()=>show(t.dataset.fid));
+  show('claude');
+})();
+
+// ── Commands ──────────────────────────────────────────────────
+(function(){
+  const cmdData=DATA.commands;
+  const tabsEl=document.getElementById('commands-tabs');
+  const listEl=document.getElementById('commands-list');
+  const toastEl=document.getElementById('commands-toast');
+  const fallback={categories:[
+    {id:'dashboard',label:'Dashboard',commands:[
+      {label:'Dashboard 빌드+서빙',command:'python3 60_tools/generate-dashboard.py --serve',description:'현재 브랜치·commit 반영'},
+      {label:'세션 wrap (4/4 ✓)',command:'methodology wrap',description:'TODO/HANDOFF/checkpoint/observation 갱신 확인'},
+    ]},
+  ]};
+  const data=(cmdData&&cmdData.categories&&cmdData.categories.length)?cmdData:fallback;
+  function render(catId){
+    tabsEl.innerHTML=data.categories.map(c=>`<div class="cmd-cat ${c.id===catId?'active':''}" data-cat="${esc(c.id)}">${esc(c.label)}</div>`).join('');
+    tabsEl.querySelectorAll('.cmd-cat').forEach(b=>b.onclick=()=>render(b.dataset.cat));
+    const cat=data.categories.find(c=>c.id===catId)||data.categories[0];
+    listEl.innerHTML=(cat&&cat.commands||[]).map(c=>`
+      <div class="cmd-item">
+        <div><div class="lbl">${esc(c.label||c.command)}</div></div>
+        <div class="desc">${esc(c.description||c.desc||'')}</div>
+        <div class="run" data-cmd="${esc(c.command)}" title="copy">${esc(c.command)}</div>
+      </div>`).join('');
+    listEl.querySelectorAll('.run').forEach(el=>{
+      el.onclick=()=>{
+        const cmd=el.dataset.cmd;
+        if(navigator.clipboard)navigator.clipboard.writeText(cmd).catch(()=>{});
+        toastEl.textContent='copied — '+cmd;
+        setTimeout(()=>toastEl.textContent='',1800);
       };
     });
-  } catch (e) {
-    dashTbody.innerHTML = `<tr><td colspan="6" style="padding:8px;color:#f87171">갱신 실패: ${e.message}</td></tr>`;
   }
+  if(data.categories.length)render(data.categories[0].id);
+})();
+
+// ── Kanban ────────────────────────────────────────────────────
+const KANBAN_MAP=[
+  {sec:'InProgress',id:'now',      title:'NOW',       hint:'이번 sprint에서 진행 중인 작업'},
+  {sec:'Ready',     id:'next',     title:'NEXT',      hint:'다음 sprint 후보'},
+  {sec:'Done',      id:'library',  title:'LIBRARY',   hint:'완료된 작업 아카이브'},
+  {sec:'Backlog',   id:'thinktank',title:'THINKTANK', hint:'아이디어 인큐베이터'},
+  {sec:'Blocked',   id:'blocked',  title:'BLOCKED',   hint:'외부 의존으로 보류 중'},
+];
+const collapseState={};
+function renderKanban(){
+  const kb=DATA.kanban||{};
+  const board=document.getElementById('kanban-board');
+  board.innerHTML='';
+  let total=0;
+  KANBAN_MAP.forEach(col=>{
+    const items=kb[col.sec]||[];
+    total+=items.length;
+    const collapsed=!!collapseState[col.id];
+    const colEl=document.createElement('div');
+    colEl.className='k-col'+(collapsed?' collapsed':'');
+    colEl.dataset.col=col.id;
+    colEl.innerHTML=`
+      <div class="k-col-head">
+        <span class="title">${col.title}</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="count">${String(items.length).padStart(2,'0')}</span>
+          <button class="collapse" data-col="${col.id}">${collapsed?'+':'−'}</button>
+        </div>
+      </div>
+      <div class="k-col-summary">${col.hint}</div>
+      ${items.map(c=>{
+        const cls=(c.fields['change-class']||'').replace(/\s/g,'').toUpperCase();
+        const priCss=cls==='A'?'a':cls==='B'?'b':cls==='C'?'c':'';
+        return `<div class="k-card" data-card-id="${esc(c.id)}" data-col-id="${col.id}">
+          <div class="tag">
+            <span class="id">${esc(c.id)}</span>
+            <span class="pri ${priCss}">${cls?`[${esc(cls)}]`:''}</span>
+          </div>
+          <div class="title">${esc(c.fields.title||c.id)}</div>
+          <div class="meta">
+            <span>${esc(c.fields.sprint||'—')}</span>
+            <span class="sep">·</span>
+            <span>${esc(c.fields.owner||'—')}</span>
+            ${c.fields['blocked-on']?`<span class="sep">·</span><span style="color:var(--danger)">${esc(c.fields['blocked-on'])}</span>`:''}
+          </div>
+        </div>`;
+      }).join('')}`;
+    board.appendChild(colEl);
+  });
+  document.getElementById('kanban-count').textContent=`${total} todos`;
+  board.querySelectorAll('.collapse').forEach(btn=>{
+    btn.onclick=e=>{e.stopPropagation();const col=btn.dataset.col;collapseState[col]=!collapseState[col];renderKanban();};
+  });
+  board.querySelectorAll('.k-card').forEach(card=>{
+    card.onclick=()=>{
+      const colData=KANBAN_MAP.find(c=>c.id===card.dataset.colId);
+      const cardData=(DATA.kanban[colData&&colData.sec]||[]).find(c=>c.id===card.dataset.cardId);
+      if(cardData)openTodoModal(cardData,colData);
+    };
+  });
 }
+document.getElementById('kanban-collapse-all').onclick=()=>{KANBAN_MAP.forEach(c=>collapseState[c.id]=true);renderKanban();};
+document.getElementById('kanban-expand-all').onclick=()=>{KANBAN_MAP.forEach(c=>delete collapseState[c.id]);renderKanban();};
+renderKanban();
 
-document.getElementById('dashboards-refresh').onclick = dashboardsRefresh;
-dashboardsRefresh();
-setInterval(dashboardsRefresh, 5000);
+// ── Timeline / Gantt ──────────────────────────────────────────
+(function(){
+  const sprints=DATA.sprints||[];
+  const ganttEl=document.getElementById('gantt');
+  if(!sprints.length){ganttEl.innerHTML='<div style="padding:24px;color:var(--muted)">스프린트 없음</div>';return;}
+  function parseDate(s){if(!s||s.includes('YYYY')||s==='—')return null;try{return new Date(s);}catch{return null;}}
+  const dates=sprints.flatMap(s=>[parseDate(s.fields.start),parseDate(s.fields.end)]).filter(Boolean);
+  const minDate=dates.length?new Date(Math.min(...dates.map(d=>d.getTime()))):new Date(new Date().getFullYear(),0,1);
+  const maxDate=dates.length?new Date(Math.max(...dates.map(d=>d.getTime()))):new Date(new Date().getFullYear(),11,31);
+  const span=Math.max(maxDate-minDate,1);
+  const now=new Date();
+  const nowPct=((now-minDate)/span*100).toFixed(2);
+  const MN=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const months=[];
+  let d=new Date(minDate.getFullYear(),minDate.getMonth(),1);
+  while(d<=maxDate){months.push(new Date(d));d=new Date(d.getFullYear(),d.getMonth()+1,1);}
+  const nc=Math.max(months.length,1);
+  ganttEl.style.gridTemplateColumns='200px 1fr';
+  // Header
+  const hdrLabel=document.createElement('div');hdrLabel.className='hcell';hdrLabel.textContent='Sprint';
+  const hdrTrack=document.createElement('div');
+  hdrTrack.style.cssText=`display:grid;grid-template-columns:repeat(${nc},1fr);border-bottom:1px solid var(--hairline);background:var(--surface-2)`;
+  months.forEach(m=>{const tick=document.createElement('div');tick.className='tick';tick.textContent=MN[m.getMonth()]+" '"+String(m.getFullYear()).slice(2);hdrTrack.appendChild(tick);});
+  ganttEl.appendChild(hdrLabel);ganttEl.appendChild(hdrTrack);
+  // Rows
+  sprints.forEach(s=>{
+    const start=parseDate(s.fields.start),end=parseDate(s.fields.end);
+    const status=(s.fields.status||'planned').toLowerCase();
+    const goals=s.goals||[],done=goals.filter(g=>g[0]).length;
+    const perc=goals.length?Math.round(done/goals.length*100):(status==='done'?100:0);
+    const lft=start?Math.max(0,((start-minDate)/span*100)).toFixed(2):0;
+    const wid=(start&&end)?Math.max(1,((end-start)/span*100)).toFixed(2):20;
+    const lbl=document.createElement('div');lbl.className='label';
+    lbl.innerHTML=`<span class="id">${esc(s.id)}</span><span class="ttl">${esc(s.fields.title||'')}</span><span class="dt">${esc(s.fields.start||'?')} → ${esc(s.fields.end||'?')}</span>`;
+    lbl.onclick=()=>openSprintModal(s);
+    const lane=document.createElement('div');lane.className='lane';
+    lane.onclick=()=>openSprintModal(s);
+    const bar=document.createElement('div');bar.className='gantt-bar '+status;
+    bar.style.left=lft+'%';bar.style.width=wid+'%';
+    const barTitle=(s.fields.title||'').split('·')[0].split('—')[0].trim();
+    bar.innerHTML=`<span>${esc(status==='cancelled'?'cancelled':barTitle)}</span>`;
+    if(status!=='planned'&&status!=='cancelled'){const pEl=document.createElement('span');pEl.className='perc';pEl.textContent=perc+'%';bar.appendChild(pEl);}
+    lane.appendChild(bar);
+    if(now>=minDate&&now<=maxDate){const nl=document.createElement('div');nl.className='now-line';nl.style.left=nowPct+'%';lane.appendChild(nl);}
+    ganttEl.appendChild(lbl);ganttEl.appendChild(lane);
+  });
+  // View toggle (cosmetic — same data, just label)
+  document.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.onclick=()=>{document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===btn));};
+  });
+})();
 
-// ── Branches 패널 ────────────────────────────────────────────────
-const branchApi = {
-  list: async () => (await fetch('/api/branches')).json(),
-  spawn: async (branch) => {
-    const r = await fetch('/api/dashboard/spawn', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({branch})
+// ── Graph ─────────────────────────────────────────────────────
+let graphInited=false;
+function initGraph(){
+  if(graphInited)return;graphInited=true;
+  const graph=DATA.graph||{},nodes=graph.nodes||[],edges=graph.edges||[];
+  const W=720,H=540,svg=document.getElementById('graph-svg');
+  if(!nodes.length){svg.innerHTML='<text x="360" y="280" text-anchor="middle" fill="var(--muted)" font-family="var(--font-mono)" font-size="13">그래프 데이터 없음</text>';return;}
+  const KIND_COLOR={meta:'oklch(0.78 0.05 75)',guides:'oklch(0.78 0.13 155)',planning:'oklch(0.74 0.17 25)',dev:'oklch(0.78 0.14 60)',resources:'oklch(0.75 0.11 240)',tools:'oklch(0.72 0.13 300)','root-doc':'oklch(0.78 0.05 75)','live-state':'oklch(0.78 0.10 75)',guide:'oklch(0.78 0.13 155)'};
+  const catColors={};(graph.categories||[]).forEach(c=>catColors[c.id]=c.color||'#888');
+  function nodeColor(n){return KIND_COLOR[n.kind]||KIND_COLOR[n.category]||catColors[n.category]||'oklch(0.60 0.02 75)';}
+  function nodePos(n){
+    if(n.x!=null&&n.y!=null)return{x:n.x*W,y:n.y*H};
+    const cats=['meta','guides','planning','dev','resources'];
+    const ci=cats.indexOf(n.category);
+    return{x:ci>=0?(ci+1)/(cats.length+1)*W:W/2,y:n.tier!=null?(n.tier+1)/8*H:H/2};
+  }
+  let selId=nodes[0].id;
+  function render(){
+    svg.innerHTML=`<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-dim)"/></marker><marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/></marker></defs>`;
+    edges.forEach(e=>{
+      const na=nodes.find(n=>n.id===(e.from||e.source)),nb=nodes.find(n=>n.id===(e.to||e.target));
+      if(!na||!nb)return;
+      const pa=nodePos(na),pb=nodePos(nb),active=na.id===selId||nb.id===selId;
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',pa.x);line.setAttribute('y1',pa.y);line.setAttribute('x2',pb.x);line.setAttribute('y2',pb.y);
+      line.setAttribute('stroke',active?'var(--accent)':'var(--text-dim)');
+      line.setAttribute('stroke-width',active?1.8:1.2);
+      if(!active)line.setAttribute('stroke-dasharray','2 5');
+      line.setAttribute('stroke-linecap','round');
+      line.setAttribute('marker-end',active?'url(#arr-a)':'url(#arr)');
+      line.setAttribute('opacity',active?1:0.55);
+      svg.appendChild(line);
     });
-    return {ok: r.ok, body: await r.json()};
-  },
-};
-
-const branchesList = document.getElementById('branches-list');
-const branchesStatus = document.getElementById('branches-status');
-
-async function branchesRefresh() {
-  branchesStatus.textContent = 'Loading…';
-  try {
-    const {current, branches} = await branchApi.list();
-    if (!branches || branches.length === 0) {
-      branchesList.innerHTML = '<span style="color:var(--muted);font-size:12px">git 브랜치 미발견.</span>';
-      branchesStatus.textContent = '';
-      return;
-    }
-    branchesList.innerHTML = '';
-    for (const b of branches) {
-      const id = 'br_' + b.replace(/[^a-zA-Z0-9]/g, '_');
-      const label = document.createElement('label');
-      label.style.cssText = 'display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;padding:3px 6px;border-radius:3px';
-      label.innerHTML = `
-        <input type="radio" name="branch-select" value="${b}" id="${id}"${b === current ? ' checked' : ''} />
-        <code style="flex:1">${b}</code>
-        ${b === current ? '<span style="font-size:10px;color:#22d3ee">(current)</span>' : ''}
-      `;
-      branchesList.appendChild(label);
-    }
-    branchesStatus.textContent = `${branches.length}개 브랜치 (current: ${current || '?'})`;
-  } catch (e) {
-    branchesList.innerHTML = `<span style="color:#f87171">로드 실패: ${e.message}</span>`;
-    branchesStatus.textContent = '';
+    nodes.forEach(n=>{
+      const p=nodePos(n),active=n.id===selId,color=nodeColor(n);
+      const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.style.cursor='pointer';
+      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',active?16:11);
+      c.setAttribute('fill',active?color:'var(--surface-2)');c.setAttribute('stroke',color);c.setAttribute('stroke-width',active?3:1.5);
+      const label=n.label||n.id;
+      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+      tx.setAttribute('x',p.x);tx.setAttribute('y',p.y+28);tx.setAttribute('text-anchor','middle');
+      tx.setAttribute('font-family','var(--font-mono)');tx.setAttribute('font-size','9.5');
+      tx.setAttribute('fill',active?'var(--text)':'var(--text-dim)');
+      tx.textContent=label.length>20?label.slice(0,19)+'…':label;
+      g.appendChild(c);g.appendChild(tx);
+      g.onclick=()=>{selId=n.id;render();updateDetail(n);};
+      svg.appendChild(g);
+    });
   }
+  function updateDetail(n){
+    const detail=document.getElementById('graph-detail');
+    const connEdges=edges.filter(e=>(e.from||e.source)===n.id||(e.to||e.target)===n.id).map(e=>({other:(e.from||e.source)===n.id?(e.to||e.target):(e.from||e.source),kind:e.kind||e.relationship||'',dir:(e.from||e.source)===n.id?'→':'←'}));
+    const nc=DATA.node_contents&&DATA.node_contents[n.id];
+    detail.innerHTML=`<span class="eyebrow">${esc(n.category||n.kind||'')} / selected</span>
+      <h4 style="margin:8px 0 6px">${esc(n.label||n.id)}</h4>
+      <div class="path">${esc(n.path||'')}</div>
+      <p>${esc(n.role||n.description||'')}</p>
+      ${connEdges.length?`<div class="conn-block"><span class="eyebrow">Connections · ${connEdges.length}</span><ul>${connEdges.map(e=>`<li><span class="ek">${esc(e.dir)} ${esc(e.kind)}</span><span class="mono" style="color:var(--text)">${esc(e.other)}</span></li>`).join('')}</ul></div>`:''}
+      ${nc&&nc.kind==='file'?`<div class="conn-block"><span class="eyebrow">File · ${nc.size} chars</span><div class="file-body" style="margin-top:8px;max-height:200px;font-size:11px">${esc((nc.text||'').slice(0,600))}${nc.size>600?'…':''}</div></div>`:''}`;
+  }
+  // Legend
+  const cats=[...new Set(nodes.map(n=>n.category||n.kind).filter(Boolean))];
+  const lg=document.getElementById('graph-legend-bottom');
+  if(lg)lg.innerHTML=cats.slice(0,8).map(c=>`<span><span class="lg-dot" style="background:${KIND_COLOR[c]||catColors[c]||'#888'}"></span>${c}</span>`).join('');
+  render();updateDetail(nodes[0]);
 }
 
-document.getElementById('branches-refresh').onclick = branchesRefresh;
-document.getElementById('branches-spawn').onclick = async () => {
-  const selected = document.querySelector('input[name="branch-select"]:checked');
-  if (!selected) { alert('브랜치를 선택하세요.'); return; }
-  const branch = selected.value;
-  branchesStatus.textContent = `Spawning dashboard for ${branch} ...`;
-  const {ok, body} = await branchApi.spawn(branch);
-  if (!ok) {
-    alert(`spawn 실패: ${body.error || 'unknown'}\n\n${body.output || ''}`);
-    branchesStatus.textContent = `spawn 실패: ${body.error}`;
-    return;
-  }
-  branchesStatus.textContent = `Spawned: ${body.url}`;
-  window.open(body.url, '_blank');
-  dashboardsRefresh();
-};
+// ── Guide / Whitepaper ────────────────────────────────────────
+(function(){
+  document.getElementById('guide-content').innerHTML=`
+    <div class="section-head" style="margin-top:0">
+      <h2>방법론 <em>백서</em>.</h2>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">v3.2 · Evidence-Driven AI Development</span>
+    </div>
+    <div class="row2">
+      <div class="card">
+        <div class="card-head"><h3><em>5</em> 영역 설계</h3><span class="meta">zones</span></div>
+        <ul class="kv">
+          <li><span class="k">메타</span><span class="v"><span class="mono">(root)</span> · CLAUDE / AGENTS / HANDOFF / TODO</span></li>
+          <li><span class="k">지침서</span><span class="v"><span class="mono">20_guides/</span> · 어떻게 쓰는가 (00–18)</span></li>
+          <li><span class="k">기획 산출물</span><span class="v"><span class="mono">30_planning/</span> · 무엇을 만드는가</span></li>
+          <li><span class="k">개발 산출물</span><span class="v"><span class="mono">40_dev/</span> · MASTER_PLAN / SPRINTS / ADR</span></li>
+          <li><span class="k">재사용 자원</span><span class="v"><span class="mono">50_resources/</span> · templates / prompts</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>핵심 <em>원칙</em></h3><span class="meta">principles</span></div>
+        <ul class="kv">
+          <li><span class="k">Eval-First</span><span class="v">작성보다 평가 정의를 먼저</span></li>
+          <li><span class="k">Harness 분리</span><span class="v">Plan / Generate / Evaluate 를 같은 세션에 묶지 않음</span></li>
+          <li><span class="k">Guardrails</span><span class="v">프롬프트가 아닌 시스템 컴포넌트로 강제</span></li>
+          <li><span class="k">사람-AI 공용</span><span class="v">자연어 + 기계 판독</span></li>
+          <li><span class="k">단일 출처</span><span class="v">모든 정보는 정확히 한 군데에서만 산다</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="card">
+        <div class="card-head"><h3>변경 <em>등급</em></h3><span class="meta">change class</span></div>
+        <ul class="kv">
+          <li><span class="k" style="color:var(--ok)">Class A</span><span class="v">일반 기능 · UI 카피 · 내부 리팩토링 — 게이트: 머지된 PR</span></li>
+          <li><span class="k" style="color:var(--warn)">Class B</span><span class="v">스키마 · auth · 외부 계약 · destructive — 영향·롤백 명시 의무</span></li>
+          <li><span class="k" style="color:var(--danger)">Class C</span><span class="v">가격 · 법무 · 브랜드 · 공개 출시 — 명시적 휴먼 승인 + ADR</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Sync <em>정책</em></h3><span class="meta">file class</span></div>
+        <ul class="kv">
+          <li><span class="k">shared</span><span class="v"><span class="mono">20_guides/</span>, <span class="mono">50_resources/</span> — sync가 항상 덮어씀</span></li>
+          <li><span class="k">managed</span><span class="v">CLAUDE / AGENTS — 마커 사이만 머지</span></li>
+          <li><span class="k">scaffolds</span><span class="v"><span class="mono">30_planning/</span>, <span class="mono">40_dev/</span> — init 1회, sync 무시</span></li>
+          <li><span class="k">local</span><span class="v">HANDOFF · TODO · MASTER_PLAN · ADR — 절대 안 건드림</span></li>
+        </ul>
+      </div>
+    </div>`;
+})();
 
+// ── Modal ─────────────────────────────────────────────────────
+function openModal(eyebrow,title,bodyHtml){
+  document.getElementById('modal-eyebrow').textContent=eyebrow;
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=bodyHtml;
+  const overlay=document.getElementById('modal-overlay');
+  overlay.style.display='';
+  document.body.style.overflow='hidden';
+  const onEsc=e=>{if(e.key==='Escape')closeModal();};
+  window.addEventListener('keydown',onEsc);
+  overlay._removeEsc=()=>window.removeEventListener('keydown',onEsc);
+}
+function closeModal(){
+  const overlay=document.getElementById('modal-overlay');
+  overlay.style.display='none';
+  document.body.style.overflow='';
+  if(overlay._removeEsc){overlay._removeEsc();overlay._removeEsc=null;}
+}
+
+function openSprintModal(s){
+  const goals=s.goals||[],done=goals.filter(g=>g[0]).length;
+  const status=(s.fields.status||'planned').toLowerCase();
+  const stCls={done:'ok',active:'accent',planned:'warn',cancelled:'danger'}[status]||'';
+  const perc=goals.length?Math.round(done/goals.length*100):(status==='done'?100:0);
+  const todoIds=(s.fields['todo-ids']||'').replace(/[\[\]]/g,'').split(/[,\s]+/).filter(x=>x&&x!=='—');
+  const allCards=Object.entries(DATA.kanban||{}).flatMap(([sec,cards])=>cards.map(c=>({...c,_sec:sec})));
+  const relTodos=todoIds.map(tid=>allCards.find(c=>c.id===tid)).filter(Boolean);
+  const body=`
+    <div class="section">
+      <div class="tag-row" style="margin-bottom:14px">
+        <span class="tg ${stCls}">${status}</span>
+        ${s.fields.cadence?`<span class="tg">${esc(s.fields.cadence)}</span>`:''}
+        ${s.fields.owner?`<span class="tg">${esc(s.fields.owner)}</span>`:''}
+        ${perc>0&&perc<100?`<span class="tg accent">${perc}% complete</span>`:''}
+      </div>
+      <p class="modal-prose">${esc(s.fields.notes||s.fields.title||'')}</p>
+    </div>
+    <div class="section">
+      <span class="eyebrow">Meta</span>
+      <div class="meta-grid">
+        <div class="cell"><div class="l">Start</div><div class="v">${esc(s.fields.start||'—')}</div></div>
+        <div class="cell"><div class="l">End</div><div class="v">${esc(s.fields.end||'—')}</div></div>
+        <div class="cell"><div class="l">Cadence</div><div class="v">${esc(s.fields.cadence||'—')}</div></div>
+        <div class="cell"><div class="l">Owner</div><div class="v">${esc(s.fields.owner||'—')}</div></div>
+      </div>
+    </div>
+    ${goals.length?`<div class="section"><span class="eyebrow">Goals · ${done}/${goals.length}</span><ul class="checklist">${goals.map(g=>`<li class="${g[0]?'done':''}"><span class="box">${g[0]?'&#x2713;':''}</span><span class="t">${esc(g[1])}</span></li>`).join('')}</ul></div>`:''}
+    <div class="section"><span class="eyebrow">Gate</span><p class="modal-prose">${esc(s.fields.gate||'—')}</p></div>
+    ${relTodos.length?`<div class="section"><span class="eyebrow">Related TODOs · ${relTodos.length}</span><ul class="rel-list">${relTodos.map(c=>{const col=KANBAN_MAP.find(k=>k.sec===c._sec);return `<li onclick="openTodoModal(window._findCard('${esc(c.id)}'),KANBAN_MAP.find(k=>k.sec==='${c._sec}'))" style="cursor:pointer"><span class="rid">${esc(c.id)}</span><span class="rttl">${esc(c.fields.title||c.id)}</span><span class="rpri">[${esc(c.fields['change-class']||'—')}]</span></li>`;}).join('')}</ul></div>`:''}`;
+  openModal(`Sprint · ${s.id}`,s.fields.title||s.id,body);
+}
+window._findCard=function(id){const all=Object.entries(DATA.kanban||{}).flatMap(([sec,cards])=>cards.map(c=>({...c,_sec:sec})));return all.find(c=>c.id===id)||{id,fields:{},criteria:[],_sec:'Backlog'};};
+
+function openTodoModal(card,colData){
+  if(!card)return;
+  const acc=card.criteria||[],doneAcc=acc.filter(a=>a[0]).length;
+  const cls=(card.fields['change-class']||'').replace(/\s/g,'').toUpperCase();
+  const priCss={A:'ok',B:'warn',C:'danger'}[cls]||'';
+  const colId=colData&&colData.id||'';const colTitle=colData&&colData.title||'';
+  const sprintId=card.fields.sprint||'';
+  const sprint=(DATA.sprints||[]).find(s=>s.id===sprintId);
+  const body=`
+    <div class="section">
+      <div class="tag-row" style="margin-bottom:14px">
+        ${cls?`<span class="tg ${priCss}">Priority [${esc(cls)}]</span>`:''}
+        ${colTitle?`<span class="tg ${colId==='now'?'accent':''}">${esc(colTitle)}</span>`:''}
+        ${sprintId?`<span class="tg">${esc(sprintId)}</span>`:''}
+        ${card.fields.owner?`<span class="tg">${esc(card.fields.owner)}</span>`:''}
+      </div>
+      <p class="modal-prose">${esc(card.fields.notes||card.fields.title||card.id)}</p>
+    </div>
+    <div class="section">
+      <span class="eyebrow">Meta</span>
+      <div class="meta-grid">
+        <div class="cell"><div class="l">ID</div><div class="v">${esc(card.id)}</div></div>
+        <div class="cell"><div class="l">Mode</div><div class="v">${esc(card.fields.mode||'—')}</div></div>
+        <div class="cell"><div class="l">Sprint</div><div class="v">${esc(sprintId||'—')}</div></div>
+        <div class="cell"><div class="l">Owner</div><div class="v">${esc(card.fields.owner||'—')}</div></div>
+      </div>
+    </div>
+    ${acc.length?`<div class="section"><span class="eyebrow">Acceptance criteria · ${doneAcc}/${acc.length}</span><div class="mini-bar ${doneAcc===acc.length?'done':''}" style="margin-bottom:14px"><div style="width:${acc.length?doneAcc/acc.length*100:0}%"></div></div><ul class="checklist">${acc.map(a=>`<li class="${a[0]?'done':''}"><span class="box">${a[0]?'&#x2713;':''}</span><span class="t">${esc(a[1])}</span></li>`).join('')}</ul></div>`:''}
+    ${sprint?`<div class="section"><span class="eyebrow">Sprint</span><ul class="rel-list"><li onclick="openSprintModal(window._findSprint('${esc(sprint.id)}'))" style="cursor:pointer"><span class="rid">${esc(sprint.id)}</span><span class="rttl">${esc(sprint.fields.title||sprint.id)}</span><span class="rpri">${esc(sprint.fields.status||'—')}</span></li></ul></div>`:''}`;
+  openModal(`TODO · ${card.id}`,card.fields.title||card.id,body);
+}
+window._findSprint=function(id){return(DATA.sprints||[]).find(s=>s.id===id)||{id,fields:{},goals:[]};};
+
+// ── Exec view ─────────────────────────────────────────────────
+function renderExec(){
+  if(window._execRendered)return;window._execRendered=true;
+  document.getElementById('exec-stat-row').innerHTML=buildStatHtml();
+  const ov=DATA.project_overview||{};
+  const handoff=ov.handoff_md||'';
+  const recentLines=handoff.split('\n').filter(l=>/^\d{4}-\d{2}-\d{2}/.test(l)).slice(0,5);
+  document.getElementById('exec-row').innerHTML=`
+    <div class="card">
+      <div class="card-head"><h3>최근 <em>활동</em></h3><span class="meta">HANDOFF.md</span></div>
+      <ul class="kv">${recentLines.map(l=>{const m=l.match(/^(\d{4}-\d{2}-\d{2})[\s—\-]*(.*)$/);return m?`<li><span class="k">${esc(m[1])}</span><span class="v">${renderInline(esc(m[2]))}</span></li>`:''}).join('')||'<li><span class="k" style="color:var(--muted)">없음</span><span class="v"></span></li>'}</ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>칸반 <em>요약</em></h3><span class="meta">kanban · all columns</span></div>
+      <ul class="kv">${KANBAN_MAP.map(col=>`<li><span class="k">${col.title}</span><span class="v"><strong>${(DATA.kanban[col.sec]||[]).length}</strong> · ${col.hint}</span></li>`).join('')}</ul>
+    </div>`;
+  document.getElementById('exec-dashboards').innerHTML=`
+    <div class="card">
+      <div class="card-head"><h3>로컬 <em>대시보드</em></h3><span class="meta">~/.methodology-dashboards.json</span></div>
+      <table class="tbl" id="exec-dashboards-table"><thead><tr><th>Port</th><th>Project</th><th>Branch</th><th>Commit</th><th>Started</th><th></th></tr></thead><tbody><tr><td colspan="6" style="padding:14px;color:var(--muted)">Loading…</td></tr></tbody></table>
+    </div>`;
+  document.getElementById('exec-branches').innerHTML=`
+    <div class="card">
+      <div class="card-head"><h3>브랜치 · <em>worktree</em></h3><span class="meta">git branches</span></div>
+      <div id="exec-branches-list" style="color:var(--muted);font-size:13px;padding:8px 0">Loading…</div>
+    </div>`;
+  dashboardsRefresh();branchesRefresh();
+}
+
+// ── Dev Servers API ───────────────────────────────────────────
+const devApi={
+  list:async()=>(await fetch('/api/servers')).json(),
+  start:async(cwd,cmd)=>{const r=await fetch('/api/servers/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cwd,cmd})});return{ok:r.ok,body:await r.json()};},
+  stop:async(pid)=>{const r=await fetch(`/api/servers/${pid}/stop`,{method:'POST'});return{ok:r.ok,body:await r.json()};},
+  killRange:async(from,to)=>{const r=await fetch('/api/servers/kill-range',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from,to})});return{ok:r.ok,body:await r.json()};},
+};
+const devStatus=document.getElementById('dev-servers-status');
+const devTbody=document.querySelector('#dev-servers-table tbody');
+const devCwdInput=document.getElementById('dev-cwd');
+if(devCwdInput&&DATA.root)devCwdInput.placeholder=`cwd (기본: ${DATA.root})`;
+async function devRefresh(){
+  try{
+    const{servers}=await devApi.list();
+    devTbody.innerHTML='';
+    if(!servers||!servers.length){devTbody.innerHTML='<tr><td colspan="6" style="padding:14px;color:var(--muted)">추적 중인 서버 없음</td></tr>';}
+    else{
+      for(const s of servers){
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td><a href="http://localhost:${s.port}" target="_blank" class="port">${s.port} ↗</a></td><td class="mono">${s.pid}</td><td class="mono" style="font-size:11px">${esc(s.cwd||'')}</td><td class="mono" style="font-size:11px">${esc((s.cmd||[]).join(' '))}</td><td class="mono">${s.started_at||''}</td><td><button data-pid="${s.pid}" class="dev-stop-btn btn btn-danger">Stop</button></td>`;
+        devTbody.appendChild(tr);
+      }
+      devTbody.querySelectorAll('.dev-stop-btn').forEach(b=>{b.onclick=async e=>{const pid=e.target.dataset.pid;e.target.disabled=true;e.target.textContent='Stopping…';const{ok,body}=await devApi.stop(pid);if(!ok)alert(`stop 실패: ${body.error||'unknown'}`);devRefresh();};});
+    }
+    devStatus.textContent=`${(servers||[]).length}개 추적 중 · ${new Date().toLocaleTimeString()}`;
+  }catch(e){devStatus.textContent=`갱신 실패: ${e.message}`;}
+}
+document.getElementById('dev-start').onclick=async()=>{
+  const cwd=devCwdInput.value.trim()||DATA.root;
+  const cmd=document.getElementById('dev-cmd').value.trim()||'pnpm dev';
+  devStatus.textContent=`Starting ${cmd} in ${cwd} ...`;
+  const{ok,body}=await devApi.start(cwd,cmd);
+  if(!ok){devStatus.textContent=`start 실패: ${body.error||'unknown'}`;alert(`start 실패: ${body.error||'unknown'}`);return;}
+  devStatus.textContent=`Started PID ${body.pid} on port ${body.port}`;devRefresh();
+};
+document.getElementById('dev-kill-all').onclick=async()=>{
+  if(!confirm('포트 3000-3099 의 모든 LISTEN 프로세스를 종료합니다. 진행할까요?'))return;
+  devStatus.textContent='Killing 3000-3099 ...';
+  const{ok,body}=await devApi.killRange(3000,3099);
+  if(!ok){alert(`kill 실패: ${body.error}`);return;}
+  devStatus.textContent=`${(body.killed||[]).length}개 프로세스 종료`;devRefresh();
+};
+document.getElementById('dev-refresh').onclick=devRefresh;
+devRefresh();setInterval(devRefresh,5000);
+
+// ── Dashboards API ────────────────────────────────────────────
+const dashApi={
+  list:async()=>(await fetch('/api/dashboards')).json(),
+  stop:async(port)=>{const r=await fetch('/api/dashboard/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({port})});return{ok:r.ok,body:await r.json()};},
+};
+async function dashboardsRefresh(){
+  try{
+    const{dashboards}=await dashApi.list();
+    function renderTbody(tbodyEl){
+      tbodyEl.innerHTML='';
+      if(!dashboards||!dashboards.length){tbodyEl.innerHTML='<tr><td colspan="6" style="padding:14px;color:var(--muted)">등록된 dashboard 없음</td></tr>';return;}
+      for(const d of dashboards){
+        const tr=document.createElement('tr');
+        const isCurrent=d.root===DATA.root&&d.branch===(DATA.git_branch||'');
+        const projName=(d.root||'').split('/').pop()||'?';
+        tr.innerHTML=`<td><a href="http://localhost:${d.port}" target="_blank" class="port">${d.port} ↗</a>${isCurrent?'<span style="font-size:10px;color:var(--accent);margin-left:4px">← THIS</span>':''}</td><td>${esc(projName)}</td><td class="mono">${esc(d.branch||'?')}</td><td class="mono">${esc(d.commit||'?')}</td><td class="mono">${esc(d.started_at||'')}</td><td><button data-port="${d.port}" class="dash-stop-btn btn btn-danger">Stop</button></td>`;
+        tbodyEl.appendChild(tr);
+      }
+      tbodyEl.querySelectorAll('.dash-stop-btn').forEach(b=>{b.onclick=async e=>{const port=parseInt(e.target.dataset.port);if(!confirm(`포트 ${port} dashboard를 종료할까요?`))return;e.target.disabled=true;e.target.textContent='Stopping…';const{ok,body}=await dashApi.stop(port);if(!ok)alert(`stop 실패: ${body.error||'unknown'}`);dashboardsRefresh();};});
+    }
+    const t1=document.querySelector('#dashboards-table tbody');if(t1)renderTbody(t1);
+    const t2=document.querySelector('#exec-dashboards-table tbody');if(t2)renderTbody(t2);
+    const ds=document.getElementById('dashboards-status');if(ds)ds.textContent=`${(dashboards||[]).length}개 · ${new Date().toLocaleTimeString()}`;
+  }catch(e){
+    const t1=document.querySelector('#dashboards-table tbody');
+    if(t1)t1.innerHTML=`<tr><td colspan="6" style="color:var(--danger);padding:14px">갱신 실패: ${esc(e.message)}</td></tr>`;
+  }
+}
+document.getElementById('dashboards-refresh').onclick=dashboardsRefresh;
+dashboardsRefresh();setInterval(dashboardsRefresh,5000);
+
+// ── Branches API ──────────────────────────────────────────────
+const branchApi={
+  list:async()=>(await fetch('/api/branches')).json(),
+  spawn:async(branch)=>{const r=await fetch('/api/dashboard/spawn',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({branch})});return{ok:r.ok,body:await r.json()};},
+};
+const branchesList=document.getElementById('branches-list');
+const branchesStatus=document.getElementById('branches-status');
+async function branchesRefresh(){
+  branchesStatus.textContent='Loading…';
+  try{
+    const{current,branches}=await branchApi.list();
+    if(!branches||!branches.length){branchesList.innerHTML='<span style="color:var(--muted);font-size:12px">git 브랜치 미발견</span>';branchesStatus.textContent='';return;}
+    branchesList.innerHTML='';
+    for(const b of branches){
+      const id='br_'+b.replace(/[^a-zA-Z0-9]/g,'_');
+      const lbl=document.createElement('label');
+      lbl.style.cssText='display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;padding:4px 6px;';
+      lbl.innerHTML=`<input type="radio" name="branch-select" value="${esc(b)}" id="${id}"${b===current?' checked':''} style="accent-color:var(--accent)"/><code style="flex:1;font-family:var(--font-mono);font-size:12px;color:${b===current?'var(--accent)':'var(--text)'}">${esc(b)}</code>${b===current?'<span style="font-family:var(--font-mono);font-size:10px;color:var(--ok);letter-spacing:.14em">CURRENT</span>':''}`;
+      branchesList.appendChild(lbl);
+    }
+    // Also update exec branches if rendered
+    const execBr=document.getElementById('exec-branches-list');
+    if(execBr)execBr.innerHTML=branchesList.innerHTML;
+    branchesStatus.textContent=`${branches.length}개 브랜치 (current: ${current||'?'})`;
+  }catch(e){branchesList.innerHTML=`<span style="color:var(--danger)">로드 실패: ${esc(e.message)}</span>`;branchesStatus.textContent='';}
+}
+document.getElementById('branches-refresh').onclick=branchesRefresh;
+document.getElementById('branches-spawn').onclick=async()=>{
+  const selected=document.querySelector('input[name="branch-select"]:checked');
+  if(!selected){alert('브랜치를 선택하세요.');return;}
+  const branch=selected.value;
+  branchesStatus.textContent=`Spawning dashboard for ${branch} ...`;
+  const{ok,body}=await branchApi.spawn(branch);
+  if(!ok){alert(`spawn 실패: ${body.error||'unknown'}\n\n${body.output||''}`);branchesStatus.textContent=`spawn 실패: ${body.error}`;return;}
+  branchesStatus.textContent=`Spawned: ${body.url}`;
+  window.open(body.url,'_blank');dashboardsRefresh();
+};
 branchesRefresh();
 </script>
 </body>
 </html>
+
 """
 
 
