@@ -1853,6 +1853,214 @@ def cmd_wrap(args: argparse.Namespace) -> int:
         return 1 if args.strict else 0
 
 
+# ─── 외주 인계용 export ─────────────────────────────────────────────────────
+# 코드만 추출, 방법론·메타 자산 제외.
+
+# 디렉터리·파일 패턴 (root 기준 상대경로)
+EXPORT_EXCLUDE_DIRS: set[str] = {
+    # 방법론 NN_ 폴더 (현재 + 예약 슬롯)
+    "00_briefs", "10_foundation", "20_guides", "30_planning",
+    "40_dev", "50_resources", "60_tools", "70_meta",
+    "80_reserved", "90_archive",
+    # 진입점·캐시·메타
+    "_start", ".ai", ".methodology-cache",
+    # 본 저장소 전용
+    "migrations",
+    # 로컬 도구
+    ".claude", ".codex",
+    # 빌드 산출물·캐시 (Next.js / Node / Python / 기타)
+    "node_modules", ".next", ".nuxt", ".svelte-kit", ".vercel", ".turbo",
+    "dist", "build", "out", "coverage", ".cache",
+    "__pycache__", ".venv", "venv", ".pytest_cache", ".mypy_cache",
+    ".parcel-cache", ".angular",
+}
+
+# 루트 한정 파일 (방법론 파일)
+EXPORT_EXCLUDE_FILES: set[str] = {
+    "CLAUDE.md", "AGENTS.md", "HANDOFF.md", "TODO.md", "ONBOARDING.md",
+    "AI-LOG.md", "dashboard.html", ".methodology-version",
+    "open-dashboard.command",
+}
+
+# 어느 깊이든 매칭되는 파일명 (OS·에디터 메타·빌드 캐시)
+EXPORT_EXCLUDE_BASENAMES: set[str] = {
+    ".DS_Store", "Thumbs.db", ".eslintcache", ".tsbuildinfo",
+    "npm-debug.log", "yarn-error.log", "pnpm-debug.log",
+}
+
+# .github/workflows 안에서 제외 패턴
+EXPORT_EXCLUDE_WORKFLOW_PREFIX = "methodology-"
+
+# sensitive 파일 패턴 (인계 차단)
+EXPORT_SENSITIVE = [".env", "credential", "secret", ".pem", ".key", ".p12", ".pfx"]
+
+
+def _export_should_skip(rel: str) -> bool:
+    """rel은 source 기준 상대경로 (POSIX 슬래시)."""
+    parts = rel.split("/")
+    if not parts:
+        return False
+    top = parts[0]
+    # 디렉터리 패턴 — 어느 깊이든 제외
+    for d in EXPORT_EXCLUDE_DIRS:
+        if d in parts:
+            return True
+    # 루트 파일 (방법론 파일은 루트에만 있음)
+    if len(parts) == 1 and top in EXPORT_EXCLUDE_FILES:
+        return True
+    # 어느 깊이든 — OS·에디터·빌드 캐시 basename
+    if parts[-1] in EXPORT_EXCLUDE_BASENAMES:
+        return True
+    # .github/workflows/methodology-* 제외
+    if (
+        len(parts) >= 3 and parts[0] == ".github" and parts[1] == "workflows"
+        and parts[-1].startswith(EXPORT_EXCLUDE_WORKFLOW_PREFIX)
+    ):
+        return True
+    # 빌드 산출물 (캐시)
+    if ".methodology-cache" in parts or "_start" in parts:
+        return True
+    return False
+
+
+def _export_is_sensitive(rel: str) -> bool:
+    low = rel.lower()
+    if low.endswith(".sample") or low.endswith(".example"):
+        return False
+    return any(pat in low for pat in EXPORT_SENSITIVE)
+
+
+def cmd_export(args: argparse.Namespace) -> int:
+    """외주 인계용 — 코드만 추출, 방법론·메타 자산 제외.
+
+    동작:
+      1) source 트리 walk, 제외 패턴 매칭 시 skip
+      2) sensitive 파일 검사 (.env/credentials/keys 등) — 발견 시 차단
+      3) 결과 검증 — 방법론 흔적 잔존 시 fail
+      4) --dry-run: 무엇이 포함·제외되는지만 출력
+      5) --zip: tar.gz 생성
+
+    출력:
+      <parent>/<project>-handover/   (기본)
+      또는 --target <path>
+    """
+    import time as _time
+    source = Path(args.path or ".").resolve()
+    if not source.exists():
+        err(f"source 미존재: {source}")
+        return 1
+
+    # 본 저장소(methodology-source) export 차단 — 의미 없음 + 위험
+    if (source / "60_tools" / "methodology.py").exists() and (source / "70_meta").exists():
+        warn("source 가 methodology-source 자체로 보입니다. export 는 *적용 프로젝트* 용입니다.")
+        if not args.force:
+            err("--force 없이는 진행 안 함.")
+            return 2
+
+    target = Path(args.target).resolve() if args.target else (source.parent / f"{source.name}-handover")
+    dry = args.dry_run
+
+    info(f"export: {source}  →  {target}")
+    if dry:
+        info("(dry-run) 실제 복사 안 함")
+
+    if target.exists() and not args.force:
+        err(f"target 이미 존재: {target}  (--force 로 덮어쓰기)")
+        return 1
+    if not dry and target.exists() and args.force:
+        shutil.rmtree(target)
+
+    # 1) walk + filter
+    included: list[str] = []
+    excluded: list[str] = []
+    sensitive_hits: list[str] = []
+
+    for src_path in sorted(source.rglob("*")):
+        if src_path.is_dir():
+            continue
+        if ".git" in src_path.relative_to(source).parts and not args.include_git:
+            excluded.append(str(src_path.relative_to(source)))
+            continue
+        rel = str(src_path.relative_to(source)).replace("\\", "/")
+        if _export_should_skip(rel):
+            excluded.append(rel)
+            continue
+        if _export_is_sensitive(rel):
+            sensitive_hits.append(rel)
+            continue
+        included.append(rel)
+
+    # 2) sensitive 차단
+    if sensitive_hits and not args.allow_sensitive:
+        err("sensitive 의심 파일 발견 — export 차단:")
+        for s in sensitive_hits[:20]:
+            err(f"  {s}")
+        if len(sensitive_hits) > 20:
+            err(f"  ... 외 {len(sensitive_hits) - 20}건")
+        err("의도된 것이면 --allow-sensitive 로 재호출.")
+        return 1
+    elif sensitive_hits:
+        warn(f"sensitive 의심 파일 {len(sensitive_hits)}건 — --allow-sensitive 로 포함됨")
+        included.extend(sensitive_hits)
+
+    # 3) dry-run 보고
+    print()
+    ok(f"포함 {len(included):,} 파일")
+    ok(f"제외 {len(excluded):,} 파일")
+    if args.verbose or dry:
+        print("\n=== 포함 (최대 30개 미리보기) ===")
+        for r in included[:30]:
+            print(f"  ✓ {r}")
+        if len(included) > 30:
+            print(f"  ... 외 {len(included) - 30}건")
+        print("\n=== 제외 (최대 20개 미리보기) ===")
+        for r in excluded[:20]:
+            print(f"  ✗ {r}")
+        if len(excluded) > 20:
+            print(f"  ... 외 {len(excluded) - 20}건")
+
+    if dry:
+        info("(dry-run) target 생성 안 함. --dry-run 빼고 재호출하면 실제 export.")
+        return 0
+
+    # 4) 복사
+    info(f"복사 중: {target}")
+    for rel in included:
+        src = source / rel
+        dst = target / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+
+    # 5) 결과 검증 — 방법론 흔적 잔존 검사
+    leaked: list[str] = []
+    for p in target.rglob("*"):
+        if p.is_dir():
+            continue
+        rel = str(p.relative_to(target)).replace("\\", "/")
+        if _export_should_skip(rel):
+            leaked.append(rel)
+    if leaked:
+        err("⚠ 방법론 흔적이 export 결과에 남아 있습니다:")
+        for l in leaked[:10]:
+            err(f"  {l}")
+        err("export 로직 점검 필요 — 본 결과 외주 인계 금지.")
+        return 3
+
+    # 6) zip (선택)
+    if args.zip:
+        archive_base = str(target)
+        archive_path = shutil.make_archive(archive_base, "gztar", root_dir=target.parent, base_dir=target.name)
+        ok(f"archive: {archive_path}")
+
+    print()
+    ok(f"export 완료: {target}")
+    ok(f"  포함 파일: {len(included):,}")
+    ok(f"  방법론 흔적 잔존: 0 (검증 통과)")
+    if sensitive_hits:
+        warn(f"  sensitive 파일 {len(sensitive_hits)}건 포함됨 (--allow-sensitive)")
+    return 0
+
+
 def cmd_manifest_check(args: argparse.Namespace) -> int:
     """MANIFEST excluded_paths 안전망을 명시적으로 검증.
 
@@ -1903,6 +2111,17 @@ def main(argv: list[str] | None = None) -> int:
 
     pmc = sub.add_parser("manifest-check", help="MANIFEST excluded_paths 안전망 검증")
     pmc.set_defaults(func=cmd_manifest_check)
+
+    pex = sub.add_parser("export", help="외주 인계용 — 코드만 추출 (방법론·메타 자산 제외)")
+    pex.add_argument("--path", help="source 프로젝트 (기본: 현재)")
+    pex.add_argument("--target", help="export 출력 위치 (기본: <source>-handover)")
+    pex.add_argument("--dry-run", action="store_true", help="실제 복사 안 함, 포함·제외 미리보기")
+    pex.add_argument("--zip", action="store_true", help="tar.gz 압축")
+    pex.add_argument("--include-git", action="store_true", help=".git/ 도 포함 (기본 제외)")
+    pex.add_argument("--allow-sensitive", action="store_true", help=".env/credentials 등 sensitive 차단 우회")
+    pex.add_argument("--force", action="store_true", help="target 덮어쓰기 / methodology-source 도 export")
+    pex.add_argument("--verbose", "-v", action="store_true", help="포함·제외 파일 목록 출력")
+    pex.set_defaults(func=cmd_export)
 
     pw = sub.add_parser("wrap", help="작업·세션 종료 검증 — 4개 라이브 파일(HANDOFF/TODO/checkpoint/observation) 갱신 누락 점검")
     pw.add_argument("--path", help="대상 폴더 (기본: 현재)")

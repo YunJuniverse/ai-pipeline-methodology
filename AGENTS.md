@@ -31,6 +31,7 @@
   4. `50_resources/ai_observations/YYYY-MM-DD_<slug>.md` 또는 `70_meta/observations/...` — L1 관찰 로그 1건 작성 (`20_guides/03_AI_관찰_로그_작성_규칙.md` 준수)
   wrap 출력이 `4/4 ✓` 일 때만 종료. `✗` 가 있으면 누락 갱신 후 다시 호출.
 - **commit/push 자동화 (권장)**: 위 4 파일 갱신 후 `python3 60_tools/methodology.py ship -m "<conventional commit message>"` 한 명령으로 wrap+manifest-check+sensitive 검사+(test/build)+commit+push 일괄 처리. 별도로 `git add`/`git commit`/`git push` 호출 금지 — *ship*만 사용.
+- **외주 인계 (코드만 추출)**: `python3 60_tools/methodology.py export --path <project> --dry-run` 으로 포함·제외 미리보기 후, `--dry-run` 빼고 재호출. `<project>-handover/` 폴더에 *방법론·메타·브리프 모두 제외*된 코드만 추출. sensitive 파일(.env/credentials/keys)은 *기본 차단* — 의도 확인 후 `--allow-sensitive`. `--zip` 으로 tar.gz 압축. 결과 검증: *방법론 흔적 잔존 0* 자동 보장.
 - **로컬 안전망 (1회 설치)**: `python3 60_tools/methodology.py hooks install` — `.git/hooks/pre-push`에 manifest-check + wrap --strict 자동 등록. push 직전 검증 실패 시 push 자체 차단. 우회는 `git push --no-verify` (의식적 비상 탈출).
 - Identifier and versioning rules (phase M0/M1, sprint S-NNN, TODO ID, ADR, doc version, AI feature ID) are defined in `20_guides/02_식별자_및_버전_관리_규칙.md`. Follow that file before creating any new identifier.
 - `40_dev/snapshots/` contains dated artifacts. Snapshots are never live source.

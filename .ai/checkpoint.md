@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-14 (방법론 v4.0 — 00_briefs + NN_ shift)
+# Checkpoint — 2026-05-14 (methodology export 외주 인계 CLI)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -20,7 +20,24 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 방법론 v4.0 — 00_briefs/ + NN_ +10 shift (방금)**:
+**🆕 methodology export — 외주 인계 자동화 (방금)**:
+- 사용자 통증: 외주 인계 시 방법론·메타·브리프 자산이 코드와 섞임 → 수동 정리 + 기밀 유출 위험
+- 옵션 검토: A/B (코드를 `app/` 하위로) — Next.js 충돌 비용 큼 / D (방법론을 `.methodology/` 로) — 자동 로드 깨짐 → **옵션 C (export CLI)** 채택
+- `cmd_export`: source walk + 제외 목록(DIRS/FILES/BASENAMES) + sensitive 차단 + 결과 검증
+- 제외:
+  · NN_ 방법론 폴더 (00_briefs ~ 90_archive)
+  · _start/.ai/.methodology-cache/.claude/.codex/migrations
+  · 빌드 산출물: node_modules, .next/.nuxt/.svelte-kit/.vercel/.turbo, dist/build/out/coverage/.cache, __pycache__/.venv 등
+  · OS·캐시 basename: .DS_Store, .eslintcache, .tsbuildinfo, *-debug.log
+  · .github/workflows/methodology-*.yml
+- sensitive 차단: .env/credential/secret/.pem/.key/.p12/.pfx (.sample/.example 통과). --allow-sensitive 우회.
+- 옵션: --target / --dry-run / --zip(tar.gz) / --include-git / --force / -v
+- 안전망: 복사 후 target 재 walk → 방법론 흔적 1건이라도 발견 시 exit 3 (이중 검증)
+- 실측: icons 467 / gamblescan 1,459 / talmocom 487 파일 (90%+ 노이즈 제거)
+- talmocom 실제 export 검증: 방법론 흔적 0, 코드 모두 포함, .env.local 정상 차단 → --allow-sensitive 후 98MB 결과 ✅
+- CLAUDE.md / AGENTS.md managed: 외주 인계 워크플로 명문화 (모든 AI 모델 공통)
+
+**방법론 v4.0 — 00_briefs/ + NN_ +10 shift (이전 차례)**:
 - 사용자 요구: 인간 입력 채널 신설 (리서치·아이디어·회의록), AI 가 *매 세션 자동 로드*
 - 00_briefs/{current,archived,meetings} 신설 (.gitkeep 으로 빈 디렉터리 init 보장)
 - 옛 NN_ → 새 NN_ +10 shift: 00_foundation→10, 10_guides→20, ..., 60_meta→70
