@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: USER_GUIDE.md + commands.json + dashboard Commands 카드 — 인간 사용자 워크플로 단일 매뉴얼 + 자주 사용 명령 5 카테고리 × 23개 + 클릭 클립보드 복사 UX.
+- **Working on**: `methodology wrap` sha256 콘텐츠 해시 검증 — 동일 날짜 다중 ship 오탐 차단. wrap-state.json baseline + 부트스트랩 + ship push 성공시 새 baseline 저장.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-15: **`wrap` 콘텐츠 해시 검증** — mtime 기반 → sha256 기반. `.ai/wrap-state.json` 에 라이브 파일 (HANDOFF/TODO/checkpoint) sha256 + 검증된 관찰 로그 목록 저장. 다음 wrap 은 *콘텐츠 변경* 만 통과 (touch / 동일 내용 재저장은 차단). 최초 1회 부트스트랩, ship push 성공시 자동으로 새 baseline 갱신. 원인: 동일 날짜 다중 ship 시 옛 wrap 이 mtime 만 보고 통과 → 다음 세션이 옛 HANDOFF/TODO/checkpoint 를 진실로 신뢰 → 작업 누락 발생 (S-007/S-008/S-009).
 - 2026-05-14: **USER_GUIDE.md + commands.json + Commands 카드** — 인간 워크플로 11섹션 매뉴얼 (시작·매일·brief·작업·종료·인계·명령·Class·문제해결·다이어그램·참조), commands.json 5 카테고리 × 23명령 (boot/end/ops/observe/export), dashboard Overview 탭 최상단 Commands 카드 — 카테고리 탭 + 클릭 클립보드 복사. MANIFEST shared 에 USER_GUIDE/commands.json 추가.
 - 2026-05-14: `methodology export` CLI — 외주 인계용 코드 추출. 제외 목록 3축(NN_ 방법론 폴더 + _start/.ai/.claude/.codex + 빌드 산출물 node_modules/.next/dist 등 + .DS_Store 같은 OS 캐시). sensitive(.env/credentials) 기본 차단, --allow-sensitive 명시 우회. dry-run + 결과 검증(방법론 흔적 잔존 0). icons 467 / gamblescan 1,459 / talmocom 487 파일 (90%+ 노이즈 제거). CLAUDE/AGENTS managed 에 외주 인계 워크플로 명문화.
 - 2026-05-14: 방법론 v4.0 — 00_briefs/ 신설 + 모든 NN_ 폴더 +10 shift — 인간 raw 입력 채널 (리서치·아이디어·회의록) 명문화, AI 가 매 세션 자동 로드. migration script (7 폴더 rename + 121 파일 path replace, chr() 우회로 self-replace 회피), MANIFEST·.ai/context.json·CLAUDE.md/AGENTS.md managed·백서 §부록 C 일괄 갱신. init 격리 검증 ✅. METHODOLOGY_VERSION v4.0.

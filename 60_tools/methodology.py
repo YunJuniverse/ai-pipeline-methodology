@@ -53,6 +53,7 @@ Markers
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import os
@@ -1304,6 +1305,12 @@ def cmd_ship(args: argparse.Namespace) -> int:
     if rc != 0:
         err(f"push 실패 (branch: {branch})")
         return 1
+    # push 성공 → wrap-state 를 새 baseline 으로 저장 (다음 ship 의 wrap 가
+    # 이 상태를 기준으로 콘텐츠 변경 여부를 검증).
+    try:
+        commit_wrap_state(target)
+    except Exception as e:
+        warn(f"wrap-state 저장 실패 (push 는 성공): {e}")
     ok(f"ship 완료. branch: {branch}")
     return 0
 
@@ -1767,65 +1774,190 @@ def _kill_port_listeners(port: int) -> None:
             pass
 
 
+# ─── wrap-state: 콘텐츠 해시 기반 변경 검증 ─────────────────────────────────
+# 동일 날짜 다중 ship 오탐(false-positive) 방지.
+# mtime("오늘 변경됨")만으로는 *콘텐츠가 실제로 갱신됐는가*를 보장하지 못함.
+# → 라이브 파일의 sha256 을 wrap-state.json 에 저장, 다음 wrap 에서 변경 여부 검증.
+
+_WRAP_STATE_VERSION = 1
+_WRAP_TRACKED: list[tuple[str, str]] = [
+    # (display name, relative path under target)
+    ("HANDOFF.md",         "HANDOFF.md"),
+    ("TODO.md",            "TODO.md"),
+    (".ai/checkpoint.md",  ".ai/checkpoint.md"),
+]
+_WRAP_OBS_DIRS = (
+    "50_resources/ai_observations",
+    "70_meta/observations",
+)
+
+
+def wrap_state_path(target: Path) -> Path:
+    return target / ".ai" / "wrap-state.json"
+
+
+def load_wrap_state(target: Path) -> dict[str, Any] | None:
+    p = wrap_state_path(target)
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def save_wrap_state(target: Path, state: dict[str, Any]) -> None:
+    p = wrap_state_path(target)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(
+        json.dumps(state, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+
+def file_sha256(p: Path) -> str | None:
+    if not p.exists() or not p.is_file():
+        return None
+    h = hashlib.sha256()
+    with p.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def current_git_head(target: Path) -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "-C", str(target), "rev-parse", "HEAD"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except Exception:
+        return None
+
+
+def list_observation_files(target: Path) -> list[str]:
+    """관찰 로그 파일들의 relative path 리스트 (정렬됨)."""
+    out: list[str] = []
+    for d in _WRAP_OBS_DIRS:
+        dp = target / d
+        if dp.is_dir():
+            for f in dp.glob("*.md"):
+                if f.name.startswith("_"):
+                    continue
+                out.append(str(f.relative_to(target)))
+    return sorted(out)
+
+
+def bootstrap_wrap_state(target: Path) -> dict[str, Any]:
+    """최초 1회 — 현재 파일 상태를 baseline 으로 저장."""
+    state: dict[str, Any] = {
+        "version": _WRAP_STATE_VERSION,
+        "bootstrapped_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "last_validated_commit": current_git_head(target),
+        "last_validated_at": None,
+        "files": {},
+        "observations": {"validated_files": list_observation_files(target)},
+    }
+    for name, rel in _WRAP_TRACKED:
+        sha = file_sha256(target / rel)
+        state["files"][name] = {"sha256": sha}
+    save_wrap_state(target, state)
+    return state
+
+
+def commit_wrap_state(target: Path) -> None:
+    """ship 의 push 단계 성공 후 호출 — 새 baseline 으로 wrap-state 갱신."""
+    state = load_wrap_state(target) or {
+        "version": _WRAP_STATE_VERSION,
+        "files": {},
+        "observations": {"validated_files": []},
+    }
+    state["version"] = _WRAP_STATE_VERSION
+    state["last_validated_commit"] = current_git_head(target)
+    state["last_validated_at"] = datetime.now(timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    state.setdefault("files", {})
+    for name, rel in _WRAP_TRACKED:
+        sha = file_sha256(target / rel)
+        state["files"][name] = {"sha256": sha}
+    state["observations"] = {"validated_files": list_observation_files(target)}
+    save_wrap_state(target, state)
+
+
 def cmd_wrap(args: argparse.Namespace) -> int:
-    """세션·작업 종료 검증 — 4개 라이브 파일 갱신 누락 점검.
+    """세션·작업 종료 검증 — 4개 라이브 파일 *실제 콘텐츠 갱신* 점검.
 
-    동작: 오늘(UTC) 갱신된 파일을 확인하고 누락이 있으면 표시한다.
-    이 명령은 *AI가 4개 파일을 직접 갱신한 뒤* 호출되어야 한다.
-    누락이 있으면 AI가 *다시 갱신해야 함*을 의미.
+    동작 (v4.1+): wrap-state.json 의 sha256 과 비교하여 콘텐츠 변경 여부를 검증.
+    동일 날짜에 ship 을 여러 번 해도 매번 *실제 내용 갱신* 없이는 통과 못 함.
 
-    --strict: 누락 1건이라도 있으면 exit code 1 (CI 또는 hook에서 사용).
+    bootstrap: wrap-state.json 이 없으면 현재 상태를 baseline 으로 1회 저장 후 pass.
+    --strict: 미갱신 1건이라도 있으면 exit code 1 (CI / pre-push hook 용).
     """
     target = Path(args.path or ".").resolve()
-    today = date.today().isoformat()
-
+    today = datetime.now(timezone.utc).date().isoformat()
     info(f"wrap check: {target}  (today={today} UTC)")
     print()
 
+    state = load_wrap_state(target)
+    bootstrapped = False
+    if state is None:
+        warn(".ai/wrap-state.json 없음 — 현재 파일 상태를 baseline 으로 부트스트랩.")
+        warn("다음 wrap부터는 라이브 파일이 *실제로 변경*되어야 통과합니다.")
+        state = bootstrap_wrap_state(target)
+        bootstrapped = True
+
     checks: list[tuple[str, bool, str]] = []
+    missing = 0
 
-    def _mtime_today(p: Path) -> bool:
+    # ── 1-3) 콘텐츠 해시 비교 ────────────────────────────────────────────────
+    stored_files = state.get("files", {})
+    for name, rel in _WRAP_TRACKED:
+        p = target / rel
         if not p.exists():
-            return False
-        from datetime import datetime, timezone
-        m = datetime.fromtimestamp(p.stat().st_mtime, tz=timezone.utc).date().isoformat()
-        return m == today
+            checks.append((name, False, "파일 없음 — 생성 필요"))
+            missing += 1
+            continue
+        cur = file_sha256(p)
+        old = (stored_files.get(name) or {}).get("sha256")
+        if bootstrapped:
+            checks.append((name, True, "bootstrapped (baseline 저장)"))
+        elif old is None:
+            checks.append((name, True, "신규 추적 (sha 등록)"))
+        elif cur != old:
+            checks.append((name, True, "콘텐츠 변경 확인 (sha 갱신)"))
+        else:
+            checks.append((
+                name,
+                False,
+                "콘텐츠 미변경 (sha 동일) — 실제 내용 갱신 필요",
+            ))
+            missing += 1
 
-    # 1. HANDOFF.md
-    handoff = target / "HANDOFF.md"
-    handoff_ok = handoff.exists() and _mtime_today(handoff)
-    checks.append(("HANDOFF.md", handoff_ok, "Current Focus + Recent Changes 갱신"))
-
-    # 2. TODO.md
-    todo = target / "TODO.md"
-    todo_ok = todo.exists() and _mtime_today(todo)
-    checks.append(("TODO.md", todo_ok, "Ready/InProgress/Done 갱신"))
-
-    # 3. .ai/checkpoint.md
-    cp = target / ".ai" / "checkpoint.md"
-    cp_ok = cp.exists() and _mtime_today(cp)
-    checks.append((".ai/checkpoint.md", cp_ok, "다음 사람을 위한 인계서 갱신"))
-
-    # 4. ai_observations — 오늘 날짜의 파일 1건 이상
-    obs_dir = target / "50_resources" / "ai_observations"
-    meta_obs_dir = target / "70_meta" / "observations"
-    obs_today = []
-    for d in (obs_dir, meta_obs_dir):
-        if d.is_dir():
-            obs_today.extend(d.glob(f"{today}_*.md"))
-    obs_ok = len(obs_today) >= 1
-    checks.append((
-        "ai_observations/",
-        obs_ok,
-        f"{today}_<slug>.md (현재 {len(obs_today)}건)",
-    ))
+    # ── 4) ai_observations — 직전 검증 이후 *새 파일* 1건 이상 ─────────────
+    seen = set((state.get("observations") or {}).get("validated_files", []))
+    cur_obs = list_observation_files(target)
+    new_obs = [f for f in cur_obs if f not in seen]
+    if bootstrapped:
+        checks.append(("ai_observations/", True, "bootstrapped"))
+    elif new_obs:
+        checks.append((
+            "ai_observations/",
+            True,
+            f"새 관찰 로그 {len(new_obs)}건",
+        ))
+    else:
+        checks.append((
+            "ai_observations/",
+            False,
+            f"신규 .md 없음 — {today}_<slug>.md 생성 필요",
+        ))
+        missing += 1
 
     # 출력
-    missing = 0
     for name, ok_flag, hint in checks:
         mark = "\033[32m✓\033[0m" if ok_flag else "\033[31m✗\033[0m"
-        if not ok_flag:
-            missing += 1
         print(f"  {mark} {name:<28} — {hint}")
 
     # git status 요약
@@ -1848,10 +1980,16 @@ def cmd_wrap(args: argparse.Namespace) -> int:
 
     print()
     if missing == 0:
-        ok("4/4 라이브 파일 모두 오늘 갱신됨. 사용자에게 결과 보고 후 종료 가능.")
+        ok(
+            "4/4 라이브 파일 콘텐츠 갱신 확인됨. "
+            "ship 의 push 성공 시 wrap-state 가 새 baseline 으로 저장됩니다."
+        )
         return 0
     else:
-        err(f"{missing}/4 파일 갱신 누락. AI는 누락된 파일을 갱신한 뒤 wrap을 다시 호출.")
+        err(
+            f"{missing}/4 라이브 파일 콘텐츠 미갱신 — *실제 내용*을 갱신한 뒤 wrap 재호출. "
+            "(mtime 만 갱신해서는 통과 안 됨)"
+        )
         return 1 if args.strict else 0
 
 

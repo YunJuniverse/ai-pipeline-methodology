@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "bootstrapped_at": "2026-05-14T16:04:14Z",
+  "last_validated_commit": "f6b3487f4323e42cba88fadaab925853be5a72d4",
+  "last_validated_at": null,
+  "files": {
+    "HANDOFF.md": {
+      "sha256": "29863eaaf4e226cfee0a72ce5f72e511381ec6923a30ecd13e56b9c5a7108739"
+    },
+    "TODO.md": {
+      "sha256": "d623604daccdfe538c3a44b463717812e38ba157f7fc586fe6a7ad781de55612"
+    },
+    ".ai/checkpoint.md": {
+      "sha256": "eec9aa570af54ba46f6553fea36ace8b77cb76b240f30bc622488f4fe165d080"
+    }
+  },
+  "observations": {
+    "validated_files": [
+      "50_resources/ai_observations/2026-05-07_l1-observe-flow.md",
+      "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
+      "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
+      "70_meta/observations/2026-05-12_meth-015-propagation.md",
+      "70_meta/observations/2026-05-12_ship-and-hooks-and-automerge.md",
+      "70_meta/observations/2026-05-12_v3.1-to-v3.2-migration.md",
+      "70_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md",
+      "70_meta/observations/2026-05-13_dashboard-cache-relocation.md",
+      "70_meta/observations/2026-05-13_dashboard-port-conflict-fix.md",
+      "70_meta/observations/2026-05-13_dashboard-root-rewrite.md",
+      "70_meta/observations/2026-05-13_inspire-launchers-build.md",
+      "70_meta/observations/2026-05-13_inspire-launchers-cleanup.md",
+      "70_meta/observations/2026-05-13_multi-dashboard-and-branches.md",
+      "70_meta/observations/2026-05-13_open-dashboard-command.md",
+      "70_meta/observations/2026-05-14_methodology-export.md",
+      "70_meta/observations/2026-05-14_setup-to-settings-folder.md",
+      "70_meta/observations/2026-05-14_user-guide-and-commands.md",
+      "70_meta/observations/2026-05-14_v4-briefs-and-shift.md",
+      "70_meta/observations/README.md"
+    ]
+  }
+}
