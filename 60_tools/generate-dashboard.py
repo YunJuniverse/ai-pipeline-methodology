@@ -1306,39 +1306,78 @@ function initGraph(){
   const KIND_COLOR={meta:'oklch(0.78 0.05 75)',guides:'oklch(0.78 0.13 155)',planning:'oklch(0.74 0.17 25)',dev:'oklch(0.78 0.14 60)',resources:'oklch(0.75 0.11 240)',tools:'oklch(0.72 0.13 300)','root-doc':'oklch(0.78 0.05 75)','live-state':'oklch(0.78 0.10 75)',guide:'oklch(0.78 0.13 155)'};
   const catColors={};(graph.categories||[]).forEach(c=>catColors[c.id]=c.color||'#888');
   function nodeColor(n){return KIND_COLOR[n.kind]||KIND_COLOR[n.category]||catColors[n.category]||'oklch(0.60 0.02 75)';}
-  // Precompute positions: bucket by (category, tier), then spread within each bucket
+  // Force-directed layout: repulsion + edge springs + categorical anchor gravity
   const CATS=['meta','guides','planning','dev','resources'];
   const posMap=new Map();
-  const bucketSizeMap=new Map(); // nodeId → bucket size
+  const bucketSizeMap=new Map(); // nodeId → same-anchor-bucket size (for label toggle)
   (function(){
-    const buckets=new Map();
+    const nodeById=new Map(nodes.map(n=>[n.id,n]));
+    const edgePairs=edges.map(e=>[nodeById.get(e.from||e.source),nodeById.get(e.to||e.target)]).filter(([a,b])=>a&&b);
+    // Anchor: categorical home position (category→x column, tier→y row)
+    const anchors=new Map();
     nodes.forEach(n=>{
-      let bx,by;
-      if(n.x!=null&&n.y!=null){bx=n.x*W;by=n.y*H;}
-      else{const ci=CATS.indexOf(n.category);bx=ci>=0?(ci+1)/(CATS.length+1)*W:W/2;by=n.tier!=null?(n.tier+1)/8*H:H/2;}
-      const key=`${Math.round(bx)},${Math.round(by)}`;
-      if(!buckets.has(key))buckets.set(key,[]);
-      buckets.get(key).push({n,bx,by});
-    });
-    buckets.forEach(group=>{
-      const cnt=group.length;
-      group.forEach(({n,bx,by},i)=>{
-        let ox=0,oy=0;
-        if(cnt===1){ox=0;oy=0;}
-        else if(cnt<=3){ox=(i/(cnt-1)-0.5)*2*50;oy=0;}
-        else{
-          // 2-row grid: ceil(cnt/2) nodes in top row, rest in bottom
-          const cols=Math.ceil(cnt/2);
-          const row=Math.floor(i/cols),col=i%cols;
-          const rowCnt=row===0?cols:cnt-cols;
-          const gap=32; // px between node centres
-          ox=rowCnt>1?(col-(rowCnt-1)/2)*gap:0;
-          oy=row===0?-18:18;
-        }
-        posMap.set(n.id,{x:bx+ox,y:by+oy});
-        bucketSizeMap.set(n.id,cnt);
+      const ci=CATS.indexOf(n.category);
+      anchors.set(n.id,{
+        x:ci>=0?(ci+0.5)/CATS.length*(W-60)+30:W/2,
+        y:n.tier!=null?(n.tier+0.5)/7*(H-60)+30:H/2
       });
     });
+    // Track bucket size (same anchor) for label visibility
+    const bmap=new Map();
+    nodes.forEach(n=>{
+      const a=anchors.get(n.id);
+      const k=`${Math.round(a.x)},${Math.round(a.y)}`;
+      bmap.set(k,(bmap.get(k)||0)+1);
+    });
+    nodes.forEach(n=>{
+      const a=anchors.get(n.id);
+      const k=`${Math.round(a.x)},${Math.round(a.y)}`;
+      bucketSizeMap.set(n.id,bmap.get(k)||1);
+    });
+    // Initial positions: anchor + small deterministic offset to break symmetry
+    const vels=new Map();
+    nodes.forEach((n,i)=>{
+      const a=anchors.get(n.id);
+      posMap.set(n.id,{x:a.x+(i%7-3)*12,y:a.y+(Math.floor(i/7)%5-2)*10});
+      vels.set(n.id,{x:0,y:0});
+    });
+    // Simulation constants
+    const REPULSE=4800,SPRING_K=0.055,REST=95,ANCHOR_K=0.038,DAMP=0.78,PAD=32;
+    for(let iter=0;iter<280;iter++){
+      const cool=Math.max(0.18,1-iter/320);
+      // Node-node repulsion
+      for(let i=0;i<nodes.length;i++){
+        for(let j=i+1;j<nodes.length;j++){
+          const pi=posMap.get(nodes[i].id),pj=posMap.get(nodes[j].id);
+          const dx=pj.x-pi.x,dy=pj.y-pi.y;
+          const d2=(dx*dx+dy*dy)||0.01,d=Math.sqrt(d2);
+          const f=REPULSE*cool/d2,nx=dx/d,ny=dy/d;
+          const vi=vels.get(nodes[i].id),vj=vels.get(nodes[j].id);
+          vi.x-=nx*f;vi.y-=ny*f;vj.x+=nx*f;vj.y+=ny*f;
+        }
+      }
+      // Edge spring attraction
+      edgePairs.forEach(([na,nb])=>{
+        const pa=posMap.get(na.id),pb=posMap.get(nb.id);
+        const dx=pb.x-pa.x,dy=pb.y-pa.y;
+        const d=Math.sqrt(dx*dx+dy*dy)||0.1;
+        const f=SPRING_K*(d-REST),nx=dx/d,ny=dy/d;
+        vels.get(na.id).x+=nx*f;vels.get(na.id).y+=ny*f;
+        vels.get(nb.id).x-=nx*f;vels.get(nb.id).y-=ny*f;
+      });
+      // Anchor gravity (keeps nodes near their categorical home)
+      nodes.forEach(n=>{
+        const p=posMap.get(n.id),a=anchors.get(n.id),v=vels.get(n.id);
+        v.x+=(a.x-p.x)*ANCHOR_K;v.y+=(a.y-p.y)*ANCHOR_K;
+      });
+      // Integrate + dampen + boundary clamp
+      nodes.forEach(n=>{
+        const p=posMap.get(n.id),v=vels.get(n.id);
+        v.x*=DAMP;v.y*=DAMP;
+        p.x=Math.max(PAD,Math.min(W-PAD,p.x+v.x));
+        p.y=Math.max(PAD,Math.min(H-PAD,p.y+v.y));
+      });
+    }
   })();
   function nodePos(n){return posMap.get(n.id)||{x:W/2,y:H/2};}
   let selId=nodes[0].id;
