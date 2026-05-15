@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "bba71db35b70eba623c3ade1519f2f681ba613eb",
-  "last_validated_at": "2026-05-15T09:00:16Z",
+  "last_validated_commit": "1fda6b5aac825e403145b691a844e6b737ec9540",
+  "last_validated_at": "2026-05-15T10:35:36Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "2bc450f816831d49814b3b9214ce872f1a98ae25f471e67bd85b4115f7dbb06c"
+      "sha256": "22a3f821428c0b2478d5b1b647ddb909a001ad036fb91399fe109d163ac2e96f"
     },
     "TODO.md": {
-      "sha256": "9f3971f3c63d215cd492e74ee22558b0592dbae389138b4f1b457ba7840b5b26"
+      "sha256": "bf99f6f6043c16a521147cd448e5460794470841e89a1dfc0bd76609fa0357e8"
     },
     ".ai/checkpoint.md": {
-      "sha256": "f7cbf62c3af57bdf865f99e458232ef1065d270457ae08d1af42501b3a787e61"
+      "sha256": "abd1cbf4ad93154bd3139109ccf22b7bd8e51b8ced70ab5c5fb2579fb51e7b48"
     }
   },
   "observations": {
@@ -19,13 +19,15 @@
       "50_resources/ai_observations/2026-05-07_l1-observe-flow.md",
       "50_resources/ai_observations/2026-05-15_applied-ci-source-repo-skip.md",
       "50_resources/ai_observations/2026-05-15_methodology-integrity-3-fixes.md",
+      "50_resources/ai_observations/2026-05-15_observation-lint-policy-realignment.md",
+      "50_resources/ai_observations/2026-05-15_qa-dashboard-obs-and-commands-stale.md",
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
       "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
       "70_meta/observations/2026-05-12_ship-and-hooks-and-automerge.md",
-      "70_meta/observations/2026-05-12_v3.1-to-v3.2-migration.md",
+      "70_meta/observations/2026-05-12_v3-1-to-v3-2-migration.md",
       "70_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md",
       "70_meta/observations/2026-05-13_dashboard-cache-relocation.md",
       "70_meta/observations/2026-05-13_dashboard-port-conflict-fix.md",

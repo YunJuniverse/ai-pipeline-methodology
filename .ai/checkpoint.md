@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (applied-ci source repo skip)
+# Checkpoint — 2026-05-15 (정합성 QA 우선순위 1·2 fix)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/applied-ci-source-repo-skip`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa-dashboard-obs-count-and-commands-stale`)
 
 ## 부팅 계약
 
@@ -20,7 +20,24 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 applied-ci source repo skip (방금)**:
+**🆕 정합성 QA 우선순위 1·2 fix (방금)**:
+
+- 사용자 요구: 코드베이스 QA 로 정합성 이슈 점검 + 우선순위대로 묶어 처리
+- QA 18 카테고리 결과: 12 pass, 4 실제 이슈, 2 마이너. 우선순위 1·2 묶음 PR.
+- **Fix 1 — dashboard observation 카운트 정확화**:
+  · `generate-dashboard.py:283` 의 `read_methodology_assets()` 가 `root / "50_resources" / "ai_observations"` 만 카운트
+  · `70_meta/observations/` 의 20건 (source 저장소 메타-방법론 관찰 로그) 무시됨
+  · 해결: `_count_observations(root)` 헬퍼 신설 — 50_resources/ai_observations + 70_meta/observations + v3.2 fallback (40_resources, 60_meta) 모두 합산. `_README`/`README.md` 제외.
+  · 검증: 빌드 후 payload `methodology_assets.observations` = 26 (실제 6+20)
+- **Fix 2 — commands.json stale path**:
+  · `60_tools/commands.json:119` description "10_guides/03 스키마 검증" → v3.2 명명
+  · 해결: "20_guides/03 스키마 검증" 으로 1줄 변경
+- 미선택 마이너 (별도 PR):
+  · commands.json 8 subcmd 미노출 (apply / build / diff / init / list / seed-pending / skeleton / stop) — UX 개선
+  · generate-dashboard.py 의 layout 헬퍼 미적용 9곳 — 미래 v5 마이그레이션 부채
+  · .app 런처 3-tier 통일 (현재 2-tier) — 거의 발생 안 함
+
+**applied-ci source repo skip (이전 차례)**:
 
 - 사용자 보고: `methodology-applied-ci` 의 "70_meta 미주입 검증" step 이 fail. 메시지: "❌ 70_meta/ 가 적용 프로젝트에 존재 — 메타-방법론이 새어나감".
 - 진단: source 저장소 (`YunJuniverse/ai-pipeline-methodology`) 는 70_meta/ 를 *의도적으로* 가지고 있음 (메타-방법론 격리 영역, MANIFEST `excluded_paths` 안전망). applied-ci 는 *적용 프로젝트* 의 누수만 검사하도록 설계됐는데 source 저장소 PR 에서도 같은 검사가 실행되어 항상 fail.

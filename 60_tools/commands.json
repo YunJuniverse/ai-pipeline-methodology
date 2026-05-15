@@ -116,7 +116,7 @@
         {
           "label": "L1 관찰 검증",
           "command": "methodology observe --validate 50_resources/ai_observations/<file>.md",
-          "description": "10_guides/03 스키마 검증"
+          "description": "20_guides/03 스키마 검증"
         },
         {
           "label": "Catalog 상태",
