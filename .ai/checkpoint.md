@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (observation lint 정합성 회복)
+# Checkpoint — 2026-05-15 (applied-ci source repo skip)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/observation-lint-existing-files`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/applied-ci-source-repo-skip`)
 
 ## 부팅 계약
 
@@ -20,7 +20,19 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 observation lint 정합성 회복 (방금)**:
+**🆕 applied-ci source repo skip (방금)**:
+
+- 사용자 보고: `methodology-applied-ci` 의 "70_meta 미주입 검증" step 이 fail. 메시지: "❌ 70_meta/ 가 적용 프로젝트에 존재 — 메타-방법론이 새어나감".
+- 진단: source 저장소 (`YunJuniverse/ai-pipeline-methodology`) 는 70_meta/ 를 *의도적으로* 가지고 있음 (메타-방법론 격리 영역, MANIFEST `excluded_paths` 안전망). applied-ci 는 *적용 프로젝트* 의 누수만 검사하도록 설계됐는데 source 저장소 PR 에서도 같은 검사가 실행되어 항상 fail.
+- 이 버그는 *워크플로 첫 도입 시점* 부터 있었음. 옛 검사 `if [ -e 70_meta ]; then exit 1` 가 그대로 동일하게 작동. PR #10 의 layout 탐지 추가로 단지 *가시화*됐을 뿐.
+- 해결: job-level `if: github.repository != 'YunJuniverse/ai-pipeline-methodology'` 로 skip.
+  · methodology-validate job: skip
+  · methodology-freshness job: skip
+  · 적용 프로젝트 (icons/talmocom/gamblescan/tshome) 에서는 repository name 이 다르니 정상 실행
+  · fork 의 경우 fork name 이 다르니 skip 안 됨 — fork 가 source 와 같은 구조면 70_meta/ 검사 fail. 의도된 동작 (fork 가 source 와 같으면 applied-ci 는 무관).
+- 검증: PR #14 에서 자체 CI 가 skip 으로 통과하는지 확인 예정.
+
+**observation lint 정합성 회복 (이전 차례, PR #13 머지됨)**:
 
 - 사용자 보고: source-ci 가 observation lint 에서 18 건 실패 (자유서술 너무 김 / frontmatter 없음 / 파일명 형식 / 절대 경로)
 - 분석:
@@ -30,14 +42,14 @@
   · 18 실패 중 대부분 (15건) "자유서술이 너무 깁니다" — 정책 자체가 잘못된 케이스
 - 해결 4단계:
   · (1) validator 본문 길이/단락 제약 제거 — body 는 markdown 자유 형식, frontmatter required fields 만 강제. 본문 빈 경우만 잡음. → 15 건 자동 통과
-  · (2) frontmatter 없는 3개 파일 마이그레이션 (PR #9 시기 내가 `cat >` 로 작성한 것):
+  · (2) frontmatter 없는 3개 파일 마이그레이션 (PR #9 시기 `cat >` 로 작성한 것):
     - 2026-05-14_wrap-content-hash-validation.md
     - 2026-05-14_wrap-ship-hook-skip.md
     - 2026-05-14_wrap-state-commit-pre-step.md
     → Python 스크립트로 적절한 YAML frontmatter prepend (session_id, authored_by, task_type 등 required snippets)
   · (3) `2026-05-12_v3.1-to-v3.2-migration.md` 파일명 → `2026-05-12_v3-1-to-v3-2-migration.md` rename. session_id 도 갱신. (slug 에 dot 불허)
   · (4) `2026-05-13_dashboard-port-conflict-fix.md` 의 `/Users/hayden/methodology` → `<METHODOLOGY>` 익명화
-- 검증: 모든 observation 파일 18→0 실패. source-ci 통과 예상.
+- 검증: 모든 observation 파일 18→0 실패. source-ci 통과 확인.
 - METH-024 (observe CLI 강제) 와 연결: 이 PR 으로 옛 파일 마이그레이션 완료 → 앞으로 CLI 만 사용하면 새 실패 없음.
 
 **Stack 섹션 정리 (이전 차례)**:
