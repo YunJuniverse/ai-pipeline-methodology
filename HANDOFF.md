@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: Overview 탭 *기술 스택* bento 카드 — `60_tools/stack.json` 데이터 드리븐, hero/mid/sm size hint, side-sheet 모달로 선택 이유 표시. 디자인 정합성 위해 Apple-bento 컨셉만 차용하고 시각 언어는 현재 OKLCH 엔지니어링-저널 톤 유지.
+- **Working on**: Stack 섹션 정리 (stack-cleanup) — bento 자투리 공간 + hero row-span 자동 배치 깨짐 + 카테고리 라벨 7회 반복 + role 한글 줄바꿈 문제 해결. 카테고리 그룹 헤더 + auto-fill grid + hero = 시각 강조 (★ PRIMARY 배지·좌측 액센트 라인) 으로 전환. stack.json 데이터 무수정.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-15: **Stack 섹션 정리** — PR #11 의 12-col bento 가 5개 문제 발생: (1) hero(6)+mid(4)=10 자투리 (2) hero row-span 2 가 grid auto-placement sparse 모드 깨뜨려 같은 카테고리 카드 분리됨 (3) 카테고리 라벨 7회 반복 (4) role 한글 uppercase+letter-spacing 줄바꿈 (5) hero 빈 공간 vs sm 이름만 — 정보 밀도 양극화. **해결**: 카테고리 그룹 헤더 1회 + `auto-fill minmax(240px,1fr)` 균일 grid + hero = 좌측 액센트 라인 + ★ PRIMARY 배지 + 살짝 다른 배경 (layout 변경 X) + role uppercase 제거 + 모든 카드 reason 3-line clamp 노출. stack.json 데이터 무수정 (`size: hero|mid|sm` 의미만 "레이아웃 크기" → "강조 등급" 으로 전환).
 - 2026-05-15: **Stack bento 카드** — Overview 탭 하단 신규 섹션. `60_tools/stack.json` 에서 23 항목 5 카테고리 (Frontend/Backend/CMS/Infra/Dev) 로드. CSS 12-col grid + `size: hero|mid|sm` 으로 비대칭 배치 — 카테고리당 hero 1장 (Next.js 15 / Resend / Sanity v3 / Vercel / pnpm) + mid/sm. 카드 클릭 → side-sheet 모달 (선택 이유 + meta + docs URL). Apple bento 컨셉만 차용, 시각 언어는 현재 OKLCH 엔지니어링-저널 톤 (샤프 코너, 단일 앰버 액센트, 다색 그라데이션 X). MANIFEST shared 에 stack.json 추가 → 적용 프로젝트 자동 전파.
 - 2026-05-15: **정합성 3 fix 묶음** — (1) `methodology_layout(target)` 헬퍼 — v3.2/v4.0 구조 탐지 중앙화. wrap·hook·CI·observation dir 모두 layout 기반으로 통일 (그동안 4번 패치한 fallback 누락 root cause). (2) `sync --include-worktrees` — sibling worktree 감지. 마이그레이션 있으면 기본 True 로 일괄 처리 (tshome 사고 직접 차단). `--main-only` 로 opt-out. (3) `observe` CLI 강제 — wrap 이 새 .md frontmatter 선행 검증. `cat >` 직접 작성 → CI 실패 → 수정 사이클 차단. CLAUDE/AGENTS managed 마커에 CLI 사용 권고 명문화. `OBSERVATION_DIR` 도 layout 기반으로 동적 변환.
 - 2026-05-15: **`wrap` 콘텐츠 해시 검증** — mtime 기반 → sha256 기반. `.ai/wrap-state.json` 에 라이브 파일 (HANDOFF/TODO/checkpoint) sha256 + 검증된 관찰 로그 목록 저장. 다음 wrap 은 *콘텐츠 변경* 만 통과 (touch / 동일 내용 재저장은 차단). 최초 1회 부트스트랩, ship commit 직전 wrap-state 를 *현재 sha 로 동기화* 후 함께 커밋 (post-push 갱신 X → clone/pull 후 wrap 일관성 보장). ship → push 시 `METHODOLOGY_SHIP_IN_PROGRESS=1` 환경변수로 pre-push hook 의 wrap 재실행 skip (ship step 1 에서 이미 검증됨). 원인: 동일 날짜 다중 ship 시 옛 wrap 이 mtime 만 보고 통과 → 다음 세션이 옛 HANDOFF/TODO/checkpoint 를 진실로 신뢰 → 작업 누락 발생 (S-007/S-008/S-009).

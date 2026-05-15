@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "2a3afa39c16f6b03d18d7bad5a78293b64f8f2bc",
-  "last_validated_at": "2026-05-15T08:05:31Z",
+  "last_validated_commit": "8e2eb11ac002a642a9047ee666270136b636e2b1",
+  "last_validated_at": "2026-05-15T08:46:32Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "f1713f5e726a0eec21c3c78bb55fed767f6561f3fb4bd7b94955ebf6f8547452"
+      "sha256": "5fa1a778becd580930acbfbad7eea726fbbbfe0c9b99bfaa9ea3b2d48479909e"
     },
     "TODO.md": {
-      "sha256": "8bbc532281b6d313be6aa74620e34c0ddb215db5c43c55033d7120d162555ce5"
+      "sha256": "75c28bb050e532f439c50fda0c615aaf98bb541b2ce0fb55f350e5ed5ce12e4e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "6c7afaf7157167f9572b739bbe7c123bd7f9c1103ac1c9e2002a03ca182d930d"
+      "sha256": "d527a2d45de806b0a72a4d557844469fb989acf9e42d7775b55d0e8964d2fc1a"
     }
   },
   "observations": {
@@ -19,6 +19,7 @@
       "50_resources/ai_observations/2026-05-07_l1-observe-flow.md",
       "50_resources/ai_observations/2026-05-15_methodology-integrity-3-fixes.md",
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
+      "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
