@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (wrap 콘텐츠 해시 검증)
+# Checkpoint — 2026-05-15 (정합성 3 fix 묶음)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/wrap-content-hash-validation`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/methodology-integrity`)
 
 ## 부팅 계약
 
@@ -20,7 +20,19 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 `wrap` sha256 콘텐츠 해시 검증 (방금)**:
+**🆕 방법론 정합성 3 fix 묶음 (방금)**:
+
+- 사용자 보고: tshome 작업에서 4가지 에러 발견 — `60_tools/methodology.py` 미발견 (CI), `40_resources` vs `50_resources` 불일치 (wrap), observation frontmatter 형식 오류, task_type enum 무효
+- 분석 결과: 표면 4건이지만 root cause 3개의 합성
+- 해결: 3 fix 를 한 PR 로 묶음 (METH-024)
+  · **Fix 1 — `methodology_layout(target)` 헬퍼**: v3.2/v4.0 구조 자동 탐지 중앙화. tools/resources/foundation/guides/planning/dev/briefs/meta 모든 경로 dict 로 반환. wrap/CI/`_observation_dir`/`_wrap_obs_dirs` 모두 layout 기반. fallback 4번 누락한 root cause 차단.
+  · **Fix 2 — `sync --include-worktrees`**: `_git_sibling_worktrees()` 로 같은 repo 의 다른 워크트리 탐지. 마이그레이션 chain 있으면 기본 True 로 일괄 sync. `--main-only` 로 opt-out. (tshome 사고: main 만 v4.0, worktree 들 v3.2 로 남음 → 정확히 이 root cause)
+  · **Fix 3 — `observe` CLI 강제 + wrap 선행 검증**: wrap 이 새 .md frontmatter 를 *바로* 검증 (CI 까지 안 가도). 잘못된 형식이면 wrap fail + 파일별 에러 출력. CLAUDE.md/AGENTS.md managed 마커에 `methodology observe` CLI 사용 권고 명문화. `OBSERVATION_DIR` 도 layout 기반.
+  · **CI 워크플로**: `methodology-applied-ci.yml` 가 v3.2/v4.0 자동 탐지. v3.2 워크트리에서도 `${{ steps.layout.outputs.tools }}/methodology.py` 로 호출.
+- dogfooding: 이 작업의 관찰 로그도 `methodology observe` CLI 로 생성 → Fix 3 자체 검증
+- 실측: wrap 이 일부러 만든 잘못된 frontmatter 파일 즉시 잡음 ✓ / sync dry-run 이 icons worktree 6개 감지 ✓ / layout 헬퍼 v3.2/v4.0 모두 정확 ✓
+
+**`wrap` sha256 콘텐츠 해시 검증 (이전 차례)**:
 
 - 사용자 보고: 동일 날짜에 S-007 → S-008 → S-009 연속 ship 했는데, 다음 세션이 "S-008/S-009 미처리"로 인식. wrap 이 mtime 만 보고 통과시켜 옛 HANDOFF/TODO/checkpoint 콘텐츠가 그대로 push 됨.
 - 근본 원인: `cmd_wrap` 의 `_mtime_today(p)` 검증 — "오늘 변경됨" = 콘텐츠 갱신 보장 아님. S-007 ship 이 한 번 mtime 을 찍으면 S-008/S-009 ship 은 *touch 안 해도* 통과 (false-positive).

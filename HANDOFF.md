@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: `methodology wrap` sha256 콘텐츠 해시 검증 — 동일 날짜 다중 ship 오탐 차단. wrap-state.json baseline + 부트스트랩 + ship push 성공시 새 baseline 저장.
+- **Working on**: 방법론 정합성 3 fix 묶음 — `methodology_layout()` 구조 탐지 헬퍼 / `sync --include-worktrees` (마이그레이션 시 기본 True) / `observe` CLI 강제 + wrap 선행 검증. tshome 사고에서 발견된 누수 차단.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-15: **정합성 3 fix 묶음** — (1) `methodology_layout(target)` 헬퍼 — v3.2/v4.0 구조 탐지 중앙화. wrap·hook·CI·observation dir 모두 layout 기반으로 통일 (그동안 4번 패치한 fallback 누락 root cause). (2) `sync --include-worktrees` — sibling worktree 감지. 마이그레이션 있으면 기본 True 로 일괄 처리 (tshome 사고 직접 차단). `--main-only` 로 opt-out. (3) `observe` CLI 강제 — wrap 이 새 .md frontmatter 선행 검증. `cat >` 직접 작성 → CI 실패 → 수정 사이클 차단. CLAUDE/AGENTS managed 마커에 CLI 사용 권고 명문화. `OBSERVATION_DIR` 도 layout 기반으로 동적 변환.
 - 2026-05-15: **`wrap` 콘텐츠 해시 검증** — mtime 기반 → sha256 기반. `.ai/wrap-state.json` 에 라이브 파일 (HANDOFF/TODO/checkpoint) sha256 + 검증된 관찰 로그 목록 저장. 다음 wrap 은 *콘텐츠 변경* 만 통과 (touch / 동일 내용 재저장은 차단). 최초 1회 부트스트랩, ship commit 직전 wrap-state 를 *현재 sha 로 동기화* 후 함께 커밋 (post-push 갱신 X → clone/pull 후 wrap 일관성 보장). ship → push 시 `METHODOLOGY_SHIP_IN_PROGRESS=1` 환경변수로 pre-push hook 의 wrap 재실행 skip (ship step 1 에서 이미 검증됨). 원인: 동일 날짜 다중 ship 시 옛 wrap 이 mtime 만 보고 통과 → 다음 세션이 옛 HANDOFF/TODO/checkpoint 를 진실로 신뢰 → 작업 누락 발생 (S-007/S-008/S-009).
 - 2026-05-14: **USER_GUIDE.md + commands.json + Commands 카드** — 인간 워크플로 11섹션 매뉴얼 (시작·매일·brief·작업·종료·인계·명령·Class·문제해결·다이어그램·참조), commands.json 5 카테고리 × 23명령 (boot/end/ops/observe/export), dashboard Overview 탭 최상단 Commands 카드 — 카테고리 탭 + 클릭 클립보드 복사. MANIFEST shared 에 USER_GUIDE/commands.json 추가.
 - 2026-05-14: `methodology export` CLI — 외주 인계용 코드 추출. 제외 목록 3축(NN_ 방법론 폴더 + _start/.ai/.claude/.codex + 빌드 산출물 node_modules/.next/dist 등 + .DS_Store 같은 OS 캐시). sensitive(.env/credentials) 기본 차단, --allow-sensitive 명시 우회. dry-run + 결과 검증(방법론 흔적 잔존 0). icons 467 / gamblescan 1,459 / talmocom 487 파일 (90%+ 노이즈 제거). CLAUDE/AGENTS managed 에 외주 인계 워크플로 명문화.
