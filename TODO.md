@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-024
+- **title**: 방법론 정합성 3 fix 묶음 — 구조 탐지 / sync worktree / observe CLI 강제
+- **notes**: Completed 2026-05-15. tshome 사고로 발견된 3개 root cause 를 한 PR 로 묶음. (1) `methodology_layout(target)` 헬퍼 — v3.2/v4.0 구조 탐지 중앙화. 그동안 hook·.app·CI·wrap 에서 fallback 4번 누락한 root cause. (2) `sync --include-worktrees` — sibling git worktree 감지. 마이그레이션 시 기본 True. (3) `observe` CLI 강제 + wrap 선행 frontmatter 검증 — `cat > .md` 직접 작성 차단. CLAUDE/AGENTS managed 에 CLI 사용 권고 명문화. CI 워크플로도 구조 자동 탐지 (v3.2 워크트리에서 60_tools 못 찾던 버그 차단).
+
 ### METH-023
 - **title**: `wrap` 콘텐츠 해시 검증 — 동일 날짜 다중 ship 오탐 차단
 - **notes**: Completed 2026-05-15. mtime-only → sha256 콘텐츠 해시. `.ai/wrap-state.json` baseline + 부트스트랩 + ship commit 직전 wrap-state 동기화 (push 후 갱신은 clone/pull 후 wrap 오탐 유발 → commit 직전으로 이동). pre-push hook 의 wrap 재실행은 `METHODOLOGY_SHIP_IN_PROGRESS` env 로 skip (commit 직전 동기화로 인한 sha 일치 chicken-and-egg 회피). `touch` 만으로는 통과 못 함. 원인: S-007/S-008/S-009 동일 날짜 ship 시 옛 wrap 이 옛 콘텐츠를 *오늘 mtime* 만으로 통과시켜 다음 세션이 누락 작업을 발견 — root cause 차단.

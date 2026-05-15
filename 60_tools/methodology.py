@@ -71,6 +71,57 @@ METHODOLOGY_VERSION = "v4.0"
 
 METHODOLOGY_ROOT = Path(__file__).resolve().parent.parent
 
+
+# ─── 구조 탐지 (v3.2 vs v4.0) ───────────────────────────────────────────────
+# 같은 repo 안에서도 worktree 마다 옛 구조(50_tools/40_resources/00_foundation 등)
+# vs 새 구조(60_tools/50_resources/10_foundation 등) 가 공존할 수 있음.
+# 모든 경로 하드코딩 대신 이 함수를 사용해 *해당 target* 의 구조를 탐지.
+#
+# 정합성 안전망: pre-push hook / .app 런처 / CI / wrap 모두 동일 로직을 공유.
+
+_LAYOUT_V4 = {
+    "version":    "v4.0",
+    "tools":      "60_tools",
+    "resources":  "50_resources",
+    "foundation": "10_foundation",
+    "guides":     "20_guides",
+    "planning":   "30_planning",
+    "dev":        "40_dev",
+    "briefs":     "00_briefs",
+    "meta":       "70_meta",
+}
+
+_LAYOUT_V32 = {
+    "version":    "v3.2",
+    "tools":      "50_tools",
+    "resources":  "40_resources",
+    "foundation": "00_foundation",
+    "guides":     "10_guides",
+    "planning":   "20_planning",
+    "dev":        "30_dev",
+    "briefs":     None,  # v3.2 에는 briefs 폴더 없음
+    "meta":       "60_meta",
+}
+
+
+def methodology_layout(target: Path) -> dict[str, str | None]:
+    """v3.2/v4.0 구조 자동 탐지.
+
+    탐지 우선순위:
+      1. v4.0 시그니처 — `60_tools/methodology.py` 존재
+      2. v3.2 시그니처 — `50_tools/methodology.py` 존재
+      3. 둘 다 없으면 v4.0 으로 가정 (신규 init 직후 등)
+
+    모든 호출지는 이 함수 결과의 키만 사용:
+        layout = methodology_layout(target)
+        obs_dir = target / layout["resources"] / "ai_observations"
+    """
+    if (target / "60_tools" / "methodology.py").exists():
+        return _LAYOUT_V4
+    if (target / "50_tools" / "methodology.py").exists():
+        return _LAYOUT_V32
+    return _LAYOUT_V4  # default to latest for fresh init
+
 # ─── 매니페스트 ─────────────────────────────────────────────────────────────
 MANIFEST = {
     # sync가 항상 덮어쓰는 디렉터리·파일 (재귀 복사)
@@ -141,7 +192,13 @@ MARKER_RE = re.compile(
 
 VERSION_FILE_NAME = ".methodology-version"
 META_ROOT = Path("70_meta")
-OBSERVATION_DIR = Path("50_resources/ai_observations")
+OBSERVATION_DIR = Path("50_resources/ai_observations")  # default (v4.0). 실제 사용은 _observation_dir(target).
+
+
+def _observation_dir(target: Path) -> Path:
+    """관찰 로그 디렉터리 — layout 기반. v3.2: 40_resources, v4.0: 50_resources."""
+    layout = methodology_layout(target)
+    return target / layout["resources"] / "ai_observations"
 CATALOG_DIR = Path("50_resources/catalog")
 SKELETONS_DIR = Path("50_resources/skeletons")
 INSIGHTS_DIR = Path("40_dev/snapshots/insights")
@@ -493,7 +550,7 @@ def cmd_observe(args: argparse.Namespace) -> int:
 
     date_part = args.date or utc_date()
     session_id = f"{date_part}_{args.slug}"
-    output = METHODOLOGY_ROOT / OBSERVATION_DIR / f"{session_id}.md"
+    output = _observation_dir(METHODOLOGY_ROOT) / f"{session_id}.md"
     if output.exists() and not args.force:
         err(f"이미 존재합니다: {output.relative_to(METHODOLOGY_ROOT)} (--force 로 덮어쓰기)")
         return 1
@@ -1066,7 +1123,61 @@ def cmd_sync(args: argparse.Namespace) -> int:
         info(f"총 {total_changes}개 변경 예정. 적용하려면 --apply")
     else:
         ok(f"sync 완료. 총 {total_changes}개 파일 변경.")
+
+    # 5) sibling worktree 처리
+    # 구조 마이그레이션이 있었거나 명시적 --include-worktrees 면 같은 repo 의
+    # 다른 worktree 에도 sync 를 자동 전파. 그렇지 않으면 *경고만* 표시.
+    siblings = _git_sibling_worktrees(target)
+    if siblings:
+        has_migration = bool(chain)
+        include_wt = (
+            args.include_worktrees
+            if getattr(args, "include_worktrees", None) is not None
+            else has_migration  # 마이그레이션 시 기본 True
+        )
+        if getattr(args, "main_only", False):
+            include_wt = False
+
+        if include_wt:
+            info(f"sibling worktree {len(siblings)}개 처리 ({'마이그레이션 자동' if has_migration else '명시 --include-worktrees'})")
+            for wt in siblings:
+                info(f"  → sync worktree: {wt}")
+                # 재귀 호출 회피 — sibling 에서는 worktree 처리 skip
+                sub_args = argparse.Namespace(
+                    apply=apply,
+                    target=args.target,
+                    path=str(wt),
+                    include_worktrees=False,
+                    main_only=True,
+                )
+                cmd_sync(sub_args)
+        else:
+            warn(f"sibling worktree {len(siblings)}개 발견 — sync 미적용:")
+            for wt in siblings[:5]:
+                warn(f"  {wt}")
+            if len(siblings) > 5:
+                warn(f"  ... 외 {len(siblings)-5}개")
+            warn("일괄 적용: --include-worktrees (마이그레이션 있으면 기본 True)")
     return 0
+
+
+def _git_sibling_worktrees(target: Path) -> list[Path]:
+    """target 이 속한 git repo 의 다른 worktree 들 (target 자신 제외)."""
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "worktree", "list", "--porcelain"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return []
+    paths: list[Path] = []
+    for line in out.splitlines():
+        if line.startswith("worktree "):
+            wt = Path(line[len("worktree "):].strip()).resolve()
+            if wt != target.resolve() and (wt / VERSION_FILE_NAME).exists():
+                paths.append(wt)
+    return paths
 
 
 # ─── 명령: status ───────────────────────────────────────────────────────────
@@ -1811,10 +1922,24 @@ _WRAP_TRACKED: list[tuple[str, str]] = [
     ("TODO.md",            "TODO.md"),
     (".ai/checkpoint.md",  ".ai/checkpoint.md"),
 ]
-_WRAP_OBS_DIRS = (
-    "50_resources/ai_observations",
-    "70_meta/observations",
-)
+def _wrap_obs_dirs(target: Path) -> tuple[str, ...]:
+    """관찰 로그 디렉터리 — layout 기반 동적 탐지.
+
+    v3.2: 40_resources/ai_observations + 60_meta/observations
+    v4.0: 50_resources/ai_observations + 70_meta/observations
+    구조 마이그레이션 중간 상태도 처리 (양쪽 모두 검사).
+    """
+    layout = methodology_layout(target)
+    dirs = [
+        f"{layout['resources']}/ai_observations",
+        f"{layout['meta']}/observations",
+    ]
+    # 마이그레이션 직후 양쪽 구조가 잠시 공존할 수 있음 — 양쪽 모두 추적
+    if layout["version"] == "v4.0":
+        dirs += ["40_resources/ai_observations", "60_meta/observations"]
+    else:
+        dirs += ["50_resources/ai_observations", "70_meta/observations"]
+    return tuple(dirs)
 
 
 def wrap_state_path(target: Path) -> Path:
@@ -1862,9 +1987,12 @@ def current_git_head(target: Path) -> str | None:
 
 
 def list_observation_files(target: Path) -> list[str]:
-    """관찰 로그 파일들의 relative path 리스트 (정렬됨)."""
+    """관찰 로그 파일들의 relative path 리스트 (정렬됨).
+
+    구조 탐지: layout 기반 + 마이그레이션 중간 양쪽 모두 검사.
+    """
     out: list[str] = []
-    for d in _WRAP_OBS_DIRS:
+    for d in _wrap_obs_dirs(target):
         dp = target / d
         if dp.is_dir():
             for f in dp.glob("*.md"):
@@ -1960,25 +2088,44 @@ def cmd_wrap(args: argparse.Namespace) -> int:
             ))
             missing += 1
 
-    # ── 4) ai_observations — 직전 검증 이후 *새 파일* 1건 이상 ─────────────
+    # ── 4) ai_observations — 직전 검증 이후 *새 파일* 1건 이상 + frontmatter 형식 검증 ─
     seen = set((state.get("observations") or {}).get("validated_files", []))
     cur_obs = list_observation_files(target)
     new_obs = [f for f in cur_obs if f not in seen]
     if bootstrapped:
         checks.append(("ai_observations/", True, "bootstrapped"))
-    elif new_obs:
-        checks.append((
-            "ai_observations/",
-            True,
-            f"새 관찰 로그 {len(new_obs)}건",
-        ))
-    else:
+    elif not new_obs:
         checks.append((
             "ai_observations/",
             False,
-            f"신규 .md 없음 — {today}_<slug>.md 생성 필요",
+            f"신규 .md 없음 — `methodology observe --slug <s> --task-type <t> --summary <m>` 로 생성 필요",
         ))
         missing += 1
+    else:
+        # 새 파일들의 frontmatter 선행 검증 — CI 까지 안 가도 wrap 에서 즉시 fail
+        invalid: list[tuple[str, list[str]]] = []
+        for rel in new_obs:
+            p = target / rel
+            errs = validate_observation_file(p)
+            if errs:
+                invalid.append((rel, errs))
+        if invalid:
+            checks.append((
+                "ai_observations/",
+                False,
+                f"신규 {len(new_obs)}건 중 {len(invalid)}건 형식 오류 — `methodology observe new ...` 사용 권장",
+            ))
+            for rel, errs in invalid:
+                print(f"    \033[31m·\033[0m {rel}:")
+                for e in errs:
+                    print(f"        {e}")
+            missing += 1
+        else:
+            checks.append((
+                "ai_observations/",
+                True,
+                f"새 관찰 로그 {len(new_obs)}건 (형식 검증 통과)",
+            ))
 
     # 출력
     for name, ok_flag, hint in checks:
@@ -2260,6 +2407,18 @@ def main(argv: list[str] | None = None) -> int:
     ps.add_argument("--apply", action="store_true", help="실제 적용 (없으면 dry-run)")
     ps.add_argument("--target", help="목표 버전 (기본: 최신)")
     ps.add_argument("--path", help="대상 폴더 (기본: 현재 디렉터리)")
+    ps.add_argument(
+        "--include-worktrees",
+        dest="include_worktrees",
+        action="store_true",
+        default=None,
+        help="sibling worktree 도 일괄 sync (마이그레이션 있으면 기본 True)",
+    )
+    ps.add_argument(
+        "--main-only",
+        action="store_true",
+        help="sibling worktree 무시. 마이그레이션 있어도 main 만 처리.",
+    )
     ps.set_defaults(func=cmd_sync)
 
     pst = sub.add_parser("status", help="버전 비교")

@@ -1,22 +1,23 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "81d8f0d1c4c80622475915e18070b3dcaf5eca62",
-  "last_validated_at": "2026-05-15T06:43:14Z",
+  "last_validated_commit": "d4b5101f160d83017e913153e36c0143bf70c6e1",
+  "last_validated_at": "2026-05-15T07:55:09Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "dc835185e9c3b89cd47ed76b7fb3372557bb019330e2d782fd68ccb71301e38e"
+      "sha256": "36be074891cd91d7aca657c4d41a2b2cf9f0dea39d66952ff8807bba112daf94"
     },
     "TODO.md": {
-      "sha256": "94f2c74e93d27f314a2e9e6b9345ac6955c0443434a7391d4e6800ce2962394e"
+      "sha256": "c7b7e2e8452999670412c2eda5134205be0bd6e26ada6a6cc2cc7b5b44a6b4f3"
     },
     ".ai/checkpoint.md": {
-      "sha256": "a067871ba0bd4350ebeebc9446d9568b73a88dfc02038c68279fd71aae55a579"
+      "sha256": "ba4fc4b5e743f83c3a8d9872562d47268737ac5558cfa43f0b334decc2410254"
     }
   },
   "observations": {
     "validated_files": [
       "50_resources/ai_observations/2026-05-07_l1-observe-flow.md",
+      "50_resources/ai_observations/2026-05-15_methodology-integrity-3-fixes.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
