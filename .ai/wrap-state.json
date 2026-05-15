@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "bootstrapped_at": "2026-05-14T16:04:14Z",
+  "last_validated_commit": "81d8f0d1c4c80622475915e18070b3dcaf5eca62",
+  "last_validated_at": "2026-05-15T06:43:14Z",
+  "files": {
+    "HANDOFF.md": {
+      "sha256": "dc835185e9c3b89cd47ed76b7fb3372557bb019330e2d782fd68ccb71301e38e"
+    },
+    "TODO.md": {
+      "sha256": "94f2c74e93d27f314a2e9e6b9345ac6955c0443434a7391d4e6800ce2962394e"
+    },
+    ".ai/checkpoint.md": {
+      "sha256": "a067871ba0bd4350ebeebc9446d9568b73a88dfc02038c68279fd71aae55a579"
+    }
+  },
+  "observations": {
+    "validated_files": [
+      "50_resources/ai_observations/2026-05-07_l1-observe-flow.md",
+      "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
+      "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
+      "70_meta/observations/2026-05-12_meth-015-propagation.md",
+      "70_meta/observations/2026-05-12_ship-and-hooks-and-automerge.md",
+      "70_meta/observations/2026-05-12_v3.1-to-v3.2-migration.md",
+      "70_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md",
+      "70_meta/observations/2026-05-13_dashboard-cache-relocation.md",
+      "70_meta/observations/2026-05-13_dashboard-port-conflict-fix.md",
+      "70_meta/observations/2026-05-13_dashboard-root-rewrite.md",
+      "70_meta/observations/2026-05-13_inspire-launchers-build.md",
+      "70_meta/observations/2026-05-13_inspire-launchers-cleanup.md",
+      "70_meta/observations/2026-05-13_multi-dashboard-and-branches.md",
+      "70_meta/observations/2026-05-13_open-dashboard-command.md",
+      "70_meta/observations/2026-05-14_methodology-export.md",
+      "70_meta/observations/2026-05-14_setup-to-settings-folder.md",
+      "70_meta/observations/2026-05-14_user-guide-and-commands.md",
+      "70_meta/observations/2026-05-14_v4-briefs-and-shift.md",
+      "70_meta/observations/2026-05-14_wrap-content-hash-validation.md",
+      "70_meta/observations/2026-05-14_wrap-ship-hook-skip.md",
+      "70_meta/observations/2026-05-14_wrap-state-commit-pre-step.md",
+      "70_meta/observations/README.md"
+    ]
+  }
+}

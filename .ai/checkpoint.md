@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-14 (USER_GUIDE + Commands 카드)
+# Checkpoint — 2026-05-15 (wrap 콘텐츠 해시 검증)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -6,10 +6,10 @@
 
 ## 작성자
 
-- Agent: claude-sonnet-4-6
+- Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/lucid-grothendieck-5a6562` (branch `claude/lucid-grothendieck-5a6562`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/wrap-content-hash-validation`)
 
 ## 부팅 계약
 
@@ -20,7 +20,28 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 USER_GUIDE + commands.json + Commands 카드 (방금)**:
+**🆕 `wrap` sha256 콘텐츠 해시 검증 (방금)**:
+
+- 사용자 보고: 동일 날짜에 S-007 → S-008 → S-009 연속 ship 했는데, 다음 세션이 "S-008/S-009 미처리"로 인식. wrap 이 mtime 만 보고 통과시켜 옛 HANDOFF/TODO/checkpoint 콘텐츠가 그대로 push 됨.
+- 근본 원인: `cmd_wrap` 의 `_mtime_today(p)` 검증 — "오늘 변경됨" = 콘텐츠 갱신 보장 아님. S-007 ship 이 한 번 mtime 을 찍으면 S-008/S-009 ship 은 *touch 안 해도* 통과 (false-positive).
+- 해결 설계 (옵션 ① + ②):
+  · `.ai/wrap-state.json` — `last_validated_commit`, 라이브 파일 sha256, 검증된 관찰 로그 목록
+  · `cmd_wrap` 재작성: 부트스트랩 → 콘텐츠 sha 비교 → 변경 없으면 fail
+  · `cmd_ship` 6단계 commit 직전에 `commit_wrap_state(target)` 호출 — wrap-state 와 라이브 파일이 동일 commit 에 패키징되어 clone/pull 후 wrap 일관성 보장 (post-push 갱신 시 commit 의 wrap-state 가 옛 baseline 을 가리키는 버그 회피). ship → push 시 `METHODOLOGY_SHIP_IN_PROGRESS=1` 환경변수로 pre-push hook 의 wrap 재실행 skip (commit 직전 동기화로 hook 의 wrap 이 sha 일치 → fail 하는 chicken-and-egg 회피)
+- 구현 위치 `60_tools/methodology.py`:
+  · 신설 헬퍼: `wrap_state_path`, `load_wrap_state`, `save_wrap_state`, `file_sha256`, `current_git_head`, `list_observation_files`, `bootstrap_wrap_state`, `commit_wrap_state`
+  · `cmd_wrap` 전면 재작성 — 부트스트랩 1회 통과 / sha 동일 시 fail / 새 관찰 1건 이상 요구
+  · `cmd_ship` push 성공 직후 `commit_wrap_state` 호출 (push 실패 시는 호출 안 함)
+  · `today` 라벨 버그 수정 (date.today → datetime.now(timezone.utc).date)
+- 검증 시나리오 (모두 실측):
+  · bootstrap: state 없음 → 현재 sha 저장 → 4/4 pass
+  · 변경 없음 재실행: 4/4 fail (sha 동일)
+  · `touch` 만: 4/4 fail (sha 동일) — 본 버그 시나리오 차단 확인
+  · 실제 콘텐츠 갱신: 4/4 pass (sha 갱신)
+- 관찰 로그: `70_meta/observations/2026-05-15_wrap-content-hash-validation.md`
+- 적용 프로젝트 sync 필요: methodology.py 가 shared_paths 에 이미 있어 `methodology sync --apply --path <project>` 로 자동 전파됨.
+
+**USER_GUIDE + commands.json + Commands 카드 (이전 차례)**:
 - 사용자 요청: 사람 워크플로 기준 사용자 가이드 (시작부터 코드 인계까지) + 자주 사용 명령 미리 저장 + 대시보드 표시
 - 신설 파일:
   · `10_foundation/USER_GUIDE.md` — 11 섹션 (시작·매일·brief·작업·종료·인계·명령·Class·문제해결·다이어그램·참조)

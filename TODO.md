@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-023
+- **title**: `wrap` 콘텐츠 해시 검증 — 동일 날짜 다중 ship 오탐 차단
+- **notes**: Completed 2026-05-15. mtime-only → sha256 콘텐츠 해시. `.ai/wrap-state.json` baseline + 부트스트랩 + ship commit 직전 wrap-state 동기화 (push 후 갱신은 clone/pull 후 wrap 오탐 유발 → commit 직전으로 이동). pre-push hook 의 wrap 재실행은 `METHODOLOGY_SHIP_IN_PROGRESS` env 로 skip (commit 직전 동기화로 인한 sha 일치 chicken-and-egg 회피). `touch` 만으로는 통과 못 함. 원인: S-007/S-008/S-009 동일 날짜 ship 시 옛 wrap 이 옛 콘텐츠를 *오늘 mtime* 만으로 통과시켜 다음 세션이 누락 작업을 발견 — root cause 차단.
+
 ### METH-015
 - **title**: 적용 프로젝트 3개에 applied-ci/auto-merge 워크플로 + 신규 CLI 자동 전파
 - **notes**: Completed 2026-05-12. icons/gamblescan/talmocom 3개 모두 v3.2 본 저장소 commit 83a48e0 동기화. ship/hooks/dashboard/wrap CLI + dev-server API + workflow 2종 + managed 규칙 갱신 자동 전파. 격리 3/3 ✅. 자가발전 루프 첫 진짜 회전 (F-003 repeat_of) → METH-019 트리거.
