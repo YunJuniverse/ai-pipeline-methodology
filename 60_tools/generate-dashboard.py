@@ -277,15 +277,33 @@ def read_json_safe(path: Path) -> dict:
         return {}
 
 
+def _count_observations(root: Path) -> int:
+    """관찰 로그 카운트 — 50_resources/ai_observations + 70_meta/observations 모두 포함.
+    적용 프로젝트는 50_resources 만 가짐 (70_meta 는 source 전용). source 저장소는 양쪽 합산.
+    v3.2 fallback (40_resources / 60_meta) 도 추가 검사.
+    """
+    total = 0
+    for rel in ("50_resources/ai_observations", "70_meta/observations",
+                "40_resources/ai_observations", "60_meta/observations"):
+        d = root / rel
+        if not d.is_dir():
+            continue
+        # _README.md / README.md 제외
+        for f in d.glob("*.md"):
+            if f.name.startswith("_") or f.name.lower() == "readme.md":
+                continue
+            total += 1
+    return total
+
+
 def read_methodology_assets(root: Path) -> dict:
     catalog = root / "50_resources" / "catalog"
     skeletons = root / "50_resources" / "skeletons"
-    observations = root / "50_resources" / "ai_observations"
     insights = root / "40_dev" / "snapshots" / "insights"
     context = read_json_safe(root / ".ai" / "context.json")
     return {
         "context": context,
-        "observations": count_files(observations, ".md") - (1 if (observations / "_README.md").exists() else 0),
+        "observations": _count_observations(root),
         "catalog_pending": count_files(catalog / "_pending", ".md"),
         "catalog_active": len([p for p in catalog.glob("C-*.md") if p.is_file()]),
         "catalog_archived": count_files(catalog / "archived", ".md"),

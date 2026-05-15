@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: methodology-applied-ci 가 source 저장소에서 *항상 fail* 하던 버그 fix — `if: github.repository != 'YunJuniverse/ai-pipeline-methodology'` 로 job skip. source 저장소는 70_meta/ 를 의도적으로 가지고 있어 격리 검사가 항상 fail.
+- **Working on**: 정합성 QA 후 2건 우선 fix — (1) dashboard 가 `70_meta/observations` 누락 (20건 중 6건만 셈) → `_count_observations()` 헬퍼로 양쪽 디렉터리 합산. (2) commands.json `10_guides/03` 옛 경로 → `20_guides/03`.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-15: **정합성 QA 후 2 fix** — 18개 카테고리 QA 후 4 정합성 이슈 발견 (commands stale path / dashboard obs 누락 / commands.json 8 subcmd 미노출 / generate-dashboard layout 헬퍼 미적용). 우선순위 1·2 만 묶음. (1) `generate-dashboard.py` 의 `read_methodology_assets()` 가 `50_resources/ai_observations` 만 카운트 → `_count_observations()` 헬퍼 도입 후 `50_resources + 70_meta` (+ v3.2 fallback) 모두 합산. source 저장소 dashboard 가 6 → 26 정확 보고. (2) `commands.json:119` 의 description "10_guides/03 스키마 검증" → "20_guides/03 스키마 검증" (v4.0 명명).
 - 2026-05-15: **applied-ci source repo skip** — `methodology-applied-ci.yml` 의 `70_meta 미주입 검증` 이 source 저장소(`YunJuniverse/ai-pipeline-methodology`) PR 에서 *항상 fail*. source 는 70_meta/ 를 의도적으로 가지고 있고 (메타-방법론 격리 영역), applied-ci 는 *적용 프로젝트* 의 누수만 검사해야 함. job-level `if: github.repository != 'YunJuniverse/ai-pipeline-methodology'` 로 skip. 두 job (validate / freshness) 모두 적용. source 의 자체 검증은 methodology-source-ci.yml 가 담당.
 - 2026-05-15: **observation lint 정합성 회복** — source-ci 가 옛 observation 파일들에서 18건 실패. 분석: validator 의 "본문 1단락 ≤ 220자" 규칙이 *실제 사용 패턴* (multi-section markdown body) 과 어긋남. 게다가 CLI `--summary` 도 길이 강제 안 함 — 정책-현실 괴리. **해결**: (1) validator 본문 길이/단락 제약 제거 (body 는 markdown 자유 형식, frontmatter required fields 는 유지), (2) frontmatter 없는 3개 파일 (PR #9 시기 `cat >` 작성) 에 적절한 YAML frontmatter 추가, (3) `2026-05-12_v3.1-to-v3.2-migration.md` 파일명 dot → kebab rename (slug 규칙 위반), (4) `2026-05-13_dashboard-port-conflict-fix.md` 절대 사용자 경로 `<METHODOLOGY>` 익명화. 18→0 실패.
 - 2026-05-15: **Stack 섹션 정리** — PR #11 의 12-col bento 가 5개 문제 발생: (1) hero(6)+mid(4)=10 자투리 (2) hero row-span 2 가 grid auto-placement sparse 모드 깨뜨려 같은 카테고리 카드 분리됨 (3) 카테고리 라벨 7회 반복 (4) role 한글 uppercase+letter-spacing 줄바꿈 (5) hero 빈 공간 vs sm 이름만 — 정보 밀도 양극화. **해결**: 카테고리 그룹 헤더 1회 + `auto-fill minmax(240px,1fr)` 균일 grid + hero = 좌측 액센트 라인 + ★ PRIMARY 배지 + 살짝 다른 배경 (layout 변경 X) + role uppercase 제거 + 모든 카드 reason 3-line clamp 노출. stack.json 데이터 무수정 (`size: hero|mid|sm` 의미만 "레이아웃 크기" → "강조 등급" 으로 전환).
