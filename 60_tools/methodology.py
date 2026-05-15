@@ -136,6 +136,7 @@ MANIFEST = {
         "60_tools/methodology-graph.json",
         "60_tools/generate-dashboard.py",
         "60_tools/methodology.py",
+        "60_tools/stack.json",
         "10_foundation/WHITEPAPER.md",
         "10_foundation/HOW_TO_APPLY.md",
         "10_foundation/KICKOFF_PROMPT.md",

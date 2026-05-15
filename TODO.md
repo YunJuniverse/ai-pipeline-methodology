@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-025
+- **title**: Overview 탭 *기술 스택* bento 카드
+- **notes**: Completed 2026-05-15. 데이터: `60_tools/stack.json` (23 항목 × 5 카테고리, 카테고리당 hero 1장 + mid/sm). 비대칭 CSS grid (12-col, hero=6colx2row / mid=4col / sm=3col). 카드 클릭 → side-sheet 모달로 선택 이유 + docs URL 표시. 시각 언어는 현재 대시보드 OKLCH 톤 유지 (Apple bento 컨셉만 차용). MANIFEST shared 추가 → 적용 프로젝트 자동 전파.
+
 ### METH-024
 - **title**: 방법론 정합성 3 fix 묶음 — 구조 탐지 / sync worktree / observe CLI 강제
 - **notes**: Completed 2026-05-15. tshome 사고로 발견된 3개 root cause 를 한 PR 로 묶음. (1) `methodology_layout(target)` 헬퍼 — v3.2/v4.0 구조 탐지 중앙화. 그동안 hook·.app·CI·wrap 에서 fallback 4번 누락한 root cause. (2) `sync --include-worktrees` — sibling git worktree 감지. 마이그레이션 시 기본 True. (3) `observe` CLI 강제 + wrap 선행 frontmatter 검증 — `cat > .md` 직접 작성 차단. CLAUDE/AGENTS managed 에 CLI 사용 권고 명문화. CI 워크플로도 구조 자동 탐지 (v3.2 워크트리에서 60_tools 못 찾던 버그 차단).

@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (정합성 3 fix 묶음)
+# Checkpoint — 2026-05-15 (Stack bento 카드)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/methodology-integrity`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/stack-bento-card`)
 
 ## 부팅 계약
 
@@ -20,7 +20,22 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 방법론 정합성 3 fix 묶음 (방금)**:
+**🆕 Stack bento 카드 (방금)**:
+
+- 사용자 요구: 회사 홈페이지 기술 스택 (FE/BE/CMS/Infra/Dev 5 카테고리 × 23 항목) 을 Apple M2 키노트 스타일 비대칭 카드로 시각화. 대시보드 어디? 확장성/트레이드오프?
+- 분석: Apple 톤 그대로 → 디자인 정합성 깨짐. 25 항목 다 hero → bento 의미 X. 정적 PNG → 코드와 어긋남. → **하이브리드 추천**: 데이터 (stack.json) + 명시적 size hint + 현재 OKLCH 톤 유지 + Overview 탭 통합 + side-sheet 모달 재사용.
+- 구현:
+  · `60_tools/stack.json` — 23 items, 5 categories. 각 item `size: hero | mid | sm` 명시. 카테고리당 hero 1: Next.js 15 / Resend / Sanity v3 / Vercel / pnpm.
+  · CSS: `.stack-grid` (12-col CSS Grid) + `.stack-card.hero` (span 6col x 2row) + `.mid` (4col) + `.sm` (3col). 1100px 이하 반응형 fallback.
+  · HTML: Overview 탭 최하단 새 섹션 `#stack-section`. Dev servers 카드 다음.
+  · JS: 데이터 정렬 (category 순 + size rank), 렌더링, 카드 클릭 → `openStackModal()` 신규 함수가 side-sheet 모달 띄움 (선택 이유 + meta + docs URL).
+  · `assemble()` 가 stack.json 자동 로드 → DATA.stack 으로 전달.
+  · MANIFEST shared_paths 에 `60_tools/stack.json` 추가 → 적용 프로젝트 자동 전파.
+- 비주얼: 현재 대시보드 톤 유지. 다색 그라데이션·rounded·shadows 없음. 단일 앰버 액센트는 카테고리 라벨에만. hover 시 chev (→) 표시.
+- 검증: 빌드 OK, JSON payload 검증 (5 cats, 23 items, hero 5/mid 5/sm 13)
+- 미검증: 시각 (Chrome MCP 연결 끊김) — 사용자가 http://localhost:8765 에서 확인 필요
+
+**방법론 정합성 3 fix 묶음 (이전 차례)**:
 
 - 사용자 보고: tshome 작업에서 4가지 에러 발견 — `60_tools/methodology.py` 미발견 (CI), `40_resources` vs `50_resources` 불일치 (wrap), observation frontmatter 형식 오류, task_type enum 무효
 - 분석 결과: 표면 4건이지만 root cause 3개의 합성
