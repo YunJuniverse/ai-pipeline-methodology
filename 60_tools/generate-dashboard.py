@@ -402,12 +402,22 @@ def assemble(root: Path) -> dict[str, Any]:
         except Exception:
             commands_data = {}
 
+    # 기술 스택 메타데이터 (Stack bento 카드용)
+    stack_data: dict = {}
+    stack_path = root / "60_tools" / "stack.json"
+    if stack_path.exists():
+        try:
+            stack_data = json.loads(stack_path.read_text(encoding="utf-8"))
+        except Exception:
+            stack_data = {}
+
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "root": str(root),
         "git_branch": git_branch,
         "git_commit": git_commit,
         "commands": commands_data,
+        "stack": stack_data,
         "graph": graph,
         "kanban": kanban,
         "sprints": sprints_json,
@@ -704,6 +714,30 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
 .legend span{display:flex;align-items:center;gap:6px;text-transform:uppercase;}
 .legend .lg-dot{width:9px;height:9px;display:inline-block;border-radius:50%;}
 
+/* Stack bento grid — 비대칭 카드 (hero/mid/sm) */
+.stack-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(96px,auto);gap:1px;background:var(--hairline-soft);border:1px solid var(--hairline-soft);}
+.stack-card{background:var(--surface);padding:18px 20px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative;transition:background .12s;min-height:96px;}
+.stack-card:hover{background:var(--surface-2);}
+.stack-card.hero{grid-column:span 6;grid-row:span 2;padding:24px 28px;}
+.stack-card.mid{grid-column:span 4;}
+.stack-card.sm{grid-column:span 3;}
+.stack-card .eyebrow{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:auto;display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.stack-card .eyebrow .cat{color:var(--accent);}
+.stack-card .name{font-family:var(--font-display);font-weight:800;letter-spacing:-0.02em;color:var(--text);line-height:1.15;margin:14px 0 4px;}
+.stack-card.hero .name{font-size:32px;letter-spacing:-0.025em;}
+.stack-card.mid  .name{font-size:18px;}
+.stack-card.sm   .name{font-size:15px;}
+.stack-card .tag{font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-bottom:6px;letter-spacing:0.02em;}
+.stack-card .role{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);}
+.stack-card.hero .reason-preview{color:var(--text-dim);font-size:13px;font-weight:300;line-height:1.55;margin-top:12px;max-width:42ch;}
+.stack-card .chev{position:absolute;top:14px;right:18px;color:var(--text-dim);font-size:11px;opacity:0;transition:opacity .12s;}
+.stack-card:hover .chev{opacity:1;}
+@media (max-width: 1100px){
+  .stack-card.hero{grid-column:span 12;}
+  .stack-card.mid{grid-column:span 6;}
+  .stack-card.sm{grid-column:span 6;}
+}
+
 /* Section head */
 .section-head{margin-top:48px;display:flex;justify-content:space-between;align-items:end;margin-bottom:24px;}
 .section-head h2{font-family:var(--font-display);font-weight:800;font-size:32px;letter-spacing:-0.03em;margin:0;line-height:1;}
@@ -887,6 +921,15 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
         <tbody></tbody>
       </table>
       <div id="dev-servers-status" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)"></div>
+    </div>
+
+    <!-- Stack bento -->
+    <div id="stack-section" style="margin-top:var(--gap-card)">
+      <div class="section-head" style="margin-top:0;margin-bottom:18px">
+        <h2>기술 <em>스택</em>.</h2>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase" id="stack-meta">카드 클릭 → 선택 이유</span>
+      </div>
+      <div class="stack-grid" id="stack-grid"></div>
     </div>
   </section>
 
@@ -1178,6 +1221,79 @@ document.getElementById('stat-row').innerHTML = buildStatHtml();
   }
   if(data.categories.length)render(data.categories[0].id);
 })();
+
+// ── Stack bento (Overview 탭 하단) ─────────────────────────────
+(function(){
+  const stackData=DATA.stack||{};
+  const grid=document.getElementById('stack-grid');
+  const metaEl=document.getElementById('stack-meta');
+  const section=document.getElementById('stack-section');
+  if(!grid)return;
+  const items=stackData.items||[];
+  const cats=stackData.categories||[];
+  if(!items.length){section.style.display='none';return;}
+  const catLabel=id=>{const c=cats.find(x=>x.id===id);return c?c.label:id;};
+  // 카테고리 순서 + 같은 카테고리 안에서 hero → mid → sm 정렬
+  const sizeRank={hero:0,mid:1,sm:2};
+  const catOrder=cats.map(c=>c.id);
+  const sorted=[...items].sort((a,b)=>{
+    const ca=catOrder.indexOf(a.category),cb=catOrder.indexOf(b.category);
+    if(ca!==cb)return ca-cb;
+    return (sizeRank[a.size]||9)-(sizeRank[b.size]||9);
+  });
+  grid.innerHTML=sorted.map(it=>{
+    const size=it.size||'sm';
+    const preview=size==='hero'&&it.reason?`<div class="reason-preview">${esc(it.reason).slice(0,140)}${it.reason.length>140?'…':''}</div>`:'';
+    return `
+      <div class="stack-card ${size}" data-id="${esc(it.id)}">
+        <div class="eyebrow">
+          <span class="cat">${esc(catLabel(it.category))}</span>
+          <span>${esc(it.role||'')}</span>
+        </div>
+        <div>
+          <div class="name">${esc(it.name)}</div>
+          ${it.tag?`<div class="tag">${esc(it.tag)}</div>`:''}
+          ${preview}
+        </div>
+        <div class="chev">→</div>
+      </div>`;
+  }).join('');
+  // 카드 클릭 → 모달
+  grid.querySelectorAll('.stack-card').forEach(el=>{
+    el.onclick=()=>{
+      const it=items.find(x=>x.id===el.dataset.id);
+      if(it)openStackModal(it);
+    };
+  });
+  metaEl.textContent=`${items.length} items · ${cats.length} categories`;
+})();
+
+function openStackModal(it){
+  const stackData=DATA.stack||{};
+  const cats=stackData.categories||[];
+  const cat=cats.find(c=>c.id===it.category);
+  const body=`
+    <div class="section">
+      <div class="tag-row" style="margin-bottom:14px">
+        <span class="tg accent">${esc(cat?cat.label:it.category)}</span>
+        ${it.tag?`<span class="tg">${esc(it.tag)}</span>`:''}
+        ${it.role?`<span class="tg">${esc(it.role)}</span>`:''}
+        ${it.size==='hero'?`<span class="tg">hero</span>`:''}
+      </div>
+      <p class="modal-prose">${esc(it.reason||'(이유 미작성)')}</p>
+    </div>
+    <div class="section">
+      <span class="eyebrow">Meta</span>
+      <div class="meta-grid">
+        <div class="cell"><div class="l">id</div><div class="v">${esc(it.id)}</div></div>
+        <div class="cell"><div class="l">category</div><div class="v">${esc(it.category)}</div></div>
+        <div class="cell"><div class="l">role</div><div class="v">${esc(it.role||'—')}</div></div>
+        <div class="cell"><div class="l">size</div><div class="v">${esc(it.size||'sm')}</div></div>
+      </div>
+    </div>
+    ${it.url?`<div class="section"><span class="eyebrow">Docs</span><p class="modal-prose"><a href="${esc(it.url)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">${esc(it.url)} →</a></p></div>`:''}`;
+  openModal(`Stack · ${cat?cat.label:it.category}`,it.name,body);
+}
 
 // ── Kanban ────────────────────────────────────────────────────
 const KANBAN_MAP=[
