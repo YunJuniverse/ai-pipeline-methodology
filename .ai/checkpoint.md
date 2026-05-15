@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (Stack bento 카드)
+# Checkpoint — 2026-05-15 (Stack 섹션 정리)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/stack-bento-card`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/stack-cleanup`)
 
 ## 부팅 계약
 
@@ -20,7 +20,32 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 Stack bento 카드 (방금)**:
+**🆕 Stack 섹션 정리 (방금)**:
+
+- 사용자 요구: PR #11 의 stack bento 가 사용자가 실제로 봤을 때 5개 문제 발견 — Claude Design 핸드오프 번들로 fix 디자인 제공
+- 5개 문제:
+  · (1) hero(6col)+mid(4col)=10col 항상 2col 자투리, sm 행도 3×3=9 어긋남
+  · (2) hero 의 `grid-row: span 2` 가 CSS Grid auto-placement sparse 모드 깨뜨림 — Next.js 15 hero 가 자기 카테고리 카드보다 *아래* 배치됨
+  · (3) "FRONTEND" 라벨 7번 반복 — 노이즈만 증가
+  · (4) "UI 컴포넌트" / "패키지 매니저" 한글이 uppercase + letter-spacing 으로 강제 줄바꿈
+  · (5) hero 거대한 빈 공간 vs sm 이름만 — 정보 밀도 양극화
+- 해결 (디자인 번들 기반):
+  · 카테고리 그룹 헤더 1회: "01 / FE · Frontend · ★ 1 primary · 7 items"
+  · `grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))` — 균일 grid, 자투리 최소화
+  · hero = *시각 강조만* (좌측 2px 액센트 라인 + ★ PRIMARY 배지 + `color-mix` 살짝 다른 배경) — layout 변경 X
+  · role 라벨 uppercase 제거, letter-spacing 0.02em 로 축소
+  · 모든 카드에 reason 3-line clamp 노출
+- 구현:
+  · CSS: `.stack-grid` → `.stack-wrap` + `.stack-cat` + `.stack-cat-head` + `.stack-cat-grid` + `.stack-card.hero ::before/.star/.name` 강조 트리먼트
+  · JS: 카테고리별 group → header + grid 렌더링. 카드 클릭 모달 호환 유지.
+  · HTML 컨테이너: `class="stack-grid"` → `class="stack-wrap"` (id 는 stack-grid 유지 — JS 셀렉터 호환)
+  · stack.json 데이터 무수정 — `size: hero|mid|sm` 데이터 그대로, 의미만 "레이아웃 크기" → "강조 등급"
+- 검증:
+  · 빌드 OK
+  · 옛 클래스 (`.stack-card.hero` grid row-span, `.stack-card.mid` 등) 완전 제거 확인
+  · 새 클래스 (`stack-cat` × 15회, `★ PRIMARY` × 2회) 정상 렌더
+
+**Stack bento 카드 (이전 차례)**:
 
 - 사용자 요구: 회사 홈페이지 기술 스택 (FE/BE/CMS/Infra/Dev 5 카테고리 × 23 항목) 을 Apple M2 키노트 스타일 비대칭 카드로 시각화. 대시보드 어디? 확장성/트레이드오프?
 - 분석: Apple 톤 그대로 → 디자인 정합성 깨짐. 25 항목 다 hero → bento 의미 X. 정적 PNG → 코드와 어긋남. → **하이브리드 추천**: 데이터 (stack.json) + 명시적 size hint + 현재 OKLCH 톤 유지 + Overview 탭 통합 + side-sheet 모달 재사용.

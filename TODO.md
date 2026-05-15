@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-026
+- **title**: Stack 섹션 정리 — bento 자투리·hero row-span·카테고리 반복 문제 해결
+- **notes**: Completed 2026-05-15. Claude Design 핸드오프 번들 (stack-cleanup.html) 기반. PR #11 의 12-col bento 5개 문제 (자투리 / hero row-span / 라벨 반복 / 한글 줄바꿈 / 정보 밀도 양극화) 모두 해결. 카테고리 그룹 헤더 + auto-fill grid + hero 시각 강조 (좌측 액센트 + ★ PRIMARY 배지) + role uppercase 제거 + 모든 카드 reason 3-line clamp. `size: hero|mid|sm` 의미 전환 (레이아웃 크기 → 강조 등급), stack.json 데이터 무수정.
+
 ### METH-025
 - **title**: Overview 탭 *기술 스택* bento 카드
 - **notes**: Completed 2026-05-15. 데이터: `60_tools/stack.json` (23 항목 × 5 카테고리, 카테고리당 hero 1장 + mid/sm). 비대칭 CSS grid (12-col, hero=6colx2row / mid=4col / sm=3col). 카드 클릭 → side-sheet 모달로 선택 이유 + docs URL 표시. 시각 언어는 현재 대시보드 OKLCH 톤 유지 (Apple bento 컨셉만 차용). MANIFEST shared 추가 → 적용 프로젝트 자동 전파.

@@ -714,28 +714,34 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
 .legend span{display:flex;align-items:center;gap:6px;text-transform:uppercase;}
 .legend .lg-dot{width:9px;height:9px;display:inline-block;border-radius:50%;}
 
-/* Stack bento grid — 비대칭 카드 (hero/mid/sm) */
-.stack-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(96px,auto);gap:1px;background:var(--hairline-soft);border:1px solid var(--hairline-soft);}
-.stack-card{background:var(--surface);padding:18px 20px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative;transition:background .12s;min-height:96px;}
+/* Stack — 카테고리별 그룹, 정렬된 카드 그리드 (size = 강조 등급, 레이아웃 X) */
+.stack-wrap{display:flex;flex-direction:column;gap:0;border:1px solid var(--hairline-soft);background:var(--surface);}
+.stack-cat{border-bottom:1px solid var(--hairline-soft);}
+.stack-cat:last-child{border-bottom:none;}
+.stack-cat-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:16px 24px;background:var(--surface);border-bottom:1px solid var(--hairline-soft);}
+.stack-cat-head .num{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;color:var(--muted);}
+.stack-cat-head .lbl{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.02em;color:var(--text);display:flex;align-items:baseline;gap:12px;}
+.stack-cat-head .lbl .primary-note{font-family:var(--font-mono);font-weight:500;font-size:10.5px;color:var(--accent);letter-spacing:0.14em;text-transform:uppercase;}
+.stack-cat-head .count{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+.stack-cat-head .count b{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:0;margin-right:4px;}
+.stack-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--hairline-soft);}
+.stack-card{background:var(--surface);padding:18px 22px;display:flex;flex-direction:column;gap:6px;cursor:pointer;position:relative;transition:background .12s;min-height:148px;}
 .stack-card:hover{background:var(--surface-2);}
-.stack-card.hero{grid-column:span 6;grid-row:span 2;padding:24px 28px;}
-.stack-card.mid{grid-column:span 4;}
-.stack-card.sm{grid-column:span 3;}
-.stack-card .eyebrow{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:auto;display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-.stack-card .eyebrow .cat{color:var(--accent);}
-.stack-card .name{font-family:var(--font-display);font-weight:800;letter-spacing:-0.02em;color:var(--text);line-height:1.15;margin:14px 0 4px;}
-.stack-card.hero .name{font-size:32px;letter-spacing:-0.025em;}
-.stack-card.mid  .name{font-size:18px;}
-.stack-card.sm   .name{font-size:15px;}
-.stack-card .tag{font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-bottom:6px;letter-spacing:0.02em;}
-.stack-card .role{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);}
-.stack-card.hero .reason-preview{color:var(--text-dim);font-size:13px;font-weight:300;line-height:1.55;margin-top:12px;max-width:42ch;}
-.stack-card .chev{position:absolute;top:14px;right:18px;color:var(--text-dim);font-size:11px;opacity:0;transition:opacity .12s;}
-.stack-card:hover .chev{opacity:1;}
-@media (max-width: 1100px){
-  .stack-card.hero{grid-column:span 12;}
-  .stack-card.mid{grid-column:span 6;}
-  .stack-card.sm{grid-column:span 6;}
+.stack-card .role{font-family:var(--font-mono);font-size:11px;letter-spacing:0.02em;color:var(--muted);font-weight:400;}
+.stack-card .name{font-family:var(--font-display);font-weight:700;font-size:17px;letter-spacing:-0.015em;color:var(--text);line-height:1.25;margin:2px 0 0;}
+.stack-card .tag{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.02em;margin-top:2px;}
+.stack-card .reason{font-size:12.5px;color:var(--text-dim);font-weight:300;line-height:1.55;margin-top:auto;padding-top:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.stack-card .chev{position:absolute;bottom:16px;right:20px;color:var(--muted);font-size:13px;opacity:0;transition:opacity .12s,transform .12s;}
+.stack-card:hover .chev{opacity:1;transform:translateX(2px);color:var(--accent);}
+.stack-card.hero{background:color-mix(in oklch,var(--surface) 82%, var(--accent) 4%);}
+.stack-card.hero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);}
+.stack-card.hero .star{position:absolute;top:16px;right:20px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.18em;color:var(--accent);font-weight:500;}
+.stack-card.hero .name{font-size:20px;letter-spacing:-0.02em;}
+.stack-card.hero:hover{background:color-mix(in oklch,var(--surface) 68%, var(--accent) 6%);}
+@media (max-width:680px){
+  .stack-cat-head{grid-template-columns:1fr auto;gap:12px;}
+  .stack-cat-head .num{display:none;}
+  .stack-cat-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}
 }
 
 /* Section head */
@@ -929,7 +935,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
         <h2>기술 <em>스택</em>.</h2>
         <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase" id="stack-meta">카드 클릭 → 선택 이유</span>
       </div>
-      <div class="stack-grid" id="stack-grid"></div>
+      <div class="stack-wrap" id="stack-grid"></div>
     </div>
   </section>
 
@@ -1222,44 +1228,53 @@ document.getElementById('stat-row').innerHTML = buildStatHtml();
   if(data.categories.length)render(data.categories[0].id);
 })();
 
-// ── Stack bento (Overview 탭 하단) ─────────────────────────────
+// ── Stack — 카테고리별 그룹, 정렬된 카드 그리드 ────────────────
+// 디자인 변경 이력 (PR #12, stack-cleanup):
+//   - hero 의 grid row-span 으로 자동 배치가 깨지던 문제 → size 는 *강조 등급* 으로 의미 전환.
+//   - hero = 좌측 액센트 + ★ PRIMARY 배지 + 살짝 다른 톤 (layout 변경 X).
+//   - 카테고리 라벨 매 카드 반복 → 카테고리 그룹 헤더 1회.
+//   - role 라벨 uppercase 제거 (한글 줄바꿈 회피).
+//   - 모든 카드에 reason 3-line clamp 노출.
 (function(){
   const stackData=DATA.stack||{};
-  const grid=document.getElementById('stack-grid');
+  const wrap=document.getElementById('stack-grid');
   const metaEl=document.getElementById('stack-meta');
   const section=document.getElementById('stack-section');
-  if(!grid)return;
+  if(!wrap)return;
   const items=stackData.items||[];
   const cats=stackData.categories||[];
   if(!items.length){section.style.display='none';return;}
-  const catLabel=id=>{const c=cats.find(x=>x.id===id);return c?c.label:id;};
-  // 카테고리 순서 + 같은 카테고리 안에서 hero → mid → sm 정렬
   const sizeRank={hero:0,mid:1,sm:2};
-  const catOrder=cats.map(c=>c.id);
-  const sorted=[...items].sort((a,b)=>{
-    const ca=catOrder.indexOf(a.category),cb=catOrder.indexOf(b.category);
-    if(ca!==cb)return ca-cb;
-    return (sizeRank[a.size]||9)-(sizeRank[b.size]||9);
-  });
-  grid.innerHTML=sorted.map(it=>{
-    const size=it.size||'sm';
-    const preview=size==='hero'&&it.reason?`<div class="reason-preview">${esc(it.reason).slice(0,140)}${it.reason.length>140?'…':''}</div>`:'';
+  wrap.innerHTML=cats.map((cat,i)=>{
+    const list=items.filter(x=>x.category===cat.id)
+      .sort((a,b)=>(sizeRank[a.size]??9)-(sizeRank[b.size]??9));
+    if(!list.length)return '';
+    const heroCount=list.filter(x=>x.size==='hero').length;
     return `
-      <div class="stack-card ${size}" data-id="${esc(it.id)}">
-        <div class="eyebrow">
-          <span class="cat">${esc(catLabel(it.category))}</span>
-          <span>${esc(it.role||'')}</span>
+      <div class="stack-cat">
+        <div class="stack-cat-head">
+          <div class="num">${String(i+1).padStart(2,'0')} / ${esc(cat.short||cat.id.toUpperCase())}</div>
+          <div class="lbl">${esc(cat.label)}${heroCount?`<span class="primary-note">★ ${heroCount} primary</span>`:''}</div>
+          <div class="count"><b>${list.length}</b> items</div>
         </div>
-        <div>
-          <div class="name">${esc(it.name)}</div>
-          ${it.tag?`<div class="tag">${esc(it.tag)}</div>`:''}
-          ${preview}
+        <div class="stack-cat-grid">
+          ${list.map(it=>{
+            const hero=it.size==='hero';
+            return `
+              <div class="stack-card ${hero?'hero':''}" data-id="${esc(it.id)}">
+                ${hero?'<span class="star">★ PRIMARY</span>':''}
+                <div class="role">${esc(it.role||'')}</div>
+                <div class="name">${esc(it.name)}</div>
+                ${it.tag?`<div class="tag">${esc(it.tag)}</div>`:''}
+                ${it.reason?`<div class="reason">${esc(it.reason)}</div>`:''}
+                <div class="chev">→</div>
+              </div>`;
+          }).join('')}
         </div>
-        <div class="chev">→</div>
       </div>`;
   }).join('');
   // 카드 클릭 → 모달
-  grid.querySelectorAll('.stack-card').forEach(el=>{
+  wrap.querySelectorAll('.stack-card').forEach(el=>{
     el.onclick=()=>{
       const it=items.find(x=>x.id===el.dataset.id);
       if(it)openStackModal(it);
