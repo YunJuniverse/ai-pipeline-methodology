@@ -8,8 +8,12 @@
 #  - HANDOFF.md 신선도 (warn-only)
 #  - methodology status — upstream commit 격차 표시 (warn-only)
 #
-# 정합성: tools/resources/meta 경로는 v3.2/v4.0 차이가 있어 구조 자동 탐지.
-# (60_tools/methodology.py 존재 → v4.0, 50_tools/methodology.py → v3.2)
+# 정합성:
+#  - tools/resources/meta 경로는 v3.2/v4.0 차이가 있어 구조 자동 탐지.
+#    (60_tools/methodology.py 존재 → v4.0, 50_tools/methodology.py → v3.2)
+#  - 본 워크플로는 *source 저장소(ai-pipeline-methodology) 에서 skip*.
+#    source 는 70_meta/ 를 의도적으로 가지고 있어서 격리 검사가 항상 fail 됨.
+#    source 의 자체 검증은 methodology-source-ci.yml 가 담당.
 
 name: methodology-applied-ci
 
@@ -21,6 +25,8 @@ on:
 
 jobs:
   methodology-validate:
+    # source 저장소 (ai-pipeline-methodology) 에서는 skip — applied-ci 는 외부 적용 프로젝트 전용.
+    if: github.repository != 'YunJuniverse/ai-pipeline-methodology'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +84,7 @@ jobs:
     # warn-only — HANDOFF/TODO/checkpoint 신선도. fail로 머지 차단은 하지 않음.
     runs-on: ubuntu-latest
     continue-on-error: true
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository != 'YunJuniverse/ai-pipeline-methodology'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

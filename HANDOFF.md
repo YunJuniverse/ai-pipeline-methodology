@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: observation lint 정합성 회복 — CI 가 옛 observation 파일들에서 18건 실패. (1) validator 본문 길이/단락 제약 완화 (markdown body 자유 형식 허용), (2) frontmatter 없는 3 파일 마이그레이션, (3) 파일명 슬러그 dot → kebab rename, (4) 절대 사용자 경로 익명화.
+- **Working on**: methodology-applied-ci 가 source 저장소에서 *항상 fail* 하던 버그 fix — `if: github.repository != 'YunJuniverse/ai-pipeline-methodology'` 로 job skip. source 저장소는 70_meta/ 를 의도적으로 가지고 있어 격리 검사가 항상 fail.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-15: **applied-ci source repo skip** — `methodology-applied-ci.yml` 의 `70_meta 미주입 검증` 이 source 저장소(`YunJuniverse/ai-pipeline-methodology`) PR 에서 *항상 fail*. source 는 70_meta/ 를 의도적으로 가지고 있고 (메타-방법론 격리 영역), applied-ci 는 *적용 프로젝트* 의 누수만 검사해야 함. job-level `if: github.repository != 'YunJuniverse/ai-pipeline-methodology'` 로 skip. 두 job (validate / freshness) 모두 적용. source 의 자체 검증은 methodology-source-ci.yml 가 담당.
 - 2026-05-15: **observation lint 정합성 회복** — source-ci 가 옛 observation 파일들에서 18건 실패. 분석: validator 의 "본문 1단락 ≤ 220자" 규칙이 *실제 사용 패턴* (multi-section markdown body) 과 어긋남. 게다가 CLI `--summary` 도 길이 강제 안 함 — 정책-현실 괴리. **해결**: (1) validator 본문 길이/단락 제약 제거 (body 는 markdown 자유 형식, frontmatter required fields 는 유지), (2) frontmatter 없는 3개 파일 (PR #9 시기 `cat >` 작성) 에 적절한 YAML frontmatter 추가, (3) `2026-05-12_v3.1-to-v3.2-migration.md` 파일명 dot → kebab rename (slug 규칙 위반), (4) `2026-05-13_dashboard-port-conflict-fix.md` 절대 사용자 경로 `<METHODOLOGY>` 익명화. 18→0 실패.
 - 2026-05-15: **Stack 섹션 정리** — PR #11 의 12-col bento 가 5개 문제 발생: (1) hero(6)+mid(4)=10 자투리 (2) hero row-span 2 가 grid auto-placement sparse 모드 깨뜨려 같은 카테고리 카드 분리됨 (3) 카테고리 라벨 7회 반복 (4) role 한글 uppercase+letter-spacing 줄바꿈 (5) hero 빈 공간 vs sm 이름만 — 정보 밀도 양극화. **해결**: 카테고리 그룹 헤더 1회 + `auto-fill minmax(240px,1fr)` 균일 grid + hero = 좌측 액센트 라인 + ★ PRIMARY 배지 + 살짝 다른 배경 (layout 변경 X) + role uppercase 제거 + 모든 카드 reason 3-line clamp 노출. stack.json 데이터 무수정 (`size: hero|mid|sm` 의미만 "레이아웃 크기" → "강조 등급" 으로 전환).
 - 2026-05-15: **Stack bento 카드** — Overview 탭 하단 신규 섹션. `60_tools/stack.json` 에서 23 항목 5 카테고리 (Frontend/Backend/CMS/Infra/Dev) 로드. CSS 12-col grid + `size: hero|mid|sm` 으로 비대칭 배치 — 카테고리당 hero 1장 (Next.js 15 / Resend / Sanity v3 / Vercel / pnpm) + mid/sm. 카드 클릭 → side-sheet 모달 (선택 이유 + meta + docs URL). Apple bento 컨셉만 차용, 시각 언어는 현재 OKLCH 엔지니어링-저널 톤 (샤프 코너, 단일 앰버 액센트, 다색 그라데이션 X). MANIFEST shared 에 stack.json 추가 → 적용 프로젝트 자동 전파.

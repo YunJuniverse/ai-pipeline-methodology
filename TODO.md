@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-028
+- **title**: applied-ci source repo skip — `70_meta/` 격리 검사가 source 에서 항상 fail
+- **notes**: Completed 2026-05-15. `methodology-applied-ci.yml` 가 source 저장소(`YunJuniverse/ai-pipeline-methodology`) PR 에서 *항상 fail* — source 는 70_meta/ 를 의도적으로 가지고 있는데 워크플로의 누수 검사가 그걸 잡아냄. 처음부터 있던 버그였으나 PR #10 의 layout 탐지 추가로 가시화됨. job-level `if: github.repository != ...` 로 skip. validate / freshness 두 job 모두 적용. source 자체 검증은 source-ci 담당.
+
 ### METH-027
 - **title**: observation lint 정합성 회복 — validator 정책 현실화 + 옛 파일 마이그레이션
 - **notes**: Completed 2026-05-15. source-ci 가 18개 파일에서 실패. 분석 결과 validator 의 "본문 1단락 ≤ 220자" 가 *실제 사용 (multi-section markdown body)* 과 어긋남. 정책 완화 (body 는 markdown 자유 형식, frontmatter required fields 만 강제) + 진짜 위반 5개 (frontmatter 없음 3, 파일명 슬러그 dot 1, 절대 경로 1) 개별 fix. 결과 18→0 실패.
