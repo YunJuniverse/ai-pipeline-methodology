@@ -27,7 +27,7 @@
 - 해결 설계 (옵션 ① + ②):
   · `.ai/wrap-state.json` — `last_validated_commit`, 라이브 파일 sha256, 검증된 관찰 로그 목록
   · `cmd_wrap` 재작성: 부트스트랩 → 콘텐츠 sha 비교 → 변경 없으면 fail
-  · `cmd_ship` 6단계 commit 직전에 `commit_wrap_state(target)` 호출 — wrap-state 와 라이브 파일이 동일 commit 에 패키징되어 clone/pull 후 wrap 일관성 보장 (post-push 갱신 시 commit 의 wrap-state 가 옛 baseline 을 가리키는 버그 회피)
+  · `cmd_ship` 6단계 commit 직전에 `commit_wrap_state(target)` 호출 — wrap-state 와 라이브 파일이 동일 commit 에 패키징되어 clone/pull 후 wrap 일관성 보장 (post-push 갱신 시 commit 의 wrap-state 가 옛 baseline 을 가리키는 버그 회피). ship → push 시 `METHODOLOGY_SHIP_IN_PROGRESS=1` 환경변수로 pre-push hook 의 wrap 재실행 skip (commit 직전 동기화로 hook 의 wrap 이 sha 일치 → fail 하는 chicken-and-egg 회피)
 - 구현 위치 `60_tools/methodology.py`:
   · 신설 헬퍼: `wrap_state_path`, `load_wrap_state`, `save_wrap_state`, `file_sha256`, `current_git_head`, `list_observation_files`, `bootstrap_wrap_state`, `commit_wrap_state`
   · `cmd_wrap` 전면 재작성 — 부트스트랩 1회 통과 / sha 동일 시 fail / 새 관찰 1건 이상 요구

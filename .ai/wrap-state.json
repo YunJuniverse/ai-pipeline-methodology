@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "e811addf0c18717b29ef9b379dbafb057e2664dd",
-  "last_validated_at": "2026-05-14T16:10:22Z",
+  "last_validated_commit": "81d8f0d1c4c80622475915e18070b3dcaf5eca62",
+  "last_validated_at": "2026-05-15T06:43:14Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "338f03e4684d67e3e852d880d8ee646e911a2ad6e2998bda52808dfd54f05980"
+      "sha256": "dc835185e9c3b89cd47ed76b7fb3372557bb019330e2d782fd68ccb71301e38e"
     },
     "TODO.md": {
-      "sha256": "0aed62aeb42382e151e7d3a27e27bc1cec257cb9ba28571293e5ce665162ec81"
+      "sha256": "94f2c74e93d27f314a2e9e6b9345ac6955c0443434a7391d4e6800ce2962394e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "342635e12764dcd37839a8edc2d6a27aaf3d75aa53aa3eddcf0bc9f40f660a91"
+      "sha256": "a067871ba0bd4350ebeebc9446d9568b73a88dfc02038c68279fd71aae55a579"
     }
   },
   "observations": {
@@ -35,6 +35,7 @@
       "70_meta/observations/2026-05-14_user-guide-and-commands.md",
       "70_meta/observations/2026-05-14_v4-briefs-and-shift.md",
       "70_meta/observations/2026-05-14_wrap-content-hash-validation.md",
+      "70_meta/observations/2026-05-14_wrap-ship-hook-skip.md",
       "70_meta/observations/2026-05-14_wrap-state-commit-pre-step.md",
       "70_meta/observations/README.md"
     ]

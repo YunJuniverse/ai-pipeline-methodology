@@ -1309,7 +1309,14 @@ def cmd_ship(args: argparse.Namespace) -> int:
     if not branch:
         err("DETACHED HEAD — push 안 함.")
         return 1
-    rc = subprocess.call(["git", "-C", str(target), "push", "origin", branch])
+    # ship 은 step 1 에서 이미 wrap --strict 통과 + step 6 직전 wrap-state 동기화.
+    # → pre-push hook 의 wrap 재호출은 이 시점에서 항상 fail (sha 동일).
+    # 환경변수로 hook 에게 "wrap 건너뛰고 manifest-check 만" 알림.
+    env = os.environ.copy()
+    env["METHODOLOGY_SHIP_IN_PROGRESS"] = "1"
+    rc = subprocess.call(
+        ["git", "-C", str(target), "push", "origin", branch], env=env
+    )
     if rc != 0:
         err(f"push 실패 (branch: {branch})")
         return 1
@@ -1343,12 +1350,28 @@ def cmd_hooks(args: argparse.Namespace) -> int:
 # 우회: git push --no-verify
 
 set -e
-if [ -f "60_tools/methodology.py" ]; then
-  python3 60_tools/methodology.py manifest-check
-  python3 60_tools/methodology.py wrap --strict
-else
-  echo "[methodology hook] 60_tools/methodology.py 미발견 — 검증 skip"
+METH=""
+if   [ -f "60_tools/methodology.py" ]; then METH="60_tools/methodology.py"
+elif [ -f "50_tools/methodology.py" ]; then METH="50_tools/methodology.py"
+elif [ -f "methodology.py" ];           then METH="methodology.py"
 fi
+
+if [ -z "$METH" ]; then
+  echo "[methodology hook] methodology.py 미발견 — 검증 skip"
+  exit 0
+fi
+
+python3 "$METH" manifest-check
+
+# ship 이 호출한 push 인 경우 wrap 재실행 skip
+# (ship step 1 에서 이미 wrap --strict 통과 + step 6 직전 wrap-state 동기화 →
+#  이 시점 wrap 은 항상 sha 일치 = fail. 직접 git push 시는 env 미설정으로 정상 실행).
+if [ -n "$METHODOLOGY_SHIP_IN_PROGRESS" ]; then
+  echo "[methodology hook] ship 호출 감지 — wrap 재검증 skip (step 1 에서 통과됨)"
+  exit 0
+fi
+
+python3 "$METH" wrap --strict
 """
 
     if args.action == "install":
