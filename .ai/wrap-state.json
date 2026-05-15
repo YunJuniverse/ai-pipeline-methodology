@@ -1,30 +1,31 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "8e2eb11ac002a642a9047ee666270136b636e2b1",
-  "last_validated_at": "2026-05-15T08:46:32Z",
+  "last_validated_commit": "bba71db35b70eba623c3ade1519f2f681ba613eb",
+  "last_validated_at": "2026-05-15T08:56:01Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "5fa1a778becd580930acbfbad7eea726fbbbfe0c9b99bfaa9ea3b2d48479909e"
+      "sha256": "a472d0cf5f7b511e1aef23d2fb5b423910c57dc555a6b68162d8a7e589b5f0c8"
     },
     "TODO.md": {
-      "sha256": "75c28bb050e532f439c50fda0c615aaf98bb541b2ce0fb55f350e5ed5ce12e4e"
+      "sha256": "25710d357d94382fa2fdfcfd65b276dd56faba768f2fee6a0837ebbf40876a4e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d527a2d45de806b0a72a4d557844469fb989acf9e42d7775b55d0e8964d2fc1a"
+      "sha256": "e2a8e857c33e18e29f3d9eff81705931e71fe3db33d785b9dd444b716adb1075"
     }
   },
   "observations": {
     "validated_files": [
       "50_resources/ai_observations/2026-05-07_l1-observe-flow.md",
       "50_resources/ai_observations/2026-05-15_methodology-integrity-3-fixes.md",
+      "50_resources/ai_observations/2026-05-15_observation-lint-policy-realignment.md",
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
       "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
       "70_meta/observations/2026-05-12_ship-and-hooks-and-automerge.md",
-      "70_meta/observations/2026-05-12_v3.1-to-v3.2-migration.md",
+      "70_meta/observations/2026-05-12_v3-1-to-v3-2-migration.md",
       "70_meta/observations/2026-05-12_wrap-cli-and-ci-workflows.md",
       "70_meta/observations/2026-05-13_dashboard-cache-relocation.md",
       "70_meta/observations/2026-05-13_dashboard-port-conflict-fix.md",

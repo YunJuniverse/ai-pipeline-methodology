@@ -1,5 +1,5 @@
 ---
-session_id: 2026-05-12_v3.1-to-v3.2-migration
+session_id: 2026-05-12_v3-1-to-v3-2-migration
 authored_by:
   agent: claude-sonnet-4-6
   tool: claude-code-cli

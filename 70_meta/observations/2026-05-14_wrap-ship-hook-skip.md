@@ -1,3 +1,27 @@
+---
+session_id: 2026-05-14_wrap-ship-hook-skip
+authored_by:
+  agent: claude-sonnet-4-6
+  tool: claude-code-cli
+  host_os: darwin-25.4
+domain: meta-methodology
+task_type: bugfix
+stack_used:
+  - python3
+  - methodology@v4.0
+flow_used: ad-hoc
+friction:
+  - id: F-001
+    where: "commit_wrap_state 가 sha 를 방금 동기화해서 hook 의 wrap 시점에 current==stored 가 됨"
+    cost_minutes: 8
+    resolution: "ship 이 git push 호출 시 METHODOLOGY_SHIP_IN_PROGRESS=1 env 설정. hook 이 감지하면 wrap 재실행 skip"
+    repeat_of: null
+prompt_patterns:
+  - intent: "ship 의 commit 직전 wrap-state 동기화 후 push 시 pre-push hook 의 wrap 이 항상 fail 하는 chicken-and-egg."
+    success: true
+    rounds: 2
+---
+
 # wrap-ship-hook-skip
 
 날짜: 2026-05-15

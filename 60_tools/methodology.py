@@ -474,11 +474,13 @@ def validate_observation_file(path: Path) -> list[str]:
         errors.append(f"task_type은 {', '.join(sorted(OBSERVATION_TASK_TYPES))} 중 하나여야 합니다")
     if re.search(r"^\s*-\s*\[?None\]?\s*$", frontmatter, flags=re.MULTILINE):
         errors.append("빈 배열은 [None] 대신 []로 기록해야 합니다")
-    paragraphs = [p for p in body.strip().split("\n\n") if p.strip()]
-    if len(paragraphs) != 1:
-        errors.append("자유서술은 1단락이어야 합니다")
-    elif len(paragraphs[0]) > 220:
-        errors.append("자유서술이 너무 깁니다")
+    # 본문(body) 검증:
+    # 옛 정책 — 1단락 ≤ 220자. 실제 사용은 multi-section markdown 이 압도적이고
+    # CLI 도 입력 길이 강제 안 해서 정책-현실 괴리. body 는 markdown 자유 형식으로 허용.
+    # 핵심 정보 (session_id, task_type 등) 은 frontmatter 가 강제하므로 정합성 유지.
+    # 본문이 완전히 비어있는 경우만 잡음.
+    if not body.strip():
+        errors.append("본문이 비어있습니다 — 최소 한 줄 작성 필요")
     return errors
 
 

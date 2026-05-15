@@ -1,3 +1,27 @@
+---
+session_id: 2026-05-14_wrap-content-hash-validation
+authored_by:
+  agent: claude-sonnet-4-6
+  tool: claude-code-cli
+  host_os: darwin-25.4
+domain: meta-methodology
+task_type: feature
+stack_used:
+  - python3
+  - methodology@v4.0
+flow_used: ad-hoc
+friction:
+  - id: F-001
+    where: "동일 날짜에 ship 을 여러 번 하면 옛 wrap 이 mtime 만 봐서 콘텐츠 미갱신 통과 (false-positive)"
+    cost_minutes: 8
+    resolution: ".ai/wrap-state.json baseline 도입 + ship commit 직전 wrap-state 동기화 + atomic commit"
+    repeat_of: null
+prompt_patterns:
+  - intent: "wrap 검증을 mtime 기반에서 sha256 콘텐츠 해시 기반으로 전환 — 동일 날짜 다중 ship 오탐 차단."
+    success: true
+    rounds: 2
+---
+
 # wrap-content-hash-validation
 
 날짜: 2026-05-15
