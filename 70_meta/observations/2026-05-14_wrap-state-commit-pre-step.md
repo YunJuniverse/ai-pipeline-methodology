@@ -1,3 +1,27 @@
+---
+session_id: 2026-05-14_wrap-state-commit-pre-step
+authored_by:
+  agent: claude-sonnet-4-6
+  tool: claude-code-cli
+  host_os: darwin-25.4
+domain: meta-methodology
+task_type: refactor
+stack_used:
+  - python3
+  - methodology@v4.0
+flow_used: ad-hoc
+friction:
+  - id: F-001
+    where: "push 후 갱신하면 commit 의 wrap-state.json 이 옛 baseline 가리킴. 새 clone 이 false-positive 통과"
+    cost_minutes: 8
+    resolution: "commit_wrap_state 를 step 6 (commit) 직전으로 이동. git add -A 가 wrap-state 갱신을 함께 staging"
+    repeat_of: null
+prompt_patterns:
+  - intent: "commit_wrap_state 호출을 push 직후에서 commit 직전으로 이동 — clone/pull 후 wrap 일관성 보장."
+    success: true
+    rounds: 2
+---
+
 # wrap-state-commit-pre-step
 
 날짜: 2026-05-15

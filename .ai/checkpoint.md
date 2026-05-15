@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (Stack 섹션 정리)
+# Checkpoint — 2026-05-15 (observation lint 정합성 회복)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/stack-cleanup`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/observation-lint-existing-files`)
 
 ## 부팅 계약
 
@@ -20,7 +20,27 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 Stack 섹션 정리 (방금)**:
+**🆕 observation lint 정합성 회복 (방금)**:
+
+- 사용자 보고: source-ci 가 observation lint 에서 18 건 실패 (자유서술 너무 김 / frontmatter 없음 / 파일명 형식 / 절대 경로)
+- 분석:
+  · 옛 validator 정책: "본문 1단락 ≤ 220자"
+  · 실제 사용 패턴: multi-section markdown body (## 패턴, ## 해결, ## 일반화 lesson 등)
+  · CLI `--summary` 도 길이 강제 안 함 — *정책-현실 괴리*
+  · 18 실패 중 대부분 (15건) "자유서술이 너무 깁니다" — 정책 자체가 잘못된 케이스
+- 해결 4단계:
+  · (1) validator 본문 길이/단락 제약 제거 — body 는 markdown 자유 형식, frontmatter required fields 만 강제. 본문 빈 경우만 잡음. → 15 건 자동 통과
+  · (2) frontmatter 없는 3개 파일 마이그레이션 (PR #9 시기 내가 `cat >` 로 작성한 것):
+    - 2026-05-14_wrap-content-hash-validation.md
+    - 2026-05-14_wrap-ship-hook-skip.md
+    - 2026-05-14_wrap-state-commit-pre-step.md
+    → Python 스크립트로 적절한 YAML frontmatter prepend (session_id, authored_by, task_type 등 required snippets)
+  · (3) `2026-05-12_v3.1-to-v3.2-migration.md` 파일명 → `2026-05-12_v3-1-to-v3-2-migration.md` rename. session_id 도 갱신. (slug 에 dot 불허)
+  · (4) `2026-05-13_dashboard-port-conflict-fix.md` 의 `/Users/hayden/methodology` → `<METHODOLOGY>` 익명화
+- 검증: 모든 observation 파일 18→0 실패. source-ci 통과 예상.
+- METH-024 (observe CLI 강제) 와 연결: 이 PR 으로 옛 파일 마이그레이션 완료 → 앞으로 CLI 만 사용하면 새 실패 없음.
+
+**Stack 섹션 정리 (이전 차례)**:
 
 - 사용자 요구: PR #11 의 stack bento 가 사용자가 실제로 봤을 때 5개 문제 발견 — Claude Design 핸드오프 번들로 fix 디자인 제공
 - 5개 문제:

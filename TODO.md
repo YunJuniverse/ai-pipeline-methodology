@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-027
+- **title**: observation lint 정합성 회복 — validator 정책 현실화 + 옛 파일 마이그레이션
+- **notes**: Completed 2026-05-15. source-ci 가 18개 파일에서 실패. 분석 결과 validator 의 "본문 1단락 ≤ 220자" 가 *실제 사용 (multi-section markdown body)* 과 어긋남. 정책 완화 (body 는 markdown 자유 형식, frontmatter required fields 만 강제) + 진짜 위반 5개 (frontmatter 없음 3, 파일명 슬러그 dot 1, 절대 경로 1) 개별 fix. 결과 18→0 실패.
+
 ### METH-026
 - **title**: Stack 섹션 정리 — bento 자투리·hero row-span·카테고리 반복 문제 해결
 - **notes**: Completed 2026-05-15. Claude Design 핸드오프 번들 (stack-cleanup.html) 기반. PR #11 의 12-col bento 5개 문제 (자투리 / hero row-span / 라벨 반복 / 한글 줄바꿈 / 정보 밀도 양극화) 모두 해결. 카테고리 그룹 헤더 + auto-fill grid + hero 시각 강조 (좌측 액센트 + ★ PRIMARY 배지) + role uppercase 제거 + 모든 카드 reason 3-line clamp. `size: hero|mid|sm` 의미 전환 (레이아웃 크기 → 강조 등급), stack.json 데이터 무수정.
