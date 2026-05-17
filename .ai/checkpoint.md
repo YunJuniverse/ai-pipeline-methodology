@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (QA 우선순위 5 — 런처 3-tier)
+# Checkpoint — 2026-05-17 (QA 우선순위 3 — commands.json 커버리지)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa5-app-launcher-3tier`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa3-commands-json-coverage`)
 
 ## 부팅 계약
 
@@ -20,7 +20,18 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 QA 우선순위 5 — 런처 3-tier 통일 (방금)**:
+**🆕 QA 우선순위 3 — commands.json 커버리지 (방금)**:
+
+- 배경: QA #3. dashboard Commands 카드가 25 명령만 노출 — init/diff/skeleton 등 누락
+- 분석: argparse top-level 15 + nested subparsers. 실제 누락은 init/diff/skeleton(init·build·apply)/catalog seed-pending. (apply/build/list/stop 는 nested subparser 오탐)
+- 추가:
+  · ops += `init <path> --label --type` / `diff <file>` / `sync --apply --include-worktrees`
+  · observe += `catalog seed-pending`
+  · 신규 카테고리 "스켈레톤 (L2)" — skeleton init/build/apply
+- 결과: 25 → 32 명령, 5 → 6 카테고리
+- 검증: JSON valid, 빌드 후 dashboard payload commands.categories = [boot, end, ops, observe, skeleton, export]
+
+**QA 우선순위 5 — 런처 3-tier 통일 (이전 차례, PR #16 머지됨)**:
 
 - 배경: QA 에서 발견한 마이너 #5. `.app`/`.sh`/`.bat` 런처의 methodology.py 탐지가 hook 템플릿(3-tier 60→50→root)과 불일치 — linux/windows 는 60_tools 만, mac 만 2-tier (60→50).
 - 근본: 출력 파일들이 `60_tools/build-launchers.py` generator 산출물. 출력만 패치하면 다음 빌드 때 회귀 → generator 자체 수정.

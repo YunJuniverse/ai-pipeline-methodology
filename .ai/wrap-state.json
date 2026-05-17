@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "66f7fe1492120df949f5168f16c5837cb5df37e2",
-  "last_validated_at": "2026-05-17T06:22:10Z",
+  "last_validated_commit": "475200f0103447f2c740a928c7ace7a46bd42893",
+  "last_validated_at": "2026-05-17T06:27:35Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "e2fa9164359c87b08b05b31a9f09f608910ef4f6f697251040b5bc242cb8cad1"
+      "sha256": "796ce84379815bd4a9738fe2d54707f9da27b023fe4941b2f8c7c4fc3a696023"
     },
     "TODO.md": {
-      "sha256": "a1475048ed823cf24cef8b1b6bb430e6d13244ab68c7738bf354884532479376"
+      "sha256": "e4ac7366825e6eaef9b4b5dd1ebf90a3d08163c4a991647703b1a9b1c6e1ea5b"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d569627e201f8cea1e9d67210c2031d6397b99459320a788e651ddb34c49c8d7"
+      "sha256": "16a52add873a671be016497829dce319261f408dba4bb61544e45d40a40c1187"
     }
   },
   "observations": {
@@ -23,6 +23,7 @@
       "50_resources/ai_observations/2026-05-15_qa-dashboard-obs-and-commands-stale.md",
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
       "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
+      "50_resources/ai_observations/2026-05-17_qa3-commands-json-coverage.md",
       "50_resources/ai_observations/2026-05-17_qa5-launcher-3tier-detection.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",

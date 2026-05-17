@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: QA 우선순위 5 — `.app`/`.sh`/`.bat` 3 OS 런처 + `build-launchers.py` generator 의 methodology.py 탐지를 3-tier (60→50→root) 로 통일. hook 템플릿과 동일 패턴.
+- **Working on**: QA 우선순위 3 — commands.json 커버리지. init/diff/sync(worktree)/skeleton init·build·apply/catalog seed-pending 추가. 신규 "스켈레톤 (L2)" 카테고리. 25 → 32 항목, 5 → 6 카테고리.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-17: **QA 우선순위 3 — commands.json 커버리지** — 25 → 32 명령. ops 에 init/diff/sync(--include-worktrees) 추가, observe 에 catalog seed-pending 추가, 신규 "스켈레톤 (L2)" 카테고리 (skeleton init/build/apply). 미노출 5개 잔여는 nested subparser 오탐 (skeleton/dashboard/catalog 하위명령 — 실제 sub-ops 로 모두 노출). dashboard Commands 카드 6 카테고리 렌더 확인.
 - 2026-05-15: **QA 우선순위 5 — 런처 3-tier 통일** — `_start/` 3 OS 런처 (mac `.app` / linux `.sh` / windows `.bat`) 와 `build-launchers.py` generator 의 methodology.py 탐지가 `60_tools/` 만 (또는 mac 만 2-tier) 체크. hook 템플릿의 3-tier (60→50→root) 와 불일치. generator 의 셸 스니펫 + Windows batch 로직을 3-tier 로 통일 → 재생성. v3.2 적용 프로젝트나 root-level methodology.py 시나리오에서도 런처 동작. bash -n 구문 검증 통과.
 - 2026-05-15: **정합성 QA 후 2 fix** — 18개 카테고리 QA 후 4 정합성 이슈 발견 (commands stale path / dashboard obs 누락 / commands.json 8 subcmd 미노출 / generate-dashboard layout 헬퍼 미적용). 우선순위 1·2 만 묶음. (1) `generate-dashboard.py` 의 `read_methodology_assets()` 가 `50_resources/ai_observations` 만 카운트 → `_count_observations()` 헬퍼 도입 후 `50_resources + 70_meta` (+ v3.2 fallback) 모두 합산. source 저장소 dashboard 가 6 → 26 정확 보고. (2) `commands.json:119` 의 description "10_guides/03 스키마 검증" → "20_guides/03 스키마 검증" (v4.0 명명).
 - 2026-05-15: **applied-ci source repo skip** — `methodology-applied-ci.yml` 의 `70_meta 미주입 검증` 이 source 저장소(`YunJuniverse/ai-pipeline-methodology`) PR 에서 *항상 fail*. source 는 70_meta/ 를 의도적으로 가지고 있고 (메타-방법론 격리 영역), applied-ci 는 *적용 프로젝트* 의 누수만 검사해야 함. job-level `if: github.repository != 'YunJuniverse/ai-pipeline-methodology'` 로 skip. 두 job (validate / freshness) 모두 적용. source 의 자체 검증은 methodology-source-ci.yml 가 담당.

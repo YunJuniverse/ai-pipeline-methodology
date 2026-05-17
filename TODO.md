@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-031
+- **title**: QA 우선순위 3 — commands.json 서브커맨드 커버리지
+- **notes**: Completed 2026-05-17. 25 → 32 명령. ops += init / diff / sync(--include-worktrees). observe += catalog seed-pending. 신규 "스켈레톤 (L2)" 카테고리 (skeleton init/build/apply). 잔여 미노출 5건은 nested subparser 정규식 오탐 (skeleton/dashboard/catalog 하위명령은 sub-ops 로 이미 노출). dashboard 6 카테고리 렌더 확인.
+
 ### METH-030
 - **title**: QA 우선순위 5 — 3 OS 런처 3-tier 구조 탐지 통일
 - **notes**: Completed 2026-05-15. `_start/` 의 mac `.app` / linux `.sh` / windows `.bat` 런처 + `build-launchers.py` generator 의 methodology.py 탐지가 60_tools 하드코딩 (mac 만 2-tier). hook 템플릿의 3-tier (60→50→root) 와 통일. shell 스니펫 + Windows batch 동등 로직. generator 재실행으로 3개 출력 파일 재생성. bash -n 검증 통과.
