@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-17 (4 프로젝트 정합성 전파 완료 + tshome 마이그레이션)
+# Checkpoint — 2026-05-17 (METH-022 hook sync 면제 + 백로그 정리)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `chore/meth-034-tshome-done`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `feat/meth-022-hook-sync-skip`)
 
 ## 부팅 계약
 
@@ -20,7 +20,18 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 4 프로젝트 정합성 전파 완료 + tshome 마이그레이션 (방금)**:
+**🆕 METH-022 hook sync 면제 + 백로그 일괄 정리 (방금)**:
+
+- 사용자: 잔여 백로그 8건 "다 진행해"
+- AI 작업 가능 vs Human 영역 분류 후:
+  - **METH-022 (구현, PR A 이 브랜치)**: pre-push hook 템플릿(`hook_body`)에 `git log -1 --pretty=%s` case 매칭 추가. `chore(methodology): sync*` / `chore: sync methodology*` / `chore(methodology): v*마이그레이션*` 패턴이면 `manifest-check` 만 유지하고 `wrap --strict` skip. ship 의 `METHODOLOGY_SHIP_IN_PROGRESS` env skip 과 *별개 경로* (수동 git push). 검증: `sh -n` + case 4종 시뮬 (sync 3건 SKIP / feat 1건 WRAP). 본 저장소 hook `hooks install --force` 로 worktree methodology.py 기준 재설치.
+  - **METH-021 → moot close**: PR #9 가 wrap 을 sha256 기반 전면 재작성하며 `_mtime_today` 제거. observation 검사 = `validated_files` set-diff (날짜 무관). `today` 는 표시용뿐. 자정 세션 F-004 문제 소멸. 코드 변경 불필요 — Done 에 사유 기록.
+  - **METH-014 → done**: MP-001/MP-002 시드는 2026-05-12 완료된 상태였음. 모니터링 placeholder 종결, N≥2 → 019/020 활성 승급 이관.
+  - **TODO 트림**: Done 15건 → 5건 (METH-022/021/014/033/034) + 통합 archive 주석. CLAUDE.md 파일역할 "최근 ~5건" 준수.
+  - **METH-018/016 → Human 대기 명시**: AI측 완료 (018 은 METH-022 로 sync 자동면제까지, 016 은 `.ai/adapters/claude.md` §SessionEnd 스니펫 존재). Human 1회 실행만 남음 — TODO notes 에 정확 명령 기재.
+- **다음 (PR B, Class B)**: METH-019 (MC-001 talmocom 이미지 add 패턴 — 본 세션 tshome 에서 .sanity/dist 제외로 *재재발* N↑) + METH-020 (MC-002 적용프로젝트 CLI fix 지연 — 본 세션 전파에서 재목격) 활성 Catalog 승급 + METH-013 ADR-002 (70_meta 격리 구조 결정). PR rationale/impact/rollback 필수.
+
+**4 프로젝트 정합성 전파 완료 + tshome 마이그레이션 (이전 차례)**:
 
 - icons/talmocom/gamblescan: main 미푸시 2커밋씩(QA 패치 + 이전 v4.0 sync) `git push --no-verify` (사전 검증: 비-방법론 경로 변경 0건). ff69198..f61dfd8 / b1f0233..5ef77c9 / a4cfadb..5f7a04b
 - **tshome — METH-034 수동 마이그레이션 (난이도 高)**:
