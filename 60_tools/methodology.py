@@ -1535,6 +1535,20 @@ if [ -n "$METHODOLOGY_SHIP_IN_PROGRESS" ]; then
   exit 0
 fi
 
+# 방법론 sync commit 면제 (METH-022):
+# 본 저장소의 방법론 자산을 적용 프로젝트로 전파하는 commit 은 라이브 파일
+# (HANDOFF/TODO/checkpoint/observation) 갱신을 동반하지 않으므로 wrap --strict
+# 가 정당하게 실패한다. 매번 --no-verify 수동 우회는 마찰 + 우회 습관화 위험.
+# HEAD commit 메시지가 sync 패턴이면 manifest-check 만 유지하고 wrap skip.
+HEAD_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "")
+case "$HEAD_MSG" in
+  "chore(methodology): sync"*|"chore: sync methodology"*|"chore(methodology): v"*"마이그레이션"*)
+    echo "[methodology hook] 방법론 sync commit 감지 — wrap skip (manifest-check 는 통과함)"
+    echo "  ($HEAD_MSG)"
+    exit 0
+    ;;
+esac
+
 python3 "$METH" wrap --strict
 """
 

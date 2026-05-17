@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: (완료) 정합성 QA 4 PR + sync 가드 PR 전부 머지·전파 완료. icons/talmocom/gamblescan main push + tshome v3.2→v4.0 수동 마이그레이션 push 완료. 4 적용 프로젝트 전체 정합.
+- **Working on**: 잔여 백로그 일괄 — METH-022(hook sync 면제) 구현+021 moot close+014 done [PR A]. 다음: METH-019/020 Catalog 활성 승급 + METH-013 ADR-002 [PR B, Class B]. METH-018/016 은 Human 실행 대기 (AI측 완료).
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-17: **METH-022 hook sync 면제 + 백로그 정리** — pre-push hook 템플릿에 HEAD commit 메시지 case 매칭 추가: `chore(methodology): sync*`/`chore: sync methodology*`/`chore(methodology): v*마이그레이션*` 이면 manifest-check 만 유지, wrap --strict skip. 4 프로젝트 전파에서 매번 `--no-verify` 한 실증 통증 제거 (ship 의 env-skip 과 별개 — 수동 push 경로). 본 저장소 hook 재설치. METH-021 moot close (PR #9 sha256 wrap 으로 날짜 의존 소멸), METH-014 done (MP 시드 종결 → 019/020 이관), TODO Done 15→5 트림 (CLAUDE.md 규칙). METH-018/016 Human 실행 대기로 명시.
 - 2026-05-17: **4 프로젝트 정합성 전파 완료 + tshome 마이그레이션 (METH-034)** — icons/talmocom/gamblescan main 에 QA 패치 push (--no-verify, 순수 방법론 커밋 검증). tshome 은 원격 9커밋(제품 수정 4 포함) 앞서 충돌 → 로컬 stale 커밋 백업 후 origin/main 리셋 → fresh 재마이그레이션. split-brain(40/50_resources, 30/40_dev, 00_foundation/briefs) 해소: 관찰 5건 정본 통합(tshome-027 frontmatter 버전), 빈 폴더 제거로 6 rename 차단 해제, 사업/분기 보고서 4건 백업서 복원, .sanity/dist 제외. commit 688d142 push (관찰 12·사업문서 4·옛폴더 0·제품 9커밋 보존). 8개 stale worktree 는 PR #19 가드로 향후 자동 차단.
 - 2026-05-17: **sync worktree 안전 가드** — QA 정합성 패치 전파 중 `sync --include-worktrees` 가 icons 6 + talmocom 1 stale worktree (마지막 커밋 2026-05-07, v3.1) 에 *풀 v3.1→v4.0 마이그레이션* 을 무차별 적용 → 각 133건 churn + 40/50_resources 중복. 8개 worktree 전부 revert (순수 churn, feature 손실 0). 근본 수정: `_worktree_sync_safety(wt, target_v, force)` 가 (1) 미커밋 변경 (2) 마이그레이션 유발 worktree 를 skip. `--force-worktree-migration` escape hatch. icons dry-run 6/6 정확 차단 확인. icons/talmocom/gamblescan **main** 은 정상 전파·커밋 완료. tshome (v3.2 main, 40/50_resources 중복) 은 별도 수동 처리 대기.
 - 2026-05-17: **QA 우선순위 4 — dashboard layout 헬퍼** — `generate-dashboard.py` 의 12곳 `50_resources/60_tools/40_dev` 하드코딩이 PR #10 의 `methodology_layout()` 미적용 상태 (standalone 파일이라 import 불가). 자체 `dash_layout(root)` (v3.2/v4.0 dict 반환) + `resolve_methodology_py(root)` (3-tier) 헬퍼 도입. assemble()/read_methodology_assets()/read_project_config()/API 핸들러 2곳 모두 layout 기반. 잔여 하드코딩 0 (탐지 정의부·docs fallback 제외). v3.2 시뮬: resources=40_resources/dev=30_dev 정확. 미래 v5 마이그레이션 부채 해소.
