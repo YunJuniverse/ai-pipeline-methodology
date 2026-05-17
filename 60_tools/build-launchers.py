@@ -146,12 +146,19 @@ def build_macos_app(start_dir: Path, src_icns: Path) -> None:
           exit 1
         }
 
-        if [ ! -f "60_tools/methodology.py" ]; then
-          osascript -e 'display alert "in-spire" message "60_tools/methodology.py 미발견. 방법론이 적용된 프로젝트 루트에 .app 이 있는지 확인."'
+        # 3-tier 구조 탐지: v4.0(60_tools) → v3.2(50_tools) → root fallback
+        METH=""
+        if   [ -f "60_tools/methodology.py" ]; then METH="60_tools/methodology.py"
+        elif [ -f "50_tools/methodology.py" ]; then METH="50_tools/methodology.py"
+        elif [ -f "methodology.py" ];           then METH="methodology.py"
+        fi
+
+        if [ -z "$METH" ]; then
+          osascript -e 'display alert "in-spire" message "methodology.py 미발견. 방법론이 적용된 프로젝트 루트에 _start 폴더가 있는지 확인."'
           exit 1
         fi
 
-        exec /usr/bin/env python3 60_tools/methodology.py dashboard --open
+        exec /usr/bin/env python3 "$METH" dashboard --open
     """)
     script_path = app / "Contents" / "MacOS" / "in-spire"
     script_path.write_text(script, encoding="utf-8")
@@ -167,17 +174,23 @@ def build_windows(start_dir: Path) -> None:
 
         cd /d "%~dp0\\.."
 
-        if not exist "60_tools\\methodology.py" (
-          echo [err] 60_tools\\methodology.py not found.
+        REM 3-tier 구조 탐지: v4.0(60_tools) -> v3.2(50_tools) -> root fallback
+        set "METH="
+        if exist "60_tools\\methodology.py" set "METH=60_tools\\methodology.py"
+        if not defined METH if exist "50_tools\\methodology.py" set "METH=50_tools\\methodology.py"
+        if not defined METH if exist "methodology.py" set "METH=methodology.py"
+
+        if not defined METH (
+          echo [err] methodology.py not found ^(60_tools / 50_tools / root^).
           echo Run this file inside a project where methodology is applied.
           pause
           exit /b 1
         )
 
-        python 60_tools\\methodology.py dashboard --open
+        python "%METH%" dashboard --open
         echo.
         echo Dashboard is serving in the background. Stop with:
-        echo   python 60_tools\\methodology.py dashboard stop --all
+        echo   python "%METH%" dashboard stop --all
         pause
     """)
     (start_dir / NAME_BAT).write_text(bat, encoding="utf-8")
@@ -237,11 +250,17 @@ def build_linux(start_dir: Path, src_png_linux: Path, assets_dir: Path) -> None:
         SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
         PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
         cd "$PROJECT_ROOT" || exit 1
-        if [ ! -f "60_tools/methodology.py" ]; then
-          echo "[err] 60_tools/methodology.py not found"
+        # 3-tier 구조 탐지: v4.0(60_tools) → v3.2(50_tools) → root fallback
+        METH=""
+        if   [ -f "60_tools/methodology.py" ]; then METH="60_tools/methodology.py"
+        elif [ -f "50_tools/methodology.py" ]; then METH="50_tools/methodology.py"
+        elif [ -f "methodology.py" ];           then METH="methodology.py"
+        fi
+        if [ -z "$METH" ]; then
+          echo "[err] methodology.py not found (60_tools / 50_tools / root)"
           exit 1
         fi
-        exec /usr/bin/env python3 60_tools/methodology.py dashboard --open
+        exec /usr/bin/env python3 "$METH" dashboard --open
     """)
     sh_path = start_dir / NAME_SH
     sh_path.write_text(sh, encoding="utf-8")

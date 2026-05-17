@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-15 (정합성 QA 우선순위 1·2 fix)
+# Checkpoint — 2026-05-15 (QA 우선순위 5 — 런처 3-tier)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa-dashboard-obs-count-and-commands-stale`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa5-app-launcher-3tier`)
 
 ## 부팅 계약
 
@@ -20,7 +20,19 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 정합성 QA 우선순위 1·2 fix (방금)**:
+**🆕 QA 우선순위 5 — 런처 3-tier 통일 (방금)**:
+
+- 배경: QA 에서 발견한 마이너 #5. `.app`/`.sh`/`.bat` 런처의 methodology.py 탐지가 hook 템플릿(3-tier 60→50→root)과 불일치 — linux/windows 는 60_tools 만, mac 만 2-tier (60→50).
+- 근본: 출력 파일들이 `60_tools/build-launchers.py` generator 산출물. 출력만 패치하면 다음 빌드 때 회귀 → generator 자체 수정.
+- 수정:
+  · mac .app 셸 스니펫: 3-tier METH 탐지 + 미발견 시 osascript alert
+  · linux .sh: 동일 3-tier
+  · windows .bat: batch 등가 로직 (`if exist ... set "METH=..."` + `if not defined METH` 체인)
+  · `dashboard --open` / `dashboard stop --all` 호출도 `"$METH"` / `"%METH%"` 변수화
+- 재생성: `python3 60_tools/build-launchers.py` → 3 출력 파일 갱신
+- 검증: `bash -n` mac/.app + linux/.sh 구문 통과. 현재 worktree 에서 METH=60_tools/methodology.py 정확 탐지.
+
+**정합성 QA 우선순위 1·2 fix (이전 차례, PR #15 머지됨)**:
 
 - 사용자 요구: 코드베이스 QA 로 정합성 이슈 점검 + 우선순위대로 묶어 처리
 - QA 18 카테고리 결과: 12 pass, 4 실제 이슈, 2 마이너. 우선순위 1·2 묶음 PR.

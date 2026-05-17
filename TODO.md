@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-030
+- **title**: QA 우선순위 5 — 3 OS 런처 3-tier 구조 탐지 통일
+- **notes**: Completed 2026-05-15. `_start/` 의 mac `.app` / linux `.sh` / windows `.bat` 런처 + `build-launchers.py` generator 의 methodology.py 탐지가 60_tools 하드코딩 (mac 만 2-tier). hook 템플릿의 3-tier (60→50→root) 와 통일. shell 스니펫 + Windows batch 동등 로직. generator 재실행으로 3개 출력 파일 재생성. bash -n 검증 통과.
+
 ### METH-029
 - **title**: 정합성 QA 우선순위 1·2 — dashboard observation 카운트 + commands.json stale path
 - **notes**: Completed 2026-05-15. 18개 카테고리 QA 후 4 정합성 이슈 발견. 우선순위 묶어 처리: (1) `generate-dashboard.py` 의 `read_methodology_assets()` 가 `50_resources/ai_observations` 만 카운트 → `_count_observations()` 헬퍼 도입 후 50_resources + 70_meta + v3.2 fallback 모두 합산. source 저장소 dashboard 가 6 → 26 정확 보고. (2) `commands.json:119` "10_guides/03" → "20_guides/03" (v4.0 명명). 남은 마이너 이슈 (commands.json 8 subcmd 미노출 / generate-dashboard layout 헬퍼 9곳 / .app 3-tier) 는 별도 PR.
