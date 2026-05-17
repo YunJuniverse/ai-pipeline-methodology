@@ -1,9 +1,10 @@
-# Checkpoint — 2026-05-17 (PR #22 rebase: MC-001/002 + ADR-002)
+# Checkpoint — 2026-05-17 (PR #23 rebase: 칸반 실시간 + METH-016)
 
-> ⚠️ rebase 후속: PR #21 머지 → PR #22(이 브랜치) origin/main 위로 rebase.
-> 충돌 4파일(TODO/HANDOFF/checkpoint/wrap-state)은 HEAD(PR#21) 채택 +
-> METH-019/020/013 Ready→Done 정리. MC-001/MC-002/ADR-002 신규파일 무충돌.
-> PR #23(칸반 실시간 METH-035 + METH-016)은 이 PR 머지 후 동일 패턴 rebase.
+> ⚠️ PR #22 머지 → PR #23(이 브랜치) origin/main 위 rebase. 충돌 4파일
+> (TODO/HANDOFF/checkpoint/wrap-state) HEAD 채택 + METH-016 Ready→Done +
+> METH-035 추가. generate-dashboard.py(칸반 실시간) 무충돌 자동머지.
+> 잔여 백로그: METH-018 (Human 1회 hooks install).
+
 
 ---
 

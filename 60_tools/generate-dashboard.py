@@ -1900,6 +1900,37 @@ document.getElementById('branches-spawn').onclick=async()=>{
   window.open(body.url,'_blank');dashboardsRefresh();
 };
 branchesRefresh();
+
+// ── 소스 변경 감지 → 새로고침 배너 (서버 재시작 불필요) ──────────────
+// TODO.md/HANDOFF.md 등이 바뀌면 서버가 dashboard.html 을 재생성한다.
+// 클라이언트는 /api/src-mtime 를 폴링해 변경을 감지하고, 사용자가
+// 원할 때 새로고침하도록 배너만 띄운다 (강제 reload 안 함 — 읽는 중 방해 X).
+(function(){
+  let baseline=null, stale=false;
+  async function poll(){
+    try{
+      const r=await fetch('/api/src-mtime',{cache:'no-store'});
+      if(!r.ok)return;
+      const {mtime}=await r.json();
+      if(baseline===null){baseline=mtime;return;}
+      if(mtime>baseline && !stale){stale=true;showBanner();}
+    }catch(e){/* file:// 또는 서버 없음 — 무시 */}
+  }
+  function showBanner(){
+    if(document.getElementById('stale-banner'))return;
+    const b=document.createElement('div');
+    b.id='stale-banner';
+    b.innerHTML='● TODO/HANDOFF 변경됨 — <u>새로고침</u>';
+    b.style.cssText='position:fixed;right:20px;bottom:20px;z-index:9999;'
+      +'background:var(--accent,#e0a23a);color:#1a1a1a;font:600 13px/1 var(--font-ui,sans-serif);'
+      +'padding:12px 18px;cursor:pointer;border:none;box-shadow:0 4px 16px rgba(0,0,0,.35);'
+      +'letter-spacing:-.01em;user-select:none';
+    b.onclick=()=>location.reload();
+    document.body.appendChild(b);
+  }
+  // 4초 주기 폴링 (탭 비활성 시 브라우저가 자동 스로틀)
+  setInterval(poll,4000); poll();
+})();
 </script>
 </body>
 </html>
@@ -1932,7 +1963,7 @@ def main() -> int:
           f"sprints={len(data['sprints'])}, nodes={len(data['graph'].get('nodes',[]))})", file=sys.stderr)
 
     if args.serve:
-        _serve_with_api(out, args.port)
+        _serve_with_api(out, args.port, root)
 
     return 0
 
@@ -1979,7 +2010,7 @@ def _kill_port(port: int) -> list[int]:
     return killed
 
 
-def _serve_with_api(out: Path, start_port: int) -> None:
+def _serve_with_api(out: Path, start_port: int, root: Path) -> None:
     import http.server
     import json as _json
     import signal as _signal
@@ -1987,6 +2018,33 @@ def _serve_with_api(out: Path, start_port: int) -> None:
     import urllib.parse
 
     os.chdir(out.parent)
+
+    # 칸반/그래프 데이터 소스 — 이 중 하나라도 dashboard.html 보다 새것이면
+    # GET 시 자동 재생성 (서버 재시작 불필요, 브라우저 새로고침만으로 최신).
+    _src_files = [
+        root / "TODO.md",
+        root / "HANDOFF.md",
+        root / ".ai" / "checkpoint.md",
+        root / "60_tools" / "methodology-graph.json",
+        root / "60_tools" / "commands.json",
+        root / "60_tools" / "stack.json",
+    ]
+
+    def _src_mtime() -> float:
+        return max((p.stat().st_mtime for p in _src_files if p.exists()), default=0.0)
+
+    def _maybe_rebuild() -> bool:
+        try:
+            out_m = out.stat().st_mtime
+        except FileNotFoundError:
+            out_m = 0.0
+        if _src_mtime() > out_m:
+            try:
+                out.write_text(render_html(assemble(root)), encoding="utf-8")
+                return True
+            except Exception as exc:  # 빌드 실패 시 옛 파일 유지
+                print(f"[warn] auto-rebuild 실패: {exc}", file=sys.stderr)
+        return False
 
     class Handler(http.server.SimpleHTTPRequestHandler):
         def log_message(self, fmt, *args):
@@ -2008,6 +2066,15 @@ def _serve_with_api(out: Path, start_port: int) -> None:
             if self.path == "/" or self.path == "" or self.path.startswith("/?"):
                 self.path = "/dashboard.html" + self.path[1:]
             parsed = urllib.parse.urlparse(self.path)
+
+            # 소스 mtime — 클라이언트가 폴링해 변경 감지 시 자동 새로고침
+            if parsed.path == "/api/src-mtime":
+                return self._send_json(200, {"mtime": _src_mtime()})
+
+            # dashboard.html 요청이면 소스 변경 여부 확인 후 필요 시 재생성
+            if parsed.path == "/dashboard.html":
+                _maybe_rebuild()
+
             if parsed.path == "/api/servers":
                 with _servers_lock:
                     # 죽은 프로세스 정리

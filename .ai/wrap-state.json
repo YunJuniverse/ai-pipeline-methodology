@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "ea51621d1b653aa1baa6a701a549d8fdb12745b9",
-  "last_validated_at": "2026-05-17T18:08:39Z",
+  "last_validated_commit": "d8410cdf4515fd674acc24717430e8454c575811",
+  "last_validated_at": "2026-05-17T18:18:08Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "76173c324c493270be3fdfab7234bfdd79794d4e542c18a17d25493dc7ea8389"
+      "sha256": "b34e653b3abbfd098bed372076555504e33d6e8807984f58e44b4461b3993094"
     },
     "TODO.md": {
-      "sha256": "4e7683a8a65c1a20ea10814825f11a485d9565e059c4fb2825929f274ca51d5d"
+      "sha256": "8648000a78e7df05a4025f2f913b6f3a5507757b4e6eee8b4ee535dfd62f888b"
     },
     ".ai/checkpoint.md": {
-      "sha256": "b00bd511064790211a76483cc2ceb70d7aabba08cf217793701813405a0b16a8"
+      "sha256": "20e698e9ddde8e808acb1c22fd8cdbc7377aada81ab7fe2d2a8387e715cb238b"
     }
   },
   "observations": {
@@ -23,6 +23,7 @@
       "50_resources/ai_observations/2026-05-15_qa-dashboard-obs-and-commands-stale.md",
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
       "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
+      "50_resources/ai_observations/2026-05-17_kanban-live-refresh-and-meth016.md",
       "50_resources/ai_observations/2026-05-17_meth-019-020-013-catalog-adr.md",
       "50_resources/ai_observations/2026-05-17_meth-022-hook-sync-skip-and-backlog.md",
       "50_resources/ai_observations/2026-05-17_meth-034-tshome-migration-and-propagation.md",
