@@ -34,6 +34,35 @@ ROOT = Path(__file__).resolve().parent.parent
 KANBAN_SECTIONS = ["Backlog", "Ready", "InProgress", "Blocked", "Done"]
 
 
+# ─── 구조 탐지 (v3.2 vs v4.0) ───────────────────────────────────────────────
+# generate-dashboard.py 는 standalone (methodology.py import 안 함) 이라
+# layout 탐지를 자체 보유. methodology.py 의 methodology_layout() 와 동일 규칙.
+# v4.0: 60_tools / 50_resources / 70_meta — v3.2: 50_tools / 40_resources / 60_meta
+
+_LAYOUT_V4 = {"tools": "60_tools", "resources": "50_resources",
+              "meta": "70_meta", "dev": "40_dev", "version": "v4.0"}
+_LAYOUT_V32 = {"tools": "50_tools", "resources": "40_resources",
+               "meta": "60_meta", "dev": "30_dev", "version": "v3.2"}
+
+
+def dash_layout(root: Path) -> dict[str, str]:
+    """대상 프로젝트의 v3.2/v4.0 구조 탐지. 모든 NN_ 경로 하드코딩 대신 사용."""
+    if (root / "60_tools" / "methodology.py").exists():
+        return _LAYOUT_V4
+    if (root / "50_tools" / "methodology.py").exists():
+        return _LAYOUT_V32
+    return _LAYOUT_V4  # 신규/탐지 실패 시 최신 가정
+
+
+def resolve_methodology_py(root: Path) -> Path:
+    """methodology.py 경로 — 3-tier (60_tools → 50_tools → root). 미발견 시 v4.0 경로 반환."""
+    for rel in ("60_tools/methodology.py", "50_tools/methodology.py", "methodology.py"):
+        p = root / rel
+        if p.exists():
+            return p
+    return root / "60_tools" / "methodology.py"
+
+
 # ─────────────────────────────────────── parsers ───────────────────────────────────────
 
 @dataclass
@@ -227,8 +256,8 @@ def read_package_info(root: Path) -> dict:
 
 
 def read_project_config(root: Path) -> dict:
-    """선택: 40_dev/project-config.json (사용자가 직접 채우는 추가 메타)."""
-    p = root / "40_dev" / "project-config.json"
+    """선택: <dev>/project-config.json (사용자가 직접 채우는 추가 메타)."""
+    p = root / dash_layout(root)["dev"] / "project-config.json"
     if not p.exists():
         return {}
     try:
@@ -297,9 +326,11 @@ def _count_observations(root: Path) -> int:
 
 
 def read_methodology_assets(root: Path) -> dict:
-    catalog = root / "50_resources" / "catalog"
-    skeletons = root / "50_resources" / "skeletons"
-    insights = root / "40_dev" / "snapshots" / "insights"
+    L = dash_layout(root)
+    res = L["resources"]
+    catalog = root / res / "catalog"
+    skeletons = root / res / "skeletons"
+    insights = root / L["dev"] / "snapshots" / "insights"
     context = read_json_safe(root / ".ai" / "context.json")
     return {
         "context": context,
@@ -319,32 +350,35 @@ def read_methodology_assets(root: Path) -> dict:
 
 
 def assemble(root: Path) -> dict[str, Any]:
-    # graph: 60_tools/ 우선, 루트 fallback, docs/ fallback (이전 구조 호환)
-    graph_path = root / "60_tools" / "methodology-graph.json"
+    L = dash_layout(root)
+    tools, res, dev = L["tools"], L["resources"], L["dev"]
+
+    # graph: <tools>/ 우선, 루트 fallback, docs/ fallback (이전 구조 호환)
+    graph_path = root / tools / "methodology-graph.json"
     for cand in [root / "methodology-graph.json", root / "docs" / "methodology-graph.json"]:
         if not graph_path.exists():
             graph_path = cand
 
-    # TODO: 루트 → 50_resources/templates → docs/templates
+    # TODO: 루트 → <res>/templates → docs/templates
     todo_path = root / "TODO.md"
-    for cand in [root / "50_resources" / "templates" / "TODO.md", root / "docs" / "templates" / "TODO.md"]:
+    for cand in [root / res / "templates" / "TODO.md", root / "docs" / "templates" / "TODO.md"]:
         if not todo_path.exists():
             todo_path = cand
 
-    # SPRINTS: 40_dev → 루트 → 50_resources/templates → docs/templates
-    sprints_path = root / "40_dev" / "SPRINTS.md"
-    for cand in [root / "SPRINTS.md", root / "50_resources" / "templates" / "SPRINTS.md", root / "docs" / "templates" / "SPRINTS.md"]:
+    # SPRINTS: <dev> → 루트 → <res>/templates → docs/templates
+    sprints_path = root / dev / "SPRINTS.md"
+    for cand in [root / "SPRINTS.md", root / res / "templates" / "SPRINTS.md", root / "docs" / "templates" / "SPRINTS.md"]:
         if not sprints_path.exists():
             sprints_path = cand
 
     handoff_path = root / "HANDOFF.md"
-    for cand in [root / "50_resources" / "templates" / "HANDOFF.md", root / "docs" / "templates" / "HANDOFF.md"]:
+    for cand in [root / res / "templates" / "HANDOFF.md", root / "docs" / "templates" / "HANDOFF.md"]:
         if not handoff_path.exists():
             handoff_path = cand
 
-    # MASTER_PLAN: 40_dev → root → 50_resources/templates
-    master_plan_path = root / "40_dev" / "MASTER_PLAN.md"
-    for cand in [root / "MASTER_PLAN.md", root / "50_resources" / "templates" / "MASTER_PLAN.md"]:
+    # MASTER_PLAN: <dev> → root → <res>/templates
+    master_plan_path = root / dev / "MASTER_PLAN.md"
+    for cand in [root / "MASTER_PLAN.md", root / res / "templates" / "MASTER_PLAN.md"]:
         if not master_plan_path.exists():
             master_plan_path = cand
 
@@ -413,7 +447,7 @@ def assemble(root: Path) -> dict[str, Any]:
 
     # 자주 사용 명령 메타데이터 (Commands 카드용)
     commands_data: dict = {}
-    cmds_path = root / "60_tools" / "commands.json"
+    cmds_path = root / tools / "commands.json"
     if cmds_path.exists():
         try:
             commands_data = json.loads(cmds_path.read_text(encoding="utf-8"))
@@ -422,7 +456,7 @@ def assemble(root: Path) -> dict[str, Any]:
 
     # 기술 스택 메타데이터 (Stack bento 카드용)
     stack_data: dict = {}
-    stack_path = root / "60_tools" / "stack.json"
+    stack_path = root / tools / "stack.json"
     if stack_path.exists():
         try:
             stack_data = json.loads(stack_path.read_text(encoding="utf-8"))
@@ -456,8 +490,8 @@ def assemble(root: Path) -> dict[str, Any]:
             "todo_md_path":    str(todo_path.relative_to(root)) if todo_path.exists() else "",
             "master_plan_meta": parse_master_plan_meta(master_plan_path),
             "kanban_summary": {sec: len(cards) for sec, cards in kanban.items()},
-            "adr_count":     count_files(root / "40_dev" / "adr", ".md"),
-            "snapshot_count": count_files(root / "40_dev" / "snapshots", ".md"),
+            "adr_count":     count_files(root / dev / "adr", ".md"),
+            "snapshot_count": count_files(root / dev / "snapshots", ".md"),
             "sprint_total":   len(sprints_json),
             "sprint_active":  sum(1 for s in sprints_json if s["fields"].get("status", "").lower() == "active"),
             "methodology_assets": read_methodology_assets(root),
@@ -2131,9 +2165,9 @@ def _serve_with_api(out: Path, start_port: int) -> None:
                 if not branch_name:
                     return self._send_json(400, {"error": "branch 필요"})
                 root = Path.cwd()
-                meth = root / "60_tools" / "methodology.py"
+                meth = resolve_methodology_py(root)
                 if not meth.exists():
-                    return self._send_json(500, {"error": f"60_tools/methodology.py 미발견 ({meth})"})
+                    return self._send_json(500, {"error": f"methodology.py 미발견 ({meth})"})
                 try:
                     out = subprocess.check_output(
                         [sys.executable, str(meth), "dashboard", "--branch", branch_name],
@@ -2156,7 +2190,7 @@ def _serve_with_api(out: Path, start_port: int) -> None:
                 if not port:
                     return self._send_json(400, {"error": "port 필요"})
                 root = Path.cwd()
-                meth = root / "60_tools" / "methodology.py"
+                meth = resolve_methodology_py(root)
                 try:
                     subprocess.check_output(
                         [sys.executable, str(meth), "dashboard", "stop", "--port", str(int(port))],

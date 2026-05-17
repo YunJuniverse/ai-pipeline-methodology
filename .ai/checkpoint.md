@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-17 (QA 우선순위 3 — commands.json 커버리지)
+# Checkpoint — 2026-05-17 (QA 우선순위 4 — dashboard layout 헬퍼)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa3-commands-json-coverage`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa4-dashboard-layout-helper`)
 
 ## 부팅 계약
 
@@ -20,7 +20,20 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 QA 우선순위 3 — commands.json 커버리지 (방금)**:
+**🆕 QA 우선순위 4 — dashboard layout 헬퍼 (방금)**:
+
+- 배경: QA #4. `generate-dashboard.py` 12곳이 `50_resources/60_tools/40_dev` 하드코딩. PR #10 의 `methodology_layout()` 가 있지만 generate-dashboard.py 는 standalone (methodology.py import 안 함) 이라 미적용.
+- 해결: 자체 헬퍼 2개 신설
+  · `dash_layout(root)` → `_LAYOUT_V4`/`_LAYOUT_V32` dict (tools/resources/meta/dev/version). 60_tools/methodology.py 존재 → v4.0, 50_tools → v3.2
+  · `resolve_methodology_py(root)` → 3-tier (60_tools → 50_tools → root)
+- 적용 12곳: catalog/skeleton/insights (read_methodology_assets), graph_path/todo/sprints/handoff/master_plan (assemble), commands.json/stack.json, API spawn/stop 핸들러 2곳, project-config, adr_count/snapshot_count
+- 검증:
+  · syntax OK, v4.0 빌드 정상
+  · v3.2 시뮬: dash_layout → resources=40_resources, dev=30_dev, resolve→50_tools/methodology.py ✓
+  · 잔여 하드코딩 0 (탐지 정의부 + docs fallback 제외)
+- **QA 전체 종료**: 우선순위 1·2 (PR #15) / 5 (PR #16) / 3 (PR #17) / 4 (이 PR) — 4 실제 이슈 + 마이너 5 모두 해소.
+
+**QA 우선순위 3 — commands.json 커버리지 (이전 차례, PR #17)**:
 
 - 배경: QA #3. dashboard Commands 카드가 25 명령만 노출 — init/diff/skeleton 등 누락
 - 분석: argparse top-level 15 + nested subparsers. 실제 누락은 init/diff/skeleton(init·build·apply)/catalog seed-pending. (apply/build/list/stop 는 nested subparser 오탐)

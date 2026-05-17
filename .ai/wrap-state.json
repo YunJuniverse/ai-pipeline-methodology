@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "475200f0103447f2c740a928c7ace7a46bd42893",
-  "last_validated_at": "2026-05-17T06:27:35Z",
+  "last_validated_commit": "5937e0f8127012c00055e722898d3a48fc89f5dc",
+  "last_validated_at": "2026-05-17T06:33:17Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "796ce84379815bd4a9738fe2d54707f9da27b023fe4941b2f8c7c4fc3a696023"
+      "sha256": "cbf19ed240ea5d4b3acfb6502b5999eebfe0f5435c31278bf561e85b0c0deb88"
     },
     "TODO.md": {
-      "sha256": "e4ac7366825e6eaef9b4b5dd1ebf90a3d08163c4a991647703b1a9b1c6e1ea5b"
+      "sha256": "e693892b6140c06fd897ff8885519de8d94b4bb5416e2b53dca223098f3d751d"
     },
     ".ai/checkpoint.md": {
-      "sha256": "16a52add873a671be016497829dce319261f408dba4bb61544e45d40a40c1187"
+      "sha256": "3309cb5959c3d2aae1b2cc7d6a9d318eedd54f3c784bb2b45b46f5d0a032ac1a"
     }
   },
   "observations": {
@@ -24,6 +24,7 @@
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
       "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
       "50_resources/ai_observations/2026-05-17_qa3-commands-json-coverage.md",
+      "50_resources/ai_observations/2026-05-17_qa4-dashboard-layout-helper.md",
       "50_resources/ai_observations/2026-05-17_qa5-launcher-3tier-detection.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
