@@ -98,6 +98,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-032
+- **title**: QA 우선순위 4 — generate-dashboard.py layout 헬퍼 적용
+- **notes**: Completed 2026-05-17. standalone 파일이라 methodology.py 의 methodology_layout() import 불가 → 자체 `dash_layout(root)` (_LAYOUT_V4/V32 dict, tools/resources/meta/dev) + `resolve_methodology_py(root)` (3-tier) 헬퍼 도입. 12곳 하드코딩 (catalog/skeleton/insights/graph/templates 4/commands/stack/API 2/project-config/adr/snapshot) 전부 layout 기반 전환. v3.2 시뮬 정확 (40_resources/30_dev). 미래 v5 마이그레이션 부채 해소. QA 4건 (1·2·3·4) + 마이너 5 모두 완료.
+
 ### METH-031
 - **title**: QA 우선순위 3 — commands.json 서브커맨드 커버리지
 - **notes**: Completed 2026-05-17. 25 → 32 명령. ops += init / diff / sync(--include-worktrees). observe += catalog seed-pending. 신규 "스켈레톤 (L2)" 카테고리 (skeleton init/build/apply). 잔여 미노출 5건은 nested subparser 정규식 오탐 (skeleton/dashboard/catalog 하위명령은 sub-ops 로 이미 노출). dashboard 6 카테고리 렌더 확인.
