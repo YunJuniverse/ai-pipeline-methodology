@@ -103,17 +103,8 @@
 - **notes**: Completed 2026-05-17. QA 패치 전파 중 발견: `--include-worktrees` 가 stale v3.1 worktree 8개(icons 6+talmocom 1+gamblescan 자식)에 풀 마이그레이션 churn 무차별 적용 (각 133건, 40/50_resources 중복). 8개 revert (순수 churn). `_worktree_sync_safety()` 신설 — dirty 또는 마이그레이션 유발 worktree skip. `--force-worktree-migration` escape hatch. tshome (v3.2 main, 40/50_resources 중복 + 미커밋) 은 별도 수동 마이그레이션 TODO 로 분리 (아래 METH-034).
 
 ### METH-034
-- **title**: tshome v3.2→v4.0 수동 마이그레이션 (40/50_resources 중복 해소)
-- **mode**: fullstack
-- **change-class**: B (구조 변경 + 데이터 이동)
-- **owner**: AI → Human 확인
-- **acceptance criteria**:
-  - [ ] tshome main 의 `50_tools/methodology.py` 미커밋 변경 진단·처리
-  - [ ] `40_resources` vs `50_resources` 중복 콘텐츠 비교 → 정본 결정 후 병합
-  - [ ] 잔여 옛 폴더 (00_foundation/10_guides/20_planning/30_dev/50_tools) → 신 구조 rename
-  - [ ] `.methodology-version` v3.2 → v4.0, sync --apply 로 자산 정합
-  - [ ] sibling worktree (xenodochial-brahmagupta) 별도 판단
-- **notes**: 2026-05-17 QA 전파 중 발견. 이전 부분 마이그레이션이 중단돼 old+new 폴더 공존. 자동 sync 위험 (데이터 꼬임) — 수동 진단 필요.
+- **title**: tshome v3.2→v4.0 수동 마이그레이션 (split-brain 해소)
+- **notes**: Completed 2026-05-17. tshome 원격이 9커밋 앞서 + 제품 수정 4건(broken links/image opt/visual audit/studio basePath) 포함 → force-push 불가, 95-rename rebase 위험. 전략: 로컬 stale 2커밋 백업 브랜치 보존 → origin/main 리셋(제품 수정 확보) → fresh 재마이그레이션. 처리: 50_resources/ai_observations 5건 정본 통합(tshome-027 frontmatter 버전 채택), 빈 50_resources/40_dev 제거(rename 차단 해제), v3.2→v4.0 6 rename, 사업/분기 보고서 4건 백업서 복원, .sanity/dist 제외. 결과 commit 688d142 push (관찰 12/4 사업문서/0 옛폴더, 제품 9커밋 보존). 백업 브랜치 정리. **METH-034 + 전체 4 프로젝트 전파 완료** (icons/talmocom/gamblescan main push 완료, tshome 마이그레이션+push 완료).
 
 ### METH-032
 - **title**: QA 우선순위 4 — generate-dashboard.py layout 헬퍼 적용
