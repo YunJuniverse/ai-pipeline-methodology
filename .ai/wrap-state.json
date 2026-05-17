@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "d8410cdf4515fd674acc24717430e8454c575811",
-  "last_validated_at": "2026-05-17T18:18:08Z",
+  "last_validated_commit": "bbca49f869d5758c76bf1055f81ba14f9df08f84",
+  "last_validated_at": "2026-05-17T18:23:35Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "b34e653b3abbfd098bed372076555504e33d6e8807984f58e44b4461b3993094"
+      "sha256": "48dca03da36adf65d0fc27f556b84f34a421d616707aa59b6c17b71366a321a3"
     },
     "TODO.md": {
-      "sha256": "8648000a78e7df05a4025f2f913b6f3a5507757b4e6eee8b4ee535dfd62f888b"
+      "sha256": "b8e063a880241aecfb9ca0fbf83f975c114b10f33251b75fc3020e2376003984"
     },
     ".ai/checkpoint.md": {
-      "sha256": "20e698e9ddde8e808acb1c22fd8cdbc7377aada81ab7fe2d2a8387e715cb238b"
+      "sha256": "c80ca4917a115646f41fb1e1c1c7b4723f2805224517c96aabc834a0562bff4f"
     }
   },
   "observations": {
@@ -27,6 +27,7 @@
       "50_resources/ai_observations/2026-05-17_meth-019-020-013-catalog-adr.md",
       "50_resources/ai_observations/2026-05-17_meth-022-hook-sync-skip-and-backlog.md",
       "50_resources/ai_observations/2026-05-17_meth-034-tshome-migration-and-propagation.md",
+      "50_resources/ai_observations/2026-05-17_pr22-23-four-project-sync-propagation.md",
       "50_resources/ai_observations/2026-05-17_qa3-commands-json-coverage.md",
       "50_resources/ai_observations/2026-05-17_qa4-dashboard-layout-helper.md",
       "50_resources/ai_observations/2026-05-17_qa5-launcher-3tier-detection.md",

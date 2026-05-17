@@ -19,7 +19,7 @@
   - [ ] 사용자가 본 저장소·icons·gamblescan·talmocom 각각에서 `methodology hooks install` 1회 실행
   - [ ] 다음 작업 종료 시 `methodology ship -m "..."` 사용 — git add/commit/push 직접 호출 없이 통과
   - [ ] sensitive 파일 차단·테스트 실패 차단 동작 1회씩 우연히 시연되면 학습 신호 누적
-- **notes**: hooks는 worktree마다 별도 설치 필요 (git의 hooks는 추적되지 않음). 적용 프로젝트는 다음 sync로 ship CLI를 받지만 hooks는 *그 다음 단계*에서 사용자가 1회 실행. **AI측 완료** (METH-022 로 sync commit 자동 면제까지 구현됨) — Human 1회 실행만 남음: 각 프로젝트 루트에서 `python3 60_tools/methodology.py hooks install`.
+- **notes**: hooks는 worktree마다 별도 설치 필요 (git의 hooks는 추적되지 않음). 적용 프로젝트는 다음 sync로 ship CLI를 받지만 hooks는 *그 다음 단계*에서 사용자가 1회 실행. **AI측 완료** (METH-022 로 sync commit 자동 면제까지 구현됨) — Human 1회 실행만 남음: 각 프로젝트 루트에서 `python3 60_tools/methodology.py hooks install`. **2026-05-18 갱신**: PR #22/#23 sync 전파 push 완료 (icons/talmocom/gamblescan/tshome 모두 최신 hooks 템플릿 + METH-022 sync 면제 로직 보유) → METH-018 의 전제(프로젝트가 최신 CLI/hooks 템플릿 보유) 충족됨. 이제 순수하게 Human 1회 실행만 대기.
 
 ## InProgress
 
