@@ -1141,19 +1141,34 @@ def cmd_sync(args: argparse.Namespace) -> int:
         if getattr(args, "main_only", False):
             include_wt = False
 
+        force_wt_migration = getattr(args, "force_worktree_migration", False)
         if include_wt:
-            info(f"sibling worktree {len(siblings)}개 처리 ({'마이그레이션 자동' if has_migration else '명시 --include-worktrees'})")
+            info(f"sibling worktree {len(siblings)}개 검토 ({'마이그레이션 자동' if has_migration else '명시 --include-worktrees'})")
+            synced, skipped = 0, []
             for wt in siblings:
+                safe, reason = _worktree_sync_safety(wt, target_v, force_wt_migration)
+                if not safe:
+                    skipped.append((wt, reason))
+                    continue
                 info(f"  → sync worktree: {wt}")
-                # 재귀 호출 회피 — sibling 에서는 worktree 처리 skip
                 sub_args = argparse.Namespace(
                     apply=apply,
                     target=args.target,
                     path=str(wt),
                     include_worktrees=False,
                     main_only=True,
+                    force_worktree_migration=force_wt_migration,
                 )
                 cmd_sync(sub_args)
+                synced += 1
+            if skipped:
+                warn(f"worktree {len(skipped)}개 skip (안전 가드):")
+                for wt, reason in skipped:
+                    warn(f"  {Path(wt).name}: {reason}")
+                if any("마이그레이션" in r for _, r in skipped):
+                    warn("  강제 마이그레이션: --force-worktree-migration "
+                         "(stale 브랜치 폴더 구조까지 변경 — 권장 안 함)")
+            ok(f"worktree 처리 완료 — sync {synced}, skip {len(skipped)}")
         else:
             warn(f"sibling worktree {len(siblings)}개 발견 — sync 미적용:")
             for wt in siblings[:5]:
@@ -1162,6 +1177,41 @@ def cmd_sync(args: argparse.Namespace) -> int:
                 warn(f"  ... 외 {len(siblings)-5}개")
             warn("일괄 적용: --include-worktrees (마이그레이션 있으면 기본 True)")
     return 0
+
+
+def _worktree_sync_safety(
+    wt: Path, target_v: str, force_migration: bool
+) -> tuple[bool, str]:
+    """worktree 에 sync 를 적용해도 안전한지 판정.
+
+    skip 조건 (churn·데이터 꼬임 방지):
+      1. 미커밋 변경 존재 → sync churn 이 진행 중 작업 위에 쌓임
+      2. 구조 마이그레이션 유발 (worktree 버전 < target) → stale feature
+         브랜치에 폴더 rename 강제. --force-worktree-migration 으로만 허용.
+    """
+    # 1) dirty 검사
+    try:
+        st = subprocess.check_output(
+            ["git", "-C", str(wt), "status", "--porcelain"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+        if st:
+            n = len(st.splitlines())
+            return False, f"미커밋 {n}건 — 진행 중 작업 위에 sync 안 함"
+    except Exception:
+        return False, "git status 실패 — 안전상 skip"
+
+    # 2) 구조 마이그레이션 유발 검사
+    vinfo = load_version_file(wt)
+    cur_v = (vinfo or {}).get("methodology_version", "v0.0")
+    if cur_v != target_v:
+        chain = find_migration_chain(cur_v, target_v)
+        if chain and not force_migration:
+            return False, (
+                f"마이그레이션 유발 ({cur_v}→{target_v}) — "
+                f"stale 브랜치 폴더 구조 변경 위험"
+            )
+    return True, ""
 
 
 def _git_sibling_worktrees(target: Path) -> list[Path]:
@@ -2421,6 +2471,12 @@ def main(argv: list[str] | None = None) -> int:
         "--main-only",
         action="store_true",
         help="sibling worktree 무시. 마이그레이션 있어도 main 만 처리.",
+    )
+    ps.add_argument(
+        "--force-worktree-migration",
+        dest="force_worktree_migration",
+        action="store_true",
+        help="안전 가드 무시 — stale worktree 에도 구조 마이그레이션 강제 (권장 안 함)",
     )
     ps.set_defaults(func=cmd_sync)
 

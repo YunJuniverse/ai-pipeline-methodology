@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "5937e0f8127012c00055e722898d3a48fc89f5dc",
-  "last_validated_at": "2026-05-17T06:33:17Z",
+  "last_validated_commit": "9194c1a44a9b4a80be2b4a0385a48406464eb834",
+  "last_validated_at": "2026-05-17T06:47:09Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "cbf19ed240ea5d4b3acfb6502b5999eebfe0f5435c31278bf561e85b0c0deb88"
+      "sha256": "0a7ab75a9c4f7d0675e1600bc7311e4e0f29b611b1b89c70d7714c3be07d4080"
     },
     "TODO.md": {
-      "sha256": "e693892b6140c06fd897ff8885519de8d94b4bb5416e2b53dca223098f3d751d"
+      "sha256": "1c4164e1ebdbc75f6b3bdbd57d698c9113e7e395344c5853a9cb43fe7736626f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "3309cb5959c3d2aae1b2cc7d6a9d318eedd54f3c784bb2b45b46f5d0a032ac1a"
+      "sha256": "e4d38c8ab20ee774408374a451ef767572081a99d9b843356e957198c16268a5"
     }
   },
   "observations": {
@@ -26,6 +26,7 @@
       "50_resources/ai_observations/2026-05-17_qa3-commands-json-coverage.md",
       "50_resources/ai_observations/2026-05-17_qa4-dashboard-layout-helper.md",
       "50_resources/ai_observations/2026-05-17_qa5-launcher-3tier-detection.md",
+      "50_resources/ai_observations/2026-05-17_sync-worktree-stale-guard.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

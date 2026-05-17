@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: QA 우선순위 4 — generate-dashboard.py 의 12곳 NN_ 하드코딩을 `dash_layout()` + `resolve_methodology_py()` 자체 헬퍼로 전환 (standalone 파일이라 methodology.py import 안 함). v3.2/v4.0 양쪽 정확 탐지.
+- **Working on**: `sync --include-worktrees` 안전 가드 — stale worktree 에 풀 마이그레이션 churn 무차별 적용하던 설계 결함 수정. `_worktree_sync_safety()` 로 (1) dirty (2) 마이그레이션 유발 worktree skip. escape hatch `--force-worktree-migration`.
 - **Current mode**: fullstack
 - **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
 - **Blockers**: none
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-17: **sync worktree 안전 가드** — QA 정합성 패치 전파 중 `sync --include-worktrees` 가 icons 6 + talmocom 1 stale worktree (마지막 커밋 2026-05-07, v3.1) 에 *풀 v3.1→v4.0 마이그레이션* 을 무차별 적용 → 각 133건 churn + 40/50_resources 중복. 8개 worktree 전부 revert (순수 churn, feature 손실 0). 근본 수정: `_worktree_sync_safety(wt, target_v, force)` 가 (1) 미커밋 변경 (2) 마이그레이션 유발 worktree 를 skip. `--force-worktree-migration` escape hatch. icons dry-run 6/6 정확 차단 확인. icons/talmocom/gamblescan **main** 은 정상 전파·커밋 완료. tshome (v3.2 main, 40/50_resources 중복) 은 별도 수동 처리 대기.
 - 2026-05-17: **QA 우선순위 4 — dashboard layout 헬퍼** — `generate-dashboard.py` 의 12곳 `50_resources/60_tools/40_dev` 하드코딩이 PR #10 의 `methodology_layout()` 미적용 상태 (standalone 파일이라 import 불가). 자체 `dash_layout(root)` (v3.2/v4.0 dict 반환) + `resolve_methodology_py(root)` (3-tier) 헬퍼 도입. assemble()/read_methodology_assets()/read_project_config()/API 핸들러 2곳 모두 layout 기반. 잔여 하드코딩 0 (탐지 정의부·docs fallback 제외). v3.2 시뮬: resources=40_resources/dev=30_dev 정확. 미래 v5 마이그레이션 부채 해소.
 - 2026-05-17: **QA 우선순위 3 — commands.json 커버리지** — 25 → 32 명령. ops 에 init/diff/sync(--include-worktrees) 추가, observe 에 catalog seed-pending 추가, 신규 "스켈레톤 (L2)" 카테고리 (skeleton init/build/apply). 미노출 5개 잔여는 nested subparser 오탐 (skeleton/dashboard/catalog 하위명령 — 실제 sub-ops 로 모두 노출). dashboard Commands 카드 6 카테고리 렌더 확인.
 - 2026-05-15: **QA 우선순위 5 — 런처 3-tier 통일** — `_start/` 3 OS 런처 (mac `.app` / linux `.sh` / windows `.bat`) 와 `build-launchers.py` generator 의 methodology.py 탐지가 `60_tools/` 만 (또는 mac 만 2-tier) 체크. hook 템플릿의 3-tier (60→50→root) 와 불일치. generator 의 셸 스니펫 + Windows batch 로직을 3-tier 로 통일 → 재생성. v3.2 적용 프로젝트나 root-level methodology.py 시나리오에서도 런처 동작. bash -n 구문 검증 통과.
