@@ -10,28 +10,6 @@
 ## Ready
 
 
-### METH-020
-- **title**: "적용 프로젝트가 CLI fix 즉시 못 받음" 패턴 — MC-002 승급 후보 (N=7+ 패턴 확정)
-- **mode**: planning-only
-- **change-class**: B (Catalog 활성 승급)
-- **owner**: AI → Human 머지
-- **acceptance criteria**:
-  - [ ] N≥4 목격 확인 (meth-015 F-001, meth-015 F-003, dashboard-port-conflict-fix F-003, multi-dashboard F-005)
-  - [ ] `70_meta/catalog/MC-002_*.md` 활성 승급 — "본 저장소 CLI 변경 시 적용 프로젝트는 *다음 sync 전까지* 옛 동작. fix 가 시급하면 본 저장소 절대경로 CLI 직접 호출 (`python3 /path/to/methodology/60_tools/methodology.py <cmd> --path <project>`)"
-  - [ ] 솔루션 후보: methodology 명령에 `--use-upstream` 플래그 (본 저장소 CLI 강제 사용) 또는 적용 프로젝트가 본 저장소 CLI 를 symlink
-- **notes**: dashboard 포트 충돌 fix 도 같은 패턴 — 3개 적용 프로젝트가 옛 dashboard 코드라 fix 못 받음.
-
-### METH-019
-- **title**: MC-001 승급 — talmocom 이미지 add 패턴 (N=2 도달)
-- **mode**: planning-only
-- **change-class**: B (Catalog 활성 승급 — PR rationale/impact/rollback 필수)
-- **owner**: AI → Human 머지
-- **acceptance criteria**:
-  - [ ] `70_meta/catalog/_pending/MP-003_*.md` 신설 또는 즉시 `70_meta/catalog/MC-001_*.md` 활성 승급 (N≥2 충족)
-  - [ ] 솔루션: "방법론 sync 시 *명시 add 패턴* — `git add -u` + 신규 폴더 명시. `git add -A` 회피."
-  - [ ] 다음 sync 자동화 후보로 ship/sync 흐름에 반영
-- **notes**: 본 마찰 *재발*은 자가발전 루프의 진짜 첫 회전. 70_meta/observations/2026-05-12_meth-015-propagation.md F-003 의 repeat_of: F-004(2026-05-12_v3.1-to-v3.2-migration). 시스템이 학습한 결과를 *코드/문서로* 박는 단계.
-
 ### METH-018
 - **title**: 사용자 환경에 hooks 설치 + ship 첫 일상 사용 검증
 - **mode**: fullstack
@@ -53,14 +31,6 @@
   - [ ] 다음 세션 종료 시 wrap 자동 호출 확인
 - **notes**: 가이드 위치 `.ai/adapters/claude.md` §SessionEnd hook (스니펫 준비 완료). 본 항목은 *사용자 settings.json 변경*이라 AI가 직접 적용 불가 — Human 이 `.claude/settings.json` 에 SessionEnd hook 블록 복사만 하면 됨. AI측 준비 완료.
 
-### METH-013
-- **title**: 메타-방법론 격리(`70_meta/`)의 ADR 후속화 — RFC-001 → ADR-002
-- **mode**: planning-only
-- **change-class**: B (구조 결정)
-- **owner**: Human + AI
-- **notes**: RFC-001은 status 개선용으로 *재사용됨* (2026-05-12 accepted). 격리 결정의 별도 RFC/ADR은 추후 *변경 발생 시점*에 작성. 본 TODO는 *대기*.
-
-
 ## InProgress
 
 ## Blocked
@@ -69,6 +39,18 @@
 
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
+
+### METH-019
+- **title**: MC-001 활성 승급 — sync 시 git add -A 빌드산출물 오염 패턴
+- **notes**: Completed 2026-05-17. `70_meta/catalog/MC-001_git-add-A-pollutes-sync-commit.md` 활성 엔트리. N≥3 (talmocom 2026-05-12 이미지 + tshome 2026-05-17 .sanity/dist 재재발). 솔루션: 방법론 경로 명시 add 화이트리스트 + 커밋 전 오염 검증. Class B (PR #22).
+
+### METH-020
+- **title**: MC-002 활성 승급 — 적용 프로젝트 CLI fix 전파 지연 패턴
+- **notes**: Completed 2026-05-17. `70_meta/catalog/MC-002_applied-project-cli-fix-lag.md` 활성 엔트리. N≥7 (METH-015 F-001/003, dashboard-port-conflict F-003, multi-dashboard F-005, QA 4건 전파). 솔루션: 절대경로 CLI / 정기 sync --include-worktrees / hooks install --force. 장기 --use-upstream. Class B (PR #22).
+
+### METH-013
+- **title**: 메타-방법론 격리 ADR — RFC-001 → ADR-002
+- **notes**: Completed 2026-05-17. `40_dev/adr/ADR-002-meta-methodology-isolation.md` accepted. 70_meta 격리 = MANIFEST excluded_paths + manifest-check 이중 안전망 명문화. RFC-001 은 status 용도 소진 → ADR-002 가 단일 출처. Class B (PR #22).
 
 ### METH-022
 - **title**: pre-push hook ↔ wrap 충돌 — 방법론 sync commit 면제
