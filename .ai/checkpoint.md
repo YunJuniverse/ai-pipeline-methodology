@@ -1,4 +1,12 @@
-# Checkpoint — 2026-05-17 (METH-022 hook sync 면제 + 백로그 정리)
+# Checkpoint — 2026-05-17 (PR #22 rebase: MC-001/002 + ADR-002)
+
+> ⚠️ rebase 후속: PR #21 머지 → PR #22(이 브랜치) origin/main 위로 rebase.
+> 충돌 4파일(TODO/HANDOFF/checkpoint/wrap-state)은 HEAD(PR#21) 채택 +
+> METH-019/020/013 Ready→Done 정리. MC-001/MC-002/ADR-002 신규파일 무충돌.
+> PR #23(칸반 실시간 METH-035 + METH-016)은 이 PR 머지 후 동일 패턴 rebase.
+
+---
+
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
