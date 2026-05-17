@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "9194c1a44a9b4a80be2b4a0385a48406464eb834",
-  "last_validated_at": "2026-05-17T06:47:09Z",
+  "last_validated_commit": "36691a896cf056d82be2aa2fad8c80a6e4f82652",
+  "last_validated_at": "2026-05-17T07:32:32Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "0a7ab75a9c4f7d0675e1600bc7311e4e0f29b611b1b89c70d7714c3be07d4080"
+      "sha256": "b1305992abface56478e797e652a7f03a7c8be06ed2d34a1f9f1beee8e946caf"
     },
     "TODO.md": {
-      "sha256": "1c4164e1ebdbc75f6b3bdbd57d698c9113e7e395344c5853a9cb43fe7736626f"
+      "sha256": "757fb9ad01a3adf9cbece7d22a9aa59037fc6f1d0ab4b47875fa2fc2edf7e7f9"
     },
     ".ai/checkpoint.md": {
-      "sha256": "e4d38c8ab20ee774408374a451ef767572081a99d9b843356e957198c16268a5"
+      "sha256": "a0fb03f008c8f2e67ea86b1a902c34e4ec817a0e99be4784a230a8a4f302d98a"
     }
   },
   "observations": {
@@ -23,6 +23,7 @@
       "50_resources/ai_observations/2026-05-15_qa-dashboard-obs-and-commands-stale.md",
       "50_resources/ai_observations/2026-05-15_stack-bento-card-overview.md",
       "50_resources/ai_observations/2026-05-15_stack-cleanup-from-design-handoff.md",
+      "50_resources/ai_observations/2026-05-17_meth-034-tshome-migration-and-propagation.md",
       "50_resources/ai_observations/2026-05-17_qa3-commands-json-coverage.md",
       "50_resources/ai_observations/2026-05-17_qa4-dashboard-layout-helper.md",
       "50_resources/ai_observations/2026-05-17_qa5-launcher-3tier-detection.md",
