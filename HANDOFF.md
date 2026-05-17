@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: PR #23 (Class A) — 칸반보드 실시간 갱신 (METH-035: serve GET 시 mtime 자동 재빌드 + src-mtime 폴링 배너) + METH-016 SessionEnd hook done. PR #22 머지 후 origin/main 위로 rebase 충돌 해소 완료. 남은 백로그: METH-018 (Human 1회 실행).
+- **Working on**: PR #22/#23 머지 완료 → 4 적용 프로젝트(icons/talmocom/gamblescan/tshome) sync 전파 push 완료. 남은 백로그: METH-018 (Human 1회 실행 — 각 프로젝트 `methodology hooks install`).
 - **Current mode**: fullstack
-- **Next TODO**: 3개 적용 프로젝트 export 일상 사용 검증, 루트 README.md in-spire 리브랜딩, METH-020 (MC-002 N=7+ 승급)
+- **Next TODO**: METH-018 (Human), 사용자 dashboard 1회 재시작(METH-035 serve 로직 활성화), 루트 README.md in-spire 리브랜딩
 - **Blockers**: none
 
 ## Active Links
@@ -32,6 +32,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-05-18: **PR #22/#23 4 프로젝트 sync 전파** — PR #22(MC-001/002+ADR-002)·#23(METH-035 칸반 실시간+METH-016) 머지 후 origin/main 위에서 `sync --apply` 4 프로젝트 일괄. 전부 v4.0→v4.0 (마이그레이션 0), 각 8 파일 변경 (generate-dashboard.py / methodology.py / commands.json / methodology-applied-ci.yml / _start 4 / .methodology-version). CLAUDE/AGENTS unchanged. icons 6b940a1·talmocom f285f65·gamblescan 6f7d23e·tshome 245fbea push (MC-001 명시 경로 add, METH-022 sync-commit hook 면제로 --no-verify). icons/tshome sibling worktree 각 1개는 `_worktree_sync_safety`(PR #19) 가 비-마이그레이션이라 정상 skip. 사용자 액션 잔여: dashboard 1회 재시작(METH-035 serve), METH-018 hooks install.
 - 2026-05-17: **칸반 실시간 갱신 (METH-035) + METH-016 (PR #23)** — 사용자 통증 "칸반 stale, 재실행만이 답?" → dashboard.html 정적 스냅샷이 원인. `_serve_with_api(out,port,root)` + `_maybe_rebuild()`: GET `/dashboard.html` 시 소스 6종 mtime > dashboard.html 이면 자동 재생성 (재시작 불필요, ⌘R). `/api/src-mtime` + 클라이언트 4초 폴링 → 변경 배너. METH-016 SessionEnd hook 은 update-config 스킬로 settings.local.json(gitignored) 적용. PR #22 머지 후 rebase — HANDOFF/TODO HEAD 채택 + METH-016 Ready→Done + METH-035 추가.
 - 2026-05-17: **Catalog 활성 승급 MC-001/MC-002 + ADR-002 (METH-019/020/013, PR #22)** — `70_meta/catalog/MC-001`(sync 시 git add -A 빌드산출물 오염, N≥3) + `MC-002`(적용 프로젝트 CLI fix 전파 지연, N≥7) 활성 엔트리. `40_dev/adr/ADR-002`(70_meta 격리 = excluded_paths + manifest-check 이중 안전망 단일 출처). PR #21 머지 후 origin/main 위로 rebase — TODO/HANDOFF/checkpoint/wrap-state 충돌은 HEAD(PR#21) 채택 + METH-019/020/013 Ready→Done 정리. Class B — Human 머지.
 - 2026-05-17: **METH-022 hook sync 면제 + 백로그 정리** — pre-push hook 템플릿에 HEAD commit 메시지 case 매칭 추가: `chore(methodology): sync*`/`chore: sync methodology*`/`chore(methodology): v*마이그레이션*` 이면 manifest-check 만 유지, wrap --strict skip. 4 프로젝트 전파에서 매번 `--no-verify` 한 실증 통증 제거 (ship 의 env-skip 과 별개 — 수동 push 경로). 본 저장소 hook 재설치. METH-021 moot close (PR #9 sha256 wrap 으로 날짜 의존 소멸), METH-014 done (MP 시드 종결 → 019/020 이관), TODO Done 15→5 트림 (CLAUDE.md 규칙). METH-018/016 Human 실행 대기로 명시.

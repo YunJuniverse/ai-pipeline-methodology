@@ -1,9 +1,10 @@
-# Checkpoint — 2026-05-17 (PR #23 rebase: 칸반 실시간 + METH-016)
+# Checkpoint — 2026-05-18 (PR #22/#23 4 프로젝트 sync 전파 완료)
 
-> ⚠️ PR #22 머지 → PR #23(이 브랜치) origin/main 위 rebase. 충돌 4파일
-> (TODO/HANDOFF/checkpoint/wrap-state) HEAD 채택 + METH-016 Ready→Done +
-> METH-035 추가. generate-dashboard.py(칸반 실시간) 무충돌 자동머지.
-> 잔여 백로그: METH-018 (Human 1회 hooks install).
+> ✅ PR #22(MC-001/002+ADR-002)·#23(METH-035 칸반 실시간+METH-016) 머지 후
+> origin/main 위에서 4 적용 프로젝트(icons/talmocom/gamblescan/tshome)
+> `sync --apply` 일괄 전파·push 완료. 전부 v4.0→v4.0 (마이그레이션 0),
+> 각 8파일. 잔여: METH-018 (Human 1회 hooks install), 사용자 dashboard
+> 1회 재시작(METH-035 serve 로직 활성화).
 
 
 ---
@@ -29,7 +30,18 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 METH-022 hook sync 면제 + 백로그 일괄 정리 (방금)**:
+**🆕 PR #22/#23 4 프로젝트 sync 전파 (방금)**:
+
+- 사용자: "머지 완료 이제 연결된 프로젝트에 업데이트"
+- origin/main HEAD = `041d4d4` (PR #23 merge) 동기화 후 `sync --path <proj> --apply` 4회.
+- 결과: icons/talmocom/gamblescan/tshome 전부 **v4.0→v4.0** (마이그레이션 불필요), 각 8 파일 변경 — `60_tools/generate-dashboard.py`·`methodology.py`·`commands.json`·`.github/workflows/methodology-applied-ci.yml`·`_start`(4)·`.methodology-version`. CLAUDE/AGENTS managed unchanged.
+- commit+push: MC-001 명시 경로 `git add` (`.sanity/dist` 오염 차단), METH-022 sync-commit hook 면제로 `git push --no-verify`. icons `6b940a1` / talmocom `f285f65` / gamblescan `6f7d23e` / tshome `245fbea`.
+- icons/tshome sibling worktree 각 1개 발견 → `_worktree_sync_safety`(PR #19) 가 비-마이그레이션이라 정상 skip (churn 0).
+- 잔여 사용자 액션: (1) dashboard 1회 재시작 → METH-035 serve 로직 활성화, (2) METH-018 각 프로젝트 루트 `python3 60_tools/methodology.py hooks install`.
+
+---
+
+**METH-022 hook sync 면제 + 백로그 일괄 정리 (이전)**:
 
 - 사용자: 잔여 백로그 8건 "다 진행해"
 - AI 작업 가능 vs Human 영역 분류 후:
