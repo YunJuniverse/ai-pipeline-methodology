@@ -1,4 +1,4 @@
-# Checkpoint — 2026-05-17 (QA 우선순위 4 — dashboard layout 헬퍼)
+# Checkpoint — 2026-05-17 (sync worktree 안전 가드 + QA 전파)
 
 > Live handoff for the next AI or person.
 > Contract: keep this file under 200 lines, use repository-relative paths, and update it at session end.
@@ -9,7 +9,7 @@
 - Agent: claude-opus-4-7
 - Tool: claude-code-cli
 - Host: darwin-25.4
-- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/qa4-dashboard-layout-helper`)
+- Worktree: `.claude/worktrees/unruffled-johnson-4f4325` (branch `fix/sync-worktree-stale-guard`)
 
 ## 부팅 계약
 
@@ -20,7 +20,23 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 QA 우선순위 4 — dashboard layout 헬퍼 (방금)**:
+**🆕 sync worktree 안전 가드 + QA 전파 (방금)**:
+
+- 작업: PR #15~#18 (QA 4 fix) 머지 후 4 적용 프로젝트에 정합성 패치 전파
+- icons/talmocom/gamblescan **main**: `sync --apply --include-worktrees` → 정확히 7파일 + CLAUDE/AGENTS managed merge, 커밋 완료 (8/7/8 files)
+- **중대 발견**: `--include-worktrees` 가 stale worktree 8개 (icons 6 + talmocom 1, 마지막 커밋 2026-05-07, v3.1) 에 *풀 v3.1→v4.0 마이그레이션* 무차별 적용 → 각 133건 churn + 40/50_resources 중복 폴더. 비-방법론 변경 7~20건도 전부 마이그레이션 부수효과 (HANDOFF/TODO path-replace, 루트 generate-dashboard.py 삭제 등) — feature 작업 0.
+- 조치 1 — 8개 worktree 전부 `git reset --hard HEAD && git clean -fd` revert. 133→0. 순수 churn 이라 손실 0.
+- 조치 2 — 근본 수정 (이 브랜치 `fix/sync-worktree-stale-guard`):
+  · `_worktree_sync_safety(wt, target_v, force)` 신설
+  · skip 조건: (1) git status dirty → 진행 중 작업 위 churn 방지 (2) cur_v≠target_v 마이그레이션 chain 존재 → stale 브랜치 폴더 rename 강제 방지
+  · `--force-worktree-migration` escape hatch
+  · cmd_sync 의 worktree 루프가 safe 한 것만 sync, skip 은 사유별 출력 + `worktree 처리 완료 — sync N, skip M`
+  · argparse 플래그 추가
+  · 검증: icons dry-run → 6/6 worktree "마이그레이션 유발 (v3.1→v4.0)" 정확 skip
+- 조치 3 — tshome (v3.2 main, 40/50_resources 중복 + 미커밋 50_tools/methodology.py): 자동 sync 위험 → METH-034 별도 수동 마이그레이션 TODO 로 분리
+- 미해결: PR 머지 후 icons/talmocom/gamblescan main 의 sync 커밋은 *push* 안 한 상태 (각 프로젝트 git push 필요). tshome 수동 처리.
+
+**QA 우선순위 4 — dashboard layout 헬퍼 (이전 차례, PR #18 머지됨)**:
 
 - 배경: QA #4. `generate-dashboard.py` 12곳이 `50_resources/60_tools/40_dev` 하드코딩. PR #10 의 `methodology_layout()` 가 있지만 generate-dashboard.py 는 standalone (methodology.py import 안 함) 이라 미적용.
 - 해결: 자체 헬퍼 2개 신설

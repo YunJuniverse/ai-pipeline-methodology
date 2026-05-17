@@ -98,6 +98,23 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-033
+- **title**: sync --include-worktrees 안전 가드 — stale worktree churn 차단
+- **notes**: Completed 2026-05-17. QA 패치 전파 중 발견: `--include-worktrees` 가 stale v3.1 worktree 8개(icons 6+talmocom 1+gamblescan 자식)에 풀 마이그레이션 churn 무차별 적용 (각 133건, 40/50_resources 중복). 8개 revert (순수 churn). `_worktree_sync_safety()` 신설 — dirty 또는 마이그레이션 유발 worktree skip. `--force-worktree-migration` escape hatch. tshome (v3.2 main, 40/50_resources 중복 + 미커밋) 은 별도 수동 마이그레이션 TODO 로 분리 (아래 METH-034).
+
+### METH-034
+- **title**: tshome v3.2→v4.0 수동 마이그레이션 (40/50_resources 중복 해소)
+- **mode**: fullstack
+- **change-class**: B (구조 변경 + 데이터 이동)
+- **owner**: AI → Human 확인
+- **acceptance criteria**:
+  - [ ] tshome main 의 `50_tools/methodology.py` 미커밋 변경 진단·처리
+  - [ ] `40_resources` vs `50_resources` 중복 콘텐츠 비교 → 정본 결정 후 병합
+  - [ ] 잔여 옛 폴더 (00_foundation/10_guides/20_planning/30_dev/50_tools) → 신 구조 rename
+  - [ ] `.methodology-version` v3.2 → v4.0, sync --apply 로 자산 정합
+  - [ ] sibling worktree (xenodochial-brahmagupta) 별도 판단
+- **notes**: 2026-05-17 QA 전파 중 발견. 이전 부분 마이그레이션이 중단돼 old+new 폴더 공존. 자동 sync 위험 (데이터 꼬임) — 수동 진단 필요.
+
 ### METH-032
 - **title**: QA 우선순위 4 — generate-dashboard.py layout 헬퍼 적용
 - **notes**: Completed 2026-05-17. standalone 파일이라 methodology.py 의 methodology_layout() import 불가 → 자체 `dash_layout(root)` (_LAYOUT_V4/V32 dict, tools/resources/meta/dev) + `resolve_methodology_py(root)` (3-tier) 헬퍼 도입. 12곳 하드코딩 (catalog/skeleton/insights/graph/templates 4/commands/stack/API 2/project-config/adr/snapshot) 전부 layout 기반 전환. v3.2 시뮬 정확 (40_resources/30_dev). 미래 v5 마이그레이션 부채 해소. QA 4건 (1·2·3·4) + 마이너 5 모두 완료.
