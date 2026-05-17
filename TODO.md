@@ -21,16 +21,6 @@
   - [ ] sensitive 파일 차단·테스트 실패 차단 동작 1회씩 우연히 시연되면 학습 신호 누적
 - **notes**: hooks는 worktree마다 별도 설치 필요 (git의 hooks는 추적되지 않음). 적용 프로젝트는 다음 sync로 ship CLI를 받지만 hooks는 *그 다음 단계*에서 사용자가 1회 실행. **AI측 완료** (METH-022 로 sync commit 자동 면제까지 구현됨) — Human 1회 실행만 남음: 각 프로젝트 루트에서 `python3 60_tools/methodology.py hooks install`.
 
-### METH-016
-- **title**: SessionEnd hook 활성화 — Claude Code 환경에서 wrap 자동 호출
-- **mode**: fullstack
-- **change-class**: A
-- **owner**: Human (settings.json 사용자 결정 영역)
-- **acceptance criteria**:
-  - [ ] 사용자 `.claude/settings.json` 또는 `.claude/settings.local.json`에 `SessionEnd` hook 등록
-  - [ ] 다음 세션 종료 시 wrap 자동 호출 확인
-- **notes**: 가이드 위치 `.ai/adapters/claude.md` §SessionEnd hook (스니펫 준비 완료). 본 항목은 *사용자 settings.json 변경*이라 AI가 직접 적용 불가 — Human 이 `.claude/settings.json` 에 SessionEnd hook 블록 복사만 하면 됨. AI측 준비 완료.
-
 ## InProgress
 
 ## Blocked
@@ -39,6 +29,14 @@
 
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
+
+### METH-035
+- **title**: 칸반보드 실시간 갱신 — serve 자동 재빌드 + 변경 감지 배너
+- **notes**: Completed 2026-05-17. dashboard.html 정적 1회 스냅샷이라 stale, 서버 재실행만이 답이었음. (1) `_serve_with_api(out,port,root)` + `_maybe_rebuild()`: GET `/dashboard.html` 시 소스 6종 mtime > dashboard.html 이면 자동 재생성 — 재시작 불필요, ⌘R 만으로 최신. (2) `/api/src-mtime` + 클라이언트 4초 폴링 → 변경 시 우하단 배너(클릭 새로고침). 실측: TODO 변경 → 재빌드 YES. Class A (PR #23). 주의: 떠 있는 서버는 1회 재시작해야 새 serve 로직 적용.
+
+### METH-016
+- **title**: SessionEnd hook 활성화 — Claude Code 환경에서 wrap 자동 호출
+- **notes**: Completed 2026-05-17. `update-config` 스킬로 `.claude/settings.local.json` 에 SessionEnd hook (`python3 60_tools/methodology.py wrap 2>&1 || true`) 추가. 기존 Stop hook + permissions 보존. settings.local.json gitignored — 로컬 활성화 (repo 변경 없음). 옛 "AI 직접 적용 안 함" 가정은 update-config 스킬로 해소. Class A (PR #23).
 
 ### METH-019
 - **title**: MC-001 활성 승급 — sync 시 git add -A 빌드산출물 오염 패턴
