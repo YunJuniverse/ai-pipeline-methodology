@@ -885,6 +885,21 @@ def run_migration(target: Path, mig_path: Path, dry_run: bool) -> None:
 
 # ─── 동작: copy_path / merge_path ───────────────────────────────────────────
 
+# 재귀 복사에서 항상 제외 — 생성/캐시 산출물 (방법론 자산이 아님).
+# _start 가 shared_paths 라 _start/.cache/dashboard.html 같은 빌드 캐시가
+# 프로젝트로 전파되어 추적되면 dashboard 서버 재생성 → git pull 영구 차단됨.
+COPY_EXCLUDE_DIRS = {".cache", "__pycache__", ".git"}
+COPY_EXCLUDE_FILES = {".DS_Store"}
+COPY_EXCLUDE_SUFFIXES = {".pyc"}
+
+
+def _excluded_from_copy(rel: Path) -> bool:
+    if any(part in COPY_EXCLUDE_DIRS for part in rel.parts):
+        return True
+    if rel.name in COPY_EXCLUDE_FILES:
+        return True
+    return rel.suffix in COPY_EXCLUDE_SUFFIXES
+
 
 def copy_path(src: Path, dst: Path, dry_run: bool, *, prune: bool = False) -> int:
     """src → dst 재귀 복사. prune=True면 src에 없는 파일을 dst에서 제거.
@@ -907,6 +922,8 @@ def copy_path(src: Path, dst: Path, dry_run: bool, *, prune: bool = False) -> in
         if sp.is_dir():
             continue
         rel = sp.relative_to(src)
+        if _excluded_from_copy(rel):
+            continue
         dp = dst / rel
         same = dp.exists() and dp.is_file() and sp.read_bytes() == dp.read_bytes()
         if not same:
@@ -916,11 +933,17 @@ def copy_path(src: Path, dst: Path, dry_run: bool, *, prune: bool = False) -> in
                 shutil.copy2(sp, dp)
 
     if prune and dst.is_dir():
-        src_files = {sp.relative_to(src) for sp in src.rglob("*") if sp.is_file()}
+        src_files = {
+            sp.relative_to(src)
+            for sp in src.rglob("*")
+            if sp.is_file() and not _excluded_from_copy(sp.relative_to(src))
+        }
         for dp in dst.rglob("*"):
             if not dp.is_file():
                 continue
             rel = dp.relative_to(dst)
+            if _excluded_from_copy(rel):
+                continue  # 캐시/생성물은 방법론이 관리 안 함 — prune 대상 제외
             if rel not in src_files:
                 changes += 1
                 if not dry_run:
@@ -985,6 +1008,53 @@ def assert_excluded_paths_safe() -> None:
         raise SystemExit(3)
 
 
+# ─── .gitignore 전파 ────────────────────────────────────────────────────────
+#
+# .gitignore 는 MANIFEST 자산이 아니라서 init/sync 가 프로젝트로 전파하지 않았다.
+# 그 결과 적용 프로젝트가 방법론 생성물(dashboard.html, _start/.cache/ 등)을
+# 추적하게 되고, dashboard 서버가 그 파일을 재생성하면 git pull 이 영구 차단됐다.
+# 아래 블록은 마커 사이만 idempotent 하게 갱신/추가하므로 앱 고유 규칙은 보존된다.
+#
+# 주의: .ai/wrap-state.json 은 설계상 *추적 대상* (라이브 파일 sha256 baseline 을
+# 동일 commit 에 패키징해야 wrap 콘텐츠 해시 검증이 성립) — 무시 목록에 넣지 않는다.
+
+GITIGNORE_BLOCK_START = "# >>> methodology managed (마커 사이 수정 금지) >>>"
+GITIGNORE_BLOCK_END = "# <<< methodology managed <<<"
+GITIGNORE_MANAGED_LINES = [
+    "# 방법론 생성 산출물 — 추적 금지 (대시보드/캐시는 로컬 자동 재생성)",
+    "dashboard.html",
+    "_start/.cache/",
+    "__pycache__/",
+    "*.pyc",
+    ".DS_Store",
+]
+
+
+def ensure_gitignore(target: Path, dry_run: bool) -> bool:
+    """프로젝트 .gitignore 에 방법론 생성물 무시 블록을 idempotent 하게 보장.
+
+    앱 고유 규칙은 건드리지 않고 마커 블록만 갱신/추가. 반환: 변경 여부.
+    """
+    gi = target / ".gitignore"
+    block = "\n".join([GITIGNORE_BLOCK_START, *GITIGNORE_MANAGED_LINES, GITIGNORE_BLOCK_END])
+    if gi.exists():
+        text = read_text(gi)
+        if GITIGNORE_BLOCK_START in text and GITIGNORE_BLOCK_END in text:
+            pre = text.split(GITIGNORE_BLOCK_START, 1)[0]
+            post = text.split(GITIGNORE_BLOCK_END, 1)[1]
+            new_text = pre + block + post
+        else:
+            sep = "" if text == "" or text.endswith("\n") else "\n"
+            new_text = text + sep + "\n" + block + "\n"
+        if new_text == text:
+            return False
+    else:
+        new_text = block + "\n"
+    if not dry_run:
+        write_text(gi, new_text)
+    return True
+
+
 # ─── 명령: init ─────────────────────────────────────────────────────────────
 
 
@@ -1044,7 +1114,11 @@ def cmd_init(args: argparse.Namespace) -> int:
         (target / "tests" / "integration").mkdir(parents=True, exist_ok=True)
         ok("dir       src/, tests/")
 
-    # 6) .methodology-version
+    # 6) .gitignore — 방법론 생성물 무시 블록 보장
+    if ensure_gitignore(target, dry_run=False):
+        ok("gitignore .gitignore  (방법론 생성물 무시 블록)")
+
+    # 7) .methodology-version
     write_version_file(target, label)
     ok(f"version   {VERSION_FILE_NAME} → {METHODOLOGY_VERSION}")
 
@@ -1115,7 +1189,13 @@ def cmd_sync(args: argparse.Namespace) -> int:
         else:
             info(f"managed   unchanged   {rel}")
 
-    # 4) 버전 파일 갱신
+    # 4) .gitignore — 방법론 생성물 무시 블록 보장 (마커 블록만 갱신)
+    if ensure_gitignore(target, dry_run=dry):
+        total_changes += 1
+        tag = "would update" if dry else "updated"
+        ok(f"gitignore {tag:13s} .gitignore  (방법론 생성물 무시 블록)")
+
+    # 5) 버전 파일 갱신
     if not dry:
         write_version_file(target, vinfo.get("project_label"))
         ok(f"version   {VERSION_FILE_NAME} → {target_v}")

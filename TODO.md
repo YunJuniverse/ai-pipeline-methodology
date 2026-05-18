@@ -30,6 +30,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-036
+- **title**: 방법론 생성물(_start/.cache, dashboard.html) 프로젝트 전파/추적 차단
+- **notes**: Completed 2026-05-18. Class A. 근본 원인: (1) `_start` 가 `shared_paths` 라 `copy_path` 무필터 rglob 로 `_start/.cache/dashboard.html` 빌드 캐시가 적용 프로젝트에 전파·추적됨, (2) `.gitignore` 는 MANIFEST 자산이 아니라 프로젝트로 전파 안 됨 → 프로젝트가 생성물을 추적, dashboard 서버 재생성 시 `git pull` 영구 차단 (icons 반복 실증). 수정: `_excluded_from_copy()` 로 copy_path 가 `.cache/__pycache__/.git/*.pyc/.DS_Store` 복사·prune 제외 + `ensure_gitignore()` 가 init/sync 시 프로젝트 `.gitignore` 에 마커 블록(idempotent, 앱 규칙 보존) 보장. `.ai/wrap-state.json` 은 설계상 추적 대상이라 무시 목록 제외. icons dry-run 검증: gitignore 갱신 예고 + 캐시 미전파 확인. **잔여(Human)**: 기추적 프로젝트는 1회 `git rm --cached _start/.cache/dashboard.html` 필요 — sync 의 .gitignore 만으로 기추적 파일 untrack 안 됨.
+
 ### METH-035
 - **title**: 칸반보드 실시간 갱신 — serve 자동 재빌드 + 변경 감지 배너
 - **notes**: Completed 2026-05-17. dashboard.html 정적 1회 스냅샷이라 stale, 서버 재실행만이 답이었음. (1) `_serve_with_api(out,port,root)` + `_maybe_rebuild()`: GET `/dashboard.html` 시 소스 6종 mtime > dashboard.html 이면 자동 재생성 — 재시작 불필요, ⌘R 만으로 최신. (2) `/api/src-mtime` + 클라이언트 4초 폴링 → 변경 시 우하단 배너(클릭 새로고침). 실측: TODO 변경 → 재빌드 YES. Class A (PR #23). 주의: 떠 있는 서버는 1회 재시작해야 새 serve 로직 적용.
