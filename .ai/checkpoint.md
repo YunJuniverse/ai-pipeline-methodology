@@ -107,14 +107,17 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. talmocom 에서 `ship` 실측으로 build 단계(`npm run build`) 정상 확인
-   → METH-038 완전 종결. 실패 시 talmocom 로컬 methodology.py 가 최신인지
-   (`grep 'manager, "run"' 60_tools/methodology.py` = 2/2) 먼저 확인.
-2. ~~METH-018 hooks install~~ — 완료 (stale v3.x → v4.0 `--force` 재설치).
-3. (Human) METH-036 잔여: gamblescan 에서 1회
-   `git rm --cached _start/.cache/dashboard.html` (기추적 빌드산출물 untrack).
-4. tshome: 미추적 `ts-admin-guide.html` 는 순수 로컬(origin 무관) — 사용자
-   판단 영역. `ts-service-plan.html` 는 origin/main 추적본으로 정착됨
+> 이번 세션 작업(METH-036/037/038/018) **전부 종결·main 안착**. PR #27/#28
+> 머지·pull 완료, 브랜치 origin/main 동기(ahead 0). 활성 백로그 없음.
+
+1. **다음 작업 지시 대기** — 사용자 지시 없으면 신규 작업 시작 금지.
+   유력 후보: **S-021 코드 sprint** 착수 (이제 ship build 검증·hook
+   안전망 모두 정상이라 코드 작업 진입 선결조건 해소됨).
+2. (참고) 종결 검증 완료분: talmocom methodology.py 픽스 2/2·
+   `build:"next build"` (ship 실측 OK), gamblescan
+   `_start/.cache/dashboard.html` untracked, 4 프로젝트 hook v4.0.
+3. (참고/사용자 영역) tshome 미추적 `ts-admin-guide.html` 는 순수 로컬
+   (origin 무관). `ts-service-plan.html` 는 origin/main 추적본 정착
    (백업 `/tmp/tshome-ts-service-plan.html.bak`, 내용 동일).
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
