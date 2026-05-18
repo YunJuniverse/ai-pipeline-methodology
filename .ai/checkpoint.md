@@ -1,10 +1,13 @@
-# Checkpoint — 2026-05-18 (PR #22/#23 4 프로젝트 sync 전파 완료)
+# Checkpoint — 2026-05-18 (METH-036 방법론 생성물 전파/추적 차단)
 
-> ✅ PR #22(MC-001/002+ADR-002)·#23(METH-035 칸반 실시간+METH-016) 머지 후
-> origin/main 위에서 4 적용 프로젝트(icons/talmocom/gamblescan/tshome)
-> `sync --apply` 일괄 전파·push 완료. 전부 v4.0→v4.0 (마이그레이션 0),
-> 각 8파일. 잔여: METH-018 (Human 1회 hooks install), 사용자 dashboard
-> 1회 재시작(METH-035 serve 로직 활성화).
+> ✅ METH-036: 사용자 통증 "icons `git pull` 이 `_start/.cache/dashboard.html`·
+> `.ai/wrap-state.json` 때문에 반복 차단" 의 근본 원인 수정. methodology.py 에
+> `_excluded_from_copy()`(copy_path 캐시 복사·prune 제외) + `ensure_gitignore()`
+> (init/sync 가 프로젝트 .gitignore 에 마커 블록 보장) 추가. `.ai/wrap-state.json`
+> 은 설계상 추적 대상이라 무시 제외. icons dry-run 검증 OK, icons 자체 미변경.
+> Class A, PR 진행 예정. 잔여(Human): 기추적 프로젝트 1회 `git rm --cached
+> _start/.cache/dashboard.html`. 직전 작업(PR #22/#23 4 프로젝트 sync 전파)은
+> 아래 이력 참조 — 그 잔여(METH-018 hooks install, dashboard 재시작)는 유효.
 
 
 ---
@@ -30,7 +33,23 @@
 
 ## 방금 한 것 (정확히)
 
-**🆕 PR #22/#23 4 프로젝트 sync 전파 (방금)**:
+**🆕 METH-036 방법론 생성물 전파/추적 차단 (방금)**:
+
+- 사용자: icons `git pull` 이 `_start/.cache/dashboard.html`·`.ai/wrap-state.json` 때문에 반복 차단 → "이 문제는 왜?" → "진행해봐".
+- 진단: 머지 충돌 아님. 머신 생성물이 추적된 게 원인.
+  - (1) `_start` 가 `MANIFEST.shared_paths` 라 `copy_path` 무필터 `rglob` 가 빌드 캐시 `_start/.cache/dashboard.html` 까지 적용 프로젝트로 전파·추적.
+  - (2) `.gitignore` 가 MANIFEST 자산이 아님 → init/sync 가 프로젝트로 무시 규칙 전파 안 함 → 프로젝트가 생성물 추적, dashboard 서버 재생성 시 pull 영구 차단.
+- 수정 (`60_tools/methodology.py`, Class A):
+  - `COPY_EXCLUDE_*` + `_excluded_from_copy(rel)` 신설. `copy_path` 의 복사 루프·prune 루프 양쪽에서 `.cache`/`__pycache__`/`.git`/`*.pyc`/`.DS_Store` 제외.
+  - `ensure_gitignore(target, dry_run)` 신설 + `cmd_init`(6단계)·`cmd_sync`(4단계)에서 호출. `# >>> methodology managed >>>`/`# <<< methodology managed <<<` 마커 블록만 idempotent 갱신 — 앱 고유 `.gitignore` 규칙 보존.
+  - `.ai/wrap-state.json` 은 무시 목록에서 *의도적으로 제외* (설계상 sha256 baseline 을 동일 commit 에 패키징해야 wrap 검증 성립 — line 1438-1443). 초기 진단의 "untrack 제안" 은 철회.
+- 검증: `py_compile` OK; `_excluded_from_copy` 6 케이스 + `ensure_gitignore`(앱 규칙 보존·블록 추가·재호출 idempotent·wrap-state 미포함) 단위 PASS; `sync --path /Users/hayden/icons` **dry-run**(읽기전용) → "gitignore would update" + 캐시 미전파, icons 작업트리 무변경 확인.
+- 사용자 선택: icons 리포 자체는 건드리지 않음(사용자가 직접 정리). methodology 소스만 수정.
+- 잔여(Human): 이미 추적 중인 프로젝트(icons 등)는 1회 `git rm --cached _start/.cache/dashboard.html` 필요 — sync 의 .gitignore 전파만으로는 *기추적* 파일을 untrack 하지 않음 (git 동작).
+
+---
+
+**PR #22/#23 4 프로젝트 sync 전파 (이전)**:
 
 - 사용자: "머지 완료 이제 연결된 프로젝트에 업데이트"
 - origin/main HEAD = `041d4d4` (PR #23 merge) 동기화 후 `sync --path <proj> --apply` 4회.
