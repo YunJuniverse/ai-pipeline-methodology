@@ -1989,6 +1989,38 @@ def _find_free_port(start: int = 3000, end: int = 3099) -> int | None:
     return None
 
 
+# dashboard 가 launchd / Finder 더블클릭 등 비대화형 환경에서 떠 있으면
+# PATH=/usr/bin:/bin:/usr/sbin:/sbin 만 상속받아 npm/pnpm/node 를 못 찾는다.
+# dev 서버 spawn 시 사용자 shell 가 보통 가지고 있는 위치를 PATH 앞에 보강.
+def _augmented_path_env() -> dict[str, str]:
+    env = os.environ.copy()
+    home = os.path.expanduser("~")
+    extra = [
+        "/opt/homebrew/bin",
+        "/opt/homebrew/sbin",
+        "/usr/local/bin",
+        f"{home}/.local/bin",
+        f"{home}/.bun/bin",
+        f"{home}/Library/pnpm",
+        f"{home}/.volta/bin",
+    ]
+    # nvm: ~/.nvm/versions/node/*/bin (최신 1개만)
+    nvm_root = Path(home) / ".nvm" / "versions" / "node"
+    if nvm_root.is_dir():
+        versions = sorted(
+            (p for p in nvm_root.iterdir() if p.is_dir()),
+            key=lambda p: p.name, reverse=True,
+        )
+        if versions:
+            extra.append(str(versions[0] / "bin"))
+    current = env.get("PATH", "")
+    parts = [p for p in extra if Path(p).is_dir()]
+    if current:
+        parts.append(current)
+    env["PATH"] = ":".join(parts)
+    return env
+
+
 def _kill_port(port: int) -> list[int]:
     """해당 포트 점유 프로세스 PID 들을 SIGTERM. 반환: 죽인 PID 목록."""
     import signal
@@ -2168,8 +2200,18 @@ def _serve_with_api(out: Path, start_port: int, root: Path) -> None:
                 port = _find_free_port()
                 if port is None:
                     return self._send_json(503, {"error": "포트 3000-3099 모두 점유"})
-                env = os.environ.copy()
+                env = _augmented_path_env()
                 env["PORT"] = str(port)
+                # 자식 PATH 로 cmd[0] 해석 (launchd 환경 회피)
+                import shutil as _shutil
+                resolved = _shutil.which(cmd[0], path=env["PATH"])
+                if not resolved:
+                    return self._send_json(500, {
+                        "error": f"명령 미발견: {cmd[0]} — PATH 에 없음. "
+                                 f"node/pnpm/npm 설치 위치 확인 (예: /opt/homebrew/bin).",
+                        "path": env["PATH"],
+                    })
+                cmd[0] = resolved
                 try:
                     proc = subprocess.Popen(
                         cmd,

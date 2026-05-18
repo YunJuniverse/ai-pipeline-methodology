@@ -1,13 +1,19 @@
-# Checkpoint — 2026-05-18 (METH-036 방법론 생성물 전파/추적 차단)
+# Checkpoint — 2026-05-18 (METH-037 dashboard `/api/servers/start` PATH 보강)
 
-> ✅ METH-036: 사용자 통증 "icons `git pull` 이 `_start/.cache/dashboard.html`·
-> `.ai/wrap-state.json` 때문에 반복 차단" 의 근본 원인 수정. methodology.py 에
-> `_excluded_from_copy()`(copy_path 캐시 복사·prune 제외) + `ensure_gitignore()`
-> (init/sync 가 프로젝트 .gitignore 에 마커 블록 보장) 추가. `.ai/wrap-state.json`
-> 은 설계상 추적 대상이라 무시 제외. icons dry-run 검증 OK, icons 자체 미변경.
-> Class A, PR 진행 예정. 잔여(Human): 기추적 프로젝트 1회 `git rm --cached
-> _start/.cache/dashboard.html`. 직전 작업(PR #22/#23 4 프로젝트 sync 전파)은
-> 아래 이력 참조 — 그 잔여(METH-018 hooks install, dashboard 재시작)는 유효.
+> ✅ METH-037: talmocom 사용자 보고 "프로젝트 dashboard 에서 dev 서버 열기 →
+> `명령 미발견: npm/pnpm`". 진단: dashboard 프로세스(PID 40528)가 launchd
+> 기본 PATH `/usr/bin:/bin:/usr/sbin:/sbin` 으로 떠 있었음 (Finder 더블클릭
+> `open-dashboard.command` 진입점이 사용자 shell PATH 비상속). `os.environ.copy()`
+> 가 그대로 자식 Popen 에 전달 → `/opt/homebrew/bin/pnpm` 못 찾음. 즉시 우회:
+> 터미널에서 talmocom dashboard 재기동 (PID 41314 정상). 근본 수정
+> (`60_tools/generate-dashboard.py`): `_augmented_path_env()` 헬퍼 —
+> `/opt/homebrew/{bin,sbin}`·`/usr/local/bin`·`~/.local/bin`·`~/.bun/bin`·
+> `~/Library/pnpm`·`~/.volta/bin`·최신 `~/.nvm/versions/node/*/bin` 을 PATH 앞에
+> prepend (존재 디렉터리만). `/api/servers/start` 핸들러가 이 env 사용 +
+> `shutil.which(cmd[0], path=env["PATH"])` 로 사전 해석 → 못 찾으면 PATH 포함
+> 명확한 에러 반환. 검증: launchd 빈약 PATH 흉내에서도 pnpm/npm/node resolve OK.
+> Class A. 잔여: ship + 4 프로젝트 sync 전파. METH-036/PR #22-23 직전 작업의
+> 잔여(METH-018 hooks install, 기추적 프로젝트 `git rm --cached`)는 유효.
 
 
 ---
