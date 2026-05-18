@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "e122539ff5efe081528650b3b46cd13d2303c948",
-  "last_validated_at": "2026-05-18T13:36:06Z",
+  "last_validated_commit": "6fb77096594ea07954ce43dda989e9d38cec16e6",
+  "last_validated_at": "2026-05-18T13:46:43Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "8b2d7be8b2dbc8e5c1f0171bc69ff8421859bb7c74f9f41f13e4e102ad4fd450"
+      "sha256": "b853fbe670bc7a444dc01b143b2a8e84bc352acfd0450f9b03f3c57c486e7fc9"
     },
     "TODO.md": {
-      "sha256": "fe7bac31c6d6bd22a63be788d9b5b19b2e88edbdb0dbd9eb34cb45593e61b3e3"
+      "sha256": "4d0ce2a47117ac30f82884cb02a4359ae233ef8785bfacc0a0c53e4793b5e27d"
     },
     ".ai/checkpoint.md": {
-      "sha256": "93bec1b89358d71dd47b764637b1325ce239e253eaad3b187c9466d367d78452"
+      "sha256": "0dd732b9045613d4f1ba96c5673b5ceeaa8b7cfb6d5886c11b82d97fb97592c5"
     }
   },
   "observations": {
@@ -34,6 +34,7 @@
       "50_resources/ai_observations/2026-05-17_sync-worktree-stale-guard.md",
       "50_resources/ai_observations/2026-05-18_dashboard-api-servers-start-path-augment.md",
       "50_resources/ai_observations/2026-05-18_gitignore-propagation-and-cache-copy-exclusion.md",
+      "50_resources/ai_observations/2026-05-18_meth-018-hooks-stale-reinstall.md",
       "50_resources/ai_observations/2026-05-18_meth-038-propagate-4-projects.md",
       "50_resources/ai_observations/2026-05-18_ship-npm-manager-run-fix.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",

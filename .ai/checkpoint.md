@@ -80,6 +80,21 @@
 - 결과: icons `02ce074`·talmocom `992776c`·gamblescan `7e23e9e`·
   tshome `f6a229f`, 4개 픽스 2/2·origin/main 동기 검증 완료.
 
+**METH-018 pre-push hook 최신화 (이어서, 사용자 "진행해줘")**:
+
+- 사용자 "METH-018 hooks install 은 뭐하면 돼?" → 상태 점검 중 발견:
+  4 프로젝트 hook 이 "활성"이나 구버전(v3.x) 템플릿 — `[ -f
+  "50_tools/methodology.py" ]` 만 검사. v4.0(`60_tools/`)이라 항상
+  else "검증 skip" → manifest-check·wrap --strict 안전망 사실상 무력화.
+  TODO/HANDOFF 의 "미설치, Human 1회 대기" 프레이밍이 부정확했음.
+- 조치: `hooks install --force` 4 프로젝트 재설치 → 최신 템플릿
+  (3-tier 60→50→root + `METHODOLOGY_SHIP_IN_PROGRESS` ship-skip +
+  METH-022 sync-commit 면제) 반영. 4개 모두 검증 통과. 정본 repo 는
+  이미 최신. git 공용 `.git/hooks` 공유 → repo당 1회면 worktree 커버
+  ("worktree마다 별도" 메모 정정).
+- 안전망(매 push 시 manifest-check + wrap --strict, sync-commit 면제)
+  이 4 프로젝트에서 실제 동작 가능 상태로 복구됨.
+
 ## ⚠️ 다음 사람: 우선 처리 후보
 
 - **PR #27 머지·4 프로젝트 전파: 완료** (2026-05-18). icons `02ce074`,
@@ -95,7 +110,7 @@
 1. talmocom 에서 `ship` 실측으로 build 단계(`npm run build`) 정상 확인
    → METH-038 완전 종결. 실패 시 talmocom 로컬 methodology.py 가 최신인지
    (`grep 'manager, "run"' 60_tools/methodology.py` = 2/2) 먼저 확인.
-2. (Human) METH-018: 각 프로젝트 루트에서 `methodology hooks install` 1회.
+2. ~~METH-018 hooks install~~ — 완료 (stale v3.x → v4.0 `--force` 재설치).
 3. (Human) METH-036 잔여: gamblescan 에서 1회
    `git rm --cached _start/.cache/dashboard.html` (기추적 빌드산출물 untrack).
 4. tshome: 미추적 `ts-admin-guide.html` 는 순수 로컬(origin 무관) — 사용자
