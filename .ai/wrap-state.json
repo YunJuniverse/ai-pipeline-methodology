@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "702e35cc64c0b4c1c420fea08e719bbdd15abaa7",
-  "last_validated_at": "2026-05-18T05:53:29Z",
+  "last_validated_commit": "f879f5789750401a078fbfb5c03ba11796061a96",
+  "last_validated_at": "2026-05-18T07:38:13Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "c41d0e886f878c7ca2f8a724e79643126287149dadc25171a1aca090b7b65af4"
+      "sha256": "218338a30131f8c68d3e79d206ed49a593929ae2de9c60afe8abf3651fabd611"
     },
     "TODO.md": {
-      "sha256": "ba687938264a4861fc57236052f9e37da4022078b6666db63bec41b539c7d283"
+      "sha256": "76c25a975c1ab332cd8c415c448bde53e9933a88d63ecdd4f0a2d045737b4593"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d53d89dc8b7b2a994fd9571b94a8fe863076ca7c5cd649705aedcfd18d8bf2dd"
+      "sha256": "7131ec6065f5f57d2bea73ff52e2f991d441f5b0866ae53c41b40e57862f007b"
     }
   },
   "observations": {
@@ -32,6 +32,7 @@
       "50_resources/ai_observations/2026-05-17_qa4-dashboard-layout-helper.md",
       "50_resources/ai_observations/2026-05-17_qa5-launcher-3tier-detection.md",
       "50_resources/ai_observations/2026-05-17_sync-worktree-stale-guard.md",
+      "50_resources/ai_observations/2026-05-18_dashboard-api-servers-start-path-augment.md",
       "50_resources/ai_observations/2026-05-18_gitignore-propagation-and-cache-copy-exclusion.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",

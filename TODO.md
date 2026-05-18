@@ -30,6 +30,10 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-037
+- **title**: dashboard `/api/servers/start` PATH 보강 — launchd 환경에서 pnpm/npm 미발견 차단
+- **notes**: Completed 2026-05-18. Class A. 사용자 보고(talmocom dashboard "프로젝트 dev 서버 열기" → `명령 미발견: npm/pnpm`). 진단: dashboard 프로세스가 Finder 더블클릭(`open-dashboard.command`) 등 비대화형 진입점으로 떠 있으면 launchd 기본 PATH `/usr/bin:/bin:/usr/sbin:/sbin` 만 상속 → `os.environ.copy()` 가 그대로 자식 Popen 에 전달 → `/opt/homebrew/bin/pnpm` 못 찾음. 수정 (`generate-dashboard.py`): `_augmented_path_env()` 헬퍼 — `/opt/homebrew/{bin,sbin}`·`/usr/local/bin`·`~/.local/bin`·`~/.bun/bin`·`~/Library/pnpm`·`~/.volta/bin`·최신 `~/.nvm/versions/node/*/bin` 을 PATH 앞에 prepend (존재하는 디렉터리만). `/api/servers/start` 가 이 env 사용 + `shutil.which(cmd[0], path=env["PATH"])` 로 사전 해석 → 못 찾으면 PATH 포함 명확한 에러. 즉시 우회로 talmocom dashboard 터미널 재기동 완료 (PID 41314). **잔여**: ship + 4 프로젝트(icons/talmocom/gamblescan/tshome) sync 전파 — sync 완료 후 사용자가 떠 있는 dashboard 1회 재기동(또는 launchd 진입점 그대로 두고 새 코드 받기).
+
 ### METH-036
 - **title**: 방법론 생성물(_start/.cache, dashboard.html) 프로젝트 전파/추적 차단
 - **notes**: Completed 2026-05-18. Class A. 근본 원인: (1) `_start` 가 `shared_paths` 라 `copy_path` 무필터 rglob 로 `_start/.cache/dashboard.html` 빌드 캐시가 적용 프로젝트에 전파·추적됨, (2) `.gitignore` 는 MANIFEST 자산이 아니라 프로젝트로 전파 안 됨 → 프로젝트가 생성물을 추적, dashboard 서버 재생성 시 `git pull` 영구 차단 (icons 반복 실증). 수정: `_excluded_from_copy()` 로 copy_path 가 `.cache/__pycache__/.git/*.pyc/.DS_Store` 복사·prune 제외 + `ensure_gitignore()` 가 init/sync 시 프로젝트 `.gitignore` 에 마커 블록(idempotent, 앱 규칙 보존) 보장. `.ai/wrap-state.json` 은 설계상 추적 대상이라 무시 목록 제외. icons dry-run 검증: gitignore 갱신 예고 + 캐시 미전파 확인. **잔여(Human)**: 기추적 프로젝트는 1회 `git rm --cached _start/.cache/dashboard.html` 필요 — sync 의 .gitignore 만으로 기추적 파일 untrack 안 됨.
