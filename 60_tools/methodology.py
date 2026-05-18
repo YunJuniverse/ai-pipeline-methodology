@@ -1479,7 +1479,7 @@ def cmd_ship(args: argparse.Namespace) -> int:
         except Exception:
             scripts = {}
         if "test" in scripts:
-            rc = subprocess.call([manager, "test"], cwd=str(target))
+            rc = subprocess.call([manager, "run", "test"], cwd=str(target))
             if rc != 0:
                 err("테스트 실패 — push 중단.")
                 return 1
@@ -1499,7 +1499,7 @@ def cmd_ship(args: argparse.Namespace) -> int:
         except Exception:
             scripts = {}
         if "build" in scripts:
-            rc = subprocess.call([manager, "build"], cwd=str(target))
+            rc = subprocess.call([manager, "run", "build"], cwd=str(target))
             if rc != 0:
                 err("빌드 실패 — push 중단.")
                 return 1
