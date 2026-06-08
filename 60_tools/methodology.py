@@ -163,6 +163,19 @@ MANIFEST = {
         "50_resources/skeletons",
         "50_resources/ai_observations",
     ],
+    # init_paths 복사에서 제외할 패턴 (repo-relative path, re.match)
+    # — 본 저장소가 자기 자신에 방법론을 적용해 쌓은 *실 운영 기록*
+    # (domain: meta — ADR-NNN/관찰로그/스냅샷/스켈레톤/pending lesson).
+    # v0 스켈레톤이 아니므로 적용 프로젝트로 새면 ADR-002(메타-방법론 격리) 위반.
+    # 신규 프로젝트는 _README.md/README.md 등 안내 템플릿만 받고
+    # 자신의 기록을 처음부터 직접 쌓아간다.
+    "init_path_excludes": [
+        r"^40_dev/adr/ADR-\d{3}-",                           # 방법론 자신의 ADR-NNN(3자리). 적용 프로젝트는 ADR-NNNN(4자리)로 새로 시작
+        r"^40_dev/snapshots/(?!README\.md$)",                # README 제외 모든 실 스냅샷(insights/ 포함)
+        r"^50_resources/ai_observations/(?!_README\.md$)",  # _README 제외 모든 실 관찰 로그
+        r"^50_resources/skeletons/meta/",                    # 방법론 자신의 meta 도메인 스켈레톤
+        r"^50_resources/catalog/_pending/P-\d{3}_",          # 방법론 자신의 pending lesson
+    ],
     # init이 src→dst 매핑으로 복사하는 단일 파일들 (PROJECT_NAME 치환 가능)
     "init_files": [
         # (src_in_methodology, dst_in_project, substitute)
@@ -628,37 +641,40 @@ def cmd_catalog(args: argparse.Namespace) -> int:
         print(f"archive {count_markdown(dirs['archived'])}")
         return 0
     if args.catalog_cmd == "seed-pending":
-        target = dirs["pending"] / "P-001_git-write-lock.md"
+        target = dirs["pending"] / "P-001_example-friction.md"
         if target.exists() and not args.force:
             warn(f"exists: {target.relative_to(METHODOLOGY_ROOT)}")
             return 0
+        # 메타-방법론(본 저장소)의 실제 마찰이 아니라, 이 프로젝트가
+        # 자신의 첫 Pending Lesson을 쓸 때 채워야 할 자리표시 예시다.
+        # (ADR-002: 메타 운영 기록은 적용 프로젝트로 새면 안 된다)
         content = """---
 id: P-001
-title: "Git metadata write blocked in sandboxed agent session"
-domain: meta
+title: "<반복될 수 있는 마찰을 한 줄로 요약>"
+domain: <skeleton과 일치하는 도메인 식별자>
 status: pending
 source_observations:
-  - 2026-05-07_l1-observe-flow
-signature: "git.*(index.lock|refs).*Operation not permitted|cannot lock ref"
-created: 2026-05-08
-last_seen: 2026-05-07
+  - <이 마찰을 처음 기록한 관찰 로그 파일명(확장자 제외)>
+signature: "<L3 마이닝이 검색할 정규식 키>"
+created: <YYYY-MM-DD>
+last_seen: <YYYY-MM-DD>
 promotion_rule: "Promote to active Catalog after N>=2 observations or explicit human approval."
 ---
 
 ## 증상 (Symptom)
 
-Agent can edit workspace files but cannot create Git lock/ref files under `.git/`, so branch creation, staging, commit, or push fails.
+(재현 가능한 에러 메시지·관찰 가능한 동작을 적는다)
 
 ## 임시 해결 (Current Workaround)
 
-Leave file changes in the workspace and ask the human to run Git commands from a local terminal with normal repository permissions.
+(지금 당장 우회하는 방법을 적는다)
 
 ## 승급 조건
 
-Same friction appears in another L1 observation, or a human explicitly approves active Catalog promotion.
+동일 마찰이 다른 L1 관찰에서 재현되거나, 사람이 명시적으로 active Catalog 승급을 승인하면 승급한다.
 """
         write_text(target, content)
-        ok(f"pending lesson seeded: {target.relative_to(METHODOLOGY_ROOT)}")
+        ok(f"pending lesson seeded (example placeholder — 실제 마찰로 교체할 것): {target.relative_to(METHODOLOGY_ROOT)}")
         return 0
     err("unknown catalog command")
     return 2
@@ -901,8 +917,36 @@ def _excluded_from_copy(rel: Path) -> bool:
     return rel.suffix in COPY_EXCLUDE_SUFFIXES
 
 
-def copy_path(src: Path, dst: Path, dry_run: bool, *, prune: bool = False) -> int:
+_INIT_PATH_EXCLUDE_RE = [re.compile(p) for p in MANIFEST.get("init_path_excludes", [])]
+
+
+def _init_meta_leak_skip(base_rel: str) -> Callable[[Path], bool] | None:
+    """init_paths 항목(base_rel) 복사 시 메타-방법론 실 운영 기록을 걸러내는 skip 함수.
+
+    MANIFEST.init_path_excludes 패턴을 "{base_rel}/{file_rel}" 전체 경로에 매칭한다.
+    패턴이 하나도 없으면 None (필터 없이 전체 복사).
+    """
+    if not _INIT_PATH_EXCLUDE_RE:
+        return None
+
+    def _skip(rel: Path) -> bool:
+        full = f"{base_rel}/{rel.as_posix()}"
+        return any(p.match(full) for p in _INIT_PATH_EXCLUDE_RE)
+
+    return _skip
+
+
+def copy_path(
+    src: Path,
+    dst: Path,
+    dry_run: bool,
+    *,
+    prune: bool = False,
+    skip: Callable[[Path], bool] | None = None,
+) -> int:
     """src → dst 재귀 복사. prune=True면 src에 없는 파일을 dst에서 제거.
+
+    skip(rel) 이 True를 반환하는 파일(rel은 src 기준 상대 경로)은 복사·prune 모두에서 제외.
 
     반환: 변경된 파일 수 (생성/덮어쓰기/삭제 모두 포함)
     """
@@ -923,6 +967,8 @@ def copy_path(src: Path, dst: Path, dry_run: bool, *, prune: bool = False) -> in
             continue
         rel = sp.relative_to(src)
         if _excluded_from_copy(rel):
+            continue
+        if skip and skip(rel):
             continue
         dp = dst / rel
         same = dp.exists() and dp.is_file() and sp.read_bytes() == dp.read_bytes()
@@ -1081,11 +1127,14 @@ def cmd_init(args: argparse.Namespace) -> int:
             ok(f"shared    {rel}  ({n} files)")
 
     # 2) init_paths 복사 (v0 스켈레톤)
+    # — init_path_excludes로 본 저장소 자신의 메타 운영 기록(domain: meta)은
+    #   걸러낸다. 그 기록은 v0 스켈레톤이 아니라 ADR-002가 격리 대상으로
+    #   규정한 "메타-방법론 자산"이며, 적용 프로젝트로 새면 안 된다.
     for rel in MANIFEST["init_paths"]:
         src = METHODOLOGY_ROOT / rel
         dst = target / rel
         if src.exists():
-            n = copy_path(src, dst, dry_run=False)
+            n = copy_path(src, dst, dry_run=False, skip=_init_meta_leak_skip(rel))
             ok(f"scaffold  {rel}  ({n} files)")
 
     # 3) init_files (치환 적용)

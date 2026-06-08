@@ -146,7 +146,7 @@
         {
           "label": "Catalog Pending 시드",
           "command": "methodology catalog seed-pending",
-          "description": "첫 Pending Lesson (MP-001) seed 생성. N≥2 목격 시 active 승급."
+          "description": "첫 Pending Lesson (P-001) 예시 시드 생성 — 실제 마찰로 내용을 교체할 것. N≥2 목격 시 active 승급."
         }
       ]
     },
