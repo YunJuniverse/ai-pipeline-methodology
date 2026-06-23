@@ -45,13 +45,11 @@
   `requirements-spec.md` §⑤ 보강, 지침 00 §11.5~11.7 신설.
 - 검증 예정: wrap 4/4 → ship → PR. 도메인 특화(가챠/굿즈/카드) 전부 제외, 일반 craft만.
 
-## ⚠️ 다음 사람: 우선 처리 후보 (병렬 PR 2개 주의)
+## ⚠️ 다음 사람: 우선 처리 후보
 
-- **METH-043 PR** (이 브랜치) + **PR #31**(METH-040/041/042, 브랜치 `…from-gamblescan`)이
-  *병렬*로 떠 있다. craft 파일은 서로 비충돌(METH-043=신규 prd/arch/context-glossary+ADR/
-  requirements/지침00 / PR #31=지침 10~18 §19+기획·개발명세 템플릿). 단 **라이브 파일
-  (HANDOFF/TODO/checkpoint)은 두 브랜치가 각각 수정** → *둘째로 머지되는 PR*에서 라이브 파일
-  합류(rebase) 필요. 권장: PR #31 먼저 머지 → METH-043 rebase(라이브 파일만 수동 합류).
+- **PR #31(METH-040/041/042) 머지 완료**(main `e12750f`). **METH-043(PR #32)**은 본 브랜치에서
+  `git merge origin/main`으로 라이브 파일 충돌(checkpoint/wrap-state/HANDOFF/TODO) 해소 완료 —
+  craft 파일은 비충돌이었음(예견대로). **다음**: 사용자가 PR #32 머지.
 - 머지 후 **다운스트림 sync**: METH-039~043 합산하여 icons·ai-icons·gamblescan `sync --apply`.
   cafe24 경로 미확인(`/Users/hayden/cafe24` repo 부재 — 사용자 확인).
 - **METH-044 (백로그 등록, 머지 후 capstone)**: 모드별 템플릿 선택 체계(`_CATALOG.md` + CLAUDE.md
@@ -61,7 +59,7 @@
 ## 다음 사람에게 (구체적 첫 행동)
 
 1. 사용자 지시 대기. 신규 작업 시작 금지.
-2. PR #31 / METH-043 PR 머지 순서·라이브 파일 합류는 위 "우선 처리 후보" 참조.
+2. PR #32 머지되면 → 다운스트림 sync(METH-039~043 합산) → METH-044(모드 카탈로그, TODO Backlog 설계).
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
