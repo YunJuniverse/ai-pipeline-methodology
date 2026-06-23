@@ -1,20 +1,17 @@
-# Checkpoint — 2026-05-18 (METH-038 ship npm 매니저 비호환 버그 픽스)
+# Checkpoint — 2026-06-23 (METH-039 기획 craft 역주입: ICONS 학습 → 방법론)
 
-> ✅ METH-038: 사용자 보고 "talmocom 에서 `methodology.py ship` 빌드 단계 실패".
-> 진단: `cmd_ship` 의 test(4/7)·build(5/7) 단계가
-> `subprocess.call([manager, "<script>"])` 형태. pnpm/yarn 은 bare 하위명령을
-> 자동으로 `run` 으로 alias 하지만 **npm 내장 단축어는 `test/start/stop/restart`
-> 뿐** → `npm build` 는 유효 명령이 아님. talmocom 은 `package-lock.json` 단독
-> → manager=`npm`, `package.json` 에 `scripts.build="next build"` 존재 →
-> `60_tools/methodology.py:1502` 에서 `npm build` 실행 → 실패. test 단계는
-> `npm test` 가 우연히 npm 내장 단축어라 무증상이었음.
-> 수정: 두 호출을 `[manager, "run", "<script>"]` 로 통일 — `npm run build` /
-> `pnpm run build` / `yarn run build` 모두 정상, `npm run test` 도 안전.
-> `60_tools/methodology.py` 는 `MANIFEST.shared_paths` 자산이라 본 upstream
-> repo 가 정본 — talmocom 등 다운스트림은 다음 `sync --apply` 로 수령.
-> `python3 -m py_compile` 통과. Class A. 직전 작업(METH-037 PATH 보강,
-> METH-036, PR #22-23)의 잔여(ship + 4 프로젝트 sync 전파, METH-018 hooks
-> install, 기추적 프로젝트 `git rm --cached`)는 여전히 유효.
+> ✅ METH-039: 적용 프로젝트 ICONS의 기획 학습 코퍼스(사업/서비스기획 강의·실무·케이스)를
+> 정제한 `icons:40_dev/knowledge/` 6종을 방법론 업스트림으로 **역환류**.
+> ① `20_guides` 지침 4종에 §19 "실무 craft 부록(현장 패턴·적용 프로젝트 환류)" 추가 —
+>   10_사업기획서(핵심가치 도출·검증 우선순위 게이트·KPI 단위경제 트리·분석틀·보고서 worked-example),
+>   11_서비스기획서(ASIS→TOBE·12단계 산출물 체계·데이터 무결성·정책 ON/OFF·스토리보드 8요소·Admin),
+>   13_마케팅기획서(Triple Media·4유발 퍼널·채널별·E.C.C.S),
+>   15_프로젝트_관리(WBS·Kick-off·제안 5단계).
+> ② `50_resources/templates/` 기획 양식 6종 신설(requirements-spec·ia-spec·service-policy·
+>   user-story·kpi-tree·wbs).
+> 모두 일반 craft만(프로젝트 특화 제외)+출처 명시. shared 자산이라 본 upstream 이 정본 →
+> 다운스트림(icons·ai-icons·cafe24·gamblescan)은 PR 머지 후 `sync --apply` 로 수령. Class A.
+> 브랜치 `claude/inject-planning-craft-from-icons`. **잔여(Human)**: PR 생성·대표 머지 → 4 프로젝트 sync.
 
 ---
 
@@ -24,10 +21,10 @@
 
 ## 작성자
 
-- Agent: claude-opus-4-7
+- Agent: claude-opus-4-8
 - Tool: claude-code-cli
-- Host: darwin-25.4
-- Worktree: `.claude/worktrees/romantic-fermi-62f41c` (branch `claude/romantic-fermi-62f41c`)
+- Host: darwin-25.5
+- Worktree: main checkout (branch `claude/inject-planning-craft-from-icons`)
 
 ## 부팅 계약
 
