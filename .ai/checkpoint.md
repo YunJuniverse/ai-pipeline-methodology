@@ -47,9 +47,11 @@
 
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **PR #31(METH-040/041/042) 머지 완료**(main `e12750f`). **METH-043(PR #32)**은 본 브랜치에서
-  `git merge origin/main`으로 라이브 파일 충돌(checkpoint/wrap-state/HANDOFF/TODO) 해소 완료 —
-  craft 파일은 비충돌이었음(예견대로). **다음**: 사용자가 PR #32 머지.
+- ⚠️ **PR #31은 METH-040까지만(commit `450045a`) 머지됨** — METH-041(`b3a48f7`)·METH-042
+  (`18d3784`)는 main에 안 들어갔다(PR이 040 시점에 머지). 유실 아님: gamblescan 브랜치(`18d3784`)에
+  살아 있던 041/042를 **PR #32 브랜치로 병합 통합** → 이제 **PR #32가 041+042+043 전부 운반**.
+  라이브 파일 충돌은 정확한 현실(039·040 머지 / 041·042·043 = PR #32 대기 / 044 백로그)로 해소.
+- **다음**: 사용자가 PR #32 머지 → 040~043 전부 main 안착.
 - 머지 후 **다운스트림 sync**: METH-039~043 합산하여 icons·ai-icons·gamblescan `sync --apply`.
   cafe24 경로 미확인(`/Users/hayden/cafe24` repo 부재 — 사용자 확인).
 - **METH-044 (백로그 등록, 머지 후 capstone)**: 모드별 템플릿 선택 체계(`_CATALOG.md` + CLAUDE.md
