@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "450045ad817c72515c6dcb9bc0e8f44c7f391597",
-  "last_validated_at": "2026-06-23T07:34:22Z",
+  "last_validated_commit": "b3a48f78bff2edf9839ca2352eb8ef7f11188416",
+  "last_validated_at": "2026-06-23T08:11:06Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "97aba93f0cff752f604b16594af9ca1a46ee30ce72b6f053ca52e8ccd727c5c1"
+      "sha256": "713e2a3b5b9a94be4c38e7a9693842865de861d16219912606d74e679cb357af"
     },
     "TODO.md": {
-      "sha256": "c8d86adcd240409cca1806914cc837312ca483d8943c15a3834986bcf398d149"
+      "sha256": "74c3862ee9ee40eb476bcf7b8e31dff3ad5c5f75556d643f105f7a1e00cf4196"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d30ea9e614095668760ad85f52806c8882f12c268c9629bc157e30a05aa2e697"
+      "sha256": "3aa0c9c5254f5125d55f7550eeb6dfb9626a9595a54076b2842853ae5fc14c94"
     }
   },
   "observations": {
@@ -42,6 +42,7 @@
       "50_resources/ai_observations/2026-06-23_meth-039-planning-craft-injection.md",
       "50_resources/ai_observations/2026-06-23_meth-040-inject-planning-craft-from-gamblescan.md",
       "50_resources/ai_observations/2026-06-23_meth-041-icons-section19-compression-backfill.md",
+      "50_resources/ai_observations/2026-06-23_meth-042-original-planning-corpus-direct-study.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

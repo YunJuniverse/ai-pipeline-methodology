@@ -1,4 +1,14 @@
-# Checkpoint — 2026-06-23 (METH-040 기획 craft 역주입: GambleScan 학습 → 방법론)
+# Checkpoint — 2026-06-23 (METH-040/041/042 기획 craft 역주입 — GambleScan·ICONS·원본 코퍼스 → 방법론)
+
+> ✅ METH-042: 적용 프로젝트 ICONS가 학습한 *원본* 기획 코퍼스(`~/Downloads/사업기획학습`·
+> `~/Downloads/서비스기획학습` 510종)를 AI가 **직접 정독**. ICONS 정제본(2차 lossy 요약)이
+> 통째로 흘린 craft를 회수 — office 84종 LibreOffice 변환, 6 클러스터 병렬 학습(PNG 325
+> IA캡처·hwp 중복 제외). **신규 템플릿 12종**(제안·검수·운영·수익관리 — 방법론에 거의 빈
+> 영역) + 지침 10/11/13/15 §19 대량 보강 + 16 §15 신설. PR #31에 METH-040/041과 묶음(동일
+> §19 섹션·템플릿 폴더 → 별도 PR이면 충돌). Class A. 상세는 아래 "방금 한 것".
+
+---
+
 
 > ✅ METH-040: 적용 프로젝트 GambleScan의 실전 풀 기획 코퍼스를 방법론 업스트림으로 **역환류**
 > (METH-039 ICONS 패턴의 GambleScan판). GambleScan은 전 기획 영역(사업·서비스·운영·마케팅·
@@ -31,6 +41,30 @@
 4. "다음 사람에게" 첫 항목부터 시작.
 
 ## 방금 한 것 (정확히)
+
+**METH-042 원본 코퍼스 직접 정독 역주입** (사용자: "ICONS가 학습한 원본폴더는 다운로드
+아래 사업기획학습·서비스기획학습. 너도 직접 학습하는 게 낫지 않아?", 범위="전체 정독"):
+
+- 동기: METH-039/041은 ICONS의 *2차 정제본*(knowledge 01~05)에서 주입 → 정제 단계의 lossy
+  손실 의심. 원본 직접 정독으로 회수.
+- 처리: `~/Downloads/{사업기획학습(7),서비스기획학습(510)}`. office 84종을 LibreOffice
+  (`/Applications/LibreOffice.app/.../soffice`, hwp 제외·perl alarm timeout·serial)로 PDF
+  변환 → `/tmp/planning-corpus-pdf/`. PNG 325(실사이트 IA 벤치마크 캡처)·hwp(중복)·포트폴리오
+  강의는 제외. 6 클러스터 병렬 서브에이전트 정독(사업실전보고서/마케팅교안25/서비스·유데미강의/
+  SI양식38/실전케이스/유데미office) → 방법론 현행 §19·템플릿 대조해 *신규 craft만* 추출.
+- 수확 ① **신규 템플릿 12종**(`50_resources/templates/`, 작성은 2 서브에이전트 위임): 제안군
+  (proposal-go-nogo·research-collection-checklist) · 검수군(qa-acceptance-plan·qa-test-scenario·
+  qa-acceptance-signoff) · 운영군(operation-spec·post-launch-monitoring·work-request-ticket) ·
+  수익(profitability-sheet★) · execution-plan · glossary · microcopy. **방법론에 거의 빈
+  제안·검수·운영·수익관리 영역**을 채움.
+- 수확 ② §19 보강(직접 작성): 10(마켓플레이스 KPI 10패널·분석방법 배터리·단위원가 적층·
+  아이디어 비판검증 3분류·역량 Fit·실패→설계원칙·파일럿 안티패턴) · 11(ASIS 3축·UIUX 정량화·
+  요구 수용여부 enum·유저시나리오 7요소·디스크립션 문체5+라벨사전·시나리오 3상태·화면설계서
+  7구성+서명게이트·DB 3종·IA 통합보드·마이크로카피) · 13(Daily/Campaign·콜드스타트 수치·채널
+  플레이북·키워드 경쟁도·ECCS 동심원) · 15(제안/검수/수익 산출물군·수행계획서·n(n-1)/2 채널공식·
+  WBS 3점추정/8레인·회의≠결과보고) · 16 §15 신설(추천형 AI 7단계+변수 사용구분).
+- 검증: 지침 5종+템플릿 12종 ~538줄. 도메인 특화(렌터카/비건/카지노 등) 제외. manifest-check
+  (70_meta 격리) 통과. **PR #31에 METH-040/041과 묶음 ship**(동일 §19 섹션 충돌 회피).
 
 **METH-040 GambleScan 기획 craft 역주입** (사용자: "기획문서 학습을 갬블스캔에서 진행했거든 …
 까서 보고 너도 자료 찾아 학습하고 방법론 업데이트", 범위="전체 한 번에"):
