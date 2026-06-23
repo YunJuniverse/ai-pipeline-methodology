@@ -59,6 +59,26 @@
 5. 라이브 파일 갱신: TODO(METH-040 InProgress), HANDOFF(Working on/Next/Recent 5건),
    본 checkpoint, observe 로그.
 
+**METH-041 ICONS §19 압축 누락 보충** (이어서, 사용자 "icons 폴더에서도 역주입해야해
+최근에 기획서 학습 진행했어 확인해봐"):
+
+- 확인 결과: ICONS 기획 학습 코퍼스(`/Users/hayden/icons/40_dev/knowledge/` 01~05 +
+  `40_dev/snapshots/ICONS-기획craft-학습보고서-2026-06-23.md`)는 **이미 METH-039
+  (PR #30 머지)로 주입 완료된 바로 그 출처**. 학습보고서 §4가 knowledge 01~05와,
+  그게 다시 방법론 지침 10/11/13/15 §19와 1:1. 타임라인도 일치(04·05는 03:34 UTC
+  생성 → METH-039 머지 05:25 UTC 이전).
+- 단, 서브에이전트 정밀 대조에서 **METH-039 압축 시 "이름만 남고 본문 증발"한 체크리스트
+  6건**(중요 2 + 사소 4) 발견 → 보충:
+  - 지침 10: §19.9 협업·커뮤니케이션(KJ법·블루캡·대화전환·개발/디자인 대화법),
+    §19.10 Exec Summary 8칸.
+  - 지침 11: §19.10 서비스정의 3종(측정가능 Target·Core/Support·출시유형 3)·
+    ASIS UIUX 7루브릭·용어사전/페이퍼목업/신개념 온보딩.
+  - 지침 15: §19.8 WBS 3계층(Step→Activity→Task)+Task 5요소·제안서 3 Style·
+    품질검토 8항목.
+  - 마케팅 13은 *완전 커버*라 제외. ICONS 도메인(서브컬처 IP·팝업) 특화 제외.
+- **PR #31에 METH-040과 묶음**: METH-040과 METH-041이 같은 §19 섹션(지침 10/11/15)을
+  편집 → 별도 PR이면 머지 충돌. 같은 브랜치에 ship.
+
 ## ⚠️ 다음 사람: 우선 처리 후보
 
 - **METH-040 PR 생성·머지** (Human 승인 게이트). 브랜치 `claude/inject-planning-craft-from-gamblescan`

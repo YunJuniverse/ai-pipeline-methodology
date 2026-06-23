@@ -15,6 +15,10 @@
 - **title**: 적용 프로젝트(GambleScan) 기획 craft 역주입 — 지침 10/11/12/13/14/15/18 §19 보강·신설 + 개발명세 템플릿 4종 신설
 - **notes**: 작업 완료, PR 대기(머지 전). Class A (shared 자산 — 다운스트림 `sync --apply` 수령). 적용 프로젝트 GambleScan의 실전 풀 기획 코퍼스(methodology-v1/planning·development·docs/planning·research)를 방법론으로 **역환류**(METH-039 ICONS 패턴의 GambleScan판). ① §19가 없던 **지침 12(운영)·14(브랜드) §19 신설** + **지침 18(마스터플랜) §18 신설** + 기존 §19 보강(10 사업·11 서비스·13 마케팅·15 PM). ② **개발명세 템플릿 4종 신설**(`50_resources/templates/`): data-model·user-flow·wireframe-spec·functional-spec — 기획↔빌드 사이 빈 층. 관통 주제: 다면(N-sided) 시장 기획 + 거버넌스/추적 craft. 모두 일반 craft(GambleScan 도메인 특화 제외)+출처 명시. 브랜치 `claude/inject-planning-craft-from-gamblescan` → PR(대표 머지=승인 증빙). 머지 후 다운스트림(icons·ai-icons·gamblescan, cafe24 경로 미확인) sync 전파.
 
+### METH-041
+- **title**: ICONS knowledge §19 압축 누락 보충 (METH-039 후속) — 지침 10/11/15 §19 체크리스트 본문 복원
+- **notes**: 작업 완료, PR #31에 METH-040과 **묶음**(같은 §19 섹션 편집이라 별도 PR이면 충돌). Class A. 사용자 "icons에서도 역주입" 지시 → 확인 결과 ICONS 기획 학습 코퍼스(`icons:40_dev/knowledge/` 01~05 + 학습보고서)는 **이미 METH-039(PR #30 머지)로 주입 완료**된 바로 그 출처. 단 METH-039가 §19로 *압축*하며 "이름만 남고 본문이 증발"한 체크리스트 6건 발견(정밀 대조) → 보충: 지침 10(§19.9 협업·커뮤니케이션 KJ법·블루캡·개발/디자인 대화법, §19.10 Exec Summary 8칸), 11(§19.10 서비스정의 3종·UIUX 7루브릭·용어사전/페이퍼목업/신개념 온보딩), 15(§19.8 WBS 3계층·Task 5요소·제안서 3 Style·품질검토 8항목). 마케팅 13은 완전 커버라 제외. ICONS 도메인 특화 제외. 머지 후 다운스트림 sync(METH-039/040과 합산).
+
 ## Blocked
 
 ## Done
