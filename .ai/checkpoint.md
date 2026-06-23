@@ -1,18 +1,14 @@
-# Checkpoint — 2026-06-23 (METH-039 기획 craft 역주입: ICONS 학습 → 방법론, PR #30 머지 완료)
+# Checkpoint — 2026-06-23 (METH-040 기획 craft 역주입: GambleScan 학습 → 방법론)
 
-> ✅ METH-039: 적용 프로젝트 ICONS의 기획 학습 코퍼스(사업/서비스기획 강의·실무·케이스)를
-> 정제한 `icons:40_dev/knowledge/` 6종을 방법론 업스트림으로 **역환류**.
-> ① `20_guides` 지침 4종에 §19 "실무 craft 부록(현장 패턴·적용 프로젝트 환류)" 추가 —
->   10_사업기획서(핵심가치 도출·검증 우선순위 게이트·KPI 단위경제 트리·분석틀·보고서 worked-example),
->   11_서비스기획서(ASIS→TOBE·12단계 산출물 체계·데이터 무결성·정책 ON/OFF·스토리보드 8요소·Admin),
->   13_마케팅기획서(Triple Media·4유발 퍼널·채널별·E.C.C.S),
->   15_프로젝트_관리(WBS·Kick-off·제안 5단계).
-> ② `50_resources/templates/` 기획 양식 6종 신설(requirements-spec·ia-spec·service-policy·
->   user-story·kpi-tree·wbs).
-> 모두 일반 craft만(프로젝트 특화 제외)+출처 명시. shared 자산이라 본 upstream 이 정본 →
-> 다운스트림(icons·ai-icons·gamblescan)은 `sync --apply` 로 수령. Class A.
-> **PR #30 머지 완료**(2026-06-23 05:25 UTC, main `2c6e60c`, `origin/main` 동기).
-> **잔여**: 다운스트림 `sync --apply` 전파(아직 미수행).
+> ✅ METH-040: 적용 프로젝트 GambleScan의 실전 풀 기획 코퍼스를 방법론 업스트림으로 **역환류**
+> (METH-039 ICONS 패턴의 GambleScan판). GambleScan은 전 기획 영역(사업·서비스·운영·마케팅·
+> 브랜드·PM·개발명세·리서치)을 실제로 작성한 성숙 제품이라 ICONS보다 넓은 worked-example 코퍼스.
+> ① **§19 없던 지침 12(운영)·14(브랜드) §19 신설 + 18(마스터플랜) §18 신설** + 기존 §19 보강
+>   (10 사업·11 서비스·13 마케팅·15 PM). ② **개발명세 템플릿 4종 신설**(`50_resources/templates/`):
+>   data-model·user-flow·wireframe-spec·functional-spec — 기획↔빌드 사이 빈 층.
+> 관통 주제: **다면(N-sided) 시장 기획** + **거버넌스/추적 craft**. ICONS(METH-039)와 비중복.
+> 모두 일반 craft만(GambleScan 도박/규제 도메인 특화 제외)+출처 명시. Class A(shared).
+> 브랜치 `claude/inject-planning-craft-from-gamblescan`. **잔여**: PR 생성·대표 머지 → 다운스트림 sync.
 
 ---
 
@@ -25,7 +21,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: main checkout (branch `main`, head `2c6e60c`)
+- Worktree: main checkout (branch `claude/inject-planning-craft-from-gamblescan`)
 
 ## 부팅 계약
 
@@ -36,63 +32,64 @@
 
 ## 방금 한 것 (정확히)
 
-**라이브 파일 정리 (사용자: "라이브 파일 정리만")**:
+**METH-040 GambleScan 기획 craft 역주입** (사용자: "기획문서 학습을 갬블스캔에서 진행했거든 …
+까서 보고 너도 자료 찾아 학습하고 방법론 업데이트", 범위="전체 한 번에"):
 
-- 부팅 점검에서 발견: METH-039 PR #30 은 **이미 머지**(2026-06-23 05:25 UTC,
-  main `2c6e60c`, `origin/main` 0/0 동기, 워킹트리 clean) 됐는데, 라이브
-  파일들이 머지 *이전* 시점에 쓰여 어긋나 있었음 —
-  - HANDOFF "Working on: … PR 대기"
-  - checkpoint 헤더 "잔여(Human): PR 생성·대표 머지"
-  - checkpoint 본문 "방금 한 것"이 아직 METH-038 내용(헤더만 039)
-- 조치(라이브 파일만 갱신, 신규 작업 미착수):
-  - `HANDOFF.md` — Working on=없음(METH-039 머지 완료)/Next TODO=다운스트림
-    sync 잔여+S-021 후보/Recent Changes 최상단 "PR #30 머지 완료"로 갱신.
-  - `TODO.md` — METH-039 Done 항목 말미 "PR(대표 머지=승인 증빙)" →
-    "PR #30 머지 완료(…) + 잔여 다운스트림 sync" 로 정정.
-  - 본 `checkpoint.md` — 헤더 잔여 라인 정정 + 본문 전체를 현재 현실로 재작성.
-  - observation 로그 1건(docs).
-- 검증 근거: `gh pr view 30` → `MERGED`, `git rev-list --left-right --count
-  main...origin/main` → `0 0`. 다운스트림 미전파 확인:
-  `icons:50_resources/templates/` 에 METH-039 템플릿 6종 부재.
+1. **학습(까서 보기)**: GambleScan(`/Users/hayden/gamblescan`)의 실전 기획 코퍼스 확인 —
+   `docs/archive/methodology-v1/planning/`(사업·서비스·운영·마케팅·브랜드·PM, 1,375줄),
+   `.../development/`(data-model·user-flow·user-stories·wireframes·functional-spec·IA·requirements,
+   2,034줄), `docs/planning/`(dev-specs·sprint-plan·task-registry, 5,455줄),
+   `docs/archive/research/`(market·regulatory). 6개 영역을 병렬 서브에이전트로 정밀 학습 →
+   *방법론에 아직 없는 일반화 가능 craft만* 추출(도메인 특화 제외, 기존 §19 대조해 중복 제외).
+2. **갭의 핵심**: METH-039(ICONS)는 지침 10/11/13/15 §19만 채웠음 → GambleScan은
+   **§19 없던 12·14·18을 실전본으로 신설**하고 **기획↔빌드 사이 개발명세 템플릿 층(전무)**을 채움.
+3. **역주입(편집)**:
+   - 지침 §19 보강: `10`(19.6~19.8 규제 게이팅·브리프 앵커드 리서치·다면+Phase 인덱싱),
+     `11`(19.7~19.9 BR→UR→FR→NFR 4층·다면 권한/인계/피라미드·라벨링/MVP 제외),
+     `13`(19.7 다면 콜드스타트·퍼널 밴드·90/9/1·검색의도), `15`(19.6~19.7 클래스×담당·
+     인간 액션 레지스트리·게이트 SLA·전략폐기 도장).
+   - §19/§18 신설: `12`(운영 — 독립성 4축·DoR/DoD·추적 매트릭스·의사결정 브리프·승인로그·
+     5필드 프로세스), `14`(브랜드 — 인식맵·가치=실체·다면 메시지하우스·정량화 톤·역상황 규약·
+     Surface 매트릭스), `18`(마스터플랜 §18 — 코드 베이스라인·페이즈 종료기준 이중화·동적
+     스케줄/인라인 가드·게이트 라이프사이클·개발명세 4종 체계). 지침 18 변경이력 v4 추가.
+   - 신규 템플릿 4종(`50_resources/templates/`): `data-model`·`user-flow`·`wireframe-spec`·
+     `functional-spec` (공통: 기반문서 frontmatter + Change Log + Out-of-Scope + 3-state UI).
+4. **검증**: 지침 7종 +122줄·템플릿 4종. manifest-check 통과(70_meta 격리 OK).
+   shared_paths = `20_guides`/`50_resources`/`60_tools`(README:212) → 전부 다운스트림 전파 대상.
+5. 라이브 파일 갱신: TODO(METH-040 InProgress), HANDOFF(Working on/Next/Recent 5건),
+   본 checkpoint, observe 로그.
 
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **METH-039 다운스트림 `sync --apply` 전파 (잔여, 미수행)** — 업스트림
-  정본 `/Users/hayden/methodology` 기준 dry-run → `--apply`:
-  - `icons`(✅ 존재, 템플릿 6종 **미수령** 확인), `ai-icons`(✅ 존재, 미확인),
-    `gamblescan`(✅ 존재, 미확인).
-  - `cafe24` 는 `/Users/hayden/cafe24` 에 repo 없음 — **경로/대상 여부 사용자
-    확인 필요** (이전 기록은 icons·ai-icons·cafe24·gamblescan 4개를 후보로 명시).
-  - 전파 시 규칙: `--dry-run` 선검토 → 명시 경로 add(MC-001, `-A` 금지) →
-    원격 선행분과 무겹침 확인 후 rebase(force push 금지) → 픽스 검증.
+- **METH-040 PR 생성·머지** (Human 승인 게이트). 브랜치 `claude/inject-planning-craft-from-gamblescan`
+  → PR(대표 머지=승인 증빙). CLAUDE.md: no direct push to main.
+- **머지 후 다운스트림 `sync --apply` 전파**: icons·ai-icons·gamblescan(템플릿 미수령),
+  cafe24 경로 미확인(`/Users/hayden/cafe24` repo 부재 — 사용자 확인). **METH-039 다운스트림
+  전파도 미수행 상태** → METH-040 머지 후 둘을 합쳐 1회 sync 로 처리하면 효율적.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-> 이번 세션은 **라이브 파일 정리만** 수행(METH-039 머지 완료 반영). 코드/방법론
-> 자산 변경 없음. 활성 백로그 비움.
-
-1. **다음 작업 지시 대기** — 사용자 지시 없으면 신규 작업 시작 금지.
-2. 사용자가 "전파 진행" 지시 시 → 위 "다음 사람: 우선 처리 후보"의 다운스트림
-   sync 수행 (cafe24 경로부터 확인).
-3. 유력 신규 후보: **S-021 코드 sprint** (ship build 검증·hook 안전망 선결조건
-   해소 완료 상태).
+1. METH-040 PR 생성(이미 ship 으로 push 됐으면 PR 만 열기) → 사용자 리뷰·머지 대기.
+2. 머지되면 다운스트림 sync(METH-039+040 합산). cafe24 경로부터 사용자 확인.
+3. 신규 작업은 사용자 지시 대기.
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
-- 없음. 부팅 점검 → 라이브 파일 3종 + observe 갱신만. 부트 시 dashboard CLI
-  정상 호출(http://localhost:8767, branch main, commit `2c6e60c`).
+- 첫 추측 오류: 사용자의 "갬블스캔 역주입" 질문에 처음엔 `90_archive/evaluation/`의 manus
+  외부감사 문서(방법론 원형의 출처)로 답했으나, 사용자가 정정 — *기획문서 학습*은 GambleScan
+  실전 산출물(planning/development)을 의미. 코퍼스 위치 재탐색 후 정상 진행.
+- GambleScan에 ICONS 같은 `40_dev/knowledge/` 라벨 폴더는 없음 — 학습 코퍼스 = 실제 작성된
+  기획·개발명세 산출물 자체(docs/archive/methodology-v1/, docs/planning/).
 
 ## 미해결 결정사항 (Open Questions)
 
-- METH-039 다운스트림 대상에 `cafe24` 포함 여부 — `/Users/hayden/cafe24` repo
-  부재. 경로가 다른지, 대상에서 제외인지 사용자 확인 필요.
-- S-021 코드 sprint 진입 시 ship 의 test 단계 실측(현재 build 만 talmocom 으로
-  간접 확인) — 코드 sprint 첫 ship 에서 자연 검증 예정.
+- 다운스트림 대상에 cafe24 포함 여부 — `/Users/hayden/cafe24` repo 부재. 경로/제외 사용자 확인.
+- METH-040 분량이 커서(7지침+4템플릿) 머지 전 사용자 정독 권장. 도메인 특화 누출 0 의도했으나
+  리뷰에서 일반성 재확인 바람.
 
 ## 환경 메모
 
-- 본 작업 worktree: main checkout (branch `main`, head `2c6e60c`).
-- 변경 파일: `HANDOFF.md`, `TODO.md`, `.ai/checkpoint.md`, 신규 observation 로그 1건.
-  (코드·지침·템플릿 등 방법론 자산 변경 없음 — 라이브 파일 정리 한정.)
-- 업스트림 정본: `/Users/hayden/methodology`. 다운스트림: icons·ai-icons·gamblescan
-  (각 `/Users/hayden/<name>`), cafe24 경로 미확인.
+- 본 작업 worktree: main checkout (branch `claude/inject-planning-craft-from-gamblescan`).
+- 변경 파일: `20_guides/{10,11,12,13,14,15,18}` + `50_resources/templates/{data-model,
+  user-flow,wireframe-spec,functional-spec}.md` + 라이브 4종 + observation 1건.
+- 출처 프로젝트: GambleScan `/Users/hayden/gamblescan`(다면 시장 리뷰 플랫폼, Next.js, 16 Phase).
