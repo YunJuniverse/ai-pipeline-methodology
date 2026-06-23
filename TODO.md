@@ -11,6 +11,10 @@
 
 ## InProgress
 
+### METH-043
+- **title**: 적용 프로젝트(icons-ip) 경량 파이프라인 문서 craft 역주입 — PRD/ARCHITECTURE/CONTEXT 템플릿 + ADR 강화 + 경량 모드
+- **notes**: 작업 완료, PR 대기(머지 전). Class A. **별도 PR**(main 기준 브랜치 `claude/inject-lean-doc-craft-from-icons-ip` — PR #31과 파일 비충돌 의도). 사용자: icons-ip(방법론 미적용 lean 코드베이스)의 PRD 작성 방식에서 받아들일 craft 검토 → 순수 doc craft 7종 채택(GitHub-Issues 트래커는 방법론 file-based 설계와 충돌이라 제외). ① 신규 템플릿 3종: `prd.md`(무엇·M/S·Pn=출시순서·규제 요구사항 표·현황 갭) · `architecture.md`(어떻게·as-built→목표→이전경로·규제 기술매핑) · `context-glossary.md`(도메인 용어집 _Avoid_+예시대화). ② `ADR-template.md` 강화(제목=결정문장·Considered Options·되돌리기 비용). ③ `requirements-spec.md` M/S+Pn 보강 · 지침 00 §11.5~11.7(경량 모드·문서 충돌 surfacing·작업유형 라우팅). ⚠️ 라이브 파일은 main 기준이라 PR #31(METH-040/041/042)과 머지 시 합류 필요(craft 파일은 비충돌). 머지 후 다운스트림 sync.
+
 ## Blocked
 
 ## Done
