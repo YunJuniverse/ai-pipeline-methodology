@@ -1,14 +1,13 @@
-# Checkpoint — 2026-06-23 (METH-040 기획 craft 역주입: GambleScan 학습 → 방법론)
+# Checkpoint — 2026-06-23 (METH-043 icons-ip 경량 문서 craft 역주입)
 
-> ✅ METH-040: 적용 프로젝트 GambleScan의 실전 풀 기획 코퍼스를 방법론 업스트림으로 **역환류**
-> (METH-039 ICONS 패턴의 GambleScan판). GambleScan은 전 기획 영역(사업·서비스·운영·마케팅·
-> 브랜드·PM·개발명세·리서치)을 실제로 작성한 성숙 제품이라 ICONS보다 넓은 worked-example 코퍼스.
-> ① **§19 없던 지침 12(운영)·14(브랜드) §19 신설 + 18(마스터플랜) §18 신설** + 기존 §19 보강
->   (10 사업·11 서비스·13 마케팅·15 PM). ② **개발명세 템플릿 4종 신설**(`50_resources/templates/`):
->   data-model·user-flow·wireframe-spec·functional-spec — 기획↔빌드 사이 빈 층.
-> 관통 주제: **다면(N-sided) 시장 기획** + **거버넌스/추적 craft**. ICONS(METH-039)와 비중복.
-> 모두 일반 craft만(GambleScan 도박/규제 도메인 특화 제외)+출처 명시. Class A(shared).
-> 브랜치 `claude/inject-planning-craft-from-gamblescan`. **잔여**: PR 생성·대표 머지 → 다운스트림 sync.
+> ✅ METH-043: 적용 프로젝트 **icons-ip**(방법론 미적용 lean 코드베이스)의 PRD/ARCHITECTURE/
+> ADR 작성 방식에서 *받아들일 만한 순수 doc craft*를 방법론으로 역주입. GitHub-Issues 트래커는
+> 방법론 file-based(TODO.md) 설계와 충돌이라 제외(AI/Human 담당축은 이미 METH-040 §19.6).
+> ① 신규 템플릿 3종: `prd.md`(무엇·M/S·Pn=출시순서·규제 요구사항 표·현황 갭) · `architecture.md`
+>   (어떻게·as-built→목표→이전경로·규제 기술매핑) · `context-glossary.md`(도메인 용어집
+>   `_Avoid_`+예시 대화). ② `ADR-template.md` 강화(제목=결정문장·Considered Options·되돌리기 비용).
+> ③ `requirements-spec.md` M/S+Pn 보강 · 지침 00 §11.5~11.7(경량 모드·문서 충돌 surfacing·작업유형
+>   라우팅). Class A. **별도 PR**(main 기준 브랜치, PR #31과 craft 파일 비충돌).
 
 ---
 
@@ -21,7 +20,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: main checkout (branch `claude/inject-planning-craft-from-gamblescan`)
+- Worktree: branch `claude/inject-lean-doc-craft-from-icons-ip` (main 기준, head `2c6e60c`)
 
 ## 부팅 계약
 
@@ -32,64 +31,53 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-040 GambleScan 기획 craft 역주입** (사용자: "기획문서 학습을 갬블스캔에서 진행했거든 …
-까서 보고 너도 자료 찾아 학습하고 방법론 업데이트", 범위="전체 한 번에"):
+**METH-043 icons-ip 경량 문서 craft 역주입** (사용자: "여기서 PRD 등 작성 방식 중
+이 경량 방법론에서 받아들일 만한 내용이 있어?" → "니 추천대로 진행"):
 
-1. **학습(까서 보기)**: GambleScan(`/Users/hayden/gamblescan`)의 실전 기획 코퍼스 확인 —
-   `docs/archive/methodology-v1/planning/`(사업·서비스·운영·마케팅·브랜드·PM, 1,375줄),
-   `.../development/`(data-model·user-flow·user-stories·wireframes·functional-spec·IA·requirements,
-   2,034줄), `docs/planning/`(dev-specs·sprint-plan·task-registry, 5,455줄),
-   `docs/archive/research/`(market·regulatory). 6개 영역을 병렬 서브에이전트로 정밀 학습 →
-   *방법론에 아직 없는 일반화 가능 craft만* 추출(도메인 특화 제외, 기존 §19 대조해 중복 제외).
-2. **갭의 핵심**: METH-039(ICONS)는 지침 10/11/13/15 §19만 채웠음 → GambleScan은
-   **§19 없던 12·14·18을 실전본으로 신설**하고 **기획↔빌드 사이 개발명세 템플릿 층(전무)**을 채움.
-3. **역주입(편집)**:
-   - 지침 §19 보강: `10`(19.6~19.8 규제 게이팅·브리프 앵커드 리서치·다면+Phase 인덱싱),
-     `11`(19.7~19.9 BR→UR→FR→NFR 4층·다면 권한/인계/피라미드·라벨링/MVP 제외),
-     `13`(19.7 다면 콜드스타트·퍼널 밴드·90/9/1·검색의도), `15`(19.6~19.7 클래스×담당·
-     인간 액션 레지스트리·게이트 SLA·전략폐기 도장).
-   - §19/§18 신설: `12`(운영 — 독립성 4축·DoR/DoD·추적 매트릭스·의사결정 브리프·승인로그·
-     5필드 프로세스), `14`(브랜드 — 인식맵·가치=실체·다면 메시지하우스·정량화 톤·역상황 규약·
-     Surface 매트릭스), `18`(마스터플랜 §18 — 코드 베이스라인·페이즈 종료기준 이중화·동적
-     스케줄/인라인 가드·게이트 라이프사이클·개발명세 4종 체계). 지침 18 변경이력 v4 추가.
-   - 신규 템플릿 4종(`50_resources/templates/`): `data-model`·`user-flow`·`wireframe-spec`·
-     `functional-spec` (공통: 기반문서 frontmatter + Change Log + Out-of-Scope + 3-state UI).
-4. **검증**: 지침 7종 +122줄·템플릿 4종. manifest-check 통과(70_meta 격리 OK).
-   shared_paths = `20_guides`/`50_resources`/`60_tools`(README:212) → 전부 다운스트림 전파 대상.
-5. 라이브 파일 갱신: TODO(METH-040 InProgress), HANDOFF(Working on/Next/Recent 5건),
-   본 checkpoint, observe 로그.
+- 분석: `/Users/hayden/icons-ip`(방법론 미적용, Next.js 16+Supabase lean 코드베이스)의
+  CLAUDE.md(`@AGENTS.md` 포인터)·AGENTS.md·CONTEXT.md·docs/{PRD,ARCHITECTURE,adr,agents} 정독.
+  GitHub Issues+Project+AGENTS.md+mattpocock/skills 기반 *Next-Gen lean 파이프라인*.
+- 판단: 순수 doc craft(전이 가능) vs 운영모델 차이(린 vs 헤비, 의도적) 구분. 채택 7종:
+  PRD↔ARCHITECTURE 짝 문서 / 규제 2-table / as-built→목표→이전경로 / ADR 강화 /
+  CONTEXT `_Avoid_`+예시대화 / M/S+Pn 태깅 / 문서 충돌 surfacing+라우팅. **제외**: GitHub-Issues
+  트래커(방법론 file-based 설계 충돌).
+- 작성: 신규 `prd.md`·`architecture.md`·`context-glossary.md`, `ADR-template.md` 재작성,
+  `requirements-spec.md` §⑤ 보강, 지침 00 §11.5~11.7 신설.
+- 검증 예정: wrap 4/4 → ship → PR. 도메인 특화(가챠/굿즈/카드) 전부 제외, 일반 craft만.
 
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **METH-040 PR 생성·머지** (Human 승인 게이트). 브랜치 `claude/inject-planning-craft-from-gamblescan`
-  → PR(대표 머지=승인 증빙). CLAUDE.md: no direct push to main.
-- **머지 후 다운스트림 `sync --apply` 전파**: icons·ai-icons·gamblescan(템플릿 미수령),
-  cafe24 경로 미확인(`/Users/hayden/cafe24` repo 부재 — 사용자 확인). **METH-039 다운스트림
-  전파도 미수행 상태** → METH-040 머지 후 둘을 합쳐 1회 sync 로 처리하면 효율적.
+- ⚠️ **PR #31은 METH-040까지만(commit `450045a`) 머지됨** — METH-041(`b3a48f7`)·METH-042
+  (`18d3784`)는 main에 안 들어갔다(PR이 040 시점에 머지). 유실 아님: gamblescan 브랜치(`18d3784`)에
+  살아 있던 041/042를 **PR #32 브랜치로 병합 통합** → 이제 **PR #32가 041+042+043 전부 운반**.
+  라이브 파일 충돌은 정확한 현실(039·040 머지 / 041·042·043 = PR #32 대기 / 044 백로그)로 해소.
+- **다음**: 사용자가 PR #32 머지 → 040~043 전부 main 안착.
+- 머지 후 **다운스트림 sync**: METH-039~043 합산하여 icons·ai-icons·gamblescan `sync --apply`.
+  cafe24 경로 미확인(`/Users/hayden/cafe24` repo 부재 — 사용자 확인).
+- **METH-044 (백로그 등록, 머지 후 capstone)**: 모드별 템플릿 선택 체계(`_CATALOG.md` + CLAUDE.md
+  Mode 확장 `[planning/dev/fullstack/agency/lean/ops]`). 설계 확정본은 TODO.md Backlog 참조.
+  #31/#32 머지 후 clean main에서 착수(25종 전체 참조 필요). 사용자 승인 완료(타이밍="머지 후").
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-040 PR 생성(이미 ship 으로 push 됐으면 PR 만 열기) → 사용자 리뷰·머지 대기.
-2. 머지되면 다운스트림 sync(METH-039+040 합산). cafe24 경로부터 사용자 확인.
-3. 신규 작업은 사용자 지시 대기.
+1. 사용자 지시 대기. 신규 작업 시작 금지.
+2. PR #32 머지되면 → 다운스트림 sync(METH-039~043 합산) → METH-044(모드 카탈로그, TODO Backlog 설계).
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
-- 첫 추측 오류: 사용자의 "갬블스캔 역주입" 질문에 처음엔 `90_archive/evaluation/`의 manus
-  외부감사 문서(방법론 원형의 출처)로 답했으나, 사용자가 정정 — *기획문서 학습*은 GambleScan
-  실전 산출물(planning/development)을 의미. 코퍼스 위치 재탐색 후 정상 진행.
-- GambleScan에 ICONS 같은 `40_dev/knowledge/` 라벨 폴더는 없음 — 학습 코퍼스 = 실제 작성된
-  기획·개발명세 산출물 자체(docs/archive/methodology-v1/, docs/planning/).
+- 없음. icons-ip office 변환 불필요(전부 md). 병렬 PR 라이브 파일 충돌은 *예견된* 것이라
+  HANDOFF/TODO/본 checkpoint에 합류 필요를 명시해 둠.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 다운스트림 대상에 cafe24 포함 여부 — `/Users/hayden/cafe24` repo 부재. 경로/제외 사용자 확인.
-- METH-040 분량이 커서(7지침+4템플릿) 머지 전 사용자 정독 권장. 도메인 특화 누출 0 의도했으나
-  리뷰에서 일반성 재확인 바람.
+- 경량 문서 모드(PRD/ARCHITECTURE/CONTEXT)를 *언제* 풀 기획서군 대신 쓸지의 판단 기준은
+  지침 00 §11.5에 "프로젝트 성격"으로만 둠 — 더 구체적 게이트가 필요하면 후속 ADR.
+- icons-ip의 `ready-for-agent`/`ready-for-human` 라벨은 METH-040 담당축(AI/Human)과 중복이라
+  미채택 — 향후 TODO 라벨 통합 시 재검토 여지.
 
 ## 환경 메모
 
-- 본 작업 worktree: main checkout (branch `claude/inject-planning-craft-from-gamblescan`).
-- 변경 파일: `20_guides/{10,11,12,13,14,15,18}` + `50_resources/templates/{data-model,
-  user-flow,wireframe-spec,functional-spec}.md` + 라이브 4종 + observation 1건.
-- 출처 프로젝트: GambleScan `/Users/hayden/gamblescan`(다면 시장 리뷰 플랫폼, Next.js, 16 Phase).
+- 브랜치: `claude/inject-lean-doc-craft-from-icons-ip` (main `2c6e60c` 기준).
+- 변경: 신규 `50_resources/templates/{prd,architecture,context-glossary}.md`,
+  `ADR-template.md`·`requirements-spec.md` 편집, `20_guides/00_*.md` §11.5~11.7, 라이브 4종.
+- 출처 프로젝트: icons-ip `/Users/hayden/icons-ip` (ICONS 기획 → icons-ip PRD 단방향, ADR-0013).
