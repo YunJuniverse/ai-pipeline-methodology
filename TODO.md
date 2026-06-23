@@ -18,9 +18,9 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
-### METH-018
-- **title**: 적용 프로젝트 pre-push hook 최신화 (stale v3.x → v4.0 재설치)
-- **notes**: Completed 2026-05-18. Class A. 진단: icons/talmocom/gamblescan/tshome 모두 pre-push hook 이 "활성"이나 **구버전(v3.x) 템플릿** — `[ -f "50_tools/methodology.py" ]` 만 검사. 프로젝트는 v4.0(`60_tools/`)이라 항상 else 로 빠져 "검증 skip" → manifest-check·wrap --strict 안전망이 사실상 무력화 상태였음. (HANDOFF/TODO 의 "미설치, Human 1회 실행 대기" 프레이밍은 부정확했음 — 실제로는 stale 설치.) 조치: `hooks install --force` 로 4 프로젝트 재설치 → 현재 템플릿(3-tier 경로탐지 60→50→root + `METHODOLOGY_SHIP_IN_PROGRESS` ship-skip + METH-022 sync-commit 면제) 반영. 검증: 4개 모두 60_tools 인식·ship-skip·sync면제 포함 확인. 정본 repo 는 이미 최신. **worktree 메모 정정**: git 공용 `.git/hooks` 공유라 repo당 1회면 worktree 전부 커버 (기존 "worktree마다 별도 설치" 메모는 이 구성에선 부정확). 잔여(Human): ship/sensitive·test 차단 동작은 일상 사용 중 자연 검증.
+### METH-039
+- **title**: 적용 프로젝트(ICONS) 기획 craft 역주입 — 10/11/13/15 지침 §19 보강 + 기획 양식 템플릿 6종 신설
+- **notes**: Completed 2026-06-23. Class A (shared 자산 추가 — 다운스트림은 `sync --apply` 시 수령). 적용 프로젝트 ICONS의 기획 학습 코퍼스(사업/서비스기획 강의·실무·케이스) 정제본(`icons:40_dev/knowledge/` 6종)을 방법론으로 **역환류**. ① 지침 §19 "실무 craft 부록(현장 패턴·적용 프로젝트 환류)" 추가 — `10_사업기획서`(핵심가치 도출·검증 우선순위 게이트·KPI 단위경제 트리·분석틀·보고서 worked-example) · `11_서비스기획서`(ASIS→TOBE·12단계 산출물 체계·데이터 무결성·정책 ON/OFF·스토리보드 8요소·Admin) · `13_마케팅기획서`(Triple Media·4유발 퍼널·채널별·E.C.C.S) · `15_프로젝트_관리`(WBS·Kick-off·제안 5단계). ② `50_resources/templates/` 기획 양식 6종 신설 — requirements-spec·ia-spec·service-policy·user-story·kpi-tree·wbs. 모두 일반 craft(프로젝트 특화 제외)+출처 명시. 브랜치 `claude/inject-planning-craft-from-icons` → PR(대표 머지=승인 증빙). 머지 후 다운스트림(icons·ai-icons·cafe24·gamblescan) `sync --apply` 전파.
 
 ### METH-038
 - **title**: ship build/test 단계 npm 매니저 비호환 버그 픽스 (`npm build` → `npm run build`)

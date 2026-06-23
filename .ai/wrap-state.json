@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "209e973c80a8f4406bbe178abf95b5134bb6caed",
-  "last_validated_at": "2026-05-18T13:54:31Z",
+  "last_validated_commit": "ebe31e20f12decc728f99f0135fe786c3eea0e1e",
+  "last_validated_at": "2026-06-23T05:05:20Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "35fc1bdc05c7e9c524f8a18513037d0f3428bcf0d1448cb3320ad4b5a8ca3bcc"
+      "sha256": "0d2a9c151e3a2ed010ff722c1f45b7722b9c3c6c12730360a43aaf9c394fa41d"
     },
     "TODO.md": {
-      "sha256": "3bc07e96259d653bb0709a889e8e3df1afba3be56217e601ca7f8d5bf1f883b6"
+      "sha256": "1f53234ca4c93510f56832eac874000d1f0d5a0268be8dcd6e1332b974d9452f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "9af18614262460b3e99b40a92a84866ab15a142decd812af27a4965840404478"
+      "sha256": "fee65f5fb4811607122503f0beb5836070c63a21528f59e47d1fcc54a8069eea"
     }
   },
   "observations": {
@@ -38,6 +38,7 @@
       "50_resources/ai_observations/2026-05-18_meth-038-propagate-4-projects.md",
       "50_resources/ai_observations/2026-05-18_session-closeout-meth-036-038-018.md",
       "50_resources/ai_observations/2026-05-18_ship-npm-manager-run-fix.md",
+      "50_resources/ai_observations/2026-06-23_meth-039-planning-craft-injection.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
