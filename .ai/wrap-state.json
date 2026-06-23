@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "2c6e60c0c161d62d162add8e9552326c87723f6a",
-  "last_validated_at": "2026-06-23T06:56:53Z",
+  "last_validated_commit": "bbd3b3e93425c12b5d782d4a5563a358ec4339d9",
+  "last_validated_at": "2026-06-23T07:24:22Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "4de4ca8574dfe61742aedd102d0be7fe9cda3ccacdd803fac08f8ab9efc78333"
+      "sha256": "0ffc8d3ae987c3bfc3e4725773dc0146318d9e3677d2aeaf755498f82ca8f5b2"
     },
     "TODO.md": {
-      "sha256": "cbacfeb53b46eccd9500a3aa853b642c1381e806b0f25952abf670a961eeb558"
+      "sha256": "af896b1ea7fa2f1f99e161469862814c6c15369e65048c74ecd0081c0199542e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "16c2e1e4412dee38be09ddc5287edb19de3a35286f741b769cfe3b467e91727c"
+      "sha256": "2fc87213afd72319e7b5c005af6a3537b85f6f83b1a4b0e74f6c3e9ffdca4a6c"
     }
   },
   "observations": {
@@ -40,6 +40,7 @@
       "50_resources/ai_observations/2026-05-18_ship-npm-manager-run-fix.md",
       "50_resources/ai_observations/2026-06-23_live-files-cleanup-meth-039-merged.md",
       "50_resources/ai_observations/2026-06-23_meth-039-planning-craft-injection.md",
+      "50_resources/ai_observations/2026-06-23_meth-040-inject-planning-craft-from-gamblescan.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

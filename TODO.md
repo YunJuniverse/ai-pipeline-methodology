@@ -11,6 +11,10 @@
 
 ## InProgress
 
+### METH-040
+- **title**: 적용 프로젝트(GambleScan) 기획 craft 역주입 — 지침 10/11/12/13/14/15/18 §19 보강·신설 + 개발명세 템플릿 4종 신설
+- **notes**: 작업 완료, PR 대기(머지 전). Class A (shared 자산 — 다운스트림 `sync --apply` 수령). 적용 프로젝트 GambleScan의 실전 풀 기획 코퍼스(methodology-v1/planning·development·docs/planning·research)를 방법론으로 **역환류**(METH-039 ICONS 패턴의 GambleScan판). ① §19가 없던 **지침 12(운영)·14(브랜드) §19 신설** + **지침 18(마스터플랜) §18 신설** + 기존 §19 보강(10 사업·11 서비스·13 마케팅·15 PM). ② **개발명세 템플릿 4종 신설**(`50_resources/templates/`): data-model·user-flow·wireframe-spec·functional-spec — 기획↔빌드 사이 빈 층. 관통 주제: 다면(N-sided) 시장 기획 + 거버넌스/추적 craft. 모두 일반 craft(GambleScan 도메인 특화 제외)+출처 명시. 브랜치 `claude/inject-planning-craft-from-gamblescan` → PR(대표 머지=승인 증빙). 머지 후 다운스트림(icons·ai-icons·gamblescan, cafe24 경로 미확인) sync 전파.
+
 ## Blocked
 
 ## Done
