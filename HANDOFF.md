@@ -6,7 +6,7 @@
 
 - **Working on**: METH-043 icons-ip 경량 문서 craft 역주입 — PRD/ARCHITECTURE/CONTEXT 템플릿 + ADR 강화 + 경량 모드. **별도 브랜치** `claude/inject-lean-doc-craft-from-icons-ip`(main 기준, PR #31과 비충돌). PR 대기.
 - **Current mode**: fullstack
-- **Next TODO**: METH-043 PR. ⚠️ **병렬 PR 2개**: PR #31(METH-040/041/042, 브랜치 `…from-gamblescan`) + METH-043. 라이브 파일은 두 브랜치가 각각 수정 → 둘째 머지 시 HANDOFF/TODO/checkpoint 합류 필요(craft 파일은 비충돌). 머지 후 다운스트림 sync(METH-039~043 합산, cafe24 경로 미확인).
+- **Next TODO**: METH-043 PR. ⚠️ **병렬 PR 2개**: PR #31(METH-040/041/042, 브랜치 `…from-gamblescan`) + METH-043. 라이브 파일은 두 브랜치가 각각 수정 → 둘째 머지 시 HANDOFF/TODO/checkpoint 합류 필요(craft 파일은 비충돌). 머지 후: ① 다운스트림 sync(METH-039~043 합산, cafe24 경로 미확인) ② **METH-044**(모드별 템플릿 카탈로그 — TODO Backlog에 설계 확정, capstone).
 - **Blockers**: none
 
 ## Active Links

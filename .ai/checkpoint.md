@@ -54,6 +54,9 @@
   합류(rebase) 필요. 권장: PR #31 먼저 머지 → METH-043 rebase(라이브 파일만 수동 합류).
 - 머지 후 **다운스트림 sync**: METH-039~043 합산하여 icons·ai-icons·gamblescan `sync --apply`.
   cafe24 경로 미확인(`/Users/hayden/cafe24` repo 부재 — 사용자 확인).
+- **METH-044 (백로그 등록, 머지 후 capstone)**: 모드별 템플릿 선택 체계(`_CATALOG.md` + CLAUDE.md
+  Mode 확장 `[planning/dev/fullstack/agency/lean/ops]`). 설계 확정본은 TODO.md Backlog 참조.
+  #31/#32 머지 후 clean main에서 착수(25종 전체 참조 필요). 사용자 승인 완료(타이밍="머지 후").
 
 ## 다음 사람에게 (구체적 첫 행동)
 

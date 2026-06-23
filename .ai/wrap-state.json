@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "bbd3b3e93425c12b5d782d4a5563a358ec4339d9",
-  "last_validated_at": "2026-06-23T08:41:09Z",
+  "last_validated_commit": "52bdd2a36233a225be345b0cb179d6b1d40eb1ba",
+  "last_validated_at": "2026-06-23T09:02:05Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "7d4122bdddb59f91a0afa15b45038e83613e81a2e22c52ce2d08c79ea4225e5e"
+      "sha256": "635c1e78d50605e0525610d58916977491ce448c9163c6969c701691b0dd88b1"
     },
     "TODO.md": {
-      "sha256": "aeae1054351573f7a6c3860575b074fb3f048bd39615a4e7c12085c51f26e564"
+      "sha256": "53490d55e980ecae86a263567ff1dea06cf44aeb3553bb5e42479216a2c1a29d"
     },
     ".ai/checkpoint.md": {
-      "sha256": "23eb91e7e03f531e2cf470d40b05a94017c139843eef2f46ef13b2c7b9489475"
+      "sha256": "22772ce2e2b63cf319e0c060fcb920b4dbc151707377a7ce96bdf5c70f17f5fd"
     }
   },
   "observations": {
@@ -41,6 +41,7 @@
       "50_resources/ai_observations/2026-06-23_live-files-cleanup-meth-039-merged.md",
       "50_resources/ai_observations/2026-06-23_meth-039-planning-craft-injection.md",
       "50_resources/ai_observations/2026-06-23_meth-043-lean-doc-craft-from-icons-ip.md",
+      "50_resources/ai_observations/2026-06-23_meth-044-mode-template-catalog-design-backlog.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

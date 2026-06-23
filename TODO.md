@@ -7,6 +7,15 @@
 
 ## Backlog
 
+### METH-044
+- **title**: 모드별 템플릿 선택 체계 — `_CATALOG.md` + CLAUDE.md Mode 확장 (작업 용도에 따라 필요한 템플릿만)
+- **gate**: ⚠️ **PR #31(METH-040/041/042) + PR #32(METH-043) 머지 후 착수**. 카탈로그가 deliverable 템플릿 25종 전체를 참조하는데 16종이 #31, 3종이 #32에 있음 → clean main에서 작성해야 dangling 참조·브랜치 스택 회피. 이번 세션 역주입 작업들의 capstone.
+- **design (확정)**:
+  - **6개 모드 → 세트**: `planning`(기획전용: prd·requirements-spec·ia-spec·service-policy·user-story·kpi-tree·context-glossary·microcopy) · `dev`(개발전용: architecture·data-model·user-flow·wireframe-spec·functional-spec) · `fullstack`(planning∪dev+wbs) · `agency`(외주 SI 라이프사이클: proposal-go-nogo·research-collection-checklist·profitability-sheet·execution-plan·wbs·qa 3종·operation-spec·post-launch-monitoring·work-request-ticket·glossary + 기획/개발) · `lean`(경량: prd·architecture·context-glossary·ADR) · `ops`(운영: operation-spec·post-launch-monitoring·work-request-ticket·qa 3종).
+  - **메커니즘(비파괴적, flat 경로 유지)**: ① `50_resources/templates/_CATALOG.md` — 25종 한 줄 카탈로그(카테고리별) + 모드×템플릿 매트릭스 + 모드별 권장 세트. ② CLAUDE.md `Mode` 필드 확장 `[planning/dev/fullstack/agency/lean/ops]`(현재 fullstack/planning-only). ③ 지침 00 "작업 모드 → 카탈로그에서 필요한 템플릿만 로드" 원칙 1줄. ④ (선택·후속) CLI `methodology templates --mode <mode>` — methodology.py 작업이라 별도.
+  - **폴더 재구성 금지**: planning/·dev/ 하위 이동 시 METH-039~043 참조 flat 경로 전부 깨짐 → 카탈로그(매핑 문서)로 해결.
+- **acceptance**: `_CATALOG.md`에 25종 전부 분류·6모드 매트릭스 완비 + CLAUDE.md Mode 확장 + 지침 00 원칙 1줄. Class A. 머지 후 다운스트림 sync 합산.
+
 ## Ready
 
 ## InProgress
