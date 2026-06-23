@@ -1,4 +1,4 @@
-# Checkpoint — 2026-06-23 (METH-039 기획 craft 역주입: ICONS 학습 → 방법론)
+# Checkpoint — 2026-06-23 (METH-039 기획 craft 역주입: ICONS 학습 → 방법론, PR #30 머지 완료)
 
 > ✅ METH-039: 적용 프로젝트 ICONS의 기획 학습 코퍼스(사업/서비스기획 강의·실무·케이스)를
 > 정제한 `icons:40_dev/knowledge/` 6종을 방법론 업스트림으로 **역환류**.
@@ -10,8 +10,9 @@
 > ② `50_resources/templates/` 기획 양식 6종 신설(requirements-spec·ia-spec·service-policy·
 >   user-story·kpi-tree·wbs).
 > 모두 일반 craft만(프로젝트 특화 제외)+출처 명시. shared 자산이라 본 upstream 이 정본 →
-> 다운스트림(icons·ai-icons·cafe24·gamblescan)은 PR 머지 후 `sync --apply` 로 수령. Class A.
-> 브랜치 `claude/inject-planning-craft-from-icons`. **잔여(Human)**: PR 생성·대표 머지 → 4 프로젝트 sync.
+> 다운스트림(icons·ai-icons·gamblescan)은 `sync --apply` 로 수령. Class A.
+> **PR #30 머지 완료**(2026-06-23 05:25 UTC, main `2c6e60c`, `origin/main` 동기).
+> **잔여**: 다운스트림 `sync --apply` 전파(아직 미수행).
 
 ---
 
@@ -24,7 +25,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: main checkout (branch `claude/inject-planning-craft-from-icons`)
+- Worktree: main checkout (branch `main`, head `2c6e60c`)
 
 ## 부팅 계약
 
@@ -35,106 +36,63 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-038 ship npm 매니저 비호환 버그 픽스**:
+**라이브 파일 정리 (사용자: "라이브 파일 정리만")**:
 
-- 사용자: "talmocom 에서 발생한 오류야 확인해봐" → 진단 후 "지금 적용하고 pr까지 진행해".
-- 근본 원인: `60_tools/methodology.py` 의 `cmd_ship`
-  - `ship: 4/7 — test` → `subprocess.call([manager, "test"], ...)`
-  - `ship: 5/7 — build` → `subprocess.call([manager, "build"], ...)`
-  - manager 추정: `pnpm-lock.yaml` → pnpm, `yarn.lock` → yarn, 그 외 → **npm**.
-  - npm 은 `npm test`/`start`/`stop`/`restart` 만 내장 단축어. `npm build`
-    는 존재하지 않는 명령 → talmocom(npm 프로젝트, `scripts.build="next build"`)
-    에서 ship 빌드 단계 실패. test 는 우연히 npm 내장이라 통과해 증상이 build
-    에만 드러남. pnpm/yarn 사용 프로젝트는 bare→run alias 라 무증상이었음.
-- 수정 (2곳, `60_tools/methodology.py`):
-  - `:1482` `[manager, "test"]` → `[manager, "run", "test"]`
-  - `:1502` `[manager, "build"]` → `[manager, "run", "build"]`
-  - 근거: `npm/pnpm/yarn run <script>` 3-매니저 모두 정상. 최소 변경.
-- 검증: `python3 -m py_compile 60_tools/methodology.py` 통과. talmocom 실측
-  근거 확인 — `/Users/hayden/talmocom` 에 `package-lock.json` 단독,
-  `scripts={dev,build:"next build",start,typecheck,db:*}`.
-- 수정 위치 판단: 현재 디렉터리가 upstream(`ai-pipeline-methodology`) 정본.
-  `methodology.py` 는 `shared_paths` → `sync --apply` 가 다운스트림을 항상
-  덮어씀. 따라서 talmocom 로컬 수정은 sync 시 소실 — 정본만 수정이 정답.
-- 라이브 파일 갱신: TODO.md(METH-038 Done, 3건 유지), HANDOFF.md(Working
-  on/Next/Recent Changes, 5건으로 트림), 본 checkpoint, observe 로그.
-
-**4 프로젝트 sync 전파 (이어서, 사용자 "전파 진행해")**:
-
-- PR #27 머지 확인(origin/main `05c8bfa`) 후 upstream 정본
-  `/Users/hayden/methodology` 기준 dry-run → `--apply` 4 프로젝트.
-- 발견: 4개 모두 `HEAD==origin/main` 인데 METH-036/037 sync 가 `--apply`만
-  되고 미커밋 잔여(methodology.py·generate-dashboard.py·.gitignore·
-  .methodology-version). 위험 충돌 아닌 *이전 세션 미완 전파* 로 판정 →
-  명시 경로 add(`-A` 금지, MC-001)로 방법론 자산 4개만 커밋.
-- 비-방법론 제외: talmocom `next-env.d.ts`(stash→pop 원복),
-  gamblescan `_start/.cache/dashboard.html`(미스테이지 — METH-036 Human
-  `git rm --cached` 잔여).
-- push: icons 직접. talmocom/gamblescan/tshome 은 원격이 2커밋(타 세션
-  dev-spec/관찰/앱) 선행 → 우리 4파일과 무겹침 확인 후 `git rebase`
-  (force push 절대 안 함). tshome 은 미추적 `ts-service-plan.html` 가
-  origin/main 추적본과 바이트 동일 확인 → 백업 후 제거→rebase.
-- 결과: icons `02ce074`·talmocom `992776c`·gamblescan `7e23e9e`·
-  tshome `f6a229f`, 4개 픽스 2/2·origin/main 동기 검증 완료.
-
-**METH-018 pre-push hook 최신화 (이어서, 사용자 "진행해줘")**:
-
-- 사용자 "METH-018 hooks install 은 뭐하면 돼?" → 상태 점검 중 발견:
-  4 프로젝트 hook 이 "활성"이나 구버전(v3.x) 템플릿 — `[ -f
-  "50_tools/methodology.py" ]` 만 검사. v4.0(`60_tools/`)이라 항상
-  else "검증 skip" → manifest-check·wrap --strict 안전망 사실상 무력화.
-  TODO/HANDOFF 의 "미설치, Human 1회 대기" 프레이밍이 부정확했음.
-- 조치: `hooks install --force` 4 프로젝트 재설치 → 최신 템플릿
-  (3-tier 60→50→root + `METHODOLOGY_SHIP_IN_PROGRESS` ship-skip +
-  METH-022 sync-commit 면제) 반영. 4개 모두 검증 통과. 정본 repo 는
-  이미 최신. git 공용 `.git/hooks` 공유 → repo당 1회면 worktree 커버
-  ("worktree마다 별도" 메모 정정).
-- 안전망(매 push 시 manifest-check + wrap --strict, sync-commit 면제)
-  이 4 프로젝트에서 실제 동작 가능 상태로 복구됨.
+- 부팅 점검에서 발견: METH-039 PR #30 은 **이미 머지**(2026-06-23 05:25 UTC,
+  main `2c6e60c`, `origin/main` 0/0 동기, 워킹트리 clean) 됐는데, 라이브
+  파일들이 머지 *이전* 시점에 쓰여 어긋나 있었음 —
+  - HANDOFF "Working on: … PR 대기"
+  - checkpoint 헤더 "잔여(Human): PR 생성·대표 머지"
+  - checkpoint 본문 "방금 한 것"이 아직 METH-038 내용(헤더만 039)
+- 조치(라이브 파일만 갱신, 신규 작업 미착수):
+  - `HANDOFF.md` — Working on=없음(METH-039 머지 완료)/Next TODO=다운스트림
+    sync 잔여+S-021 후보/Recent Changes 최상단 "PR #30 머지 완료"로 갱신.
+  - `TODO.md` — METH-039 Done 항목 말미 "PR(대표 머지=승인 증빙)" →
+    "PR #30 머지 완료(…) + 잔여 다운스트림 sync" 로 정정.
+  - 본 `checkpoint.md` — 헤더 잔여 라인 정정 + 본문 전체를 현재 현실로 재작성.
+  - observation 로그 1건(docs).
+- 검증 근거: `gh pr view 30` → `MERGED`, `git rev-list --left-right --count
+  main...origin/main` → `0 0`. 다운스트림 미전파 확인:
+  `icons:50_resources/templates/` 에 METH-039 템플릿 6종 부재.
 
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **PR #27 머지·4 프로젝트 전파: 완료** (2026-05-18). icons `02ce074`,
-  talmocom `992776c`, gamblescan `7e23e9e`, tshome `f6a229f` — 전부
-  METH-038 픽스 2/2 라인 + `origin/main` 동기 검증. METH-036/037 미커밋
-  잔여도 같은 커밋에 동반 정상 전파됨.
-- **남은 검증**: talmocom 에서 실제 `ship -m "..."` 1회 — build 단계가
-  `npm run build` 로 정상 통과하는지 실측 (S-021 코드 sprint 빌드 검증 선결).
-  단, talmocom 은 PR #27 머지 후 hooks 미설치(METH-018 대기) 상태일 수 있음.
+- **METH-039 다운스트림 `sync --apply` 전파 (잔여, 미수행)** — 업스트림
+  정본 `/Users/hayden/methodology` 기준 dry-run → `--apply`:
+  - `icons`(✅ 존재, 템플릿 6종 **미수령** 확인), `ai-icons`(✅ 존재, 미확인),
+    `gamblescan`(✅ 존재, 미확인).
+  - `cafe24` 는 `/Users/hayden/cafe24` 에 repo 없음 — **경로/대상 여부 사용자
+    확인 필요** (이전 기록은 icons·ai-icons·cafe24·gamblescan 4개를 후보로 명시).
+  - 전파 시 규칙: `--dry-run` 선검토 → 명시 경로 add(MC-001, `-A` 금지) →
+    원격 선행분과 무겹침 확인 후 rebase(force push 금지) → 픽스 검증.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-> 이번 세션 작업(METH-036/037/038/018) **전부 종결·main 안착**. PR #27/#28
-> 머지·pull 완료, 브랜치 origin/main 동기(ahead 0). 활성 백로그 없음.
+> 이번 세션은 **라이브 파일 정리만** 수행(METH-039 머지 완료 반영). 코드/방법론
+> 자산 변경 없음. 활성 백로그 비움.
 
 1. **다음 작업 지시 대기** — 사용자 지시 없으면 신규 작업 시작 금지.
-   유력 후보: **S-021 코드 sprint** 착수 (이제 ship build 검증·hook
-   안전망 모두 정상이라 코드 작업 진입 선결조건 해소됨).
-2. (참고) 종결 검증 완료분: talmocom methodology.py 픽스 2/2·
-   `build:"next build"` (ship 실측 OK), gamblescan
-   `_start/.cache/dashboard.html` untracked, 4 프로젝트 hook v4.0.
-3. (참고/사용자 영역) tshome 미추적 `ts-admin-guide.html` 는 순수 로컬
-   (origin 무관). `ts-service-plan.html` 는 origin/main 추적본 정착
-   (백업 `/tmp/tshome-ts-service-plan.html.bak`, 내용 동일).
+2. 사용자가 "전파 진행" 지시 시 → 위 "다음 사람: 우선 처리 후보"의 다운스트림
+   sync 수행 (cafe24 경로부터 확인).
+3. 유력 신규 후보: **S-021 코드 sprint** (ship build 검증·hook 안전망 선결조건
+   해소 완료 상태).
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
-- 없음. 단일 진단 → 2-라인 픽스로 해소. 부트 시 dashboard CLI 호출은
-  본 세션에서 미실행(포커스된 핫픽스 작업) — 다음 세션 부팅 시 정상 절차 복귀.
+- 없음. 부팅 점검 → 라이브 파일 3종 + observe 갱신만. 부트 시 dashboard CLI
+  정상 호출(http://localhost:8767, branch main, commit `2c6e60c`).
 
 ## 미해결 결정사항 (Open Questions)
 
-- ship build/test 단계에 `scripts` 존재 여부는 검사하나, npm 외 매니저에서
-  스크립트명 충돌(예: 사용자 정의 `start`) 가능성은 현 범위 밖 — 필요 시 별도.
-- S-021 코드 sprint 진입 전 ship 의 test 단계 실측 검증(현재 build 만 talmocom
-  으로 간접 확인) — 코드 sprint 첫 ship 에서 자연 검증 예정.
+- METH-039 다운스트림 대상에 `cafe24` 포함 여부 — `/Users/hayden/cafe24` repo
+  부재. 경로가 다른지, 대상에서 제외인지 사용자 확인 필요.
+- S-021 코드 sprint 진입 시 ship 의 test 단계 실측(현재 build 만 talmocom 으로
+  간접 확인) — 코드 sprint 첫 ship 에서 자연 검증 예정.
 
 ## 환경 메모
 
-- 본 작업 worktree: `.claude/worktrees/romantic-fermi-62f41c`
-  (branch `claude/romantic-fermi-62f41c`). main head: 72e291a.
-- 변경 파일: `60_tools/methodology.py`(2-라인), `TODO.md`, `HANDOFF.md`,
-  `.ai/checkpoint.md`, 신규 observation 로그 1건.
-- talmocom: `/Users/hayden/talmocom`, npm(`package-lock.json`),
-  Next.js(`scripts.build="next build"`). 본 픽스의 직접 수혜 대상.
-- 70_meta 격리 안전망: 본 변경은 60_tools 정본 수정이라 무관 — 정상.
+- 본 작업 worktree: main checkout (branch `main`, head `2c6e60c`).
+- 변경 파일: `HANDOFF.md`, `TODO.md`, `.ai/checkpoint.md`, 신규 observation 로그 1건.
+  (코드·지침·템플릿 등 방법론 자산 변경 없음 — 라이브 파일 정리 한정.)
+- 업스트림 정본: `/Users/hayden/methodology`. 다운스트림: icons·ai-icons·gamblescan
+  (각 `/Users/hayden/<name>`), cafe24 경로 미확인.

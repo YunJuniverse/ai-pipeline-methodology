@@ -20,7 +20,7 @@
 
 ### METH-039
 - **title**: 적용 프로젝트(ICONS) 기획 craft 역주입 — 10/11/13/15 지침 §19 보강 + 기획 양식 템플릿 6종 신설
-- **notes**: Completed 2026-06-23. Class A (shared 자산 추가 — 다운스트림은 `sync --apply` 시 수령). 적용 프로젝트 ICONS의 기획 학습 코퍼스(사업/서비스기획 강의·실무·케이스) 정제본(`icons:40_dev/knowledge/` 6종)을 방법론으로 **역환류**. ① 지침 §19 "실무 craft 부록(현장 패턴·적용 프로젝트 환류)" 추가 — `10_사업기획서`(핵심가치 도출·검증 우선순위 게이트·KPI 단위경제 트리·분석틀·보고서 worked-example) · `11_서비스기획서`(ASIS→TOBE·12단계 산출물 체계·데이터 무결성·정책 ON/OFF·스토리보드 8요소·Admin) · `13_마케팅기획서`(Triple Media·4유발 퍼널·채널별·E.C.C.S) · `15_프로젝트_관리`(WBS·Kick-off·제안 5단계). ② `50_resources/templates/` 기획 양식 6종 신설 — requirements-spec·ia-spec·service-policy·user-story·kpi-tree·wbs. 모두 일반 craft(프로젝트 특화 제외)+출처 명시. 브랜치 `claude/inject-planning-craft-from-icons` → PR(대표 머지=승인 증빙). 머지 후 다운스트림(icons·ai-icons·cafe24·gamblescan) `sync --apply` 전파.
+- **notes**: Completed 2026-06-23. Class A (shared 자산 추가 — 다운스트림은 `sync --apply` 시 수령). 적용 프로젝트 ICONS의 기획 학습 코퍼스(사업/서비스기획 강의·실무·케이스) 정제본(`icons:40_dev/knowledge/` 6종)을 방법론으로 **역환류**. ① 지침 §19 "실무 craft 부록(현장 패턴·적용 프로젝트 환류)" 추가 — `10_사업기획서`(핵심가치 도출·검증 우선순위 게이트·KPI 단위경제 트리·분석틀·보고서 worked-example) · `11_서비스기획서`(ASIS→TOBE·12단계 산출물 체계·데이터 무결성·정책 ON/OFF·스토리보드 8요소·Admin) · `13_마케팅기획서`(Triple Media·4유발 퍼널·채널별·E.C.C.S) · `15_프로젝트_관리`(WBS·Kick-off·제안 5단계). ② `50_resources/templates/` 기획 양식 6종 신설 — requirements-spec·ia-spec·service-policy·user-story·kpi-tree·wbs. 모두 일반 craft(프로젝트 특화 제외)+출처 명시. **PR #30 머지 완료**(2026-06-23 05:25 UTC, 대표 머지=승인 증빙, main `2c6e60c`, `origin/main` 동기). **잔여**: 다운스트림 `sync --apply` 전파 — icons·ai-icons·gamblescan(템플릿 6종 미수령 확인됨), cafe24 경로 미확인.
 
 ### METH-038
 - **title**: ship build/test 단계 npm 매니저 비호환 버그 픽스 (`npm build` → `npm run build`)
