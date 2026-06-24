@@ -1,10 +1,10 @@
-# Checkpoint — 2026-06-24 (METH-046 sync mirror-delete 버그 픽스)
+# Checkpoint — 2026-06-24 (METH-047 클린아키텍처·클린코드 개발 규칙 — 지침 19 신설)
 
-> ✅ METH-046: `60_tools/methodology.py`의 `sync`가 shared 디렉터리를 mirror 하면서
-> *상류(방법론 정본)에 없는 다운스트림 고유 파일*을 조용히 삭제하던 데이터 손실 버그 픽스.
-> (METH-039~044 다운스트림 sync 중 ai-icons 고유 지침 `20_guides/04_문서보관규칙`이 지워질
-> 뻔해 수동 복원했던 그 문제 — 후속 chip `task_b0c3337e`.) 수정: prune을 `--prune` opt-in으로,
-> 기본은 보존 + 경고. Class A.
+> ✅ METH-047: 적용 프로젝트 GambleScan의 Clean Code/Architecture 리팩토링(REFACTOR-CLEAN,
+> R0~R4 ~50 PR)의 회고+신설 가이드를 방법론으로 역환류. 핵심 통찰: 백서/지침 17 §4.2
+> **Guardrails-by-Construction**(원래 AI 안전용)이 *코드 품질*에도 유효 — "첫날부터 4 가드레일이
+> `error`였다면 부채가 안 쌓인다". `20_guides/19_클린아키텍처_클린코드_개발규칙.md` 신설 +
+> README 카탈로그/v4 + CLAUDE/AGENTS §7 포인터. fullstack/dev 트랙. Class A.
 
 ---
 
@@ -17,7 +17,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-046-sync-no-mirror-delete` (main 기준)
+- Worktree: branch `claude/meth-047-clean-architecture-guide` (main 기준)
 
 ## 부팅 계약
 
@@ -28,47 +28,50 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-046 sync mirror-delete 픽스** (사용자: "sync mirror-delete 수정 칩 지금 이어서 고쳐"):
+**METH-047 클린아키텍처·클린코드 지침 19 신설** (사용자: "갬블스캔에서 클린코드/클린아키텍처
+리팩토링 했어 → 확인 → 역주입해"):
 
-- 근본 원인: `cmd_sync`(`methodology.py`) line ~1215 `copy_path(..., prune=src.is_dir())` —
-  shared *디렉터리*를 무조건 mirror → `copy_path`의 prune 블록이 *dst 에 있으나 src 에 없는*
-  파일(다운스트림 고유)을 `dp.unlink()` 로 삭제. `_excluded_from_copy`(캐시/생성물)만 빠지고
-  적용 프로젝트 고유 지침/문서는 보호 안 됨.
-- 수정:
-  1. `copy_path` 에 `prune_report: list[Path] | None` 추가 — prune 후보를 *보고만* 수집,
-     prune=False 면 삭제 안 함. prune 블록에 `skip` 체크도 추가(일관성).
-  2. `cmd_sync` shared_paths 루프: prune 을 `--prune` opt-in 으로(`do_prune and src.is_dir()`).
-     기본(미지정): 상류에 없는 고유 파일을 "보존: …삭제 안 함 (정리하려면 --prune)" 경고로 표시.
-     `--prune`: "would delete/deleted … (상류에 없음 — prune)" 으로 삭제 목록 표시.
-  3. sync 서브파서에 `--prune` 플래그 신설. worktree 서브sync Namespace 에 `prune=do_prune` 전파.
-- 검증: `py_compile` 통과. ai-icons dry-run — 기본=`20_guides/04_*` "보존"(삭제 안 함),
-  `--prune`=`would delete`. init 은 이미 `copy_path(dry_run=False)`(prune 기본 False)라 무영향.
-- 잔여(경미·별개): CLAUDE/AGENTS `merge_managed` 가 관리블록 *안에* 다운스트림이 추가한 라인을
-  제거하는 건 본 픽스 범위 밖(파일 삭제가 아닌 1라인). 필요 시 후속 — 관리블록은 본래 상류 소유.
+- 출처: GambleScan `docs/snapshots/2026-06-24-refactor-clean-retrospective.md` +
+  `20_guides/19_*`(GambleScan이 자체 신설). REFACTOR-CLEAN = R0(토대·가드레일)~R4(안전망),
+  ~50 PR(#53~#112). 결과: lint 0/0, 4 ESLint 가드레일 전부 `error`, 도메인 순수로직 100% 테스트,
+  god파일 15→0, 레이어위반 75→0, any 206→0. (eslint.config 실제 `error` 확인.)
+- 작성(일반 craft만·GambleScan 도박/카지노 도메인 특화 제외·출처 명시):
+  - `20_guides/19_클린아키텍처_클린코드_개발규칙.md` 신설(11절): Guardrails-by-Construction(코드
+    품질)·4-레이어 의존성 규칙·**4 코드 가드레일(레이어경계·no-explicit-any·no-console·
+    max-lines=400)**·래칫 원리·타입 정직성(any=버그은폐)·god파일 분할 패턴·네이밍·테스트·day-1
+    체크리스트·안티패턴.
+  - 교차참조 검증: 지침 17 §4.2 Guardrails-by-Construction *실재 확인*(line 136). CLAUDE.md §7
+    Code And Review Rules ↔ 지침 19(강제 메커니즘) 양방향 포인터.
+  - `20_guides/README.md` §3.5 카탈로그 + §6 현황 + §9 변경이력 v4 등재.
+  - `CLAUDE.md`·`AGENTS.md` §7 에 지침 19 포인터 1줄.
+- 검증 예정: wrap 4/4 → ship → PR.
 
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **PR #34(METH-045 백서) 머지 완료**(main `7ed86f1`). **METH-046 PR(#35, 본 sync 픽스)** 은
-  #34 머지로 라이브 파일 충돌 → 본 브랜치에 `git merge origin/main` 으로 해소(코드 파일 비충돌·
-  py_compile 통과). **다음**: 사용자가 PR #35 머지 → 이번 세션(METH-039~046) 완전 종결.
-- 다운스트림은 이미 sync 완료. METH-046 픽스는 본 저장소 코드라 다음 다운스트림 sync 때 자연 수령.
+- **METH-047 PR 머지**(사용자 승인 게이트).
+- 머지 후 **다운스트림 sync** — 지침 19가 shared(`20_guides`)라 전파됨. CLAUDE/AGENTS §7 포인터는
+  managed-merge(다운스트림 고유 §7 내용 보존되는지 확인). sync 는 METH-046 픽스로 이제 고유 파일
+  보존 — 안전. cafe24 제외.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
 1. 사용자 지시 대기.
-2. PR #35(METH-046) 머지되면 이번 세션 완전 종결.
+2. METH-047 PR 머지되면 → 다운스트림 sync(지침 19 전파).
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
-- 없음. 단일 진단(prune=src.is_dir() mirror) → copy_path/cmd_sync 2곳 + 플래그 1개 픽스.
+- 없음. GambleScan 가이드가 이미 잘 일반화돼 있어, 방법론 파일로 교차참조 정렬 + 도메인 예시만
+  일반화(예: supabase→`<db>`)하면 됐다.
 
 ## 미해결 결정사항 (Open Questions)
 
-- CLAUDE/AGENTS 관리블록 내 다운스트림 추가 라인 보존 여부(설계상 관리블록=상류 소유 → 현 동작이
-  "맞음"이나 사용자엔 의외). 정책 결정 필요 시 ADR.
+- 지침 19 의 max-lines=400·4-레이어는 *fullstack/dev 트랙* 기본값 — 스택/규모에 따라 ADR 로 조정
+  가능(가이드에 명시). planning-only 트랙 비적용.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-046-sync-no-mirror-delete` (main 기준).
-- 변경: `60_tools/methodology.py`(copy_path·cmd_sync·sync 서브파서·worktree sub_args) + 라이브 4종.
-- 검증 대상: ai-icons(고유 `20_guides/04` 보유) — dry-run 으로만 확인(비파괴).
+- 브랜치: `claude/meth-047-clean-architecture-guide` (main 기준).
+- 변경: 신규 `20_guides/19_클린아키텍처_클린코드_개발규칙.md` + README + `CLAUDE.md`·`AGENTS.md` §7
+  포인터 + 라이브 4종.
+- 출처 프로젝트: GambleScan `/Users/hayden/gamblescan` (REFACTOR-CLEAN 회고 브랜치
+  `docs/refactor-clean-retro-and-methodology`).

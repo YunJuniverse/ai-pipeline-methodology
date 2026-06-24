@@ -175,6 +175,8 @@ Restrictions:
 
 ## 7. Code And Review Rules
 
+> fullstack/dev 트랙은 아래 규칙을 *린트 가드레일로 fail-closed 강제*한다 — 메커니즘·레이어 의존성 규칙·god파일 분할 패턴은 `20_guides/19_클린아키텍처_클린코드_개발규칙.md` 참조.
+
 ### Naming
 
 - files: plural nouns where appropriate (`users.ts`, `orders.ts`)
