@@ -9,7 +9,7 @@
 
 - **Project Name**: [PROJECT_NAME]
 - **Objective**: [one-line goal]
-- **Mode**: [fullstack / planning-only]
+- **Mode**: [planning / dev / fullstack / agency / lean / ops]  <!-- 모드별 권장 템플릿 세트는 50_resources/templates/_CATALOG.md 참조 — 필요한 템플릿만 로드 -->
 - **Stack**: [confirmed stack]
 - **Primary Approver**: [name or role]
 - **Started On**: [YYYY-MM-DD]
