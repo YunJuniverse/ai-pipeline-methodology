@@ -943,10 +943,15 @@ def copy_path(
     *,
     prune: bool = False,
     skip: Callable[[Path], bool] | None = None,
+    prune_report: list[Path] | None = None,
 ) -> int:
     """src → dst 재귀 복사. prune=True면 src에 없는 파일을 dst에서 제거.
 
     skip(rel) 이 True를 반환하는 파일(rel은 src 기준 상대 경로)은 복사·prune 모두에서 제외.
+
+    prune_report 가 주어지면, *상류(src)에 없는* dst 파일(= prune 후보)의 상대 경로를 거기에
+    append 한다. prune=False 여도 후보는 수집만 하고 삭제하지 않는다 — 다운스트림 고유 파일을
+    조용히 지우지 않고 호출자가 경고·결정하게 하기 위함(METH-046).
 
     반환: 변경된 파일 수 (생성/덮어쓰기/삭제 모두 포함)
     """
@@ -978,7 +983,8 @@ def copy_path(
                 dp.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(sp, dp)
 
-    if prune and dst.is_dir():
+    # prune 후보 = dst 에 있으나 src(상류)에 없는 파일. prune=True면 삭제, 아니면 보존(보고만).
+    if dst.is_dir() and (prune or prune_report is not None):
         src_files = {
             sp.relative_to(src)
             for sp in src.rglob("*")
@@ -990,10 +996,15 @@ def copy_path(
             rel = dp.relative_to(dst)
             if _excluded_from_copy(rel):
                 continue  # 캐시/생성물은 방법론이 관리 안 함 — prune 대상 제외
+            if skip and skip(rel):
+                continue  # init-path-exclude 대상도 prune 제외
             if rel not in src_files:
-                changes += 1
-                if not dry_run:
-                    dp.unlink()
+                if prune_report is not None:
+                    prune_report.append(rel)
+                if prune:
+                    changes += 1
+                    if not dry_run:
+                        dp.unlink()
     return changes
 
 
@@ -1205,18 +1216,39 @@ def cmd_sync(args: argparse.Namespace) -> int:
         info(f"migrate   {f} → {t}  ({p.name})")
         run_migration(target, p, dry_run=dry)
 
-    # 2) shared_paths: 항상 덮어쓰기
+    # 2) shared_paths: 항상 덮어쓰기.
+    #    단, 상류에 없는 다운스트림 고유 파일은 *기본 보존* — `--prune` 명시 시에만 삭제(METH-046).
+    #    (예전엔 shared 디렉터리를 무조건 mirror 해서 적용 프로젝트의 고유 지침/문서가 조용히 삭제됐다.)
     total_changes = 0
+    do_prune = getattr(args, "prune", False)
+    preserved: list[str] = []
     for rel in MANIFEST["shared_paths"]:
         src = METHODOLOGY_ROOT / rel
         dst = target / rel
         if not src.exists():
             continue
-        n = copy_path(src, dst, dry_run=dry, prune=src.is_dir())
+        report: list[Path] = [] if src.is_dir() else None
+        n = copy_path(
+            src, dst, dry_run=dry,
+            prune=(do_prune and src.is_dir()),
+            prune_report=report,
+        )
         if n:
             total_changes += n
             tag = "would update" if dry else "updated"
             ok(f"shared    {tag:13s} {rel}  ({n} files)")
+        for r in report or []:
+            line = f"{rel}/{r.as_posix()}"
+            if do_prune:
+                warn(f"shared    {'would delete' if dry else 'deleted':13s} {line}  (상류에 없음 — prune)")
+            else:
+                preserved.append(line)
+    if preserved:
+        warn(f"보존: 상류에 없는 다운스트림 고유 파일 {len(preserved)}개 — 삭제 안 함 (정리하려면 --prune):")
+        for line in preserved[:15]:
+            warn(f"  {line}")
+        if len(preserved) > 15:
+            warn(f"  ... 외 {len(preserved) - 15}개")
 
     # 3) managed_files: 마커 머지
     for rel in MANIFEST["managed_files"]:
@@ -1287,6 +1319,7 @@ def cmd_sync(args: argparse.Namespace) -> int:
                     include_worktrees=False,
                     main_only=True,
                     force_worktree_migration=force_wt_migration,
+                    prune=do_prune,
                 )
                 cmd_sync(sub_args)
                 synced += 1
@@ -2620,6 +2653,12 @@ def main(argv: list[str] | None = None) -> int:
         dest="force_worktree_migration",
         action="store_true",
         help="안전 가드 무시 — stale worktree 에도 구조 마이그레이션 강제 (권장 안 함)",
+    )
+    ps.add_argument(
+        "--prune",
+        action="store_true",
+        help="shared 디렉터리에서 상류에 없는 다운스트림 고유 파일을 삭제 (기본: 보존). "
+        "삭제 대상은 적용 전 목록으로 표시됨.",
     )
     ps.set_defaults(func=cmd_sync)
 
