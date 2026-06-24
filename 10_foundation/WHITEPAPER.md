@@ -1,9 +1,9 @@
 ---
 doc_id: whitepaper
 title: 방법론 백서 — Methodology Whitepaper
-version: v0.2.0
+version: v0.3.0
 status: draft
-last_updated: 2026-05-07
+last_updated: 2026-06-24
 ai_relevance: foundational
 supersedes: none
 ---
@@ -283,6 +283,15 @@ supersedes: none
 - "강화학습", "자율", "유기적", "지능형" 등 *과장된 단어*를 시스템 컴포넌트 이름에 쓰지 않는다.
 - 제안은 "제안"이라고 부른다. 추론은 "추론"이라고 부른다. 자동 적용이 없는 것을 자동이라고 부르지 않는다.
 
+### 8-5. Guardrails-by-Construction (가드레일 우선)
+
+품질·안전 규율은 *사후 정리*가 아니라 *발생 방지*로 강제한다 — 위반을 커밋/머지 단계에서 fail-closed로 막으면 부채가 애초에 안 쌓인다.
+
+- **강제 위치**: 프롬프트·리뷰 구두 지적이 아니라 *시스템*(린트·CI·pre-push 게이트). 프롬프트 한 줄로 끌 수 없다.
+- **장애 모드**: fail-closed(`error` → 차단)가 기본. fail-open(`warn` 방치) 금지.
+- **래칫 도입**: day-1 `warn` 베이스라인 → 0 수렴 → `error` 승격(역행 불가).
+- **두 영역에 동일 적용**: *AI 안전* 가드레일(지침 17 §4.2)과 *코드 품질* 가드레일(지침 19) 모두 같은 원리. 규칙 우회는 ADR 근거 필요.
+
 ---
 
 ## 9. 리스크와 한계 (정직 모드)
@@ -423,6 +432,7 @@ CI에서 본 검증이 실패하면 **반드시** 배포 차단 — 실패는 �
 | `TODO.md` (root) | 활성 백로그 | 운영 산출물. 백서 원칙에 따라 작성. |
 | `10_foundation/{HOW_TO_APPLY,KICKOFF_PROMPT,DIAGRAM}.md` | 온보딩 자료 | 백서 §3-G1 구체화. |
 | `20_guides/*` | 도메인별 작성 지침 | 백서 §3 목표를 도메인별로 구체화. |
+| `20_guides/19_클린아키텍처_클린코드_*` | 코드 품질 가드레일 | 백서 §8-5 Guardrails-by-Construction을 *코드 품질*에 인스턴스화(fullstack/dev). |
 | `50_resources/catalog/*` | L2 Catalog | 백서 §5 활성 자산. |
 | `50_resources/skeletons/*` | L2 Skeleton | 백서 §5 활성 자산. |
 | `50_resources/ai_observations/*` | L1 Raw 데이터 | 백서 §5 관찰 로그. |
