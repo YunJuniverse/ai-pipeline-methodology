@@ -78,13 +78,13 @@ cd ~/Projects/my-project
 
 ## 5. Session Rhythm
 
-### Fullstack
+> **Day-1 코드 가드레일**: 프로젝트 첫 설정 시 `20_guides/19_클린아키텍처_클린코드_개발규칙.md` §9 체크리스트로 4-레이어 + 4 린트 가드레일(레이어경계·`no-explicit-any`·`no-console`·`max-lines=400`)을 `warn` 베이스라인으로 깐다 → 0 수렴 후 `error` 승격(래칫). 코드 품질은 *린트가 fail-closed로 강제*.
 
 1. 인간이 TODO와 acceptance criteria를 적는다.
 2. AI는 `CLAUDE.md`와 `HANDOFF.md`를 읽는다.
 3. 필요한 코드, 테스트, ADR만 추가 로드한다.
 4. Change Class를 판별한다.
-5. 구현하고 PR을 연다.
+5. 지침 19 규칙(4-레이어·타입 정직성·파일 크기·테스트)을 지켜 구현하고, lint·typecheck·build·test 게이트 통과 후 PR을 연다.
 6. 인간이 리뷰하고 merge한다.
 7. AI가 `HANDOFF.md`와 `TODO.md`를 갱신한다.
 

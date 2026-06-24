@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "626b48af5b34fce71685caa87fde38366e11fea4",
-  "last_validated_at": "2026-06-24T05:27:54Z",
+  "last_validated_commit": "e256433c0616934f246a90a4baa6b2c1f9ccec48",
+  "last_validated_at": "2026-06-24T05:45:50Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "52cac9bee2d3b8dfdd70d311de33bdb3e7678cd24a1ea90edf3bdf7cf776bec3"
+      "sha256": "d8510b33d8f6f7e8b16980bc72f231bda70c03f0f13596b2842151734a9ffa51"
     },
     "TODO.md": {
-      "sha256": "f966651d718fb2ce1ce15612b14f6cf6850657131d95b72c2e3bdf5b1c80fe1e"
+      "sha256": "00dfdbc16553115fc3df3852f1daae6d8cc09f963b64898381533ab2d858441d"
     },
     ".ai/checkpoint.md": {
-      "sha256": "0b41628a6d9e0aa4c7f4edbe188edbcd508dad3801d951238f90dc516ce97ad4"
+      "sha256": "0a717706b4b3fb5c19efe185e559254f6fe9200ad49cf3d581b48b22ed5062f7"
     }
   },
   "observations": {
@@ -49,6 +49,7 @@
       "50_resources/ai_observations/2026-06-24_meth-045-whitepaper-guide-notion.md",
       "50_resources/ai_observations/2026-06-24_meth-046-sync-no-mirror-delete.md",
       "50_resources/ai_observations/2026-06-24_meth-047-clean-architecture-clean-code-guide.md",
+      "50_resources/ai_observations/2026-06-24_meth-048-whitepaper-onboarding-codequality-integration.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
