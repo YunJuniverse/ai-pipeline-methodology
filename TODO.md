@@ -11,9 +11,9 @@
 
 ## InProgress
 
-### METH-044
-- **title**: 모드별 템플릿 선택 체계 — `_CATALOG.md` + CLAUDE.md/AGENTS.md Mode 확장 + 지침 00 §11.8
-- **notes**: 작업 완료, **PR 대기**(브랜치 `claude/meth-044-template-mode-catalog`, main 기준). Class A. 템플릿이 25종+로 늘어 "작업 용도에 따라 필요한 템플릿만" 선택하는 체계 신설(사용자 제안). ① `50_resources/templates/_CATALOG.md` 신설 — 25종 카테고리별 카탈로그 + **6모드(planning/dev/fullstack/agency/lean/ops) × 템플릿 매트릭스** + 모드별 권장 세트. ② CLAUDE.md·AGENTS.md `Mode` 필드 확장(`fullstack/planning-only` → 6모드). ③ 지침 00 §11.8(작업 모드별 템플릿 선택, 카탈로그 정본). **폴더 재구성 안 함**(flat 경로 유지 — 기존 참조 보존). (선택·후속) CLI `methodology templates --mode <mode>`는 별도. 머지 후 다운스트림 sync(METH-039~044 합산).
+### METH-046
+- **title**: sync mirror-delete 버그 픽스 — 다운스트림 고유 파일 보존 (`--prune` opt-in)
+- **notes**: 작업 완료, **PR 대기**(브랜치 `claude/meth-046-sync-no-mirror-delete`, main 기준). Class A. 발견: 다운스트림 sync 중 `methodology.py`의 `copy_path(prune=src.is_dir())`가 shared 디렉터리를 mirror 해, *상류에 없는 다운스트림 고유 파일*(ai-icons `20_guides/04_문서보관규칙`)을 조용히 삭제. 수정: ① `copy_path`에 `prune_report` 추가 — prune 후보를 *보고만* 하고 기본은 삭제 안 함. ② `cmd_sync`에서 prune을 `--prune` opt-in으로(기본 보존), 상류에 없는 고유 파일은 "보존" 경고로 표시, `--prune` 시 삭제 목록 표시. ③ sync `--prune` 플래그 신설 + worktree 서브sync에 전파. 검증: ai-icons dry-run — 기본=guide 04 "보존", `--prune`=`would delete` 표시. init은 이미 prune=False라 무영향. py_compile 통과. (잔여: CLAUDE/AGENTS managed-merge가 관리블록 내 다운스트림 추가 라인 제거하는 건 별개·경미 — 후속 여지.)
 
 ## Blocked
 
@@ -22,13 +22,13 @@
 > 최근 완료 3건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
+### METH-045
+- **notes**: Completed 2026-06-24 (작업), **PR #34 대기**. Class A. 방법론 백서 겸 가이드 — 레포 `10_foundation/방법론_백서_가이드.md`(11섹션) + Notion In-spire 하위 페이지 업로드. 기존 WHITEPAPER.md(메타 헌법)와 상보, 콘텐츠(craft·템플릿·모드)까지 포함한 현행 종합본.
+
+### METH-044
+- **notes**: Completed 2026-06-24. **PR #33 머지 완료**(main `6d3d4e8`). Class A. 모드별 템플릿 선택 체계 — `_CATALOG.md`(25종 + 6모드 매트릭스) + CLAUDE/AGENTS Mode 확장 + 지침 00 §11.8. **다운스트림 sync 완료**(icons·gamblescan·ai-icons, cafe24 제외).
+
 ### METH-043
-- **notes**: Completed 2026-06-24. **PR #32 머지 완료**(main `ca6fc57`). Class A. icons-ip(방법론 미적용 lean) PRD 작성 craft 중 순수 doc craft 7종 채택. 신규 템플릿 3종(`prd`·`architecture`·`context-glossary`) + `ADR-template` 강화(결정문장·Considered Options·되돌리기 비용) + `requirements-spec`(M/S+Pn) + 지침 00 §11.5~11.7. GitHub-Issues 트래커는 제외(file-based 설계 충돌).
+- **notes**: Completed 2026-06-24. **PR #32 머지 완료**(main `ca6fc57`). Class A. icons-ip 경량 문서 craft 7종 — 신규 템플릿 3종(prd·architecture·context-glossary) + ADR 강화 + requirements(M/S+Pn) + 지침 00 §11.5~11.7.
 
-### METH-042
-- **notes**: Completed 2026-06-24. **PR #32 머지 완료**(원래 PR #31 묶음이었으나 #31이 040까지만 머지돼 #32로 재통합). Class A. ICONS 학습 *원본*(다운로드 510종) 직접 정독 → 정제본이 흘린 craft 회수. **신규 템플릿 12종**(제안·검수·운영·수익관리) + 지침 10/11/13/15 §19 대량 보강 + 16 §15 신설.
-
-### METH-041
-- **notes**: Completed 2026-06-24. **PR #32 머지 완료**(원래 PR #31 묶음, #32로 재통합). Class A. METH-039 압축 시 "이름만 남고 본문 증발"한 체크리스트 6건 복원(지침 10/11/15: 협업·커뮤니케이션·Exec Summary 8칸·서비스정의 3종·UIUX 7루브릭·WBS 3계층·제안서 3 Style·품질검토 8항목).
-
-<!-- Archived: METH-001~040 (2026-05~06-23). 특히 METH-039(PR #30)·040(PR #31 부분머지)는 머지 완료. 상세는 git log --grep="METH-" 및 PR #5~#32, 40_dev/snapshots/ 참조. CLAUDE.md 파일역할: Done 은 최근 ~3건만. -->
+<!-- Archived: METH-001~042 (2026-05~06). 상세는 git log --grep="METH-" 및 PR #5~#33, 40_dev/snapshots/ 참조. CLAUDE.md 파일역할: Done 은 최근 ~3건만. -->
