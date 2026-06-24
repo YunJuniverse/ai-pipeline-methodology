@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "6d3d4e8c02a614ef4ef5684b1b5ad7d077ac83e2",
-  "last_validated_at": "2026-06-24T01:20:54Z",
+  "last_validated_commit": "626b48af5b34fce71685caa87fde38366e11fea4",
+  "last_validated_at": "2026-06-24T05:27:54Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "ed74bd2c6bfa9f8da7ee27d691bda46c91474760d52d7206646a57c1c82493e3"
+      "sha256": "52cac9bee2d3b8dfdd70d311de33bdb3e7678cd24a1ea90edf3bdf7cf776bec3"
     },
     "TODO.md": {
-      "sha256": "b0734539d4086e1cf96da9caee958b65e3a5186a2b4cf57d22d6a1c5a4347888"
+      "sha256": "f966651d718fb2ce1ce15612b14f6cf6850657131d95b72c2e3bdf5b1c80fe1e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "eb39a68dc079ce9dee53861fb7983da7086aa1a0f227460bc4fa13958fed914b"
+      "sha256": "0b41628a6d9e0aa4c7f4edbe188edbcd508dad3801d951238f90dc516ce97ad4"
     }
   },
   "observations": {
@@ -47,6 +47,8 @@
       "50_resources/ai_observations/2026-06-23_meth-044-mode-template-catalog-design-backlog.md",
       "50_resources/ai_observations/2026-06-24_meth-044-template-mode-catalog.md",
       "50_resources/ai_observations/2026-06-24_meth-045-whitepaper-guide-notion.md",
+      "50_resources/ai_observations/2026-06-24_meth-046-sync-no-mirror-delete.md",
+      "50_resources/ai_observations/2026-06-24_meth-047-clean-architecture-clean-code-guide.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

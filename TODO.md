@@ -11,9 +11,9 @@
 
 ## InProgress
 
-### METH-046
-- **title**: sync mirror-delete 버그 픽스 — 다운스트림 고유 파일 보존 (`--prune` opt-in)
-- **notes**: 작업 완료, **PR #35 대기**(브랜치 `claude/meth-046-sync-no-mirror-delete`, main 기준). Class A. 발견: 다운스트림 sync 중 `methodology.py`의 `copy_path(prune=src.is_dir())`가 shared 디렉터리를 mirror 해, *상류에 없는 다운스트림 고유 파일*(ai-icons `20_guides/04_문서보관규칙`)을 조용히 삭제. 수정: ① `copy_path`에 `prune_report` 추가 — prune 후보를 *보고만* 하고 기본은 삭제 안 함. ② `cmd_sync`에서 prune을 `--prune` opt-in으로(기본 보존), 상류에 없는 고유 파일은 "보존" 경고로 표시, `--prune` 시 삭제 목록 표시. ③ sync `--prune` 플래그 신설 + worktree 서브sync에 전파. 검증: ai-icons dry-run — 기본=guide 04 "보존", `--prune`=`would delete`. init은 prune=False라 무영향. py_compile 통과.
+### METH-047
+- **title**: 클린아키텍처·클린코드 개발 규칙 — 지침 19 신설 (GambleScan REFACTOR-CLEAN 역주입)
+- **notes**: 작업 완료, **PR 대기**(브랜치 `claude/meth-047-clean-architecture-guide`, main 기준). Class A. 적용 프로젝트 GambleScan이 Robert C. Martin Clean Code/Architecture를 실용 적용한 REFACTOR-CLEAN(R0~R4, ~50 PR)의 회고+신설 가이드를 방법론으로 역환류. 핵심 통찰: 백서/지침 17 §4.2 **Guardrails-by-Construction**(원래 AI 안전용)이 *코드 품질*에도 유효 — "첫날부터 4 가드레일이 error였다면 부채가 안 쌓인다". ① `20_guides/19_클린아키텍처_클린코드_개발규칙.md` 신설(일반 craft만·도메인 특화 제외·출처 명시): 4-레이어 의존성 규칙·**4 코드 가드레일(레이어경계·no-explicit-any·no-console·max-lines=400)**·래칫 원리(warn→0→error)·god파일 분할 패턴·day-1 체크리스트·`any`는 버그은폐 교훈. ② README 카탈로그/현황/변경이력(v4) 등재. ③ CLAUDE.md·AGENTS.md §7에 guide 19 포인터. fullstack/dev 트랙용(planning-only 비적용). 머지 후 다운스트림 sync → 전 프로젝트가 day-1부터 적용.
 
 ## Blocked
 
@@ -28,7 +28,7 @@
 ### METH-044
 - **notes**: Completed 2026-06-24. **PR #33 머지 완료**(main `6d3d4e8`). Class A. 모드별 템플릿 선택 체계 — `_CATALOG.md`(25종 + 6모드 매트릭스) + CLAUDE/AGENTS Mode 확장 + 지침 00 §11.8. **다운스트림 sync 완료**(icons·gamblescan·ai-icons, cafe24 제외).
 
-### METH-043
-- **notes**: Completed 2026-06-24. **PR #32 머지 완료**(main `ca6fc57`). Class A. icons-ip 경량 문서 craft 7종 — 신규 템플릿 3종(prd·architecture·context-glossary) + ADR 강화 + requirements(M/S+Pn) + 지침 00 §11.5~11.7.
+### METH-046
+- **notes**: Completed 2026-06-24. **PR #35 머지 완료**(main `626b48a`). Class A. sync mirror-delete 버그 픽스 — `copy_path` prune_report 추가 + `cmd_sync` prune을 `--prune` opt-in으로(기본 보존+경고). 다운스트림 고유 파일(ai-icons guide 04)이 조용히 삭제되던 데이터손실 차단.
 
-<!-- Archived: METH-001~042 (2026-05~06). 상세는 git log --grep="METH-" 및 PR #5~#34, 40_dev/snapshots/ 참조. CLAUDE.md 파일역할: Done 은 최근 ~3건만. -->
+<!-- Archived: METH-001~044 (2026-05~06). 상세는 git log --grep="METH-" 및 PR #5~#35, 40_dev/snapshots/ 참조. CLAUDE.md 파일역할: Done 은 최근 ~3건만. -->
