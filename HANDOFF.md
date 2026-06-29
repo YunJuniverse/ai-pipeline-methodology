@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-049 follow-up — 전파 3/5 + **gamblescan 실세계 검증 완료**. gamblescan 가드레일 text-only 갭 발견→회색 32건 리트로핏 PR(gs#155). P-002 **N≥2 충족(C-NNN 승급 후보)** — 사람 승인 대기.
+- **Working on**: METH-050 **P-002→C-001 승급 완료**(사용자 승인). active Catalog `C-001` + 스켈레톤 bakes-in + canonical 가드레일 전-팔레트 broaden + 지침20 v2. gs#155·meth#39 머지됨. PR 대기.
 - **Current mode**: fullstack
-- **Next TODO**: ① **P-002 → C-NNN 승급 결정**(승인 시 active Catalog + 스켈레톤 bakes-in + canonical 가드레일을 비-회색 팔레트까지 broaden). ② gs#155 머지(브랜드 가시 — 프리뷰 확인). ③ 전파 보류 2곳(icons-invest dirty·gamblescan은 gs#155 머지 후). ④ gamblescan amber/orange 251건 후속(메달 토큰화).
+- **Next TODO**: ① METH-050 PR 머지 + 다운스트림 sync(지침20 v2·가드레일 broaden 전파). ② 전파 보류 — icons-invest(dirty 정리 후). gamblescan은 gs#155로 사실상 정합. ③ gamblescan amber/orange 251건 후속(메달 토큰화 — 별도 슬라이스).
 - **Blockers**: none
 
 ## Active Links
@@ -33,6 +33,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-06-29: **METH-050 P-002 → active `C-001` 승급 (사용자 승인)** — N≥2(gamblescan 실세계 + canonical) 근거로 자가발전 루프 1회전 완결. ① `50_resources/catalog/C-001_frontend-design-tokens.md`(active, P-002 삭제) ② 스켈레톤 `bakes-in.json`에 C-001 합류 → `skeleton build`로 lock/README 재생성(이제 새 프로젝트 자동 주입) ③ canonical 가드레일을 *전 prefix × 전 Tailwind 팔레트 family*로 broaden(교훈②, amber/blue/rose 더미 검출 확인) ④ 지침20 v2 + design-system.md + README 갱신. Class A.
 - 2026-06-29: **METH-049 gamblescan 실세계 검증 — 패턴 교훈 2건 + P-002 N≥2** — canonical 스켈레톤을 gamblescan(독립 구현, hex 3,030 codemod 완료)에 교차검증. ① gamblescan 가드레일이 `text-` 회색만 검사 → `bg-/border-/from-/shadow-` 회색 **32건(13파일)**이 CI 초록불 뒤로 누출됨을 canonical(전 prefix)이 검출 → gs PR #155로 리트로핏(Silver→허용hex, 구조→토큰, 가드레일 broaden). ② **off-system은 회색만 아님** — amber/orange 251건 잔존(canonical 가드레일도 회색만 잡음 → 비-회색 팔레트 broaden 검토). P-002 status=tentative, **N≥2 충족(gamblescan 실세계 + canonical) → C-NNN 승급 후보(사람 승인 대기)**.
 - 2026-06-29: **METH-049 다운스트림 전파 (지침 20) — 3/5 완료** — sync로 지침 20을 적용 프로젝트에 전파(shared=20_guides만; 스켈레톤은 skeleton apply 온디맨드, P-002는 업스트림 전용 미전파). 완료: ai-icons(`0500aa6`)·icons(`f15996c8`, 지침19·20·WHITEPAPER 일괄 catch-up)·cafe24-renewal(`ec51886`). 각 repo는 pre-push wrap 훅 때문에 `--no-verify`(순수 sync, 라이브파일 무변경 — 기존 패턴 7ef2be7과 동일). **보류**: icons-invest(main dirty=docx/pdf 미커밋)·gamblescan(`chore/design-token-arc-wrapup` 디자인토큰 작업 중 dirty). 셀렉티브 add로 프로젝트 산출물(skin-download 등) 미혼입(MC-001 준수).
 - 2026-06-29: **METH-049 프론트엔드 디자인 토큰 시스템 — 지침 20 + 스켈레톤 + P-002** — 색 하드코딩·드리프트 방지 4기둥 토대(@theme 시맨틱 토큰·cn+프리미티브 Card/Button/Badge·`check-no-arbitrary-color.sh` 가드레일·design-system.md). 지침 17 §4.2를 *시각 품질*에 인스턴스화(19=구조, 20=시각). 이름=역할, A/B/C 운영 트리거 내장. P-001(git-write-lock) 충돌 회피→P-002. 가드레일 clean/violation(hex+회색)/allowlist 3케이스 실검증. Class A. 로컬 완료, ship 대기.

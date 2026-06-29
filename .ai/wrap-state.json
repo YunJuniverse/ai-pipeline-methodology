@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "abc1edec2e0c9b4098bbfb59eefbf863334265fb",
-  "last_validated_at": "2026-06-29T02:04:44Z",
+  "last_validated_commit": "5e82494f940b28a5974fe33c0361ff9164a008c9",
+  "last_validated_at": "2026-06-29T02:12:54Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "ac66a00e8c3d48ecf594299d412f4d0bdf83c0c97ca7fefd2da8cb6da0269211"
+      "sha256": "47f9c812ea10af99d79c3eae32167da232ba61daa41575ea729f2be6be5e70f5"
     },
     "TODO.md": {
-      "sha256": "a1c470c9f5af6c01af10f15e98a7717da20d43e56582da731918d9313f59de1e"
+      "sha256": "965e9cbb53c8366ee6b397b81108ba1d32af67c3de291abaacc34e2abe411b4f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "3b18eec7ab0ba5b2903e2897d7e4bdd17da2128152e42f59cede2fe9b1f183da"
+      "sha256": "416df4b3c3498c1b994886a542c487648ce61c42b90ef03886117a108ab4b425"
     }
   },
   "observations": {
@@ -53,6 +53,7 @@
       "50_resources/ai_observations/2026-06-29_frontend-design-token-foundation.md",
       "50_resources/ai_observations/2026-06-29_meth-049-downstream-propagation.md",
       "50_resources/ai_observations/2026-06-29_meth-049-gamblescan-validation.md",
+      "50_resources/ai_observations/2026-06-29_meth-050-promote-c001.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
