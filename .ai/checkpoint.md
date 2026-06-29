@@ -54,12 +54,20 @@
   pre-push wrap 훅 때문에 순수 sync는 `--no-verify`(라이브파일 무변경 — 기존 7ef2be7 패턴). 셀렉티브
   add로 프로젝트 산출물(skin-download 등) 미혼입(MC-001).
 
+## gamblescan 실세계 검증 결과 (2026-06-29)
+
+- canonical 스켈레톤을 gamblescan(독립 디자인토큰 구현 완료작)에 교차검증 → **패턴 교훈 2건**(P-002 본문):
+  ① 가드레일은 전 prefix 검사 필수(gamblescan은 text-only라 회색 32건 누출 — gs PR #155로 시정).
+  ② off-system은 회색만 아님 — amber/orange 251건(canonical도 회색만 잡음 → broaden 검토).
+- **P-002 N≥2 충족** → C-NNN 승급 후보(사람 승인 대기).
+
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **전파 보류 2곳**: icons-invest(main dirty=docx/pdf 미커밋 → 정리/스태시 후 sync)·gamblescan
-  (`chore/design-token-arc-wrapup` 디자인토큰 작업 중 dirty → 작업 마무리 후. 지침 20이 특히 유관).
-- **스켈레톤 실전 검증**: 아직 유닛검증(가드레일 3케이스)만. 프론트엔드 1곳에 `skeleton apply
-  frontend-design-tokens <project>` → end-to-end 검증 + 첫 P-002 hit → C-NNN 승급·bakes-in 경로.
+- **P-002 → C-NNN 승급 결정**: 승인 시 ① active Catalog `C-NNN_frontend-design-tokens` 생성
+  ② 스켈레톤 `bakes-in.json`에 합류 ③ canonical 가드레일을 비-회색 Tailwind 팔레트까지 broaden(교훈②).
+- **gs PR #155 머지**(브랜드 가시 — Silver 배지·rank 그라데이션·admin 패널 Vercel 프리뷰 확인).
+- **전파 보류 2곳**: icons-invest(main dirty 정리 후)·gamblescan(gs#155 머지 후 sync).
+- **gamblescan amber/orange 251건 후속**: 메달 토큰(`--color-medal-*`) + 비-메달 warn/danger 흡수 + 가드레일 broaden.
 
 ## 다음 사람에게 (구체적 첫 행동)
 

@@ -11,6 +11,9 @@
 
 ## InProgress
 
+### METH-049b · P-002 → C-NNN 승급 결정 (사람 승인 게이트)
+- **notes**: gamblescan 실세계 검증으로 P-002 **N≥2 충족**(gamblescan hex 3,030 codemod + canonical 자산화). 승인 시 ① active Catalog `C-NNN_frontend-design-tokens` 생성 ② 스켈레톤 `bakes-in.json` 합류 ③ canonical 가드레일을 *비-회색 Tailwind 팔레트*까지 broaden(gamblescan amber/orange 251건 교훈). 규칙: _pending→active는 사람 머지. PR #39에 검증 근거 포함.
+
 ## Blocked
 
 ## Done
