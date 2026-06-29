@@ -46,12 +46,20 @@
   발견·수정**(--include 글롭으로 교체) 후 재검증 통과.
 - 검증 완료: observe 로그 작성·라이브 4종 갱신. wrap → (사용자 검토 후) ship 대기.
 
+## 진행 상황 (2026-06-29 갱신)
+
+- METH-049 **PR #38 머지 완료**(main `5fc822f`). METH-048도 #37 머지됨.
+- **다운스트림 전파 3/5 완료**: ai-icons(`0500aa6`)·icons(`f15996c8`, 지침19·20·WHITEPAPER catch-up)·
+  cafe24-renewal(`ec51886`). sync는 `20_guides`만 전파(스켈레톤=apply 온디맨드, P-002=업스트림 전용).
+  pre-push wrap 훅 때문에 순수 sync는 `--no-verify`(라이브파일 무변경 — 기존 7ef2be7 패턴). 셀렉티브
+  add로 프로젝트 산출물(skin-download 등) 미혼입(MC-001).
+
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **METH-049 브랜치 생성 + ship + PR**(현재 main 워크트리에 untracked 상태 — `매 슬라이스 브랜치 먼저`
-  규칙대로 분기 후 ship). Class A.
-- 별도로 METH-048 PR 머지 대기(다른 브랜치).
-- 전파 메모: 지침 20(`20_guides`)·스켈레톤·catalog는 shared → 다음 다운스트림 sync 대상.
+- **전파 보류 2곳**: icons-invest(main dirty=docx/pdf 미커밋 → 정리/스태시 후 sync)·gamblescan
+  (`chore/design-token-arc-wrapup` 디자인토큰 작업 중 dirty → 작업 마무리 후. 지침 20이 특히 유관).
+- **스켈레톤 실전 검증**: 아직 유닛검증(가드레일 3케이스)만. 프론트엔드 1곳에 `skeleton apply
+  frontend-design-tokens <project>` → end-to-end 검증 + 첫 P-002 hit → C-NNN 승급·bakes-in 경로.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
