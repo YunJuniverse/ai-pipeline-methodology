@@ -1,9 +1,8 @@
-# Checkpoint — 2026-06-24 (METH-048 백서·온보딩에 코드 품질 가드레일 통합)
+# Checkpoint — 2026-06-29 (METH-049 프론트엔드 디자인 토큰 시스템)
 
-> ✅ METH-048: 지침 19(클린아키텍처·클린코드, METH-047)를 standalone에서 *방법론 표준 서사*로
-> 통합(사용자 지시: "백서·가이드라인을 클린코드·클린아키텍처 기반으로 업데이트"). 백서 겸 가이드
-> §5/§7 + **WHITEPAPER(헌법) §8-5 신규 운영 원칙 "Guardrails-by-Construction"**(AI 안전+코드 품질
-> 횡단) + HOW_TO_APPLY §5. 백서 변경이라 **Class C — `40_dev/adr/ADR-003` 신설**(사용자 지시=승인).
+> ✅ METH-049: 지침 20(프론트엔드 디자인 토큰 시스템) 신설 + 스켈레톤 `frontend-design-tokens`(4기둥)
+> + Pending Lesson P-002. 색 하드코딩·드리프트를 day-1 가드레일로 fail-closed 차단. 지침 17 §4.2를
+> *시각 품질*에 인스턴스화(19=구조 품질, 20=시각 품질 자매 가드레일). **로컬 완료, 브랜치+ship 대기.**
 
 ---
 
@@ -16,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-048-whitepaper-guide-codequality` (main 기준)
+- Worktree: branch `main` (아직 브랜치 미생성 — ship 시 분기 필요)
 
 ## 부팅 계약
 
@@ -27,48 +26,50 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-048 백서·온보딩 코드 품질 통합** (사용자: "이걸 바탕으로 방법론 백서와 가이드라인도
-업데이트해" — 직전 "앞으로 코드는 클린코드·클린아키텍처 규칙으로"에 이어):
+**METH-049 프론트엔드 디자인 토큰 시스템** (사용자: A/B/C 트리거 블록 제시 → AskUserQuestion에서
+"Full system" + "New P-002" 선택):
 
-- 배경: METH-047로 지침 19를 신설했으나 *standalone 가이드*라, 백서·온보딩의 표준 서사엔 미반영.
-  → 코드 품질 가드레일을 방법론 일급 원칙으로 통합.
+- 배경: 사용자가 design-token 시스템의 A(greenfield)/B(retrofit)/C(학습훅) 트리거 템플릿을 제시했으나
+  그 토대(지침 20·스켈레톤·패턴)가 레포에 미존재. 또 블록이 패턴을 "P-001"로 칭했는데 P-001은 이미
+  git-write-lock → P-002로 배정.
 - 변경:
-  - `10_foundation/방법론_백서_가이드.md` §5: "코드 품질 craft — Guardrails by Construction(지침 19)"
-    소절 추가(4-레이어·4 가드레일·래칫·any=버그은폐). §7 워크플로: day-1 가드레일 + lint·typecheck·
-    build·test 게이트.
-  - `10_foundation/WHITEPAPER.md`(헌법): **§8-5 "Guardrails-by-Construction" 신규 운영 원칙**
-    (강제=시스템/fail-closed/래칫/AI안전·코드품질 동일 적용) + 부록 A 지침 19 행 + 버전
-    v0.2.0→v0.3.0(§12: 메커니즘 변경=MINOR).
-  - `10_foundation/HOW_TO_APPLY.md` §5 Fullstack: day-1 가드레일 안내 + 구현 게이트.
-  - **`40_dev/adr/ADR-003`** 신설 — 백서는 헌법(§12)이라 변경=Class C → ADR로 근거 고정(사용자
-    지시=승인 증빙). Considered Options 3안 중 "§8-5 격상" 채택.
-- 전파 메모: `10_foundation/`은 shared 아님 → 백서·온보딩은 다운스트림 미전파(업스트림 전용).
-  지침 19(`20_guides`)는 METH-047로 이미 shared·전파 대상.
-- 검증 예정: wrap 4/4 → ship → PR.
+  - `20_guides/20_프론트엔드_디자인_토큰_시스템_규칙.md` 신설 — 4기둥(① @theme 시맨틱 토큰
+    surfaces/text/border/brand/semantic + 디자인 언어 ② cn+프리미티브 ③ 색 가드레일 ④ 제약문서).
+    원칙 "이름=역할". §5에 A/B/C 운영 트리거 내장. 17 §4.2 인스턴스화(시각 품질).
+  - `50_resources/skeletons/frontend-design-tokens/` 스켈레톤 — base/{theme/tokens.css(@theme,
+    라이트+다크), lib/cn.ts, components/primitives/{Card,Button,Badge,index}, guardrails/
+    {check-no-arbitrary-color.sh, wiring.md}, design-system.md} + bakes-in.json + README.
+  - `50_resources/catalog/_pending/P-002_frontend-design-tokens.md` — Pending Lesson(N≥2 시 C-NNN 승급).
+  - `20_guides/README.md` — 카탈로그(3.5)·현황(6) 행 추가.
+- 검증(실측): 가드레일 스크립트 3케이스 — clean=exit0 pass / arbitrary hex+off-system 회색=exit1 fail
+  (3건 모두 검출) / ALLOW_HEX 등록 hex=pass. **초안의 file-glob 버그(grep -o 출력에 `$`앵커 적용)를
+  발견·수정**(--include 글롭으로 교체) 후 재검증 통과.
+- 검증 완료: observe 로그 작성·라이브 4종 갱신. wrap → (사용자 검토 후) ship 대기.
 
 ## ⚠️ 다음 사람: 우선 처리 후보
 
-- **METH-048 PR 머지**(사용자 승인 게이트).
-- 머지 후 다운스트림 sync는 *불필요*(변경이 10_foundation·40_dev = shared 아님). 지침 19는
-  이미 전파됨. 다음 다운스트림 sync 시 METH-046 픽스 덕에 고유 파일 보존됨.
+- **METH-049 브랜치 생성 + ship + PR**(현재 main 워크트리에 untracked 상태 — `매 슬라이스 브랜치 먼저`
+  규칙대로 분기 후 ship). Class A.
+- 별도로 METH-048 PR 머지 대기(다른 브랜치).
+- 전파 메모: 지침 20(`20_guides`)·스켈레톤·catalog는 shared → 다음 다운스트림 sync 대상.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. 사용자 지시 대기.
-2. METH-048 PR 머지되면 백서·온보딩까지 코드 품질 통합 완료.
+1. 사용자 검토/승인 대기.
+2. 승인 시: `git switch -c claude/meth-049-frontend-design-tokens` → `methodology.py ship -m "feat(guides): METH-049 ..."`.
 
 ## 막혔던 지점 / 시도해봤지만 안 된 것
 
-- 없음. 백서 헌법 변경이라 방법론 자체 규칙(§12 Class C)을 따라 ADR-003 동반 — 방법론이 자기
-  거버넌스를 스스로 적용한 사례.
+- 가드레일 스크립트 초안이 위반을 못 잡음 — 원인: `grep -rno` 출력(`path:line:match`)에 파일확장자
+  `$` 앵커 필터를 적용해 전부 탈락. → `grep --include='*.tsx' ...` 글롭으로 교체해 해결. 교훈:
+  가드레일은 *반드시 더미 위반으로 실검증*(지침 20 §4 자기 규칙대로).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 백서 2종 관계(WHITEPAPER 헌법 vs 방법론_백서_가이드 종합본) — 둘 다 §8-5/§5에 같은 원리 기술.
-  중복 누적 시 정본 정리 검토(METH-045 때 기록된 open question 유지).
+- 스켈레톤 `base/`는 Tailwind v4 `@theme` + React 전제. Svelte/Vue 등 비-React 스택용 변종은
+  *옵션 플래그*로 처리할지(스켈레톤 README §6 안티패턴: 도메인 과분리 금지) 차기 검토.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-048-whitepaper-guide-codequality` (main 기준).
-- 변경: `10_foundation/{방법론_백서_가이드,WHITEPAPER,HOW_TO_APPLY}.md` + `40_dev/adr/ADR-003` +
-  라이브 4종. (코드/지침/템플릿 변경 없음 — 문서 통합 한정.)
+- 브랜치: `main` (미분기). ship 전 분기 필수.
+- 변경: `20_guides/20_*.md`(신규) + `20_guides/README.md` + `50_resources/skeletons/frontend-design-tokens/`(신규) + `50_resources/catalog/_pending/P-002_*.md`(신규) + `50_resources/ai_observations/2026-06-29_*.md` + 라이브 4종.
