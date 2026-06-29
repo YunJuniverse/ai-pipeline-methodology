@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-048 백서·온보딩에 코드 품질 가드레일 통합 — 지침 19를 방법론 표준 서사로. 백서_가이드 §5/§7 + WHITEPAPER §8-5(헌법, Class C·ADR-003) + HOW_TO_APPLY §5. 브랜치 `claude/meth-048-whitepaper-guide-codequality`(main 기준), **PR 대기**.
+- **Working on**: METH-049 프론트엔드 디자인 토큰 시스템 — 지침 20 신설 + 스켈레톤 `frontend-design-tokens`(4기둥) + Pending Lesson P-002. 가드레일 3케이스 실검증 완료. **로컬 완료, 브랜치+ship 대기**(아직 main 워크트리, 커밋 전).
 - **Current mode**: fullstack
-- **Next TODO**: METH-048 PR 머지. (METH-039~047 전부 main 안착·지침 19 다운스트림 전파 완료. 백서/온보딩은 10_foundation이라 미전파=업스트림 전용.)
+- **Next TODO**: METH-049 브랜치 생성 + ship + PR. 그리고 METH-048 PR 머지(별도 브랜치 대기).
 - **Blockers**: none
 
 ## Active Links
@@ -33,6 +33,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-06-29: **METH-049 프론트엔드 디자인 토큰 시스템 — 지침 20 + 스켈레톤 + P-002** — 색 하드코딩·드리프트 방지 4기둥 토대(@theme 시맨틱 토큰·cn+프리미티브 Card/Button/Badge·`check-no-arbitrary-color.sh` 가드레일·design-system.md). 지침 17 §4.2를 *시각 품질*에 인스턴스화(19=구조, 20=시각). 이름=역할, A/B/C 운영 트리거 내장. P-001(git-write-lock) 충돌 회피→P-002. 가드레일 clean/violation(hex+회색)/allowlist 3케이스 실검증. Class A. 로컬 완료, ship 대기.
 - 2026-06-24: **METH-048 백서·온보딩에 코드 품질 가드레일 통합** — 지침 19(METH-047)를 standalone에서 *방법론 표준 서사*로 통합(사용자 지시). `방법론_백서_가이드.md` §5 "코드 품질 craft(Guardrails by Construction)" + §7 워크플로 day-1 가드레일·lint 게이트 / **`WHITEPAPER.md`(헌법) §8-5 신규 운영 원칙**(AI 안전+코드 품질 횡단) + 부록A + v0.3.0 / `HOW_TO_APPLY.md` §5 Fullstack 게이트. 백서 변경이라 **Class C·ADR-003 신설**(사용자 지시=승인). PR 대기.
 - 2026-06-24: **METH-047 클린아키텍처·클린코드 지침 19 신설 (PR #36 머지)** — GambleScan REFACTOR-CLEAN(~50 PR) 회고 역주입. 4 코드 가드레일(레이어경계·no-explicit-any·no-console·max-lines=400)·래칫·4-레이어·god파일 분할·day-1 체크리스트. 지침 17 §4.2의 코드 품질 인스턴스화. Class A.
 - 2026-06-24: **METH-046 sync mirror-delete 버그 픽스 (PR #35 머지)** — sync가 상류에 없는 다운스트림 고유 파일(ai-icons `20_guides/04`)을 조용히 삭제하던 데이터손실 차단. prune을 `--prune` opt-in으로(기본 보존+경고). Class A.
