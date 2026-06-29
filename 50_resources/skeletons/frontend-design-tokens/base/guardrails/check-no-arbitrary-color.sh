@@ -4,7 +4,8 @@
 # --------------------------------------------------------------------------
 # 색 하드코딩을 빌드 단계에서 차단한다. 두 종류를 잡는다:
 #   1) arbitrary hex   : bg-[#1a1a2e], text-[#fff], border-[#abcdef] ...
-#   2) off-system 회색 : text-gray-N, bg-slate-N, border-zinc-N, *-neutral-N, *-stone-N
+#   2) off-system 팔레트 : 전 prefix(bg/text/border/ring/from/to/shadow/…) × 전 팔레트 family
+#      (gray/slate/zinc … 뿐 아니라 red/orange/amber/yellow/…/rose 까지. C-001 교훈②)
 # 의도적 예외(순백 max-contrast, 메달 gold/silver 등)는 ALLOW_HEX 에만 등록.
 #
 # 사용: bash guardrails/check-no-arbitrary-color.sh [scan_dir]
@@ -20,8 +21,9 @@ ALLOW_HEX=(
   # "#ffffff"   # 순백 max-contrast (필요 시 주석 해제)
 )
 
-# off-system 색 팔레트 (토큰을 우회한 회색·원색 유틸)
-OFF_SYSTEM='(gray|slate|zinc|neutral|stone)'
+# off-system 색 팔레트 (토큰을 우회한 *전체* Tailwind 팔레트 — 회색만이 아님. C-001 교훈②)
+# 의도적 categorical/메달 색은 토큰 또는 ALLOW_HEX로 명시 분리할 것.
+OFF_SYSTEM='(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)'
 
 # 스캔 대상 확장자 (grep --include 글롭)
 INCLUDES=(--include='*.tsx' --include='*.ts' --include='*.jsx' --include='*.js' \
@@ -65,7 +67,7 @@ fi
 
 if [ -n "$gray_hits" ]; then
   echo ""
-  echo "❌ off-system 회색/원색 유틸 발견 (surface-*/text-*/border-* 토큰으로 교체):"
+  echo "❌ off-system 팔레트 유틸 발견 (시맨틱 토큰으로 교체 / 의도색은 ALLOW_HEX·토큰으로 명시):"
   echo "$gray_hits"
   fail=1
 fi

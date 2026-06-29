@@ -1,7 +1,7 @@
 # Design System — 토큰 제약 문서
 
 > **이 문서는 AI 생성의 제약(constraint)이다.** UI를 만들 때 색·반경·그림자·모션은
-> 아래 토큰 표의 *역할 이름*으로만 부른다. arbitrary hex·off-system 회색은 가드레일이 차단한다.
+> 아래 토큰 표의 *역할 이름*으로만 부른다. arbitrary hex·off-system Tailwind 팔레트(회색뿐 아니라 amber/blue/rose… 전 family)는 가드레일이 차단한다.
 > 토큰 정의 원본: [`theme/tokens.css`](theme/tokens.css) · 규칙: 지침 20.
 >
 > 🔧 신규 프로젝트는 아래 "값" 열을 이 프로젝트 브랜드에 맞게 채운다(역할 이름은 유지).
@@ -66,6 +66,6 @@
 | `Badge` | `tone`: neutral/brand/success/warning/danger/info | `components/primitives/Badge.tsx` |
 
 ## 규칙 요약
-1. 색은 위 토큰으로만. `bg-[#...]`·`text-gray-N` 금지(가드레일 차단).
+1. 색은 위 토큰으로만. `bg-[#...]`·`text-gray-N`·`bg-amber-N` 등 전 팔레트 금지(가드레일 차단).
 2. 새 컴포넌트는 가능하면 프리미티브 조합으로. 클래스 병합은 `cn()`.
 3. 의도적 예외는 `guardrails/check-no-arbitrary-color.sh`의 `ALLOW_HEX`로만.

@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "5fc822f9b1b5b43d22542c9bc2843d166bcd23dc",
-  "last_validated_at": "2026-06-29T01:44:56Z",
+  "last_validated_commit": "5e82494f940b28a5974fe33c0361ff9164a008c9",
+  "last_validated_at": "2026-06-29T02:12:54Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "083699ec61b39a3fc02dc35aebd5b9a9ead08c58e8162bd70e064f940f814d02"
+      "sha256": "47f9c812ea10af99d79c3eae32167da232ba61daa41575ea729f2be6be5e70f5"
     },
     "TODO.md": {
-      "sha256": "83431ca6c6ea33b57ffdfbf78438a49e46e79ac5baa74d771fa04ee9b3a3c14d"
+      "sha256": "965e9cbb53c8366ee6b397b81108ba1d32af67c3de291abaacc34e2abe411b4f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "730b356ffe76fdedb57d2e0b8adaa9143dde7b63a49957f9b0364ad23a50f6d4"
+      "sha256": "416df4b3c3498c1b994886a542c487648ce61c42b90ef03886117a108ab4b425"
     }
   },
   "observations": {
@@ -52,6 +52,8 @@
       "50_resources/ai_observations/2026-06-24_meth-048-whitepaper-onboarding-codequality-integration.md",
       "50_resources/ai_observations/2026-06-29_frontend-design-token-foundation.md",
       "50_resources/ai_observations/2026-06-29_meth-049-downstream-propagation.md",
+      "50_resources/ai_observations/2026-06-29_meth-049-gamblescan-validation.md",
+      "50_resources/ai_observations/2026-06-29_meth-050-promote-c001.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
