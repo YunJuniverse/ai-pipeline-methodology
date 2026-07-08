@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "f284633ff465780c9aa6bcd969be9b59b2e198a8",
-  "last_validated_at": "2026-07-08T08:05:22Z",
+  "last_validated_commit": "26e42d091bc6cca6d5e5b9c762f4f1868d5e0f98",
+  "last_validated_at": "2026-07-08T08:31:21Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "cfb0c15803c3b9a23b6ee0a0a0dd19573d9c6b97c1efe597247b19fcc66c5402"
+      "sha256": "19912edf544d76ec0d1368ba64517eac8dcba6ea0802c52e5a845da3245add80"
     },
     "TODO.md": {
-      "sha256": "ef7381781e6443d89589a361b17445c17a9e39b4ab02b53bcc7221f4fc86979c"
+      "sha256": "ca69eb17926497943ec2b17f66211eb7928041f5c9a182392d0eb54d8bc1d54b"
     },
     ".ai/checkpoint.md": {
-      "sha256": "1a2980c427e6be6f7769ec6ccc652290167a3c4e8664ba055121a767082cb35a"
+      "sha256": "014780302fba7b3856d4f1aae0a6802fd50a955dd04ea1645357f56b684f2e54"
     }
   },
   "observations": {
@@ -66,6 +66,7 @@
       "50_resources/ai_observations/2026-07-08_meth-061-planning-handoff-mode.md",
       "50_resources/ai_observations/2026-07-08_meth-062-api-contract-devspec-guide.md",
       "50_resources/ai_observations/2026-07-08_meth-062-recovery-pr51-timing.md",
+      "50_resources/ai_observations/2026-07-08_meth-063-business-plan-revamp.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
