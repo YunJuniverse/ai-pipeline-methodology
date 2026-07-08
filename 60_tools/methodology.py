@@ -802,31 +802,68 @@ def observation_files() -> list[Path]:
 
 
 def cmd_thinktank(args: argparse.Namespace) -> int:
+    """L3 Thinktank v0 — L1 관찰 로그 집계 리포트.
+
+    **수동 승급이 정식이다.** 이 명령은 관찰 로그에서 (1) 백서 §7-근접 지표를 집계하고
+    (2) 반복 마찰을 승급 *후보*로 마킹할 뿐, 아무것도 자동 승급하지 않는다.
+    승급은 사람이 PR로 한다(백서 §8-2, `50_resources/catalog/_README.md` §3).
+    분기 회고(`70_meta/retrospectives`) §1 지표의 소스로 회고 직전 실행한다.
+    """
     files = observation_files()
     observations = [parse_observation_frontmatter(p) for p in files]
+
     friction_lines: list[str] = []
+    repeat_hits = 0
     for p in files:
         text = read_text(p)
         for match in re.finditer(r"where:\s*\"?(.+?)\"?\s*$", text, flags=re.MULTILINE):
             friction_lines.append(match.group(1))
+        for match in re.finditer(r"repeat_of:\s*(.+?)\s*$", text, flags=re.MULTILINE):
+            val = match.group(1).strip().strip('"')
+            if val and val.lower() not in {"null", "none", "-"}:
+                repeat_hits += 1
     counts: dict[str, int] = {}
     for item in friction_lines:
         counts[item] = counts.get(item, 0) + 1
+    promote_candidates = sum(1 for c in counts.values() if c >= 2)
+
+    task_counts: dict[str, int] = {}
+    for obs in observations:
+        t = (obs.get("task_type") or "?") if isinstance(obs.get("task_type"), str) else "?"
+        task_counts[t] = task_counts.get(t, 0) + 1
+
+    dates: list[date] = []
+    for p in files:
+        m = re.match(r"(\d{4})-(\d{2})-(\d{2})_", p.name)
+        if m:
+            try:
+                dates.append(date(int(m.group(1)), int(m.group(2)), int(m.group(3))))
+            except ValueError:
+                pass
+    span_days = (max(dates) - min(dates)).days if len(dates) >= 2 else 0
+    per_week = round(len(files) / (span_days / 7), 1) if span_days >= 7 else None
+    obs_threshold = "충족" if len(files) >= 100 else "미달(권장 100+)"
 
     now = datetime.now(timezone.utc)
     iso_year, iso_week, _ = now.isocalendar()
     out_dir = METHODOLOGY_ROOT / INSIGHTS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"{iso_year}-W{iso_week:02d}_thinktank.md"
+    task_dist = ", ".join(f"{k} {v}" for k, v in sorted(task_counts.items(), key=lambda kv: -kv[1])) or "없음"
     lines = [
         f"# Thinktank v0 — {iso_year}-W{iso_week:02d}",
         "",
-        "> Snapshot. Generated from L1 observations and repository metadata.",
+        "> **수동 승급이 정식.** 이 리포트는 지표 집계 + 승급 *후보* 마킹만 한다 — 자동 승급 없음.",
+        "> 승급은 사람이 PR로(백서 §8-2). 분기 회고 §1 지표의 소스 — 회고 직전 실행.",
+        f"> Generated at: {utc_stamp()}",
         "",
-        "## Inputs",
+        "## 지표 (Metrics)",
         "",
-        f"- Observation files: {len(files)}",
-        f"- Generated at: {utc_stamp()}",
+        f"- 관찰 로그: **{len(files)}건** ({obs_threshold})",
+        f"- 기간: {min(dates).isoformat() if dates else '?'} ~ {max(dates).isoformat() if dates else '?'} ({span_days}일)",
+        "- 케이던스: " + (f"주당 약 {per_week}건" if per_week is not None else "산출 불가(기간 부족)"),
+        f"- task_type 분포: {task_dist}",
+        f"- 마찰 총계: {len(friction_lines)}건 · Catalog 재적중(repeat_of): {repeat_hits}건 · 승급 후보(≥2회): {promote_candidates}건",
         "",
         "## Repeated Friction Candidates",
         "",
@@ -846,6 +883,7 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
         lines.append(f"- `{obs.get('session_id', 'unknown')}` — domain `{obs.get('domain', '?')}`, task `{obs.get('task_type', '?')}`")
     write_text(out, "\n".join(lines) + "\n")
     ok(f"thinktank report: {out.relative_to(METHODOLOGY_ROOT)}")
+    info("수동 승급이 정식 — 승급 후보(≥2회)는 사람이 검토·PR로 승급(백서 §8-2).")
     return 0
 
 
@@ -2769,7 +2807,7 @@ def main(argv: list[str] | None = None) -> int:
     ska.add_argument("--force", action="store_true")
     ska.set_defaults(func=cmd_skeleton)
 
-    pt = sub.add_parser("thinktank", help="L3 Thinktank v0 리포트 생성")
+    pt = sub.add_parser("thinktank", help="L3 관찰 집계 — §7 지표 + 승급 후보 마킹 (수동 승급 정식, 회고 소스)")
     pt.set_defaults(func=cmd_thinktank)
 
     args = p.parse_args(argv)

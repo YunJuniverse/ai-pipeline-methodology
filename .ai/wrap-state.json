@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "c669a2bfc12c3061fc7c6a87ef68429c19981973",
-  "last_validated_at": "2026-07-08T05:59:27Z",
+  "last_validated_commit": "23fe611e0b23b9fb37a94fbab0dc9207a014f600",
+  "last_validated_at": "2026-07-08T06:25:54Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "bd7c4ee266fd038a8580f5eb7c82488c6cb750e486d7b297df9900d32e308c13"
+      "sha256": "affbf3b738ce0524260c7d3cc7211065e86fb10742986a000390aca11291e87b"
     },
     "TODO.md": {
-      "sha256": "0a89728052a79fadffe02ad71b1724c6e95c6c896b3454feb9e66a99258177ac"
+      "sha256": "12e4a95dcd2522c55dbfcd5eddd5010a8ec56a9fb47b04ea7e88ce8f31362b46"
     },
     ".ai/checkpoint.md": {
-      "sha256": "a2938a6c26c37dae3ceac645e1c0038fdf8904271f08bbb704f31f95643ed637"
+      "sha256": "a5ab933d20709e116333715ffc6cf6f8cdfeb98067ba38dd49fd214ccc4dac6d"
     }
   },
   "observations": {
@@ -57,6 +57,8 @@
       "50_resources/ai_observations/2026-07-08_meth-051-output-channel-separation-guide.md",
       "50_resources/ai_observations/2026-07-08_meth-053-guide-renumber-and-rfc-recovery.md",
       "50_resources/ai_observations/2026-07-08_meth-054-first-quarterly-retrospective.md",
+      "50_resources/ai_observations/2026-07-08_meth-055-accept-rfc002.md",
+      "50_resources/ai_observations/2026-07-08_meth-056-compaction-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

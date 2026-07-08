@@ -36,11 +36,13 @@ relates_to: [RFC-001, 2026-Q3, MP-003]
 
 ## Proposal — 발전 로드맵 (우선순위순)
 
-### R1 [HIGH · Class B] Reflect/Learn 아크 자동화 — 최대 레버
+### R1 [HIGH · Class B] Reflect/Learn 아크 자동화 — 최대 레버 · 🟡 부분 구현 (METH-057)
 **갭:** ERL/ExpeL의 핵심은 휴리스틱을 *관련성 점수로 검색해 컨텍스트에 자동 주입*하는 것. 본 방법론의 Catalog `signature`는 regex 검색키일 뿐, 승급은 수동 PR, L3 thinktank는 휴면(무게 감사 확증). 루프에서 가장 가치 있는 단계가 가장 덜 자동화됨.
 **제안:**
 - (a) 세션 부팅 시 현재 작업과 관련성 높은 Catalog 엔트리를 top-k 자동 주입(현 memory recall과 Catalog를 연결).
 - (b) thinktank를 wrap/ship 케이던스에 결합하거나, 최소한 "수동 승급이 정식"임을 문서·CLI 도크스트링에 반영(문서-현실 부패 해소).
+**구현 (METH-057, (b) 완료):** thinktank를 정직한 **지표 집계 + 후보 마킹** 도구로 재구성 — CLI 도크스트링·출력·`catalog/_README §승급`·`retrospectives/README`에 "수동 승급이 정식" 명문화(문서-현실 부패 해소). 출력에 §7-근접 지표(관찰 건수·기간·케이던스·task_type 분포·마찰/재적중/후보 수) 신설 → 회고 §1 지표 소스로 연결. **지표 인프라 착수 = 다음 회고가 측정 가능.**
+**미구현 (a):** 관련성 top-k 자동 주입은 임베딩/스코어링 의존이라 이식성 제0원칙상 어댑터 격리가 필요 — 별도 후속(Class B).
 **출처:** ERL(arXiv 2603.24639), Anthropic note-taking.
 
 ### R2 [HIGH · Class A] Compaction 프로토콜 신설 — ✅ 구현됨 (METH-056)
