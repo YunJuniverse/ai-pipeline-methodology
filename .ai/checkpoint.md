@@ -1,10 +1,10 @@
-# Checkpoint — 2026-07-08 (METH-053 guide 04→05 리넘버 + RFC-002 복구)
+# Checkpoint — 2026-07-08 (METH-054 첫 분기 회고 2026-Q3 + MP-003)
 
-> ✅ METH-053: ① 상류 산출물 채널 분리 지침 `04`→`05` 리넘버(ai-icons·icons-invest 커스텀 04 doc_id
-> 충돌 회피) + guide 02 §8 지침번호 예약(상류 00–89 / 다운스트림 90–99). ② **RFC-002 복구** —
-> METH-052(#42)가 스택 PR 함정으로 main 미도달·고아화되어 파일 복원, main 직접 PR로 재포함.
-> ⚠️ 교훈: 스택 PR은 base PR 먼저 머지 시 stale 브랜치로 머지돼 고아화 — 앞으로 main 직접 PR 순차 진행.
-> 다음: `70_meta/retrospectives` 첫 회고(무게 감사 HIGH + 이 두 교훈 정식화).
+> ✅ METH-054: 백서 §9 ROI 게이트 **첫 발화**(~9주 초과). `70_meta/retrospectives/2026-Q3_first-methodology-review.md`.
+> **정직 모드**: 지표 인프라 미달(관찰 41/권장 100·active Catalog 1/권장 5) → README 규칙대로 다음 분기 P1=지표 인프라.
+> 다음 분기 우선순위: P1 지표+thinktank 존폐(a되살림/b공식화, **b권장**) · P2 compaction(RFC-002 R2) · P3 온보딩 다이어트.
+> **RFC-002 draft→accepted 권장**(회고 머지=비준). 스택-PR 고아화 교훈 → `MP-003` pending(N≥2 재발 시 MC 승급).
+> (선행 완료: #41 guide 05 · #43 리넘버+RFC-002 복구 모두 main 반영됨.)
 
 ---
 
@@ -17,7 +17,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-053-guide-renumber` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-054-first-retrospective` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -54,9 +54,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-053 PR(main 직접) 리뷰·머지 — guide 04→05 리넘버 + guide 02 §8 + RFC-002 복구.
-2. 머지 후 `70_meta/retrospectives` 첫 회고 작성(무게 감사 HIGH + 스택-머지 고아 교훈 + guide-04 충돌 교훈 정식화).
-3. 회고에서 RFC-002 draft→accepted 판정 → R2(compaction, Class A)부터. guide 05 다운스트림 sync(충돌 해소됨).
+1. METH-054 회고 PR(main 직접) 리뷰·머지 — 머지 = RFC-002 accepted 비준.
+2. P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A, 가장 가벼움)부터 착수.
+3. P1 지표 인프라 + thinktank 존폐 결정(b 공식화 권장). guide 05 다운스트림 sync(충돌 해소됨).
 
 ## 미해결 결정사항 (Open Questions)
 
