@@ -1,10 +1,11 @@
-# Checkpoint — 2026-07-08 (METH-055 RFC-002 accepted 비준)
+# Checkpoint — 2026-07-08 (METH-056 Compaction 프로토콜 구현 — RFC-002 R2)
 
-> ✅ METH-055: #44(2026-Q3 회고) 머지가 사람 게이트 → **RFC-002 status=accepted** 비준(accepted_via #44,
-> relates_to [RFC-001,2026-Q3,MP-003]). 별도 ADR 미승급(RFC-001 선례; 개별 R1~R6 Class B/C만 각자 ADR).
-> **발전 로드맵이 방법론 진화 백로그로 확정** — 이제 진단·문서화가 아니라 **실제 구현 단계.**
-> ⏭ 즉시 착수 후보: **P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A)** — 가장 가벼운 "실제로 고침" 1건.
-> (선행 완료 main 반영: #41 guide 05 · #43 리넘버+RFC-002 복구 · #44 회고+MP-003.)
+> ✅ METH-056: RFC-002 로드맵의 **첫 실제 구현** — 진단·문서화를 넘어 약점(런타임 compaction 규율)을 고침.
+> `20_guides/06_컨텍스트_컴팩션_프로토콜.md` 신설: compaction 경계 보존/폐기 규칙 + checkpoint를 세션 종료뿐
+> 아니라 **compaction 경계·긴 세션 자연 경계**에서도 갱신(=세션 중간 인계) + pre-compaction 체크리스트.
+> CLAUDE/AGENTS 세션 절차에 "컴팩션 경계 트리거" 편입(로드·준수 강제). README 06 + RFC-002 R2 ✅구현 표시.
+> ⏭ 다음: guide 06 sync · P1(R1 Reflect/Learn 자동화, b 공식화 권장) · P3(온보딩 다이어트).
+> (이 세션 main 반영: #41 guide 05 · #43 리넘버+RFC-002복구 · #44 회고 · #45 RFC-002 accepted.)
 
 ---
 
@@ -17,7 +18,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-055-accept-rfc002` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-056-compaction-protocol` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -54,9 +55,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-055 PR(RFC-002 accepted) 리뷰·머지.
-2. **P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A) 실제 구현** — "compaction 경계에서 무엇이 살아남는가" 스펙 신설(보존=아키텍처 결정·게이트 상태·open question / 폐기=원시 툴 출력·중복) + checkpoint 트리거를 compaction 경계로 확장. 로드맵의 첫 실제 구현.
-3. P1 지표 인프라 + thinktank 존폐(b 공식화 권장). guide 05 다운스트림 sync.
+1. METH-056 PR(compaction 프로토콜) 리뷰·머지 → guide 06 다운스트림 sync(20_guides shared).
+2. **P1 (RFC-002 R1) 지표 인프라 + thinktank 존폐** 결정·구현 — b(수동 승급 공식화 + 지표 로깅) 권장. 회고가 최우선으로 꼽은 항목.
+3. P3 온보딩 밴드 다이어트(무게 감사 MED: HOW_TO_APPLY §6 → CLAUDE 링크 축약).
 
 ## 미해결 결정사항 (Open Questions)
 

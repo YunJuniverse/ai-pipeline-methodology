@@ -43,9 +43,10 @@ relates_to: [RFC-001, 2026-Q3, MP-003]
 - (b) thinktank를 wrap/ship 케이던스에 결합하거나, 최소한 "수동 승급이 정식"임을 문서·CLI 도크스트링에 반영(문서-현실 부패 해소).
 **출처:** ERL(arXiv 2603.24639), Anthropic note-taking.
 
-### R2 [HIGH · Class A] Compaction 프로토콜 신설
+### R2 [HIGH · Class A] Compaction 프로토콜 신설 — ✅ 구현됨 (METH-056)
 **갭:** Anthropic이 장기 실행의 1순위 기법으로 꼽는 compaction("한계 근처 요약·재시작, recall 최대화 후 precision")이 방법론에 부재. checkpoint는 세션 종료 시점 기준일 뿐 *긴 단일 세션의 compaction 규율*이 없음.
 **제안:** "compaction 경계에서 무엇이 살아남는가" 스펙 신설(보존=아키텍처 결정·게이트 상태·미해결 open question / 폐기=원시 툴 출력·중복). checkpoint 트리거를 세션 종료뿐 아니라 compaction 경계에도 확장.
+**구현:** `20_guides/06_컨텍스트_컴팩션_프로토콜.md`(보존/폐기 규칙·pre-compaction 체크리스트) + CLAUDE/AGENTS 운영 규칙에 "컴팩션 경계 트리거" 편입. 로드맵의 **첫 실제 구현**.
 **출처:** Anthropic context engineering.
 
 ### R3 [MED · Class A] Budget & stop conditions 도입
