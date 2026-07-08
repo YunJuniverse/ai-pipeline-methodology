@@ -1,10 +1,10 @@
-# Checkpoint — 2026-07-08 (METH-054 첫 분기 회고 2026-Q3 + MP-003)
+# Checkpoint — 2026-07-08 (METH-055 RFC-002 accepted 비준)
 
-> ✅ METH-054: 백서 §9 ROI 게이트 **첫 발화**(~9주 초과). `70_meta/retrospectives/2026-Q3_first-methodology-review.md`.
-> **정직 모드**: 지표 인프라 미달(관찰 41/권장 100·active Catalog 1/권장 5) → README 규칙대로 다음 분기 P1=지표 인프라.
-> 다음 분기 우선순위: P1 지표+thinktank 존폐(a되살림/b공식화, **b권장**) · P2 compaction(RFC-002 R2) · P3 온보딩 다이어트.
-> **RFC-002 draft→accepted 권장**(회고 머지=비준). 스택-PR 고아화 교훈 → `MP-003` pending(N≥2 재발 시 MC 승급).
-> (선행 완료: #41 guide 05 · #43 리넘버+RFC-002 복구 모두 main 반영됨.)
+> ✅ METH-055: #44(2026-Q3 회고) 머지가 사람 게이트 → **RFC-002 status=accepted** 비준(accepted_via #44,
+> relates_to [RFC-001,2026-Q3,MP-003]). 별도 ADR 미승급(RFC-001 선례; 개별 R1~R6 Class B/C만 각자 ADR).
+> **발전 로드맵이 방법론 진화 백로그로 확정** — 이제 진단·문서화가 아니라 **실제 구현 단계.**
+> ⏭ 즉시 착수 후보: **P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A)** — 가장 가벼운 "실제로 고침" 1건.
+> (선행 완료 main 반영: #41 guide 05 · #43 리넘버+RFC-002 복구 · #44 회고+MP-003.)
 
 ---
 
@@ -17,7 +17,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-054-first-retrospective` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-055-accept-rfc002` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -54,9 +54,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-054 회고 PR(main 직접) 리뷰·머지 — 머지 = RFC-002 accepted 비준.
-2. P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A, 가장 가벼움)부터 착수.
-3. P1 지표 인프라 + thinktank 존폐 결정(b 공식화 권장). guide 05 다운스트림 sync(충돌 해소됨).
+1. METH-055 PR(RFC-002 accepted) 리뷰·머지.
+2. **P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A) 실제 구현** — "compaction 경계에서 무엇이 살아남는가" 스펙 신설(보존=아키텍처 결정·게이트 상태·open question / 폐기=원시 툴 출력·중복) + checkpoint 트리거를 compaction 경계로 확장. 로드맵의 첫 실제 구현.
+3. P1 지표 인프라 + thinktank 존폐(b 공식화 권장). guide 05 다운스트림 sync.
 
 ## 미해결 결정사항 (Open Questions)
 

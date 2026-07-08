@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-054 **첫 분기 회고(2026-Q3) + MP-003**. 백서 §9 ROI 게이트 발화(~9주 초과). 지표 미달(관찰 41/권장 100·Catalog 1/권장 5) 정직 기록 → 다음 분기 P1=지표 인프라+thinktank 존폐, P2=compaction(R2), P3=온보딩 다이어트. RFC-002 draft→accepted 권장. 스택-PR 고아화를 `MP-003`으로 캡처. Class A. PR 대기(main 직접).
+- **Working on**: METH-055 **RFC-002 draft→accepted 비준**. #44 회고 머지가 사람 게이트 → RFC-002 status=accepted + accepted_via(2026-Q3 회고/#44) + relates_to 갱신. 별도 ADR 미승급(RFC-001 선례; 로드맵이라 개별 Class B/C 항목만 ADR). Class A. PR 대기(main 직접).
 - **Current mode**: fullstack
-- **Next TODO**: ① 회고 머지 = RFC-002 accepted 비준 + P1~P3 착수. ② P2 compaction 프로토콜(METH-056, 가장 가벼움)부터. ③ guide 05 다운스트림 sync(충돌 해소됨).
+- **Next TODO**: ① **P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A)** — 가장 가벼운 "실제 구현" 1건, 즉시 착수. ② P1 지표 인프라 + thinktank 존폐(b 공식화 권장). ③ guide 05 다운스트림 sync(충돌 해소됨).
 - **Blockers**: none
 
 ## Active Links
@@ -33,11 +33,11 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-07-08: **METH-054 첫 분기 회고(2026-Q3) + MP-003 (Class A)** — 백서 §9 ROI 게이트 첫 발화(~9주 초과, 무게 감사·SOTA 평가가 촉발). `70_meta/retrospectives/2026-Q3_first-methodology-review.md` — **정직 모드: 지표 인프라 미달**(관찰 41/권장 100·active Catalog 1/권장 5), README 규칙대로 "지표 인프라 1순위" 자인. 효과적=경험 루프 1회전 완주·서브에이전트 하네스 / 부패=thinktank 휴면·온보딩 중복·프로세스 사고 2건. 다음 분기 P1 지표+thinktank 존폐(a되살림/b공식화, b권장)·P2 compaction(R2)·P3 온보딩 다이어트. **RFC-002 draft→accepted 권장**(머지=비준). 스택-PR 고아화를 `70_meta/catalog/_pending/MP-003`으로 캡처(N≥2 재발 시 MC 승급).
+- 2026-07-08: **METH-055 RFC-002 draft→accepted 비준 (Class A)** — #44(2026-Q3 회고) 머지 = 사람 게이트 통과 → `70_meta/rfc/RFC-002` status=accepted, accepted_at·accepted_via(#44)·relates_to([RFC-001,2026-Q3,MP-003]) 갱신 + 비준 blockquote. 별도 단일 ADR 미승급(RFC-001 선례: accepted Class A 로드맵/도구 RFC는 ADR 미승급; 개별 R1~R6의 Class B/C 항목만 각자 ADR). 발전 로드맵이 방법론 진화 백로그로 확정 — 다음은 실제 구현(P2 compaction부터).
+- 2026-07-08: **METH-054 첫 분기 회고(2026-Q3) + MP-003 (Class A, PR #44 머지)** — 백서 §9 ROI 게이트 첫 발화(~9주 초과, 무게 감사·SOTA 평가가 촉발). `70_meta/retrospectives/2026-Q3_first-methodology-review.md` — **정직 모드: 지표 인프라 미달**(관찰 41/권장 100·active Catalog 1/권장 5), README 규칙대로 "지표 인프라 1순위" 자인. 효과적=경험 루프 1회전 완주·서브에이전트 하네스 / 부패=thinktank 휴면·온보딩 중복·프로세스 사고 2건. 다음 분기 P1 지표+thinktank 존폐(a되살림/b공식화, b권장)·P2 compaction(R2)·P3 온보딩 다이어트. **RFC-002 draft→accepted 권장**(머지=비준). 스택-PR 고아화를 `70_meta/catalog/_pending/MP-003`으로 캡처(N≥2 재발 시 MC 승급).
 - 2026-07-08: **METH-053 guide 04→05 리넘버 + 식별자 예약범위 + RFC-002 복구 (Class A, PR #43 머지)** — ① 상류 산출물 채널 분리 지침을 `04`→`05`로 이동(ai-icons·icons-invest가 커스텀 `04_프로젝트_문서_보관_및_분류` 점유 → doc_id 충돌 회피). guide 02 §8 신설: 지침 번호 예약(상류 00–89 / 다운스트림-커스텀 90–99), 레거시 비준수 04는 마이그레이션 대상. CLAUDE/AGENTS/README 참조 05로 갱신. ② **RFC-002 복구** — METH-052(#42)가 스택 PR 함정(base=이미 머지된 meth-051 브랜치)으로 main 미도달·고아화 → 파일 복원해 main 직접 PR에 재포함.
 - 2026-07-08: **METH-052 SOTA 평가 + RFC-002 발전 로드맵 (Class A)** — 무게 감사(에이전트 16개, MIXED: 코어 정당·군살 국소[온보딩 밴드 중복·휴면 thinktank·~9주 초과 ROI 게이트]) + SOTA 웹 리서치(harness/context/loop engineering·ERL: 코어가 정합/선행, 약점=Reflect/Learn 자동화+compaction·budget). `70_meta/rfc/RFC-002`(draft, R1~R6). ※#42 고아화로 main 미반영 → METH-053에서 복구.
 - 2026-07-08: **METH-051 산출물 채널 분리 지침 신설 (Class A, PR #41 머지)** — 다운스트림(ai-icons) 반복 피드백("작업 메타를 산출물에 넣지 마라", 06-19→07-06→07-07 + 명시승인)을 에이전트 토론(찬반→반론→심판)으로 상류 격상 판정. 결론: 백서 헌법 직행이 아닌 전-도메인 지침. `20_guides/04_산출물_채널_분리_규칙.md`(청중 축=외부 무맥락 공유 여부로 트리거, 주제 축=changelog류 예외, 메타는 삭제 아닌 라우팅) + CLAUDE/AGENTS File Roles "Output channel" 행 + README 카탈로그(02·03·04). 백서 미수정(제0·제2·§8-4·§8-5 인용만). 강제 grep 래칫은 §7 스펙만(fail-open 금지).
-- 2026-06-29: **METH-050 P-002 → active `C-001` 승급 (사용자 승인)** — N≥2(gamblescan 실세계 + canonical) 근거로 자가발전 루프 1회전 완결. ① `50_resources/catalog/C-001_frontend-design-tokens.md`(active, P-002 삭제) ② 스켈레톤 `bakes-in.json`에 C-001 합류 → `skeleton build`로 lock/README 재생성(이제 새 프로젝트 자동 주입) ③ canonical 가드레일을 *전 prefix × 전 Tailwind 팔레트 family*로 broaden(교훈②, amber/blue/rose 더미 검출 확인) ④ 지침20 v2 + design-system.md + README 갱신. Class A.
 - 2026-06-29: **METH-049 gamblescan 실세계 검증 — 패턴 교훈 2건 + P-002 N≥2** — canonical 스켈레톤을 gamblescan(독립 구현, hex 3,030 codemod 완료)에 교차검증. ① gamblescan 가드레일이 `text-` 회색만 검사 → `bg-/border-/from-/shadow-` 회색 **32건(13파일)**이 CI 초록불 뒤로 누출됨을 canonical(전 prefix)이 검출 → gs PR #155로 리트로핏(Silver→허용hex, 구조→토큰, 가드레일 broaden). ② **off-system은 회색만 아님** — amber/orange 251건 잔존(canonical 가드레일도 회색만 잡음 → 비-회색 팔레트 broaden 검토). P-002 status=tentative, **N≥2 충족(gamblescan 실세계 + canonical) → C-NNN 승급 후보(사람 승인 대기)**.
 - 2026-06-24: **METH-048 백서·온보딩에 코드 품질 가드레일 통합** — 지침 19(METH-047)를 standalone에서 *방법론 표준 서사*로 통합(사용자 지시). `방법론_백서_가이드.md` §5 "코드 품질 craft(Guardrails by Construction)" + §7 워크플로 day-1 가드레일·lint 게이트 / **`WHITEPAPER.md`(헌법) §8-5 신규 운영 원칙**(AI 안전+코드 품질 횡단) + 부록A + v0.3.0 / `HOW_TO_APPLY.md` §5 Fullstack 게이트. 백서 변경이라 **Class C·ADR-003 신설**(사용자 지시=승인). PR 대기.
 - 2026-06-24: **METH-047 클린아키텍처·클린코드 지침 19 신설 (PR #36 머지)** — GambleScan REFACTOR-CLEAN(~50 PR) 회고 역주입. 4 코드 가드레일(레이어경계·no-explicit-any·no-console·max-lines=400)·래칫·4-레이어·god파일 분할·day-1 체크리스트. 지침 17 §4.2의 코드 품질 인스턴스화. Class A.
