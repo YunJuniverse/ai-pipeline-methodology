@@ -9,7 +9,7 @@
 
 - **Project Name**: [PROJECT_NAME]
 - **Objective**: [one-line goal]
-- **Mode**: [planning / dev / fullstack / agency / lean / ops]  <!-- 모드별 권장 템플릿 세트는 50_resources/templates/_CATALOG.md 참조 — 필요한 템플릿만 로드 -->
+- **Mode**: [planning / planning-handoff / dev / fullstack / agency / lean / ops]  <!-- 모드별 권장 템플릿 세트는 50_resources/templates/_CATALOG.md 참조 — 필요한 템플릿만 로드. planning-handoff(사람 개발자 인계)는 20_guides/09 재포맷 규칙 적용 -->
 - **Stack**: [confirmed stack]
 - **Primary Approver**: [name or role]
 - **Started On**: [YYYY-MM-DD]

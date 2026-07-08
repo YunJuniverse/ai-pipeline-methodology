@@ -1,12 +1,9 @@
-# Checkpoint — 2026-07-08 (METH-060 다운스트림 sync 전파)
+# Checkpoint — 2026-07-08 (METH-061 planning-handoff 모드 코드화)
 
-> ✅ METH-060: 신규 지침 05~08 + guide 02 §8 + thinktank + HOW_TO_APPLY §6을 적용 프로젝트에 전파.
-> **완료: icons(`5564bc11`)·gamblescan(`792ad1e`)** — clean·feature 브랜치라 main 전환→sync --apply→
-> 커밋(`--no-verify` 순수 sync)→원 브랜치 복귀, 산출물 혼입 0 검증.
-> **홀드: ai-icons**(커스텀 05 회의록·21 산출물채널분리 번호/내용 충돌 → dedup·90+ 마이그레이션 별건, Open Issue 등재),
-> **cafe24·icons-invest**(dirty). → active 백로그 0, 홀드 항목은 Open Issue/Next TODO에 durable 기록.
-> 🏁 이 세션 종료: 원칙 격상(#41)→감사·평가(#43)→회고(#44)→비준(#45)→구현 R2·R1b·P3·R3·R4(#46~49)→sync(이번).
-> (다음 세션: ai-icons 번호 정리(별건 repo 세션) · cafe24·icons-invest clean 후 sync · 2026-Q4 회고.)
+> ✅ METH-061: 방법론 기본 가정(1인+AI, 산출물=AI 입력)이 "기획 전담자 → 별도 *사람* 개발자"
+> 분업에서 깨지는 경우를 코드화. 신규 지침 `20_guides/09_기획_핸드오프_재포맷_규칙.md` +
+> `_CATALOG.md` 7번째 모드 `planning-handoff` + 모드 열거 5곳 전파.
+> 🏁 다음: PR 리뷰·머지. 이후 guide 09를 다운스트림 sync 대상에 포함. METH-060 잔여(ai-icons 번호 정리 등) 유효.
 
 ---
 
@@ -19,7 +16,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-060-sync-propagation` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-061-planning-handoff-mode` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -30,44 +27,41 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-051 — 산출물 채널 분리 지침 04** (에이전트 토론 2회 + 사용자 스코프 확정):
+**METH-061 — planning-handoff 모드 + 재포맷 규칙** (사용자 발의):
 
-- 발단: ai-icons 메모리 `audience_facing_docs_no_workflow_artifacts.md`(반복 피드백 3회 + "여러 번 말했다")를
-  상류 방법론으로 격상할지 사용자가 질문 → 에이전트 토론(입론 찬성/반대/방법론적합성 → 교차 반론 → 심판).
-- 토론 결론: **ELEVATE_WITH_CONDITIONS** — 백서 §2 신규 원칙(헌법) 직행은 단일 도메인 N≥2라 부당(§9·§12 위반),
-  C-001 선례(단일 프로젝트→active)대로 **전-도메인 지침**이 정확한 고도. "절대"는 "라우팅+예외군"으로 완화.
-- 사용자 스코프 확정(2축): ① 청중 축 = "맥락 없는 외부 사람에게 공유되는가"로 트리거 —
-  **기획서(30_planning)·서비스페이지·앱UI·브랜드카피 = 포함 / 그 기획서를 만드는 메타문서 = 면제.**
-  ② 주제 축 = 산출물이 그 메타에 *관한* 것이면 예외(changelog·릴리스노트·API 문서·ADR·README 버전배지).
-- 변경(PR1):
-  - `20_guides/04_산출물_채널_분리_규칙.md` 신설(9절: 왜=백서 종속·두 채널 정의·트리거·판정 2축·배제 3종+예외군·
-    메타 라우팅·§7 강제 스펙·타 지침 경계·격상 이력). status:active, ai_relevance:foundational.
-  - `CLAUDE.md`·`AGENTS.md` File Roles 표에 "Output channel" 행 신설(기존 6행은 메시지 채널만 규율하던 빈칸).
-  - `20_guides/README.md` 메타밴드 카탈로그에 02·03·04 등재.
-- 백서 미수정 — 제0·제2·§8-4·§8-5를 WHY로 인용만. §7 grep 래칫은 스펙만(fail-open 금지라 반쪽 가드 안 만듦).
-
-## 같은 세션의 후속 (METH-052 = 스택 PR 2/2)
-
-- **방법론 무게 감사**(에이전트 16개): MIXED — 코어는 정당, 군살은 국소(온보딩 밴드 중복·휴면 thinktank·
-  ~9주 초과 ROI 게이트). "방법론_백서_가이드"·70_meta·30_planning stub·AGENTS 미러·템플릿 32는 load-bearing 방어.
-- **SOTA 평가**(웹 리서치): 코어가 harness/context/loop engineering·ERL과 정합/선행. 약점=Reflect/Learn 자동화 +
-  compaction·budget 규율(휴면 thinktank와 동일 지점).
-- **`70_meta/rfc/RFC-002_sota-alignment-develop-roadmap.md`** 신설(draft) — R1~R6 발전 로드맵.
+- 발단: 사용자가 "개발 전담자가 따로 있어 기획만 전담하고, 산출물을 *사람*이 읽는 포맷으로
+  재작동시켜야 할 때 기획서를 어떻게 쓰나"를 질문. 이는 방법론 기본 가정(1인+AI, 산출물=AI 입력)이
+  깨지는 경우 → 별도 모드로 코드화.
+- 핵심 통찰(전면 재작성 반대): **AI용 명세 = 생성 계약(기계는 질문 안 함 → 빈틈 0),
+  사람용 명세 = 소통 계약(사람은 되묻고 판단 → 의도 공유 + 생산적 마찰 설계).**
+  재포맷 = 얇은 변환: ① 뼈대(ID·수용기준·권한 매트릭스)는 독자 불문 유지, ② AI 전용 인코딩만
+  재포맷(ASCII 와이어프레임→실제 목업, service-policy ON/OFF→must/should, glossary `_Avoid_` 경량화),
+  ③ 사람 레이어 추가(의도·읽는 순서·목업·질문 루프·우선순위).
+- 변경:
+  - `20_guides/09_기획_핸드오프_재포맷_규칙.md` 신설(6절: 왜=계약 전환·대원칙 얇은 변환·5축 표·
+    템플릿별 유지/재프레임/매체전환/추가·타 지침 및 agency 모드와의 경계·유래). status:active, foundational.
+  - `50_resources/templates/_CATALOG.md`: §1 모드표에 `planning-handoff` 행 + §3 매트릭스에 컬럼 신설
+    + `wireframe-spec`에 †각주(재포맷 오버레이 설명).
+  - 모드 열거 5곳 전파: `CLAUDE.md`·`AGENTS.md` §1 Mode + `20_guides/00` §11.8(+ planning-handoff 설명 블록)
+    + `20_guides/README.md` §3.1(guide 09 등재) + `10_foundation/방법론_백서_가이드.md` 용어표.
+  - `ai_observations/` 2곳(2026-06-23·24, 6모드 열거)은 *역사 기록*이라 미변경(메시지 채널 규율).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-060 PR 리뷰·머지 → 이 세션 완전 종료(active 백로그 0).
-2. **ai-icons 번호 정리(별건, ai-icons repo 세션)**: 커스텀 `21_산출물채널분리`→상류 `05`로 dedup + 레거시 `04`·`05_회의록`을 guide 02 §8 예약범위(90+)로 마이그레이션 → 그 후 sync 재개.
-3. cafe24-renewal·icons-invest는 dirty 정리 후 sync. 2026-Q4 회고 시 `thinktank` 지표 추세.
+1. METH-061 PR 리뷰·머지.
+2. **다음 다운스트림 sync 시 guide 09를 전파 대상에 포함**(shared_paths에 자동 편입되는지 확인).
+3. METH-060 잔여 유효: **ai-icons 번호 정리(별건 repo 세션)** — 커스텀 `21_산출물채널분리`→상류 `05` dedup +
+   레거시 `04`·`05_회의록`을 guide 02 §8 예약범위(90+) 마이그레이션 → sync 재개. cafe24·icons-invest는 dirty 정리 후.
 
 ## 미해결 결정사항 (Open Questions)
 
-- RFC-002 R6(휴먼 게이트 다이어트)은 백서 §5 구조 변경이라 Class C 가능 — 별도 RFC 검토.
-- thinktank를 되살릴지 vs "수동 승급이 정식"으로 공식화할지 — 무게 감사와 RFC-002가 같은 질문에 수렴, 회고에서 판정.
-- guide 04 §7 강제 래칫 실제 CI 구현 시점 — RFC-002 R1/R2와 함께.
+- **planning-handoff 세트 스코프**(이번에 판단, 사용자 조정 가능): planning ∪ {user-flow·functional-spec·
+  wireframe-spec}, architecture·data-model 제외(개발자 소유). 실사용에서 개발자가 data-model까지 원하면 확장 검토.
+- guide 09 §4.2 매체 전환(ASCII→Figma)을 CI로 강제할지 — N≥2 재현 시 별도 래칫(현재는 사람·AI 규율).
+- RFC-002 R6(휴먼 게이트 다이어트)은 백서 §5 구조 변경이라 Class C 가능 — 별도 RFC.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-051-output-channel-separation`(PR1). PR2는 이 브랜치 위에 스택.
-- PR1 변경: `20_guides/04_*.md`(신규) + `CLAUDE.md`·`AGENTS.md`(File Roles 행) + `20_guides/README.md` + 라이브 4종.
-- PR2 변경: `70_meta/rfc/RFC-002_*.md`(신규) + 라이브 4종(증분).
+- 브랜치: `claude/meth-061-planning-handoff-mode`. main 직접 PR(스택 금지).
+- 변경: `20_guides/09_*.md`(신규) + `_CATALOG.md` + `CLAUDE.md`·`AGENTS.md` + `20_guides/00`·`README.md`
+  + `10_foundation/방법론_백서_가이드.md` + 라이브 4종(TODO·HANDOFF·checkpoint·관찰로그).

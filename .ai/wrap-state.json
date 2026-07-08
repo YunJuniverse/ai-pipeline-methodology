@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "47932d83e98ed04ca737ea378ccd9ad5c07b34e8",
-  "last_validated_at": "2026-07-08T06:40:19Z",
+  "last_validated_commit": "f9575645b62c82e0d72fa24135d8cf34c4ea586e",
+  "last_validated_at": "2026-07-08T07:47:22Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "802d046eb024f1f15c45011bf0c0d5fea21feb0086aa198bf9b8ba037eb7e6c3"
+      "sha256": "0ce4b03f3a361cd377dc5e6a25782a1a8979a436cad684677143489b44c5501b"
     },
     "TODO.md": {
-      "sha256": "f479923728a4de02394b0724b7ccca571475724ab8998bf661a5f5fedb959c77"
+      "sha256": "b2463b41118a7bd7d6b6ef1eb164e1a5dc4efe1096360828327c2d58ea71dc09"
     },
     ".ai/checkpoint.md": {
-      "sha256": "0aa503d206d7e51de74324ff5976c2ee24872ab0ac8253c21d0cf9e633be2126"
+      "sha256": "304f4b02e8ecff4b14ae55ad4800fb382b5bf32fcc22a2b8fd6a771df8c91652"
     }
   },
   "observations": {
@@ -61,6 +61,9 @@
       "50_resources/ai_observations/2026-07-08_meth-056-compaction-protocol.md",
       "50_resources/ai_observations/2026-07-08_meth-057-metrics-thinktank-reframe.md",
       "50_resources/ai_observations/2026-07-08_meth-058-onboarding-band-diet.md",
+      "50_resources/ai_observations/2026-07-08_meth-059-roadmap-closure-r3-r4.md",
+      "50_resources/ai_observations/2026-07-08_meth-060-downstream-sync-propagation.md",
+      "50_resources/ai_observations/2026-07-08_meth-061-planning-handoff-mode.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
