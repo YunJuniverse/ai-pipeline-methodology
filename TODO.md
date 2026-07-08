@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-058 · 온보딩 밴드 다이어트 (무게 감사 MED, P3)
+- **notes**: 2026-07-08. Class A. PR 대기(main 직접). 회고 P3. `HOW_TO_APPLY §6` Change Class 전문(35줄, CLAUDE §3 재서술·드리프트)을 요지 3줄 + **CLAUDE §3 단일출처 포인터**(8줄)로 축약. 앵커 참조 0(안전), shared_paths라 하류 무게 동시 감소. USER_GUIDE §8·WHITEPAPER §8-2·AGENTS·DIAGRAM은 load-bearing이라 미변경(감사 판정 준수). **회고 3대 우선순위(P1·P2·P3) 전부 실제 구현 완료.**
+
 ### METH-057 · 지표 인프라 + thinktank 재구성 (RFC-002 R1(b))
 - **notes**: 2026-07-08. Class A. PR 대기(main 직접). 회고 최우선(P1). 휴면·"자동 루프" 과장이던 thinktank를 **정직한 지표 집계 + 후보 마킹** 도구로 재구성 — `cmd_thinktank` 출력에 §7-근접 지표(관찰 43·62일·주당 4.9·task 분포·마찰/재적중/후보) 신설, 도크스트링·`catalog/_README §승급`·`retrospectives/README`에 "수동 승급이 정식·자동 승급 없음" 명문화(문서-현실 부패 해소). 회고 §1 지표 소스 연결. 실행 검증(43건 실측). RFC-002 R1 🟡부분구현. R1(a) 관련성 자동 주입=임베딩 어댑터 필요 → 별도 후속. 다음: P3 온보딩 다이어트.
 
@@ -24,13 +27,7 @@
 ### METH-055 · RFC-002 draft→accepted 비준
 - **notes**: 2026-07-08. Class A. **PR #45 머지 완료**. #44(2026-Q3 회고) 머지 = 사람 게이트 → `70_meta/rfc/RFC-002` status=accepted + accepted_via(#44)·relates_to·비준 blockquote. 별도 ADR 미승급(RFC-001 선례). 발전 로드맵이 진화 백로그로 확정.
 
-### METH-054 · 첫 분기 회고(2026-Q3) + MP-003
-- **notes**: 2026-07-08. Class A. PR 대기(main 직접). 백서 §9 ROI 게이트 첫 발화(~9주 초과). `70_meta/retrospectives/2026-Q3_first-methodology-review.md` — 5섹션. **정직 모드**: 지표 인프라 미달(관찰 41/100·Catalog 1/5) → README 규칙대로 다음 분기 P1=지표 인프라+thinktank 존폐(a되살림/b공식화, b권장). P2=compaction(RFC-002 R2, Class A). P3=온보딩 밴드 다이어트(무게 감사 MED). **RFC-002 draft→accepted 권장**(이 회고 머지=비준). 스택-PR 고아화 교훈을 `70_meta/catalog/_pending/MP-003_stacked-pr-orphan.md`로 캡처(N≥2 재발 시 MC 승급). 다음: P2 compaction(METH-056)부터.
-
-### METH-053 · guide 04→05 리넘버 + 식별자 예약범위 + RFC-002 복구
-- **notes**: 2026-07-08. Class A. PR 대기(main 직접). ① 상류 산출물 채널 분리 지침 `04`→`05` 이동 — ai-icons·icons-invest가 커스텀 `04_프로젝트_문서_보관_및_분류`(doc_id guide-04) 점유 중이라 sync 시 충돌. guide 02 **§8 신설**: 지침 번호 예약(상류 00–89 / 다운스트림-커스텀 90–99), 레거시 비준수 04 마이그레이션 대상. CLAUDE/AGENTS/README 참조·guide 05 doc_id·heading 갱신, guide 02 v2. ② **RFC-002 복구** — METH-052(#42)가 스택 PR 함정(base=이미 머지된 meth-051)으로 main 미도달·고아화 → 파일 복원·재포함. 교훈: 스택 PR에서 base PR 먼저 머지 시 stacked PR은 stale 브랜치로 머지됨(retrospective·MC 후보).
-
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
-<!-- Archived: METH-001~053 (2026-05~07). METH-051 산출물채널분리(guide 05, #41)·052 SOTA평가/RFC-002·053 리넘버+RFC-002복구 포함. 상세는 git log --grep="METH-" 및 PR #5~#45, 40_dev/snapshots/ 참조. -->
+<!-- Archived: METH-001~054 (2026-05~07). 051 산출물채널분리(#41)·052 SOTA/RFC-002·053 리넘버+RFC-002복구(#43)·054 첫회고 2026-Q3+MP-003(#44) 포함. 상세는 git log --grep="METH-" 및 PR #5~#47, 40_dev/snapshots/ 참조. -->

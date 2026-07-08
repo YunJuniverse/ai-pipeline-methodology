@@ -100,39 +100,13 @@ cd ~/Projects/my-project
 
 ## 6. Change Class Rules
 
-### Class A
+변경의 위험도에 따라 게이트가 달라진다 — 요지:
 
-- 기본값
-- Gate는 PR merge
+- **Class A** (기본): 일반 기능·리팩터·버그픽스. Gate = merged PR.
+- **Class B**: 스키마/마이그레이션·외부 API·인증/권한·파괴적 데이터·백그라운드 잡. PR에 근거·영향범위·롤백·리스크 명시.
+- **Class C**: 가격/과금·법무/규정·브랜드·공개 릴리스·외부 약속 범위. 구현 전 ADR 또는 이슈 승인 증거 필요.
 
-### Class B
-
-자동 트리거:
-
-- DB migration
-- 새 외부 API 연동
-- 인증/권한 변경
-- destructive data change
-- background job/queue
-
-PR에 반드시 남길 것:
-
-- why
-- impact scope
-- rollback plan
-- risk note
-
-### Class C
-
-자동 후보:
-
-- 가격/과금
-- 법무/규정
-- 브랜드/공개 메시지
-- 공개 릴리스
-- 외부 약속된 범위
-
-이 경우 구현 전에 issue 또는 ADR approval evidence가 필요하다.
+> **전문(트리거·요구 증거·프로세스·자동 B/C 무단강등 금지)은 [`CLAUDE.md §3`](../CLAUDE.md)이 단일 출처다.** 이 절은 요지만 담는다 — 규칙이 갈릴 땐 항상 CLAUDE.md §3을 따른다. (등급 판정 quickref 표는 `USER_GUIDE.md §8`.)
 
 ---
 
