@@ -1,9 +1,10 @@
-# Checkpoint — 2026-07-08 (METH-051 산출물 채널 분리 지침 04 신설)
+# Checkpoint — 2026-07-08 (METH-053 guide 04→05 리넘버 + RFC-002 복구)
 
-> ✅ METH-051: 다운스트림(ai-icons) 반복 피드백 "작업 메타를 산출물에 넣지 마라"를
-> 에이전트 토론으로 상류 격상 판정 → **백서 헌법 직행 반려, 전-도메인 지침 04로 앉힘**.
-> 사용자 스코프 확정: 외부 공유 배포물(기획서·서비스페이지·앱UI)엔 메타 금지 / 그걸 만드는 메타문서는 면제.
-> 후속 METH-052: SOTA(하네스·루프·경험메모리) 평가 → RFC-002 발전 로드맵(스택 PR 2/2).
+> ✅ METH-053: ① 상류 산출물 채널 분리 지침 `04`→`05` 리넘버(ai-icons·icons-invest 커스텀 04 doc_id
+> 충돌 회피) + guide 02 §8 지침번호 예약(상류 00–89 / 다운스트림 90–99). ② **RFC-002 복구** —
+> METH-052(#42)가 스택 PR 함정으로 main 미도달·고아화되어 파일 복원, main 직접 PR로 재포함.
+> ⚠️ 교훈: 스택 PR은 base PR 먼저 머지 시 stale 브랜치로 머지돼 고아화 — 앞으로 main 직접 PR 순차 진행.
+> 다음: `70_meta/retrospectives` 첫 회고(무게 감사 HIGH + 이 두 교훈 정식화).
 
 ---
 
@@ -16,7 +17,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-051-output-channel-separation` (PR1) → `claude/meth-052-sota-roadmap` 스택(PR2)
+- Worktree: branch `claude/meth-053-guide-renumber` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -53,9 +54,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. PR1(guide 04, base main) 리뷰·머지 → 다운스트림 sync(20_guides shared).
-2. PR2(RFC-002, base=PR1 브랜치) 리뷰 → RFC-002 draft→accepted 결정.
-3. accepted면 R2(compaction 프로토콜, Class A)부터 + `70_meta/retrospectives` 첫 엔트리(무게 감사 HIGH).
+1. METH-053 PR(main 직접) 리뷰·머지 — guide 04→05 리넘버 + guide 02 §8 + RFC-002 복구.
+2. 머지 후 `70_meta/retrospectives` 첫 회고 작성(무게 감사 HIGH + 스택-머지 고아 교훈 + guide-04 충돌 교훈 정식화).
+3. 회고에서 RFC-002 draft→accepted 판정 → R2(compaction, Class A)부터. guide 05 다운스트림 sync(충돌 해소됨).
 
 ## 미해결 결정사항 (Open Questions)
 

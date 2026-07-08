@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "5e82494f940b28a5974fe33c0361ff9164a008c9",
-  "last_validated_at": "2026-06-29T02:12:54Z",
+  "last_validated_commit": "c7ae58b6694f9080fb6d1ac3a5e8b9e2171dd4e1",
+  "last_validated_at": "2026-07-08T05:12:18Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "47f9c812ea10af99d79c3eae32167da232ba61daa41575ea729f2be6be5e70f5"
+      "sha256": "cd12cb69ba00606fc28c0cac31866f23af320570e82a1a34bb71e17ad87930c5"
     },
     "TODO.md": {
-      "sha256": "965e9cbb53c8366ee6b397b81108ba1d32af67c3de291abaacc34e2abe411b4f"
+      "sha256": "c1712beeb7e221c70594cafedbdc7ee69aec4155c3872f2d3f98f1628e0cc488"
     },
     ".ai/checkpoint.md": {
-      "sha256": "416df4b3c3498c1b994886a542c487648ce61c42b90ef03886117a108ab4b425"
+      "sha256": "9395fe75aa8f9e8146e145a87fcef583b2a47bcf2594c1143e3e9eb170dcdcc0"
     }
   },
   "observations": {
@@ -54,6 +54,8 @@
       "50_resources/ai_observations/2026-06-29_meth-049-downstream-propagation.md",
       "50_resources/ai_observations/2026-06-29_meth-049-gamblescan-validation.md",
       "50_resources/ai_observations/2026-06-29_meth-050-promote-c001.md",
+      "50_resources/ai_observations/2026-07-08_meth-051-output-channel-separation-guide.md",
+      "50_resources/ai_observations/2026-07-08_meth-052-sota-evaluation-develop-roadmap.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
