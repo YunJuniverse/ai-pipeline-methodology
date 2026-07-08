@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-057 · 지표 인프라 + thinktank 재구성 (RFC-002 R1(b))
+- **notes**: 2026-07-08. Class A. PR 대기(main 직접). 회고 최우선(P1). 휴면·"자동 루프" 과장이던 thinktank를 **정직한 지표 집계 + 후보 마킹** 도구로 재구성 — `cmd_thinktank` 출력에 §7-근접 지표(관찰 43·62일·주당 4.9·task 분포·마찰/재적중/후보) 신설, 도크스트링·`catalog/_README §승급`·`retrospectives/README`에 "수동 승급이 정식·자동 승급 없음" 명문화(문서-현실 부패 해소). 회고 §1 지표 소스 연결. 실행 검증(43건 실측). RFC-002 R1 🟡부분구현. R1(a) 관련성 자동 주입=임베딩 어댑터 필요 → 별도 후속. 다음: P3 온보딩 다이어트.
+
 ### METH-056 · Compaction 프로토콜 구현 (RFC-002 R2)
 - **notes**: 2026-07-08. Class A. PR 대기(main 직접). **로드맵의 첫 실제 구현** — 진단·문서화를 넘어 약점(런타임 compaction 규율)을 실제로 고침. `20_guides/06_컨텍스트_컴팩션_프로토콜.md` 신설(보존/폐기 규칙·checkpoint를 compaction 경계 인계로 확장·pre-compaction 체크리스트). CLAUDE/AGENTS 운영 규칙에 "컴팩션 경계 트리거" 편입(부팅 로드·준수 강제). README 06 + RFC-002 R2 ✅구현 표시. 다음: guide 06 sync, P1(R1 Reflect/Learn), P3(온보딩 다이어트).
 

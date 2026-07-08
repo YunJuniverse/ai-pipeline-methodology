@@ -1,11 +1,12 @@
-# Checkpoint — 2026-07-08 (METH-056 Compaction 프로토콜 구현 — RFC-002 R2)
+# Checkpoint — 2026-07-08 (METH-057 지표 인프라 + thinktank 재구성 — RFC-002 R1(b))
 
-> ✅ METH-056: RFC-002 로드맵의 **첫 실제 구현** — 진단·문서화를 넘어 약점(런타임 compaction 규율)을 고침.
-> `20_guides/06_컨텍스트_컴팩션_프로토콜.md` 신설: compaction 경계 보존/폐기 규칙 + checkpoint를 세션 종료뿐
-> 아니라 **compaction 경계·긴 세션 자연 경계**에서도 갱신(=세션 중간 인계) + pre-compaction 체크리스트.
-> CLAUDE/AGENTS 세션 절차에 "컴팩션 경계 트리거" 편입(로드·준수 강제). README 06 + RFC-002 R2 ✅구현 표시.
-> ⏭ 다음: guide 06 sync · P1(R1 Reflect/Learn 자동화, b 공식화 권장) · P3(온보딩 다이어트).
-> (이 세션 main 반영: #41 guide 05 · #43 리넘버+RFC-002복구 · #44 회고 · #45 RFC-002 accepted.)
+> ✅ METH-057: 회고 최우선(P1). 휴면·"자동 루프" 과장이던 thinktank를 **정직한 지표 집계 + 승급 후보 마킹**
+> 도구로 재구성. `cmd_thinktank` 출력에 §7-근접 지표 신설(관찰 43·기간 62일·주당 4.9·task_type 분포·
+> 마찰/Catalog 재적중/승급 후보 수) → 회고 §1 지표 소스. 도크스트링·`catalog/_README §승급`·
+> `retrospectives/README`에 **"수동 승급이 정식·자동 승급 없음"** 명문화(문서-현실 부패 해소). 실행 검증(43건 실측).
+> RFC-002 R1 🟡부분구현. R1(a) 관련성 자동 주입=임베딩 어댑터 필요 → 별도 후속.
+> ⏭ 다음: P3 온보딩 다이어트(무게 감사 MED) · guide 06 sync · R1(a) 또는 R3 budget.
+> (이 세션 구현: R2 compaction(#46) → R1(b) 지표/thinktank(이번). 로드맵 2항목 실제 구현.)
 
 ---
 
@@ -18,7 +19,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-056-compaction-protocol` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-057-metrics-thinktank` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -55,9 +56,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-056 PR(compaction 프로토콜) 리뷰·머지 → guide 06 다운스트림 sync(20_guides shared).
-2. **P1 (RFC-002 R1) 지표 인프라 + thinktank 존폐** 결정·구현 — b(수동 승급 공식화 + 지표 로깅) 권장. 회고가 최우선으로 꼽은 항목.
-3. P3 온보딩 밴드 다이어트(무게 감사 MED: HOW_TO_APPLY §6 → CLAUDE 링크 축약).
+1. METH-057 PR(지표/thinktank 재구성) 리뷰·머지.
+2. **P3 온보딩 밴드 다이어트**(무게 감사 MED) — `HOW_TO_APPLY §6` Change Class 전문 → `CLAUDE.md §3` 링크 축약(드리프트·하류 무게 동시 해소). SAFE_TO_SIMPLIFY만.
+3. guide 05·06 다운스트림 sync(20_guides shared). 이후 R1(a) 임베딩 주입 또는 R3 budget.
 
 ## 미해결 결정사항 (Open Questions)
 
