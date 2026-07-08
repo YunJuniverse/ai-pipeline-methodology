@@ -12,6 +12,7 @@
 | 모드 | 용도 | 권장 템플릿 세트 |
 |---|---|---|
 | **planning** | 기획전용 (구현 안 함) | prd · requirements-spec · ia-spec · service-policy · user-story · kpi-tree · context-glossary · microcopy |
+| **planning-handoff** | 기획전용 → *별도 사람 개발자*에게 인계 (AI 아닌 사람이 읽음) | `planning` 세트 + user-flow · functional-spec · wireframe-spec — **단, 지침 `20_guides/09_기획_핸드오프_재포맷_규칙.md`의 재포맷 규칙을 얹어 산출**(ASCII→실제 목업, ON/OFF→must/should, 의도·읽는 순서·질문 루프 추가). architecture·data-model은 개발자 소유이므로 제외(필요 시 끌어 씀) |
 | **dev** | 개발전용 (기획 받아 구현) | architecture · data-model · user-flow · wireframe-spec · functional-spec |
 | **fullstack** | 기획+개발 일괄 | `planning` ∪ `dev` + wbs |
 | **agency** | 외주(수주·납품) SI 라이프사이클 | proposal-go-nogo · research-collection-checklist · profitability-sheet · execution-plan · wbs · qa-acceptance-plan · qa-test-scenario · qa-acceptance-signoff · operation-spec · post-launch-monitoring · work-request-ticket · glossary (+ 산출물은 `planning`/`dev`에서) |
@@ -86,36 +87,38 @@
 
 > ✓ = 그 모드의 권장 세트. `agency`는 제안·검수·운영 산출물 + 실제 기획/개발 산출물(planning/dev)을 함께 쓴다.
 
-| 템플릿 | planning | dev | fullstack | agency | lean | ops |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|
-| prd | ✓ | | ✓ | ✓ | ✓ | |
-| requirements-spec | ✓ | | ✓ | ✓ | | |
-| ia-spec | ✓ | | ✓ | ✓ | | |
-| service-policy | ✓ | | ✓ | ✓ | | |
-| user-story | ✓ | | ✓ | ✓ | | |
-| kpi-tree | ✓ | | ✓ | ✓ | | |
-| context-glossary | ✓ | | ✓ | ✓ | ✓ | |
-| microcopy | ✓ | | ✓ | ✓ | | |
-| architecture | | ✓ | ✓ | ✓ | ✓ | |
-| data-model | | ✓ | ✓ | ✓ | | |
-| user-flow | | ✓ | ✓ | ✓ | | |
-| wireframe-spec | | ✓ | ✓ | ✓ | | |
-| functional-spec | | ✓ | ✓ | ✓ | | |
-| wbs | | | ✓ | ✓ | | |
-| proposal-go-nogo | | | | ✓ | | |
-| research-collection-checklist | | | | ✓ | | |
-| profitability-sheet | | | | ✓ | | |
-| execution-plan | | | | ✓ | | |
-| qa-acceptance-plan | | | | ✓ | | ✓ |
-| qa-test-scenario | | | | ✓ | | ✓ |
-| qa-acceptance-signoff | | | | ✓ | | ✓ |
-| operation-spec | | | | ✓ | | ✓ |
-| post-launch-monitoring | | | | ✓ | | ✓ |
-| work-request-ticket | | | | ✓ | | ✓ |
-| glossary | | | | ✓ | | |
-| ADR-template | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| MASTER_PLAN | | ✓ | ✓ | ✓ | | |
-| SPRINTS | | ✓ | ✓ | ✓ | | |
+| 템플릿 | planning | planning-handoff | dev | fullstack | agency | lean | ops |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| prd | ✓ | ✓ | | ✓ | ✓ | ✓ | |
+| requirements-spec | ✓ | ✓ | | ✓ | ✓ | | |
+| ia-spec | ✓ | ✓ | | ✓ | ✓ | | |
+| service-policy | ✓ | ✓ | | ✓ | ✓ | | |
+| user-story | ✓ | ✓ | | ✓ | ✓ | | |
+| kpi-tree | ✓ | ✓ | | ✓ | ✓ | | |
+| context-glossary | ✓ | ✓ | | ✓ | ✓ | ✓ | |
+| microcopy | ✓ | ✓ | | ✓ | ✓ | | |
+| architecture | | | ✓ | ✓ | ✓ | ✓ | |
+| data-model | | | ✓ | ✓ | ✓ | | |
+| user-flow | | ✓ | ✓ | ✓ | ✓ | | |
+| wireframe-spec | | ✓† | ✓ | ✓ | ✓ | | |
+| functional-spec | | ✓ | ✓ | ✓ | ✓ | | |
+| wbs | | | | ✓ | ✓ | | |
+| proposal-go-nogo | | | | | ✓ | | |
+| research-collection-checklist | | | | | ✓ | | |
+| profitability-sheet | | | | | ✓ | | |
+| execution-plan | | | | | ✓ | | |
+| qa-acceptance-plan | | | | | ✓ | | ✓ |
+| qa-test-scenario | | | | | ✓ | | ✓ |
+| qa-acceptance-signoff | | | | | ✓ | | ✓ |
+| operation-spec | | | | | ✓ | | ✓ |
+| post-launch-monitoring | | | | | ✓ | | ✓ |
+| work-request-ticket | | | | | ✓ | | ✓ |
+| glossary | | | | | ✓ | | |
+| ADR-template | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| MASTER_PLAN | | | ✓ | ✓ | ✓ | | |
+| SPRINTS | | | ✓ | ✓ | ✓ | | |
+
+> **† `planning-handoff`의 산출물은 AI가 아닌 *사람 개발자*가 읽는다** — 위 세트를 지침 `20_guides/09_기획_핸드오프_재포맷_규칙.md`의 재포맷 규칙으로 변환해 산출한다: `wireframe-spec`은 ASCII 대신 **실제 목업/Figma**로, `service-policy`의 ON/OFF는 **must/should**로, `context-glossary`의 `_Avoid_`는 경량화, 그리고 **의도(왜)·읽는 순서·열린 질문 루프**를 얹는다. `architecture`·`data-model`은 개발자 소유이므로 기본 제외(필요 시 끌어 씀).
 
 ---
 
