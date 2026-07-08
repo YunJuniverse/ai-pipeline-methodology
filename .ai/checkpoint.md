@@ -1,11 +1,11 @@
-# Checkpoint — 2026-07-08 (METH-058 온보딩 밴드 다이어트 — 무게 감사 MED P3)
+# Checkpoint — 2026-07-08 (METH-059 로드맵 잔여 마감 — RFC-002 R3·R4 구현)
 
-> ✅ METH-058: 회고 P3. `HOW_TO_APPLY §6` Change Class 전문(35줄, CLAUDE §3 재서술·드리프트)을
-> 요지 3줄 + **CLAUDE §3 단일출처 포인터**(8줄)로 축약. 앵커 참조 0(안전), shared_paths라 하류 무게 감소.
-> USER_GUIDE §8·WHITEPAPER §8-2·AGENTS·DIAGRAM은 load-bearing이라 미변경(감사 판정 준수).
-> 🎯 **회고 3대 우선순위(P1 지표/thinktank #47 · P2 compaction #46 · P3 온보딩 다이어트 이번) 전부 실제 구현 완료.**
-> ⏭ 다음: guide 05·06 다운스트림 sync · R1(a) 임베딩 주입/R3 budget/R4 서브에이전트 자산화 · 2026-Q4 회고 시 지표 추세.
-> (이 세션 로드맵 구현: R2(#46) → R1(b)(#47) → P3 다이어트(이번). 진단→로드맵→비준→구현 한 바퀴 완주.)
+> ✅ METH-059: Class A로 즉시 구현 가능한 로드맵 항목 마무리. R3 `20_guides/07_자율진행_예산_및_정지조건.md`
+> + R4 `20_guides/08_서브에이전트_오케스트레이션.md` 신설 + CLAUDE/AGENTS 예산 규칙 + README 07·08.
+> RFC-002: R3·R4 ✅, **R1(a)·R5·R6 ⏸보류(임베딩 어댑터 인프라 / Class C 게이트 대기)** + 로드맵 상태표.
+> ⚠️ 잔여(R1a·R5·R6)는 미완 작업 아닌 *선행조건 있는 미래 항목* — active 백로그 아님. 급조 금지(아스피레이셔널 함정).
+> ⏭ 남은 실행 항목: **guide 05·06·07·08 다운스트림 sync**(그 뒤 active 백로그 0). 2026-Q4 회고 시 thinktank 지표.
+> (이 세션 로드맵: R2(#46)→R1b(#47)→P3(#48)→R3·R4(이번). Class A 로드맵 전부 구현, 나머지 정직하게 파킹.)
 
 ---
 
@@ -18,7 +18,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-058-onboarding-diet` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-059-roadmap-closure` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -55,9 +55,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-058 PR(온보딩 다이어트) 리뷰·머지 → **회고 3대 우선순위 전부 종료.**
-2. **guide 05·06 다운스트림 sync**(20_guides shared) — 산출물 채널 분리·compaction 프로토콜을 적용 프로젝트에 전파. (ai-icons 커스텀 04와 충돌 없음 — 05/06.)
-3. 다음 로드맵 항목 택1: R1(a) 관련성 임베딩 주입(Class B, 어댑터 격리) / R3 budget & stop / R4 서브에이전트 자산화. 2026-Q4 회고 시 `thinktank` 지표 추세 확인.
+1. METH-059 PR 리뷰·머지 → RFC-002 Class A 로드맵 전부 종료.
+2. **guide 05·06·07·08 다운스트림 sync** — 신규 지침 4종을 적용 프로젝트에 전파(20_guides shared). 이후 active 백로그 0.
+3. (미래·active 백로그 아님) 임베딩 어댑터 착수 시 R1(a)·R5 재개 / 게이트 다이어트 Class C RFC 제안 시 R6. 2026-Q4 회고 시 `thinktank` 지표 추세.
 
 ## 미해결 결정사항 (Open Questions)
 
