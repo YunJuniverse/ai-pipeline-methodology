@@ -1,17 +1,21 @@
 ---
 id: RFC-002
 title: 최신 하네스·루프·경험메모리 엔지니어링 대비 방법론 평가 + 발전 로드맵
-status: draft
+status: accepted
 proposed_by: claude-opus-4-8
 proposed_at: 2026-07-08
+accepted_at: 2026-07-08
+accepted_via: 2026-Q3 분기 회고 (PR #44)
 target_class: A
 supersedes: null
-relates_to: [RFC-001]
+relates_to: [RFC-001, 2026-Q3, MP-003]
 ---
 
 # RFC-002 — SOTA(하네스·루프·경험메모리) 정합 평가 + 발전 로드맵
 
 > 이 문서는 *로드맵*이다. 개별 항목은 각자의 change class로 별도 RFC/ADR·구현 커밋을 갖는다. 본 RFC 채택 = "이 로드맵을 방법론 진화 백로그로 인정"까지.
+
+> **✅ 비준 (Accepted) — 2026-07-08.** `2026-Q3` 분기 회고(PR #44 머지)로 사람 게이트 통과 = 방법론 진화 백로그로 확정. 회고 §4가 우선순위를 지정: **P1** R1(Reflect/Learn 자동화 + 지표 인프라·thinktank 존폐) · **P2** R2(compaction) · **P3** 온보딩 다이어트. 개별 항목은 구현 시 각자의 change class를 따르며, Class B/C 항목(예: R6 게이트 다이어트)은 별도 ADR을 신설한다. 별도 단일 ADR로 승급하지 않는다(RFC-001 선례 — accepted Class A RFC는 로드맵/도구 변경이라 ADR 미승급).
 
 ## Context
 
