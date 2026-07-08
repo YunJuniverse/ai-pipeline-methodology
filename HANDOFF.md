@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-050 **P-002→C-001 승급 완료**(사용자 승인). active Catalog `C-001` + 스켈레톤 bakes-in + canonical 가드레일 전-팔레트 broaden + 지침20 v2. gs#155·meth#39 머지됨. PR 대기.
+- **Working on**: METH-051 **산출물 채널 분리 지침 04 신설**(에이전트 토론 결론 + 사용자 스코프 확정: 외부 공유 배포물=기획서·서비스페이지·앱UI / 그걸 만드는 메타문서=면제). `20_guides/04` + CLAUDE/AGENTS File Roles 행 + README 카탈로그. 백서 미수정(제0·제2·§8-4·§8-5 인용). Class A. PR 대기. 후속 RFC-002(SOTA 발전 로드맵)=스택 PR.
 - **Current mode**: fullstack
-- **Next TODO**: ① METH-050 PR 머지 + 다운스트림 sync(지침20 v2·가드레일 broaden 전파). ② 전파 보류 — icons-invest(dirty 정리 후). gamblescan은 gs#155로 사실상 정합. ③ gamblescan amber/orange 251건 후속(메달 토큰화 — 별도 슬라이스).
+- **Next TODO**: ① METH-051 guide 04 PR 머지 → 다운스트림 sync(20_guides shared). ② METH-052 RFC-002 발전 로드맵 검토(draft→accepted) → R2 compaction 프로토콜부터. ③ 무게 감사 HIGH: `70_meta/retrospectives` 첫 엔트리(8주 초과 ROI 게이트 발화).
 - **Blockers**: none
 
 ## Active Links
@@ -33,6 +33,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-08: **METH-051 산출물 채널 분리 지침 04 신설 (Class A)** — 다운스트림(ai-icons) 반복 피드백("작업 메타를 산출물에 넣지 마라", 06-19→07-06→07-07 + 명시승인)을 에이전트 토론(찬반→반론→심판)으로 상류 격상 판정. 결론: 백서 헌법 직행이 아닌 전-도메인 지침. `20_guides/04_산출물_채널_분리_규칙.md`(청중 축=외부 무맥락 공유 여부로 트리거, 주제 축=changelog류 예외, 메타는 삭제 아닌 라우팅) + CLAUDE/AGENTS File Roles "Output channel" 행 + README 카탈로그(02·03·04). 백서 미수정(제0·제2·§8-4·§8-5 인용만). 강제 grep 래칫은 §7 스펙만(fail-open 금지).
 - 2026-06-29: **METH-050 P-002 → active `C-001` 승급 (사용자 승인)** — N≥2(gamblescan 실세계 + canonical) 근거로 자가발전 루프 1회전 완결. ① `50_resources/catalog/C-001_frontend-design-tokens.md`(active, P-002 삭제) ② 스켈레톤 `bakes-in.json`에 C-001 합류 → `skeleton build`로 lock/README 재생성(이제 새 프로젝트 자동 주입) ③ canonical 가드레일을 *전 prefix × 전 Tailwind 팔레트 family*로 broaden(교훈②, amber/blue/rose 더미 검출 확인) ④ 지침20 v2 + design-system.md + README 갱신. Class A.
 - 2026-06-29: **METH-049 gamblescan 실세계 검증 — 패턴 교훈 2건 + P-002 N≥2** — canonical 스켈레톤을 gamblescan(독립 구현, hex 3,030 codemod 완료)에 교차검증. ① gamblescan 가드레일이 `text-` 회색만 검사 → `bg-/border-/from-/shadow-` 회색 **32건(13파일)**이 CI 초록불 뒤로 누출됨을 canonical(전 prefix)이 검출 → gs PR #155로 리트로핏(Silver→허용hex, 구조→토큰, 가드레일 broaden). ② **off-system은 회색만 아님** — amber/orange 251건 잔존(canonical 가드레일도 회색만 잡음 → 비-회색 팔레트 broaden 검토). P-002 status=tentative, **N≥2 충족(gamblescan 실세계 + canonical) → C-NNN 승급 후보(사람 승인 대기)**.
 - 2026-06-29: **METH-049 다운스트림 전파 (지침 20) — 3/5 완료** — sync로 지침 20을 적용 프로젝트에 전파(shared=20_guides만; 스켈레톤은 skeleton apply 온디맨드, P-002는 업스트림 전용 미전파). 완료: ai-icons(`0500aa6`)·icons(`f15996c8`, 지침19·20·WHITEPAPER 일괄 catch-up)·cafe24-renewal(`ec51886`). 각 repo는 pre-push wrap 훅 때문에 `--no-verify`(순수 sync, 라이브파일 무변경 — 기존 패턴 7ef2be7과 동일). **보류**: icons-invest(main dirty=docx/pdf 미커밋)·gamblescan(`chore/design-token-arc-wrapup` 디자인토큰 작업 중 dirty). 셀렉티브 add로 프로젝트 산출물(skin-download 등) 미혼입(MC-001 준수).
@@ -41,4 +42,3 @@
 - 2026-06-24: **METH-047 클린아키텍처·클린코드 지침 19 신설 (PR #36 머지)** — GambleScan REFACTOR-CLEAN(~50 PR) 회고 역주입. 4 코드 가드레일(레이어경계·no-explicit-any·no-console·max-lines=400)·래칫·4-레이어·god파일 분할·day-1 체크리스트. 지침 17 §4.2의 코드 품질 인스턴스화. Class A.
 - 2026-06-24: **METH-046 sync mirror-delete 버그 픽스 (PR #35 머지)** — sync가 상류에 없는 다운스트림 고유 파일(ai-icons `20_guides/04`)을 조용히 삭제하던 데이터손실 차단. prune을 `--prune` opt-in으로(기본 보존+경고). Class A.
 - 2026-06-24: **METH-045 방법론 백서 겸 가이드 (PR #34 머지)** — 철학+거버넌스+기획 craft+25 템플릿/6모드+워크플로 공유용 종합본. 레포 `10_foundation/방법론_백서_가이드.md`(11섹션) + Notion In-spire 하위 페이지(app.notion.com/p/3891a2ebe06a812aa1f8cd6b79e2ae20).
-- 2026-06-24: **METH-039~044 다운스트림 sync 완료** — icons(`b1c60db`)·gamblescan(`561c0f5`)·ai-icons(`7ef2be7`) 3곳 main에 25종 템플릿+지침 전파(cafe24 제외). icons/gamblescan은 feature 브랜치라 main 전환→sync→복귀. ai-icons는 고유 자산(guide 04·CLAUDE 커스텀) 보존하며 부분 sync → 그 버그를 METH-046으로 픽스.
