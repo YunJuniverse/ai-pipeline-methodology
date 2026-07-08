@@ -1,11 +1,12 @@
-# Checkpoint — 2026-07-08 (METH-059 로드맵 잔여 마감 — RFC-002 R3·R4 구현)
+# Checkpoint — 2026-07-08 (METH-060 다운스트림 sync 전파)
 
-> ✅ METH-059: Class A로 즉시 구현 가능한 로드맵 항목 마무리. R3 `20_guides/07_자율진행_예산_및_정지조건.md`
-> + R4 `20_guides/08_서브에이전트_오케스트레이션.md` 신설 + CLAUDE/AGENTS 예산 규칙 + README 07·08.
-> RFC-002: R3·R4 ✅, **R1(a)·R5·R6 ⏸보류(임베딩 어댑터 인프라 / Class C 게이트 대기)** + 로드맵 상태표.
-> ⚠️ 잔여(R1a·R5·R6)는 미완 작업 아닌 *선행조건 있는 미래 항목* — active 백로그 아님. 급조 금지(아스피레이셔널 함정).
-> ⏭ 남은 실행 항목: **guide 05·06·07·08 다운스트림 sync**(그 뒤 active 백로그 0). 2026-Q4 회고 시 thinktank 지표.
-> (이 세션 로드맵: R2(#46)→R1b(#47)→P3(#48)→R3·R4(이번). Class A 로드맵 전부 구현, 나머지 정직하게 파킹.)
+> ✅ METH-060: 신규 지침 05~08 + guide 02 §8 + thinktank + HOW_TO_APPLY §6을 적용 프로젝트에 전파.
+> **완료: icons(`5564bc11`)·gamblescan(`792ad1e`)** — clean·feature 브랜치라 main 전환→sync --apply→
+> 커밋(`--no-verify` 순수 sync)→원 브랜치 복귀, 산출물 혼입 0 검증.
+> **홀드: ai-icons**(커스텀 05 회의록·21 산출물채널분리 번호/내용 충돌 → dedup·90+ 마이그레이션 별건, Open Issue 등재),
+> **cafe24·icons-invest**(dirty). → active 백로그 0, 홀드 항목은 Open Issue/Next TODO에 durable 기록.
+> 🏁 이 세션 종료: 원칙 격상(#41)→감사·평가(#43)→회고(#44)→비준(#45)→구현 R2·R1b·P3·R3·R4(#46~49)→sync(이번).
+> (다음 세션: ai-icons 번호 정리(별건 repo 세션) · cafe24·icons-invest clean 후 sync · 2026-Q4 회고.)
 
 ---
 
@@ -18,7 +19,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-059-roadmap-closure` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-060-sync-propagation` (main 직접 PR — 스택 금지)
 
 ## 부팅 계약
 
@@ -55,9 +56,9 @@
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-059 PR 리뷰·머지 → RFC-002 Class A 로드맵 전부 종료.
-2. **guide 05·06·07·08 다운스트림 sync** — 신규 지침 4종을 적용 프로젝트에 전파(20_guides shared). 이후 active 백로그 0.
-3. (미래·active 백로그 아님) 임베딩 어댑터 착수 시 R1(a)·R5 재개 / 게이트 다이어트 Class C RFC 제안 시 R6. 2026-Q4 회고 시 `thinktank` 지표 추세.
+1. METH-060 PR 리뷰·머지 → 이 세션 완전 종료(active 백로그 0).
+2. **ai-icons 번호 정리(별건, ai-icons repo 세션)**: 커스텀 `21_산출물채널분리`→상류 `05`로 dedup + 레거시 `04`·`05_회의록`을 guide 02 §8 예약범위(90+)로 마이그레이션 → 그 후 sync 재개.
+3. cafe24-renewal·icons-invest는 dirty 정리 후 sync. 2026-Q4 회고 시 `thinktank` 지표 추세.
 
 ## 미해결 결정사항 (Open Questions)
 
