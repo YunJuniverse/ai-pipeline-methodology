@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "f9575645b62c82e0d72fa24135d8cf34c4ea586e",
-  "last_validated_at": "2026-07-08T07:47:22Z",
+  "last_validated_commit": "dcbd3e38c3137a076a18e650da94fe40aeb00ea5",
+  "last_validated_at": "2026-07-08T08:00:01Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "0ce4b03f3a361cd377dc5e6a25782a1a8979a436cad684677143489b44c5501b"
+      "sha256": "43afa88e9729517d1ce900528bcd38b665b06c8732e97c2fcc0057fa87782240"
     },
     "TODO.md": {
-      "sha256": "b2463b41118a7bd7d6b6ef1eb164e1a5dc4efe1096360828327c2d58ea71dc09"
+      "sha256": "0c55c090e9d1755e4adc95789c071e6bb071d4f9f029d2d261782d523a547322"
     },
     ".ai/checkpoint.md": {
-      "sha256": "304f4b02e8ecff4b14ae55ad4800fb382b5bf32fcc22a2b8fd6a771df8c91652"
+      "sha256": "49cda6587a00d27e44be22647138fc9ab4bff4de7848b57ddd108555296e5706"
     }
   },
   "observations": {
@@ -64,6 +64,7 @@
       "50_resources/ai_observations/2026-07-08_meth-059-roadmap-closure-r3-r4.md",
       "50_resources/ai_observations/2026-07-08_meth-060-downstream-sync-propagation.md",
       "50_resources/ai_observations/2026-07-08_meth-061-planning-handoff-mode.md",
+      "50_resources/ai_observations/2026-07-08_meth-062-api-contract-devspec-guide.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

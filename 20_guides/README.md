@@ -85,6 +85,7 @@
 | **18** | 개발 마스터 플랜 작성 지침 | 기획서를 빌드 순서로 정렬·MVP 확정·페이즈 게이트·B/C 트리거 사전 매핑 |
 | **19** | 클린아키텍처·클린코드 개발 규칙 | 4-레이어 의존성 규칙·4 코드 가드레일(레이어경계·any·console·max-lines)·래칫·god파일 분할 — 17 §4.2를 *코드 품질*에 인스턴스화(fullstack/dev 트랙) |
 | **20** | 프론트엔드 디자인 토큰 시스템 규칙 | 4기둥(시맨틱 토큰·프리미티브·색 가드레일·제약문서)·이름=역할·arbitrary hex/off-system 팔레트(전 family) fail-closed 차단 — 17 §4.2를 *시각 품질*에 인스턴스화. 패턴 active `C-001`(스켈레톤 bake-in) |
+| **21** | 개발명세 작성 지침 | 개발명세 6종(architecture·data-model·api-contract·functional-spec·user-flow·wireframe-spec) 조합·인계 표준 — 개발자용 "여기서 시작" 읽는 순서 · "개발기획서"를 단일 문서로 재번들하지 않는 이유(단일출처) |
 
 ---
 
