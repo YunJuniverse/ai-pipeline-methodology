@@ -1,9 +1,10 @@
-# Checkpoint — 2026-07-08 (METH-051 산출물 채널 분리 지침 04 신설)
+# Checkpoint — 2026-07-08 (METH-052 SOTA 평가 + RFC-002 발전 로드맵)
 
-> ✅ METH-051: 다운스트림(ai-icons) 반복 피드백 "작업 메타를 산출물에 넣지 마라"를
-> 에이전트 토론으로 상류 격상 판정 → **백서 헌법 직행 반려, 전-도메인 지침 04로 앉힘**.
-> 사용자 스코프 확정: 외부 공유 배포물(기획서·서비스페이지·앱UI)엔 메타 금지 / 그걸 만드는 메타문서는 면제.
-> 후속 METH-052: SOTA(하네스·루프·경험메모리) 평가 → RFC-002 발전 로드맵(스택 PR 2/2).
+> ✅ METH-052(스택 PR 2/2): 방법론 무게 감사(에이전트 16개) + SOTA 웹 리서치(harness/context/loop
+> engineering·ERL) → 코어는 최신 프레임과 정합/선행, 약점=루프의 Reflect/Learn 자동화 + compaction·budget
+> 규율(휴면 thinktank와 동일 지점). `70_meta/rfc/RFC-002`(R1~R6 발전 로드맵, draft) 신설.
+> ✅ METH-051(PR #41, base main): "작업 메타를 산출물에 넣지 마라"를 에이전트 토론으로 전-도메인 지침 04로 격상.
+> 사용자 스코프: 외부 공유 배포물(기획서·서비스페이지·앱UI)엔 메타 금지 / 그걸 만드는 메타문서는 면제.
 
 ---
 
@@ -16,7 +17,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-051-output-channel-separation` (PR1) → `claude/meth-052-sota-roadmap` 스택(PR2)
+- Worktree: branch `claude/meth-052-sota-roadmap` (PR2, base=`claude/meth-051-output-channel-separation`=PR1 #41)
 
 ## 부팅 계약
 
