@@ -1,9 +1,9 @@
-# Checkpoint — 2026-06-29 (METH-050 P-002→C-001 승급 — 자가발전 루프 완결)
+# Checkpoint — 2026-07-08 (METH-051 산출물 채널 분리 지침 04 신설)
 
-> ✅ METH-050: gamblescan 실세계 검증으로 P-002 **N≥2 충족 → active `C-001` 승급**(사용자 승인).
-> 스켈레톤 `bakes-in.json`에 C-001 합류(새 프로젝트 자동 주입) + canonical 가드레일 전-팔레트 broaden
-> + 지침20 v2. **L1 관찰 → 실세계 반복 → active Catalog 승급 → bake-in** 한 바퀴가 실제로 돌았다.
-> (METH-049: 지침 20·스켈레톤·P-002 신설. 19=구조 / 20=시각 자매 가드레일.)
+> ✅ METH-051: 다운스트림(ai-icons) 반복 피드백 "작업 메타를 산출물에 넣지 마라"를
+> 에이전트 토론으로 상류 격상 판정 → **백서 헌법 직행 반려, 전-도메인 지침 04로 앉힘**.
+> 사용자 스코프 확정: 외부 공유 배포물(기획서·서비스페이지·앱UI)엔 메타 금지 / 그걸 만드는 메타문서는 면제.
+> 후속 METH-052: SOTA(하네스·루프·경험메모리) 평가 → RFC-002 발전 로드맵(스택 PR 2/2).
 
 ---
 
@@ -16,7 +16,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `main` (아직 브랜치 미생성 — ship 시 분기 필요)
+- Worktree: branch `claude/meth-051-output-channel-separation` (PR1) → `claude/meth-052-sota-roadmap` 스택(PR2)
 
 ## 부팅 계약
 
@@ -27,66 +27,44 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-049 프론트엔드 디자인 토큰 시스템** (사용자: A/B/C 트리거 블록 제시 → AskUserQuestion에서
-"Full system" + "New P-002" 선택):
+**METH-051 — 산출물 채널 분리 지침 04** (에이전트 토론 2회 + 사용자 스코프 확정):
 
-- 배경: 사용자가 design-token 시스템의 A(greenfield)/B(retrofit)/C(학습훅) 트리거 템플릿을 제시했으나
-  그 토대(지침 20·스켈레톤·패턴)가 레포에 미존재. 또 블록이 패턴을 "P-001"로 칭했는데 P-001은 이미
-  git-write-lock → P-002로 배정.
-- 변경:
-  - `20_guides/20_프론트엔드_디자인_토큰_시스템_규칙.md` 신설 — 4기둥(① @theme 시맨틱 토큰
-    surfaces/text/border/brand/semantic + 디자인 언어 ② cn+프리미티브 ③ 색 가드레일 ④ 제약문서).
-    원칙 "이름=역할". §5에 A/B/C 운영 트리거 내장. 17 §4.2 인스턴스화(시각 품질).
-  - `50_resources/skeletons/frontend-design-tokens/` 스켈레톤 — base/{theme/tokens.css(@theme,
-    라이트+다크), lib/cn.ts, components/primitives/{Card,Button,Badge,index}, guardrails/
-    {check-no-arbitrary-color.sh, wiring.md}, design-system.md} + bakes-in.json + README.
-  - `50_resources/catalog/_pending/P-002_frontend-design-tokens.md` — Pending Lesson(N≥2 시 C-NNN 승급).
-  - `20_guides/README.md` — 카탈로그(3.5)·현황(6) 행 추가.
-- 검증(실측): 가드레일 스크립트 3케이스 — clean=exit0 pass / arbitrary hex+off-system 회색=exit1 fail
-  (3건 모두 검출) / ALLOW_HEX 등록 hex=pass. **초안의 file-glob 버그(grep -o 출력에 `$`앵커 적용)를
-  발견·수정**(--include 글롭으로 교체) 후 재검증 통과.
-- 검증 완료: observe 로그 작성·라이브 4종 갱신. wrap → (사용자 검토 후) ship 대기.
+- 발단: ai-icons 메모리 `audience_facing_docs_no_workflow_artifacts.md`(반복 피드백 3회 + "여러 번 말했다")를
+  상류 방법론으로 격상할지 사용자가 질문 → 에이전트 토론(입론 찬성/반대/방법론적합성 → 교차 반론 → 심판).
+- 토론 결론: **ELEVATE_WITH_CONDITIONS** — 백서 §2 신규 원칙(헌법) 직행은 단일 도메인 N≥2라 부당(§9·§12 위반),
+  C-001 선례(단일 프로젝트→active)대로 **전-도메인 지침**이 정확한 고도. "절대"는 "라우팅+예외군"으로 완화.
+- 사용자 스코프 확정(2축): ① 청중 축 = "맥락 없는 외부 사람에게 공유되는가"로 트리거 —
+  **기획서(30_planning)·서비스페이지·앱UI·브랜드카피 = 포함 / 그 기획서를 만드는 메타문서 = 면제.**
+  ② 주제 축 = 산출물이 그 메타에 *관한* 것이면 예외(changelog·릴리스노트·API 문서·ADR·README 버전배지).
+- 변경(PR1):
+  - `20_guides/04_산출물_채널_분리_규칙.md` 신설(9절: 왜=백서 종속·두 채널 정의·트리거·판정 2축·배제 3종+예외군·
+    메타 라우팅·§7 강제 스펙·타 지침 경계·격상 이력). status:active, ai_relevance:foundational.
+  - `CLAUDE.md`·`AGENTS.md` File Roles 표에 "Output channel" 행 신설(기존 6행은 메시지 채널만 규율하던 빈칸).
+  - `20_guides/README.md` 메타밴드 카탈로그에 02·03·04 등재.
+- 백서 미수정 — 제0·제2·§8-4·§8-5를 WHY로 인용만. §7 grep 래칫은 스펙만(fail-open 금지라 반쪽 가드 안 만듦).
 
-## 진행 상황 (2026-06-29 갱신)
+## 같은 세션의 후속 (METH-052 = 스택 PR 2/2)
 
-- METH-049 **PR #38 머지 완료**(main `5fc822f`). METH-048도 #37 머지됨.
-- **다운스트림 전파 3/5 완료**: ai-icons(`0500aa6`)·icons(`f15996c8`, 지침19·20·WHITEPAPER catch-up)·
-  cafe24-renewal(`ec51886`). sync는 `20_guides`만 전파(스켈레톤=apply 온디맨드, P-002=업스트림 전용).
-  pre-push wrap 훅 때문에 순수 sync는 `--no-verify`(라이브파일 무변경 — 기존 7ef2be7 패턴). 셀렉티브
-  add로 프로젝트 산출물(skin-download 등) 미혼입(MC-001).
-
-## gamblescan 실세계 검증 결과 (2026-06-29)
-
-- canonical 스켈레톤을 gamblescan(독립 디자인토큰 구현 완료작)에 교차검증 → **패턴 교훈 2건**(P-002 본문):
-  ① 가드레일은 전 prefix 검사 필수(gamblescan은 text-only라 회색 32건 누출 — gs PR #155로 시정).
-  ② off-system은 회색만 아님 — amber/orange 251건(canonical도 회색만 잡음 → broaden 검토).
-- **P-002 N≥2 충족** → C-NNN 승급 후보(사람 승인 대기).
-
-## ⚠️ 다음 사람: 우선 처리 후보
-
-- **P-002 → C-NNN 승급 결정**: 승인 시 ① active Catalog `C-NNN_frontend-design-tokens` 생성
-  ② 스켈레톤 `bakes-in.json`에 합류 ③ canonical 가드레일을 비-회색 Tailwind 팔레트까지 broaden(교훈②).
-- **gs PR #155 머지**(브랜드 가시 — Silver 배지·rank 그라데이션·admin 패널 Vercel 프리뷰 확인).
-- **전파 보류 2곳**: icons-invest(main dirty 정리 후)·gamblescan(gs#155 머지 후 sync).
-- **gamblescan amber/orange 251건 후속**: 메달 토큰(`--color-medal-*`) + 비-메달 warn/danger 흡수 + 가드레일 broaden.
+- **방법론 무게 감사**(에이전트 16개): MIXED — 코어는 정당, 군살은 국소(온보딩 밴드 중복·휴면 thinktank·
+  ~9주 초과 ROI 게이트). "방법론_백서_가이드"·70_meta·30_planning stub·AGENTS 미러·템플릿 32는 load-bearing 방어.
+- **SOTA 평가**(웹 리서치): 코어가 harness/context/loop engineering·ERL과 정합/선행. 약점=Reflect/Learn 자동화 +
+  compaction·budget 규율(휴면 thinktank와 동일 지점).
+- **`70_meta/rfc/RFC-002_sota-alignment-develop-roadmap.md`** 신설(draft) — R1~R6 발전 로드맵.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. 사용자 검토/승인 대기.
-2. 승인 시: `git switch -c claude/meth-049-frontend-design-tokens` → `methodology.py ship -m "feat(guides): METH-049 ..."`.
-
-## 막혔던 지점 / 시도해봤지만 안 된 것
-
-- 가드레일 스크립트 초안이 위반을 못 잡음 — 원인: `grep -rno` 출력(`path:line:match`)에 파일확장자
-  `$` 앵커 필터를 적용해 전부 탈락. → `grep --include='*.tsx' ...` 글롭으로 교체해 해결. 교훈:
-  가드레일은 *반드시 더미 위반으로 실검증*(지침 20 §4 자기 규칙대로).
+1. PR1(guide 04, base main) 리뷰·머지 → 다운스트림 sync(20_guides shared).
+2. PR2(RFC-002, base=PR1 브랜치) 리뷰 → RFC-002 draft→accepted 결정.
+3. accepted면 R2(compaction 프로토콜, Class A)부터 + `70_meta/retrospectives` 첫 엔트리(무게 감사 HIGH).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 스켈레톤 `base/`는 Tailwind v4 `@theme` + React 전제. Svelte/Vue 등 비-React 스택용 변종은
-  *옵션 플래그*로 처리할지(스켈레톤 README §6 안티패턴: 도메인 과분리 금지) 차기 검토.
+- RFC-002 R6(휴먼 게이트 다이어트)은 백서 §5 구조 변경이라 Class C 가능 — 별도 RFC 검토.
+- thinktank를 되살릴지 vs "수동 승급이 정식"으로 공식화할지 — 무게 감사와 RFC-002가 같은 질문에 수렴, 회고에서 판정.
+- guide 04 §7 강제 래칫 실제 CI 구현 시점 — RFC-002 R1/R2와 함께.
 
 ## 환경 메모
 
-- 브랜치: `main` (미분기). ship 전 분기 필수.
-- 변경: `20_guides/20_*.md`(신규) + `20_guides/README.md` + `50_resources/skeletons/frontend-design-tokens/`(신규) + `50_resources/catalog/_pending/P-002_*.md`(신규) + `50_resources/ai_observations/2026-06-29_*.md` + 라이브 4종.
+- 브랜치: `claude/meth-051-output-channel-separation`(PR1). PR2는 이 브랜치 위에 스택.
+- PR1 변경: `20_guides/04_*.md`(신규) + `CLAUDE.md`·`AGENTS.md`(File Roles 행) + `20_guides/README.md` + 라이브 4종.
+- PR2 변경: `70_meta/rfc/RFC-002_*.md`(신규) + 라이브 4종(증분).
