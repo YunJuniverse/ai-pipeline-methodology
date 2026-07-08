@@ -13,7 +13,7 @@
 |---|---|---|
 | **planning** | 기획전용 (구현 안 함) | prd · requirements-spec · ia-spec · service-policy · user-story · kpi-tree · context-glossary · microcopy |
 | **planning-handoff** | 기획전용 → *별도 사람 개발자*에게 인계 (AI 아닌 사람이 읽음) | `planning` 세트 + user-flow · functional-spec · wireframe-spec — **단, 지침 `20_guides/09_기획_핸드오프_재포맷_규칙.md`의 재포맷 규칙을 얹어 산출**(ASCII→실제 목업, ON/OFF→must/should, 의도·읽는 순서·질문 루프 추가). architecture·data-model은 개발자 소유이므로 제외(필요 시 끌어 씀) |
-| **dev** | 개발전용 (기획 받아 구현) | architecture · data-model · user-flow · wireframe-spec · functional-spec |
+| **dev** | 개발전용 (기획 받아 구현) | architecture · data-model · api-contract · user-flow · wireframe-spec · functional-spec (작성·조합·인계 표준은 지침 `20_guides/21_개발명세_작성_지침.md`) |
 | **fullstack** | 기획+개발 일괄 | `planning` ∪ `dev` + wbs |
 | **agency** | 외주(수주·납품) SI 라이프사이클 | proposal-go-nogo · research-collection-checklist · profitability-sheet · execution-plan · wbs · qa-acceptance-plan · qa-test-scenario · qa-acceptance-signoff · operation-spec · post-launch-monitoring · work-request-ticket · glossary (+ 산출물은 `planning`/`dev`에서) |
 | **lean** | 1인+AI 빠른 반복 | prd · architecture · context-glossary · ADR-template |
@@ -42,6 +42,7 @@
 |---|---|
 | `architecture.md` | 아키텍처(어떻게) — as-built→목표→mock→real 이전경로·규제 기술매핑 |
 | `data-model.md` | 데이터 모델 — 엔티티·필드·관계·무결성·마이그레이션 |
+| `api-contract.md` | API·인터페이스 계약 — 엔드포인트·요청/응답·에러·버전·인증 (개발리드→개발자, FE/BE 병렬 조율축). functional-spec의 상위 시스템 레벨 |
 | `user-flow.md` | 사용자 플로우 — 정상/대안/실패(+복구)/분기 |
 | `wireframe-spec.md` | 화면설계(텍스트 ASCII) — 화면별 5블록·Empty/Loading/Error 3-state |
 | `functional-spec.md` | 기능명세 — FS-ID·비즈니스 규칙·권한 매트릭스·예외(레이어별) |
@@ -99,6 +100,7 @@
 | microcopy | ✓ | ✓ | | ✓ | ✓ | | |
 | architecture | | | ✓ | ✓ | ✓ | ✓ | |
 | data-model | | | ✓ | ✓ | ✓ | | |
+| api-contract | | | ✓ | ✓ | ✓ | | |
 | user-flow | | ✓ | ✓ | ✓ | ✓ | | |
 | wireframe-spec | | ✓† | ✓ | ✓ | ✓ | | |
 | functional-spec | | ✓ | ✓ | ✓ | ✓ | | |
