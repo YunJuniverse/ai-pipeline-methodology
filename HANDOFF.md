@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-055 **RFC-002 draft→accepted 비준**. #44 회고 머지가 사람 게이트 → RFC-002 status=accepted + accepted_via(2026-Q3 회고/#44) + relates_to 갱신. 별도 ADR 미승급(RFC-001 선례; 로드맵이라 개별 Class B/C 항목만 ADR). Class A. PR 대기(main 직접).
+- **Working on**: METH-056 **P2 Compaction 프로토콜 구현 (RFC-002 R2 첫 실제 구현)**. `20_guides/06_컨텍스트_컴팩션_프로토콜.md` 신설(보존/폐기 규칙·checkpoint를 세션 중간 인계로 확장·pre-compaction 체크리스트) + CLAUDE/AGENTS 운영 규칙에 "컴팩션 경계 트리거" 편입 + README·RFC-002 R2 구현 표시. 로드맵이 문서에서 **실제 구현**으로 넘어간 첫 항목. Class A. PR 대기(main 직접).
 - **Current mode**: fullstack
-- **Next TODO**: ① **P2 compaction 프로토콜(METH-056, RFC-002 R2, Class A)** — 가장 가벼운 "실제 구현" 1건, 즉시 착수. ② P1 지표 인프라 + thinktank 존폐(b 공식화 권장). ③ guide 05 다운스트림 sync(충돌 해소됨).
+- **Next TODO**: ① guide 06 다운스트림 sync(20_guides shared). ② P1 지표 인프라 + thinktank 존폐(b 공식화 권장, RFC-002 R1). ③ P3 온보딩 밴드 다이어트(무게 감사 MED).
 - **Blockers**: none
 
 ## Active Links
@@ -33,7 +33,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-07-08: **METH-055 RFC-002 draft→accepted 비준 (Class A)** — #44(2026-Q3 회고) 머지 = 사람 게이트 통과 → `70_meta/rfc/RFC-002` status=accepted, accepted_at·accepted_via(#44)·relates_to([RFC-001,2026-Q3,MP-003]) 갱신 + 비준 blockquote. 별도 단일 ADR 미승급(RFC-001 선례: accepted Class A 로드맵/도구 RFC는 ADR 미승급; 개별 R1~R6의 Class B/C 항목만 각자 ADR). 발전 로드맵이 방법론 진화 백로그로 확정 — 다음은 실제 구현(P2 compaction부터).
+- 2026-07-08: **METH-056 Compaction 프로토콜 구현 — RFC-002 R2 첫 실제 구현 (Class A)** — 진단·로드맵을 넘어 **약점을 실제로 고친 첫 항목**. `20_guides/06_컨텍스트_컴팩션_프로토콜.md` 신설: compaction 경계 보존/폐기 규칙(보존=결정·게이트 상태·open question·경로 포인터 / 폐기=원시 툴 출력·중복·이미 파일 반영분), checkpoint를 세션 종료뿐 아니라 **compaction 경계·긴 세션 자연 경계**에서도 갱신(=세션 중간 인계), pre-compaction 체크리스트. CLAUDE/AGENTS 세션 절차에 "컴팩션 경계 트리거" 편입(로드·준수 강제). README 카탈로그 06 + RFC-002 R2 ✅구현 표시. SOTA(Anthropic context engineering)를 방법론 구조에 접합.
+- 2026-07-08: **METH-055 RFC-002 draft→accepted 비준 (Class A, PR #45 머지)** — #44(2026-Q3 회고) 머지 = 사람 게이트 통과 → `70_meta/rfc/RFC-002` status=accepted, accepted_at·accepted_via(#44)·relates_to([RFC-001,2026-Q3,MP-003]) 갱신 + 비준 blockquote. 별도 단일 ADR 미승급(RFC-001 선례: accepted Class A 로드맵/도구 RFC는 ADR 미승급; 개별 R1~R6의 Class B/C 항목만 각자 ADR). 발전 로드맵이 방법론 진화 백로그로 확정 — 다음은 실제 구현(P2 compaction부터).
 - 2026-07-08: **METH-054 첫 분기 회고(2026-Q3) + MP-003 (Class A, PR #44 머지)** — 백서 §9 ROI 게이트 첫 발화(~9주 초과, 무게 감사·SOTA 평가가 촉발). `70_meta/retrospectives/2026-Q3_first-methodology-review.md` — **정직 모드: 지표 인프라 미달**(관찰 41/권장 100·active Catalog 1/권장 5), README 규칙대로 "지표 인프라 1순위" 자인. 효과적=경험 루프 1회전 완주·서브에이전트 하네스 / 부패=thinktank 휴면·온보딩 중복·프로세스 사고 2건. 다음 분기 P1 지표+thinktank 존폐(a되살림/b공식화, b권장)·P2 compaction(R2)·P3 온보딩 다이어트. **RFC-002 draft→accepted 권장**(머지=비준). 스택-PR 고아화를 `70_meta/catalog/_pending/MP-003`으로 캡처(N≥2 재발 시 MC 승급).
 - 2026-07-08: **METH-053 guide 04→05 리넘버 + 식별자 예약범위 + RFC-002 복구 (Class A, PR #43 머지)** — ① 상류 산출물 채널 분리 지침을 `04`→`05`로 이동(ai-icons·icons-invest가 커스텀 `04_프로젝트_문서_보관_및_분류` 점유 → doc_id 충돌 회피). guide 02 §8 신설: 지침 번호 예약(상류 00–89 / 다운스트림-커스텀 90–99), 레거시 비준수 04는 마이그레이션 대상. CLAUDE/AGENTS/README 참조 05로 갱신. ② **RFC-002 복구** — METH-052(#42)가 스택 PR 함정(base=이미 머지된 meth-051 브랜치)으로 main 미도달·고아화 → 파일 복원해 main 직접 PR에 재포함.
 - 2026-07-08: **METH-052 SOTA 평가 + RFC-002 발전 로드맵 (Class A)** — 무게 감사(에이전트 16개, MIXED: 코어 정당·군살 국소[온보딩 밴드 중복·휴면 thinktank·~9주 초과 ROI 게이트]) + SOTA 웹 리서치(harness/context/loop engineering·ERL: 코어가 정합/선행, 약점=Reflect/Learn 자동화+compaction·budget). `70_meta/rfc/RFC-002`(draft, R1~R6). ※#42 고아화로 main 미반영 → METH-053에서 복구.
