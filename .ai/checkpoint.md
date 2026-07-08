@@ -1,9 +1,8 @@
-# Checkpoint — 2026-07-08 (METH-064 서비스기획서 = 부모(인덱스) 모델)
+# Checkpoint — 2026-07-08 (METH-065 서비스기획서 자식 산출물 8종 최신화)
 
-> ✅ METH-064: 문서별 심화 2번 = 서비스기획서. 사용자 통찰("여러 문서의 총합 아닌가")이 지침11 내부 모순
-> (§2/§6=컨테이너 vs §19.2="12 중 한 장")을 드러냄. 웹리서치 → **컨테이너 아닌 index로 결정** → 부모=오케스트레이터로 재정의.
-> 🏁 다음: PR 리뷰·머지 → 문서별 심화 계속(다음 대상 선정).
-> ⚠️ 프로세스: stale local main 기준 브랜치 사고 → pull 후 재베이스로 복구(작업 손실 0). 앞으로 문서 심화는 머지 후 착수 or pull 먼저.
+> ✅ METH-065: 문서별 심화 3번. 064가 정한 서비스기획서 자식 8종을 4개 병렬 웹리서치(1차 소스)로 2025-26 최신화.
+> 공통 수렴: **사람이 읽는 표 + 기계판독/추적 미러 + AI가 빠뜨리는 "불행 경로"(에러·상태) 강제.**
+> 🏁 다음: PR 리뷰·머지 → 문서별 심화 계속(대상 선정).
 
 ---
 
@@ -16,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-064-service-plan-index-model` (main 기준, 063 머지 후 재베이스 — main 직접 PR)
+- Worktree: branch `claude/meth-065-child-templates-refresh` (fresh main 기준 — 064 머지 후 pull → 브랜치, 프로세스 교훈 준수)
 
 ## 부팅 계약
 
@@ -27,40 +26,37 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-064 — 서비스기획서를 컨테이너 → 부모(인덱스)로 재정의** (사용자 통찰 발의):
+**METH-065 — 서비스기획서 자식 산출물 8종 최신화** (사용자: "산출물 전체를 최신 방법론·양식·샘플로 업데이트"):
 
-- **발단**: 사용자가 "서비스기획서는 원래 여러 문서의 총합 아닌가"를 물음. 확인 결과 **지침11이 내부 모순**:
-  §2.2/§6은 "구조·기능·정책의 *원본 컨테이너*"인데 §19.2는 "표준 12 산출물 중 *한 장*". 우리 카탈로그엔 이미
-  `ia-spec·functional-spec·service-policy·user-flow·wireframe-spec·user-story` 자식 템플릿이 있어 단일출처 붕괴.
-- **웹리서치**(서브에이전트): GitHub Spec Kit(spec.md=WHAT/WHY, HOW 배제; plan→tasks 하류 생성) · Cagan(고충실
-  프로토타입이 화면 스펙) · Amazon PR/FAQ · Basecamp Shape Up(No-gos) · Atlassian/Figma(link-don't-embed) ·
-  한국 실무(화면설계서 모놀리스 → Notion/Figma ID 인덱스 해체) → **결정적으로 index, not container**.
-- **결정(사용자 확정 A)**: 부모=**의도·결정·경계** 소유 / 자식=**상세·열거** 소유. 상세가 전용 SSOT에 살 수 있으면 복사 말고 링크.
-- **변경 (지침 `20_guides/11_서비스기획서_작성_지침.md`)**:
-  - §2.2 위상 재정의(컨테이너→오케스트레이터) + [원본]/[인덱스] 소유표, §2.3/§2.4 정합.
-  - §6 각 항목 **[원본]** vs **[인덱스 → 자식템플릿]** 재라벨 + 위임 노트(6.4→ia-spec·6.6→functional-spec·
-    6.7→wireframe-spec·6.8→service-policy·6.9→functional-spec·6.10→ia-spec).
-  - **§6.0 산출물 인덱스 신설**(부모의 척추: 자식 링크+상태+소유자 표) — §19.2 "12 산출물 현황"의 정본.
-  - §8.1 목차를 인덱스 척추로 재정렬(의도·결정·경계 앞, 상세는 인덱스로 위임) + **비목표(Non-Goals) 1급화**(§6.11).
-  - §16 인덱스 모델 체크(중복 없음·인덱스 최신·비목표·AI 품질bar) + §19.14 부모=인덱스 원칙 환류.
-  - 스켈레톤 `30_planning/11_서비스기획서.md` 인덱스 척추로 재작성(§4에 산출물 인덱스 표).
-- **동형성**: METH-062 "개발기획서=재번들 반대"의 기획 쪽 쌍둥이. 09/21 인덱스 패턴과 정합.
+- **방법**: 4개 병렬 웹리서치 서브에이전트(그룹: story+func / policy+ia / flow+wireframe / api+microcopy), 1차 소스
+  (INVEST·Gherkin·EARS·DMN·OPA·NN/g·OpenAPI 3.1·RFC 9457·Mailchimp·GOV.UK 등) → 각 문서 gap 도출 → 적용.
+- **8종 변경 (`50_resources/templates/`)**:
+  - `user-story`: Job Story 폼 · **Gherkin(G/W/T) AC 블록**(```gherkin, AI 스펙+검증) · INVEST 6체크 · DoR/DoD · SPIDR · Story ID/링크.
+  - `functional-spec`: **EARS 표기**(5패턴) · State Transition 표 · 측정가능 NFR 표 · 추적표(요구↔AC↔테스트↔코드).
+  - `service-policy`: **의사결정 표**(조건→액션·**hit policy**·Default 행) · **effective-dating**(버전·시행일, 이력 보존) · 예외=우선순위 행 · 변경이력 · **AI 가드레일 정책** 시트.
+  - `ia-spec`: **Screen-ID 명명 규약** · 화면 인벤토리(Parent-ID) · 메뉴트리(global/local/utility) · **RBAC**(CRUD·default-deny·SoD) · 라벨링/택소노미 · **IA 검증**(카드소트/트리테스트 75%+).
+  - `user-flow`: **Mermaid** flowchart/sequence 블록 · 3열 경로표(해피+불행) · Decision Y/N · **엣지케이스 체크리스트** · actor 태그.
+  - `wireframe-spec`: **5-state**(Empty/Loading/**Partial**/Error/Success — AI 92% 누락) · 번호 콜아웃 표 · 접근성·반응형 · **Figma 링크·Ready-for-dev**.
+  - `api-contract`: **RFC 9457 Problem Details**(`application/problem+json`) · RFC 9745/8594 Deprecation/Sunset · **cursor 페이지네이션** · 표준 RateLimit-* · Idempotency 상태규칙 · OpenAPI 3.1 정본.
+  - `microcopy`: 콘텐츠 원칙 · **Voice(상수)/Tone(맥락) 표** · 에러 패턴(무엇+왜+복구) · 상태별 인벤토리 · 용어사전 · 포용/i18n 체크 · **AI 프롬프트 스캐폴드**.
+  - `_CATALOG.md` §2 한줄 8개 갱신(특히 wireframe 3-state→5-state 팩트 수정).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-064 PR 리뷰·머지.
-2. **문서별 심화 계속** — 다음 대상 사용자와 합의(후보: 요구사항정의서·정책정의서). 패턴: 현행 고찰 → 웹리서치 → 제안 → 반영.
-   **프로세스 교훈**: 다음 착수 전 `git pull` 또는 직전 PR 머지 확인(064에서 stale main 사고).
-3. guide 09·21 + api-contract를 다음 다운스트림 sync 대상에 포함.
-4. METH-060 잔여: ai-icons 번호 정리(별건 repo 세션) + cafe24·icons-invest clean 후 sync.
+1. METH-065 PR 리뷰·머지.
+2. **문서별 심화 계속** — 대상 사용자와 합의. 후보: 요구사항정의서(requirements-spec)·prd·kpi-tree·context-glossary, 또는 다른 기획서(운영/마케팅/브랜드).
+3. 자식 8종 실사용 시 EARS/의사결정표/Mermaid 실전 예를 지침 §19 craft로 환류.
+4. guide 09·21 + api-contract + 갱신 8종을 다음 다운스트림 sync 대상에 포함.
+5. METH-060 잔여: ai-icons 번호 정리 + cafe24·icons-invest clean 후 sync.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 서비스기획서 §6.0 산출물 인덱스를 *자동 생성*(자식 파일 존재→상태 채움) 도구화할지 — 현재 수동 표. 실사용 빈도 보고 판단.
-- 문서별 심화 표준 산출물 = 지침 개정 + 스켈레톤 정합 + (필요 시) 위상 재정의. 063=포맷/척추, 064=위상/경계 — 문서마다 축이 다름.
+- 서비스기획서 §6.0 산출물 인덱스 자동 생성 도구화 여부(064 open) — 유지.
+- 캔버스(P4, 063)·Lean Canvas 별도 템플릿화 여부 — 유지.
+- 갱신된 자식 템플릿이 커져도 lean 유지 원칙과 충돌 없는지 — 각 여전히 1스크린 내. 실사용 피드백으로 재점검.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-064-service-plan-index-model` (fresh main 기준, 063 포함). main 직접 PR.
-- 변경: `20_guides/11_서비스기획서_작성_지침.md`(§2·§6·§8·§16·§19) + `30_planning/11_서비스기획서.md`(재작성) + 라이브 4종.
-- 선행 061·062·063 = PR #51·#52·#53 머지 완료(main 반영).
+- 브랜치: `claude/meth-065-child-templates-refresh` (fresh main 기준, 064 포함). main 직접 PR.
+- 변경: `50_resources/templates/` 8종(user-story·functional-spec·service-policy·ia-spec·user-flow·wireframe-spec·api-contract·microcopy) + `_CATALOG.md` + 라이브 4종.
+- 선행 061·062·063·064 = PR #51·#52·#53·#54 머지 완료(main 반영).
