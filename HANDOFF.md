@@ -4,14 +4,14 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-062 **API 계약 템플릿 + 개발명세 작성 지침**. "개발기획서 필요?" 질문에서 도출 — 단일 개발기획서=반대(재번들=단일출처 위반), 대신 진짜 공백 2개 채움: 신규 템플릿 `api-contract.md`(FE/BE 병렬 조율축) + 신규 지침 21(개발명세 6종 조합·개발자용 읽는 순서). Class A. PR 대기(main 직접).
+- **Working on**: METH-062 **API 계약 템플릿 + 개발명세 작성 지침**. "개발기획서 필요?" 질문에서 도출 — 단일 개발기획서=반대(재번들=단일출처 위반), 대신 진짜 공백 2개 채움: 신규 템플릿 `api-contract.md`(FE/BE 병렬 조율축) + 신규 지침 21(개발명세 6종 조합·개발자용 읽는 순서). Class A. **선행 METH-061은 PR #51로 머지됨.** 062는 원 PR #51에 미포함(푸시-머지 타이밍 어긋남)돼 커밋 `169a3c2`를 새 브랜치로 cherry-pick 복구 → 별도 PR. PR 대기(main 직접).
 - **Current mode**: fullstack
 - **Next TODO**: ① METH-060 잔여 — **ai-icons 번호 정리**(별건, 그 repo 세션): 커스텀 21_산출물채널분리→상류 05로 dedup + 레거시 04·05 회의록을 guide 02 §8 예약범위(90+)로 마이그레이션 → 그 후 sync. ② cafe24·icons-invest clean 후 sync. ③ guide 09·21 + api-contract를 다음 다운스트림 sync 대상에 포함. ④ dev 계열 실사용 craft 축적 시 guide 21 §3 읽는 순서·§4 게이트 보강.
 - **Blockers**: none
 
 ## Active Links
 
-- Current PR: #35 (METH-046 sync 픽스)
+- Current PR: METH-062 (신규, api-contract + guide 21) · METH-061 #51 머지 완료
 - Current issue:
 - Relevant ADRs:
 - Relevant snapshots: `40_dev/snapshots/implementation-plan-2026-05-07.md`, `40_dev/snapshots/transfer-drill-2026-05-08.md`

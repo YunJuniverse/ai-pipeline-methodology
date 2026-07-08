@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "dcbd3e38c3137a076a18e650da94fe40aeb00ea5",
-  "last_validated_at": "2026-07-08T08:00:01Z",
+  "last_validated_commit": "f284633ff465780c9aa6bcd969be9b59b2e198a8",
+  "last_validated_at": "2026-07-08T08:05:22Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "43afa88e9729517d1ce900528bcd38b665b06c8732e97c2fcc0057fa87782240"
+      "sha256": "cfb0c15803c3b9a23b6ee0a0a0dd19573d9c6b97c1efe597247b19fcc66c5402"
     },
     "TODO.md": {
-      "sha256": "0c55c090e9d1755e4adc95789c071e6bb071d4f9f029d2d261782d523a547322"
+      "sha256": "ef7381781e6443d89589a361b17445c17a9e39b4ab02b53bcc7221f4fc86979c"
     },
     ".ai/checkpoint.md": {
-      "sha256": "49cda6587a00d27e44be22647138fc9ab4bff4de7848b57ddd108555296e5706"
+      "sha256": "1a2980c427e6be6f7769ec6ccc652290167a3c4e8664ba055121a767082cb35a"
     }
   },
   "observations": {
@@ -65,6 +65,7 @@
       "50_resources/ai_observations/2026-07-08_meth-060-downstream-sync-propagation.md",
       "50_resources/ai_observations/2026-07-08_meth-061-planning-handoff-mode.md",
       "50_resources/ai_observations/2026-07-08_meth-062-api-contract-devspec-guide.md",
+      "50_resources/ai_observations/2026-07-08_meth-062-recovery-pr51-timing.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

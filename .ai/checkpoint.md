@@ -2,8 +2,10 @@
 
 > ✅ METH-062: "개발기획서 필요?" 질문 → **단일 개발기획서=반대**(재번들=단일출처 위반).
 > 대신 진짜 공백 2개: ① 신규 템플릿 `api-contract.md`(FE/BE 병렬 조율축) ② 신규 지침 21(개발명세 6종 조합·읽는 순서).
-> METH-061(09 핸드오프 재포맷, PR #51)의 짝 — 09=누가 읽나, 21=무엇을 어떻게 조합하나.
-> 🏁 다음: PR 리뷰·머지. 이후 09·21·api-contract를 다운스트림 sync에 포함. METH-060 잔여(ai-icons 번호 정리) 유효.
+> METH-061(09 핸드오프 재포맷, **PR #51 머지 완료**)의 짝 — 09=누가 읽나, 21=무엇을 어떻게 조합하나.
+> ⚠️ 062는 원래 #51 브랜치에 얹었으나 푸시-머지 타이밍이 어긋나 #51엔 061만 머지됨 → 062 커밋 `169a3c2`를
+> main 기준 새 브랜치로 cherry-pick 복구 → 별도 PR로 진행(작업 손실 0).
+> 🏁 다음: 062 PR 리뷰·머지. 이후 09·21·api-contract를 다운스트림 sync에 포함. METH-060 잔여(ai-icons 번호 정리) 유효.
 
 ---
 
@@ -16,7 +18,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-061-planning-handoff-mode` (main 직접 PR — 스택 금지)
+- Worktree: branch `claude/meth-062-api-contract-devspec` (main 기준, 062 복구 — main 직접 PR)
 
 ## 부팅 계약
 
@@ -27,7 +29,7 @@
 
 ## 방금 한 것 (정확히)
 
-**한 세션에 짝지어진 두 작업 — METH-061(핸드오프 재포맷) + METH-062(개발명세/API 계약).** 둘 다 "기획→개발 인계" 테마이고 062가 061의 `_CATALOG` 편집 위에 직접 얹혀 tightly-coupled → 스택 금지 원칙상 **같은 브랜치/PR #51에 통합**(061 미머지 상태라 main 분기 시 base 결여).
+**한 세션에 짝지어진 두 작업 — METH-061(핸드오프 재포맷) + METH-062(개발명세/API 계약).** 둘 다 "기획→개발 인계" 테마. 061은 **PR #51로 머지 완료**. 062는 처음에 #51 브랜치에 얹었으나(커밋 `169a3c2`) 푸시-머지 타이밍이 어긋나 #51엔 061 커밋만 담겨 머지됨 → 062를 **main 기준 새 브랜치로 cherry-pick 복구**해 별도 PR로 올린다(작업 손실 0, 커밋 온전 보존).
 
 **METH-062 — API 계약 템플릿 + 개발명세 작성 지침** (사용자 질문 "개발기획서 필요?"):
 - **판단: 단일 개발기획서=반대.** architecture+wbs+master_plan+adr의 재번들이라 단일출처·중복금지(File Roles) 위반.
@@ -60,8 +62,6 @@
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-061-planning-handoff-mode` = **PR #51 (METH-061 + 062 통합)**. main 직접 PR(스택 금지).
-- 062 변경: `50_resources/templates/api-contract.md`(신규) + `20_guides/21_*.md`(신규) + `_CATALOG.md`(dev세트·§2·매트릭스)
-  + `20_guides/README.md` §3.5 + 라이브 4종.
-- 061 변경: `20_guides/09_*.md`(신규) + `_CATALOG.md`(모드) + `CLAUDE.md`·`AGENTS.md` + `20_guides/00`·`README.md` §3.1
-  + `10_foundation/방법론_백서_가이드.md`.
+- 061 = **PR #51 머지 완료**(main = merge `58a2aac`): `20_guides/09_*.md`(신규) + `_CATALOG.md`(모드) + `CLAUDE.md`·`AGENTS.md` + `20_guides/00`·`README.md` §3.1 + `10_foundation/방법론_백서_가이드.md`.
+- 062 = **새 브랜치 `claude/meth-062-api-contract-devspec`**(main 기준 cherry-pick `169a3c2` → `f284633`): `50_resources/templates/api-contract.md`(신규) + `20_guides/21_*.md`(신규) + `_CATALOG.md`(dev세트·§2·매트릭스) + `20_guides/README.md` §3.5 + 라이브 4종.
+- 정리 예정: 구 브랜치 `claude/meth-061-planning-handoff-mode`(169a3c2 보유)는 062 머지 후 삭제.
