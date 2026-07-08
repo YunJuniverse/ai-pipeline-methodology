@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "d2d0558938289694f295a4816209d23247c075b4",
-  "last_validated_at": "2026-07-08T06:33:52Z",
+  "last_validated_commit": "47932d83e98ed04ca737ea378ccd9ad5c07b34e8",
+  "last_validated_at": "2026-07-08T06:40:19Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "48c8086e7a1196cd5a4d413dde496327411e0f74caf669f2550b19d78e80eaf4"
+      "sha256": "802d046eb024f1f15c45011bf0c0d5fea21feb0086aa198bf9b8ba037eb7e6c3"
     },
     "TODO.md": {
-      "sha256": "30068884fade866bcc27f8b2eee989d6676b97f0d5280d558caced5cbd660c7e"
+      "sha256": "f479923728a4de02394b0724b7ccca571475724ab8998bf661a5f5fedb959c77"
     },
     ".ai/checkpoint.md": {
-      "sha256": "190be3df51c1eadd2dcfe559046e98d24415a923b5ba2d057f60f8491cc82030"
+      "sha256": "0aa503d206d7e51de74324ff5976c2ee24872ab0ac8253c21d0cf9e633be2126"
     }
   },
   "observations": {
@@ -60,6 +60,7 @@
       "50_resources/ai_observations/2026-07-08_meth-055-accept-rfc002.md",
       "50_resources/ai_observations/2026-07-08_meth-056-compaction-protocol.md",
       "50_resources/ai_observations/2026-07-08_meth-057-metrics-thinktank-reframe.md",
+      "50_resources/ai_observations/2026-07-08_meth-058-onboarding-band-diet.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

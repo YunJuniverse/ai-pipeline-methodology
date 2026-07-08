@@ -51,26 +51,46 @@ relates_to: [RFC-001, 2026-Q3, MP-003]
 **구현:** `20_guides/06_컨텍스트_컴팩션_프로토콜.md`(보존/폐기 규칙·pre-compaction 체크리스트) + CLAUDE/AGENTS 운영 규칙에 "컴팩션 경계 트리거" 편입. 로드맵의 **첫 실제 구현**.
 **출처:** Anthropic context engineering.
 
-### R3 [MED · Class A] Budget & stop conditions 도입
+### R3 [MED · Class A] Budget & stop conditions 도입 — ✅ 구현됨 (METH-059)
 **갭:** loop engineering은 토큰·비용 예산, no-progress 감지, 반복 캡을 필수로 봄(단일 ~4×, 멀티 ~15× 토큰). 방법론의 유일한 정지는 휴먼 게이트뿐 — 자율 진행 구간의 compute 규율 없음.
 **제안:** 자율 진행(대규모 전파·리트로핏) 구간에 budget tracker + no-progress exit 지침. 자율성 선호(메모리 [[user-autonomy-multistep]])와 결합해 "예산 내 자율, 초과 시 사람에게 보고" 규율화.
+**구현:** `20_guides/07_자율진행_예산_및_정지조건.md`(예산 선언·no-progress 정지·반복 캡·침묵 절단 금지) + CLAUDE/AGENTS 운영 규칙 편입.
 **출처:** loop engineering.
 
-### R4 [MED · Class A] 서브에이전트 오케스트레이션을 1급 자산으로
+### R4 [MED · Class A] 서브에이전트 오케스트레이션을 1급 자산으로 — ✅ 구현됨 (METH-059)
 **갭:** Anthropic은 서브에이전트(컨텍스트 격리→1~2k 토큰 요약 반환)를 장기 작업 핵심으로 봄. 방법론은 "1인" 프레임이라 미명문화 — 정작 이 평가·감사·토론을 전부 서브에이전트 워크플로우로 수행함(패턴은 쓰는데 자산화 안 됨).
 **제안:** 워크플로우/서브에이전트 패턴(context 격리 + 요약 반환 규약 + 적대적 검증)을 지침 또는 Catalog 자산으로 코드화.
+**구현:** `20_guides/08_서브에이전트_오케스트레이션.md`(언제 쓰나·요약 반환/격리/적대적 검증 규약·스케일 매칭).
 **출처:** Anthropic sub-agents.
 
-### R5 [MED · Class A] 관련성 기반 메모리 검색 업그레이드
+### R5 [MED · Class A] 관련성 기반 메모리 검색 업그레이드 — ⏸ 보류 (인프라 대기)
 **갭:** Catalog 검색이 regex `signature` 수준. ERL은 관련성 점수 top-후보 주입이 few-shot보다 우수함을 실증.
 **제안:** signature(regex) → 관련성 스코어드 top-k 주입. R1과 통합 구현 가능.
+**보류 사유:** R1(a)와 동일 — 관련성 스코어링은 임베딩 의존. 이식성 제0원칙상 임베딩은 어댑터로 격리해야 하며, 그 어댑터 인프라가 선행 조건. **급조 금지**(방법론이 경계하는 "아스피레이셔널" 함정). active Catalog 1건이라 현재 실효도 낮음 — Catalog 5+ 누적 후 착수가 합리적.
 **출처:** ERL, Anthropic JIT.
 
-### R6 [통찰 · Class B/C] Inner/Outer 이중 루프 — 게이트 다이어트
+### R6 [통찰 · Class B/C] Inner/Outer 이중 루프 — 게이트 다이어트 — ⏸ 보류 (Class C 게이트 대기)
 **갭·통찰:** loop engineering의 dual-loop(inner=실행, outer=진행 감시·전략 리셋). 유저플로우상 인간이 5개 게이트에서 멈추는데, *기계적으로 검증 가능한 게이트*(예: Dev Spec→Build를 guardrail/eval로 판정 가능한 부분)는 자동 검증 게이트로 강등하고, 진짜 판단(Class C·브랜드·스코프)만 사람이 쥔다.
 **효과:** 사람 부담(무게) ↓ · 통제 유지 — 무게 감사·유저플로우·루프 엔지니어링을 하나로 잇는 지점.
 **주의:** 게이트 강등은 백서 §5 휴먼 게이트 구조 변경이라 Class C 가능성. 신중 검토.
+**보류 사유:** **Class C** — 휴먼 게이트 구조 변경은 방법론 자체 규칙상 별도 휴먼 게이트(RFC→ADR→사람 승인)가 필요하다. 세션 마감에 자율로 "clear"할 수 없다(그 자체가 규칙 위반). 별도 RFC로 정식 제안 시 착수.
 **출처:** loop engineering dual-loop.
+
+---
+
+## 로드맵 상태 (2026-07-08 마감)
+
+| 항목 | Class | 상태 |
+|---|---|---|
+| R1 Reflect/Learn — (b) 지표/thinktank | B | ✅ 구현 (METH-057) |
+| R1 Reflect/Learn — (a) 관련성 자동 주입 | B | ⏸ 보류(임베딩 어댑터 인프라 대기) |
+| R2 Compaction 프로토콜 | A | ✅ 구현 (METH-056) |
+| R3 Budget & stop conditions | A | ✅ 구현 (METH-059) |
+| R4 서브에이전트 오케스트레이션 | A | ✅ 구현 (METH-059) |
+| R5 관련성 기반 검색 | A→B | ⏸ 보류(R1(a)와 동일 임베딩 인프라) |
+| R6 게이트 다이어트 | C | ⏸ 보류(별도 Class C RFC 필요) |
+
+**Class A로 즉시 구현 가능한 로드맵 항목은 전부 완료.** 잔여(R1(a)·R5·R6)는 "미완의 작업"이 아니라 *선행 조건(임베딩 어댑터 인프라 / Class C 게이트)이 있는 미래 항목* — active 백로그가 아니라 로드맵에 파킹. 급조는 방법론이 일관되게 경계한 아스피레이셔널 함정이므로 하지 않는다. 재개 트리거: 임베딩 어댑터 착수(R1a·R5) / 게이트 다이어트 RFC 제안(R6) / Catalog 5+ 누적(R5 실효).
 
 ## Alternatives Considered
 

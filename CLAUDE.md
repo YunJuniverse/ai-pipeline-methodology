@@ -38,6 +38,7 @@
      CLI 가 frontmatter·enum·길이 검증을 atomic 하게 처리. `cat > .md` 직접 작성은 형식 오류로 wrap·CI 실패 유발.
   wrap 출력이 `4/4 ✓` 일 때만 종료. `✗` 가 있으면 누락 갱신 후 다시 호출. wrap v4.1+ 는 sha256 콘텐츠 해시 비교 — *실제 내용 갱신* 만 통과 (`touch`/동일 내용 재저장 차단).
 - **컨텍스트 컴팩션 경계 (의무, 긴 세션)**: 컨텍스트가 한계에 근접하거나 하네스가 요약(compaction)을 예고하면, *요약 전에* 라이브 파일(특히 `.ai/checkpoint.md`의 방금 한 것·다음 사람에게·미해결 결정)을 먼저 갱신한다. compaction 은 "세션 중간 인계" — 파일에 상태가 있으면 요약이 잃어도 복원된다. 보존/폐기 규칙·pre-compaction 체크리스트는 `20_guides/06_컨텍스트_컴팩션_프로토콜.md`. 핵심: *"compaction 후의 내가 이걸 잃으면 사용자에게 다시 물어야 하나?"* → 그렇다면 보존, 파일 재로드로 되는 것은 경로만 남기고 폐기.
+- **자율 진행 예산·정지 (권장, 대규모 자율 작업)**: 사람 확인 없이 여러 단계를 자율 진행할 땐 착수 전 개략 예산(파일/PR/반복 규모)을 선언하고, no-progress 2회·반복 캡·예산 초과 시 멈춰 보고한다("예산 내 자율, 초과 시 보고"). 범위를 줄이면 무엇을 남겼는지 반드시 보고. 상세: `20_guides/07_자율진행_예산_및_정지조건.md`. 멀티에이전트 팬아웃 규약은 `20_guides/08_서브에이전트_오케스트레이션.md`.
 - **commit/push 자동화 (권장)**: 위 4 파일 갱신 후 `python3 60_tools/methodology.py ship -m "<conventional commit message>"` 한 명령으로 wrap+manifest-check+sensitive 검사+(test/build)+commit+push 일괄 처리. 별도로 `git add`/`git commit`/`git push` 호출 금지 — *ship*만 사용.
 - **외주 인계 (코드만 추출)**: `python3 60_tools/methodology.py export --path <project> --dry-run` 으로 포함·제외 미리보기 후, `--dry-run` 빼고 재호출. `<project>-handover/` 폴더에 *방법론·메타·브리프 모두 제외*된 코드만 추출. sensitive 파일(.env/credentials/keys)은 *기본 차단* — 의도 확인 후 `--allow-sensitive`. `--zip` 으로 tar.gz 압축. 결과 검증: *방법론 흔적 잔존 0* 자동 보장.
 - **로컬 안전망 (1회 설치)**: `python3 60_tools/methodology.py hooks install` — `.git/hooks/pre-push`에 manifest-check + wrap --strict 자동 등록. push 직전 검증 실패 시 push 자체 차단. 우회는 `git push --no-verify` (의식적 비상 탈출).

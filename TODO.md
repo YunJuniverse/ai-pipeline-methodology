@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-059 · 로드맵 잔여 마감 (RFC-002 R3·R4 구현)
+- **notes**: 2026-07-08. Class A. PR 대기(main 직접). Class A로 즉시 구현 가능한 로드맵 항목 마무리. R3 `20_guides/07_자율진행_예산_및_정지조건.md` + R4 `20_guides/08_서브에이전트_오케스트레이션.md` 신설, CLAUDE/AGENTS 예산 규칙 + README 07·08. RFC-002: R3·R4 ✅, **R1(a)·R5·R6 ⏸보류(임베딩 어댑터 인프라 / Class C 게이트 대기)** + 로드맵 상태표. 잔여는 active 백로그 아닌 선행조건 있는 미래 항목 — 급조 금지. 남은 것: guide 05~08 다운스트림 sync.
+
 ### METH-058 · 온보딩 밴드 다이어트 (무게 감사 MED, P3)
 - **notes**: 2026-07-08. Class A. PR 대기(main 직접). 회고 P3. `HOW_TO_APPLY §6` Change Class 전문(35줄, CLAUDE §3 재서술·드리프트)을 요지 3줄 + **CLAUDE §3 단일출처 포인터**(8줄)로 축약. 앵커 참조 0(안전), shared_paths라 하류 무게 동시 감소. USER_GUIDE §8·WHITEPAPER §8-2·AGENTS·DIAGRAM은 load-bearing이라 미변경(감사 판정 준수). **회고 3대 우선순위(P1·P2·P3) 전부 실제 구현 완료.**
 
@@ -24,10 +27,7 @@
 ### METH-056 · Compaction 프로토콜 구현 (RFC-002 R2)
 - **notes**: 2026-07-08. Class A. PR 대기(main 직접). **로드맵의 첫 실제 구현** — 진단·문서화를 넘어 약점(런타임 compaction 규율)을 실제로 고침. `20_guides/06_컨텍스트_컴팩션_프로토콜.md` 신설(보존/폐기 규칙·checkpoint를 compaction 경계 인계로 확장·pre-compaction 체크리스트). CLAUDE/AGENTS 운영 규칙에 "컴팩션 경계 트리거" 편입(부팅 로드·준수 강제). README 06 + RFC-002 R2 ✅구현 표시. 다음: guide 06 sync, P1(R1 Reflect/Learn), P3(온보딩 다이어트).
 
-### METH-055 · RFC-002 draft→accepted 비준
-- **notes**: 2026-07-08. Class A. **PR #45 머지 완료**. #44(2026-Q3 회고) 머지 = 사람 게이트 → `70_meta/rfc/RFC-002` status=accepted + accepted_via(#44)·relates_to·비준 blockquote. 별도 ADR 미승급(RFC-001 선례). 발전 로드맵이 진화 백로그로 확정.
-
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
-<!-- Archived: METH-001~054 (2026-05~07). 051 산출물채널분리(#41)·052 SOTA/RFC-002·053 리넘버+RFC-002복구(#43)·054 첫회고 2026-Q3+MP-003(#44) 포함. 상세는 git log --grep="METH-" 및 PR #5~#47, 40_dev/snapshots/ 참조. -->
+<!-- Archived: METH-001~055 (2026-05~07). 054 첫회고 2026-Q3+MP-003(#44)·055 RFC-002 accepted(#45) 포함. 상세는 git log --grep="METH-" 및 PR #5~#48, 40_dev/snapshots/ 참조. -->
