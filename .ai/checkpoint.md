@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-09 (메타/dev 지침 심화 배치 — 093 완료)
+# Checkpoint — 2026-07-09 (메타/dev 지침 심화 배치 완결)
 
-> ✅ 배치 진행: 092(guide 03)·**093(guide 06·07·08 웹리서치 심화)** 완료. 남음: **094 = 05·09 내부정합 + 02/19/20 경량**.
-> 🏁 다음 세션이 094를 이어서 하면 배치 완결. 이후 남은 건 전부 Low·선택(graph.json·v3.2 코드) 또는 별도 repo(ai-icons 92 환류·talmo-com).
+> ✅ 메타/dev 지침(02~09·19~20) 심화 배치 **완결** — 092(guide 03)·093(06·07·08)·094(guide 20 DTCG). 심화 필요분 5개(03·06·07·08·20) 완료, 나머지 5개(02·05·09·19) 검토·적정(bloat 회피로 무변경).
+> 🏁 문서별 심화 프로그램(063~094) 사실상 전종 완료. 남은 건 전부 Low·선택 또는 별도 repo.
 
 ---
 
@@ -12,7 +12,7 @@
 ## 작성자
 
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `claude/meth-093-agent-mechanics-deepen` (#81 위 스택, branch-first)
+- Worktree: branch `claude/meth-094-internal-guides-deepen` (#82 위 스택, branch-first)
 
 ## 부팅 계약
 
@@ -20,28 +20,27 @@
 
 ## 방금 한 것 (정확히)
 
-**메타/dev 지침(02~09·19~20) 심화 배치** — 사용자 "전부".
-
-- **092(완료, PR #81)**: guide 03(관찰 로그). observe CLI 정본화 + friction 캡처 + 학습루프 파이프라인. v2.
-- **093(완료, 이 브랜치)**: guide 06·07·08 웹리서치 심화. 각 §SOTA 보강 섹션 + v2 이력:
-  - **06 컴팩션**: 두 층 모델(하네스 ~95% / API 150k)·proactive ~60%·auto-survive 명시(파일 재읽기·CLAUDE.md 재주입→포인터 안전)·⚠️paths-scoped rule/nested CLAUDE.md는 재주입 안 됨→re-anchor·safest-first 폐기(raw output 먼저)·post-compaction 검증·subagent isolation=공간축.
-  - **07 자율/정지**: 이중예산(runtime turns/USD[SDK 기본 무제한 경고] + declared scope)·6 circuit breaker(①②⑤만 SDK enforced)·ground-truth 진척(self-report 금지)+build/eval 분리·ask→clarify→escalate(over-asking도 실패)·비가역=Class C 정지·stop report(ResultMessage: 사유+예산소비+검증+남은것+resume handle)·재선언 전 checkpoint.
-  - **08 서브에이전트**: fan-out(read/search/verify) vs single-writer(coupled generation, Cognition)·sizing(1/2-4/10+)·위임 계약 필드(목표+출력+경계, 프롬프트가 유일 채널)·per-subagent model/effort·concurrency 3-5 cap·completeness critic rubric·artifact 외부메모리 집계·[CC] Workflow 스케일 escape+"복잡도는 이득 있을 때만".
+**메타/dev 지침(02~09·19~20) 심화 배치 완결** — 사용자 "전부". 3 PR:
+- **092(#81)**: guide 03(관찰 로그) — observe CLI 정본화 + friction 캡처 + 학습루프. v2.
+- **093(#82)**: guide 06·07·08 웹리서치 심화(에이전트 메카닉) — 컴팩션 두층/임계치/auto-survive·자율 이중예산/ground-truth/비가역=Class C·서브에이전트 fan-out vs single-writer/sizing/completeness critic. 각 v2.
+- **094(이 브랜치)**: guide 20에 W3C DTCG 상호운용 §8 신설(DTCG JSON·Style Dictionary·Tokens Studio·도입 트리거·4기둥↔DTCG 매핑, "필요할 때만"). v3. **05·09·02·19는 검토=이미 성숙 → 무변경**(padding=bloat 회피, 세션 관통 원칙).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-092(#81)·093 PR 리뷰·머지.
-2. **METH-094 — 05·09 내부 정합 + 02/19/20 경량**(배치 마무리):
-   - **05 산출물 채널 분리**(127줄): 내부 규칙, 이미 적정 — 변경이력 신설 + (필요 시) grep 시그니처·AI 답변 채널 등 경량 보강.
-   - **09 기획 핸드오프 재포맷**(87줄): 내부 규칙, planning-handoff 모드와 정합 확인 + 변경이력.
-   - **02/19/20**: 이미 성숙 → 변경이력 유무만 확인, 실질 보강 최소(재심화 낭비 회피).
-3. 남은 것(전부 Low·선택): graph.json 노드(02~09·19~21)·v3.2 backward-compat 코드 정리. 다른 repo(별도 세션): ai-icons 92 환류·talmo-com 실작업.
+1. METH-092(#81)·093(#82)·094 PR 리뷰·머지(스택 순서).
+2. **문서별 심화 프로그램은 사실상 완료** — 남은 건 전부 Low·선택:
+   - graph.json 노드 완성(guide 02~09·19~21 누락 — 대시보드 그래프)
+   - v3.2 backward-compat 코드 정리(별건, 7 repo 전부 v4.0이라 dead)
+   - agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs) — 원래 심화 후보였으나 미착수
+3. **다른 repo(별도 세션, 킥오프 프롬프트 전달됨)**: ai-icons 92_LOCAL↔상류05 환류, `~/talmo-com` 탈모닷컴 실작업(방향=멀티브랜드 커머스로 확정).
+4. 학습 루프 후속: friction 축적→thinktank→catalog 승급.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 메타/dev 배치를 094까지 하면 문서별 심화 프로그램 사실상 전종 완료. 이후 방법론 정비는 일단락 지점.
+- 방법론 정비는 사실상 일단락(핵심·정합·구조·전파·정비·심화 사이클 완료). 계속 vs 마무리는 사용자 판단.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-093-agent-mechanics-deepen` (#81 위 스택). branch-first.
-- 진척: …091 sweep + 092 guide03(#81) + **093 guide06/07/08(이번)**. 남은 배치: 094(05/09/02/19/20).
+- 브랜치: `claude/meth-094-internal-guides-deepen` (#82 위 스택). branch-first.
+- 변경: guide 20(§8 DTCG) + 라이브 4종. (05/09/02/19 무변경 — 검토만.)
+- 진척: 메타/dev 배치 092·093·094 완결. 세션 총: 079~094(정합·구조·전파·정비·심화) + talmo-com 부트스트랩(방법론 밖).

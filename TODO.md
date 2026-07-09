@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-094 · guide 20 DTCG 상호운용 + 메타/dev 배치 완결
+- **notes**: 2026-07-09. Class A. PR 대기(스택). 배치 3번(마무리). guide 20에 실제 gap(W3C DTCG 미언급) → §8 상호운용 표준 신설(DTCG JSON·Style Dictionary·Tokens Studio·도입 트리거·4기둥↔DTCG 매핑·"필요할 때만"·v3). **05·09·02·19는 검토=성숙, 콘텐츠 추가 없음**(bloat 회피). 배치 총괄: 심화분 03·06·07·08·20 완료, 나머지 5개 적정 확인. branch-first 준수.
+
 ### METH-093 · guide 06·07·08 심화 — 에이전트 메카닉 웹리서치
 - **notes**: 2026-07-09. Class B. PR 대기(#81 위 스택). 메타/dev 배치 2번, 리서치 3건. 얇던 3개에 §SOTA 보강+v2: 06=두층 임계치·auto-survive·safest-first·post검증·subagent isolation / 07=이중예산(SDK 무제한 경고)·6 circuit breaker·ground-truth·ask→escalate·비가역=Class C·stop report·재선언 전 checkpoint / 08=fan-out vs single-writer(Cognition)·sizing·model/effort·concurrency cap·completeness critic·artifact memory·Workflow escape. 남음: 094=05·09+02/19/20. branch-first 준수.
 
@@ -24,8 +27,6 @@
 ### METH-091 · legacy 경로 sweep — 라이브 문서 3건 수정
 - **notes**: 2026-07-09. Class A. PR #80 머지. 라이브 문서 pre-v4 경로 점검(90_archive·마이그레이션·시점기록 제외). 실제 stale 3건 수정: `10_foundation/{KICKOFF_PROMPT,DIAGRAM,HOW_TO_APPLY}.md`의 `docs/snapshots/`→`40_dev/snapshots/`. 나머지 `docs/` 참조는 정당(guide 19 gamblescan 인용=실제 위치·api-contract=예시). 부수 발견: v3.2 backward-compat 코드 폴백 dead(7 repo 전부 v4.0)이나 별건 Open Issue. docs sweep Open Issue Closed. branch-first 준수.
 
-### METH-090 · .claude/skills 레거시 3종 삭제
-- **notes**: 2026-07-09. Class A. PR #79 머지. ai-planning·ai-relay·vibe-coding(2026-03, 구모델: 스프린트·기획서6종/개발명세8종·`docs/` dead 경로) 삭제. 기능은 guide 01(오케)/08(서브에이전트)/19(클린코드)+prompts가 정본이라 stale 중복, 호출 시 v4와 반대로 안내. 살릴 고유 콘텐츠 없음(릴레이 handoff≈checkpoint, 4-레이어=guide19). 다운스트림 sync 대상 아님(로컬). 잔여 참조는 90_archive 히스토리뿐 보존. 세션 관통 SSOT/anti-중복. branch-first 준수.
 
 
 
