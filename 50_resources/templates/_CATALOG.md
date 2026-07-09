@@ -34,7 +34,7 @@
 | `service-policy.md` | 서비스 정책 정의서 — 의사결정 표(조건→액션·hit policy)·effective-dating·변경이력·AI 가드레일, 2-시트 |
 | `user-story.md` | 유저스토리·시나리오 — User/Job Story·Gherkin(G/W/T) AC·INVEST·DoR/DoD·SPIDR |
 | `kpi-tree.md` | KPI 단위경제 — 비즈모델 top-line 토글(마켓/구독/거래/AI)·마진 워터폴·단위경제(LTV/CAC/payback)·NRR/GRR·자본효율(Rule40·burn multiple)·AI COGS·드라이버 트리(North Star) |
-| `context-glossary.md` | 도메인 용어집 — 표준어 + `_Avoid_`(금지 동의어) + 예시 대화 |
+| `context-glossary.md` | 도메인 용어집(유비쿼터스 언어/SKOS) — 표준어·`_Avoid_`·바운디드 컨텍스트·상태/소유자·Code/UI 매핑·약어·예시 대화·AI 스티어링/린트 훅 |
 | `microcopy.md` | UX 라이팅 — 콘텐츠원칙·Voice(상수)/Tone(맥락)·에러패턴·용어사전·i18n·AI 프롬프트 |
 
 ### 개발명세 (Dev-spec)
