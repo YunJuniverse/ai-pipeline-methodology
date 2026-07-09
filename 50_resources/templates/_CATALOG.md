@@ -30,12 +30,12 @@
 |---|---|
 | `prd.md` | 제품 요구사항(무엇) — 비전·목표/비목표·범위·기능요구(M/S·Pn=출시순서)·규제 요구사항·출시단계 |
 | `requirements-spec.md` | 요구사항 추적 대장 — ID·중요도·출처(VOC)·수용여부 enum·사유·M/S+Pn |
-| `ia-spec.md` | 정보구조 기능정의서 — 화면ID·Page Type·권한 매트릭스 |
-| `service-policy.md` | 서비스 정책 정의서 — 반복규칙→ON(자동)/OFF(가이드), 2-시트 |
-| `user-story.md` | 유저스토리·시나리오 — As-a/I-want/So-that + 내러티브 7요소 |
+| `ia-spec.md` | 정보구조 기능정의서 — Screen-ID 규약·화면 인벤토리·메뉴트리·RBAC 매트릭스·IA 검증(카드소트/트리테스트) |
+| `service-policy.md` | 서비스 정책 정의서 — 의사결정 표(조건→액션·hit policy)·effective-dating·변경이력·AI 가드레일, 2-시트 |
+| `user-story.md` | 유저스토리·시나리오 — User/Job Story·Gherkin(G/W/T) AC·INVEST·DoR/DoD·SPIDR |
 | `kpi-tree.md` | KPI 단위경제 트리 + 마켓플레이스 10-패널·분석방법 배터리 |
 | `context-glossary.md` | 도메인 용어집 — 표준어 + `_Avoid_`(금지 동의어) + 예시 대화 |
-| `microcopy.md` | UX 라이팅 — 에러·확인·공백 상태별 카피 + 보이스앤톤 |
+| `microcopy.md` | UX 라이팅 — 콘텐츠원칙·Voice(상수)/Tone(맥락)·에러패턴·용어사전·i18n·AI 프롬프트 |
 
 ### 개발명세 (Dev-spec)
 | 템플릿 | 한 줄 |
@@ -43,9 +43,9 @@
 | `architecture.md` | 아키텍처(어떻게) — as-built→목표→mock→real 이전경로·규제 기술매핑 |
 | `data-model.md` | 데이터 모델 — 엔티티·필드·관계·무결성·마이그레이션 |
 | `api-contract.md` | API·인터페이스 계약 — 엔드포인트·요청/응답·에러·버전·인증 (개발리드→개발자, FE/BE 병렬 조율축). functional-spec의 상위 시스템 레벨 |
-| `user-flow.md` | 사용자 플로우 — 정상/대안/실패(+복구)/분기 |
-| `wireframe-spec.md` | 화면설계(텍스트 ASCII) — 화면별 5블록·Empty/Loading/Error 3-state |
-| `functional-spec.md` | 기능명세 — FS-ID·비즈니스 규칙·권한 매트릭스·예외(레이어별) |
+| `user-flow.md` | 사용자 플로우 — Mermaid 다이어그램·정상/대안/실패(+복구)/분기·엣지케이스 체크리스트·actor 태그 |
+| `wireframe-spec.md` | 화면설계(텍스트 ASCII) — 화면별 번호 콜아웃·**5-state**(Empty/Loading/Partial/Error/Success)·접근성·반응형·Figma 링크 |
+| `functional-spec.md` | 기능명세 — FS-ID·**EARS 표기**·상태전이·권한·예외(레이어별)·측정가능 NFR·추적(요구↔테스트↔코드) |
 
 ### PM·일정
 | 템플릿 | 한 줄 |

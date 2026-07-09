@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "095ec92e7d336f97a261f4757755e047ad7067d1",
-  "last_validated_at": "2026-07-08T08:48:32Z",
+  "last_validated_commit": "6413942d9897cdbcf996871aa37fd057f52bc301",
+  "last_validated_at": "2026-07-08T09:09:00Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "6b29483525ba62ff192cf2bbd8d63abc64c1a7b283db20b8a2e10aa45456fe1f"
+      "sha256": "9db622489a0384cfb9f5dcc2a64cbad2f11a98874afecf63066ce9ca50834ea5"
     },
     "TODO.md": {
-      "sha256": "832180a99d3456bc38c1ff8b533ac2cd022b56606d31a54892a63f229b48ead0"
+      "sha256": "6f221f049c60bc9578b20aebc47961a01ab793027d0efdcf0f9162055930eba9"
     },
     ".ai/checkpoint.md": {
-      "sha256": "c8977fa0c6cc05656bbeea2c4006b1a84bc8b8e929f83d2c300ee4565fb5fc54"
+      "sha256": "98beb180af42688d505a5824bc798b71ea7e79b24e17d534fd7af313c435aa86"
     }
   },
   "observations": {
@@ -68,6 +68,7 @@
       "50_resources/ai_observations/2026-07-08_meth-062-recovery-pr51-timing.md",
       "50_resources/ai_observations/2026-07-08_meth-063-business-plan-revamp.md",
       "50_resources/ai_observations/2026-07-08_meth-064-service-plan-index-model.md",
+      "50_resources/ai_observations/2026-07-08_meth-065-child-templates-refresh.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

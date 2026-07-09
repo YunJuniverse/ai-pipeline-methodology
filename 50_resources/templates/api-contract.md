@@ -45,11 +45,21 @@
 
 ## 3. 공통 규약 (전 엔드포인트)
 
-### 3.1 에러 포맷 (단일 형태)
+### 3.1 에러 포맷 — RFC 9457 Problem Details
+> 표준 `application/problem+json`(RFC 9457, RFC 7807 후속). `type`(URI, 주 식별자, 기본 `about:blank`) · `title`(타입별 안정 요약) · `status`(참고용, 실제는 헤더 우선) · `detail`(이 발생 건, 해결 안내) · `instance`(발생 URI) + 확장 멤버(소비자는 미지의 멤버 무시). 안정 기계코드 `code`는 확장 멤버로.
+
 ```json
-{ "error": { "code": "INVALID_STATUS", "message": "status must be one of ...", "field": "status" } }
+{
+  "type": "https://api.example.com/problems/out-of-credit",
+  "title": "You do not have enough credit.",
+  "status": 403,
+  "detail": "Your current balance is 30, but that costs 50.",
+  "instance": "/account/12345/msgs/abc",
+  "code": "OUT_OF_CREDIT",
+  "balance": 30
+}
 ```
-> `code`는 기계 분기용(안정적 enum), `message`는 사람용. 클라이언트는 **`code`로만 분기**한다(문구 변경에 깨지지 않게).
+> 클라이언트는 **안정 `type`/`code`로만 분기**(`title`/`detail`은 표시·현지화용, 변경 가능).
 
 ### 3.2 상태 코드 규약
 | 코드 | 의미 | 사용 규칙 |
@@ -61,14 +71,16 @@
 | 429 / 5xx | rate limit / 서버오류 | 429는 `Retry-After` 포함 |
 
 ### 3.3 공통 정책
-- **페이지네이션**: `page`/`size` (또는 cursor) — 프로젝트 하나로 통일.
+- **페이지네이션**: 기본 **cursor/keyset**(대규모·동적 컬렉션 — O(1) seek, 삽입에 안정, 페이지 점프 없음). offset은 소규모·정적·랜덤접근+total 필요 시만. `?limit=` + 불투명 `?cursor=` + `next`/`prev`.
 - **정렬·필터**: `sort=field,-field` 규칙.
-- **Rate limit**: (예: 인증 60 req/min, 공개 20 req/min) — 초과 시 429 + `Retry-After`.
-- **Idempotency**: 결제·생성 등은 `Idempotency-Key` 헤더 (§ data/auth 리스크 — PR에 명시).
+- **Rate limit**: 표준 `RateLimit-Limit`/`RateLimit-Remaining`/`RateLimit-Reset`(IETF) — 초과 시 429 + `Retry-After`.
+- **Idempotency**: 결제·생성 등 unsafe 메서드에 `Idempotency-Key`(UUID). 서버는 첫 결과 캐시 후 재시도 시 재생. **409**(원 요청 진행 중 재시도) · **422**(같은 키 다른 페이로드) · **400**(필수 키 누락). 만료창 명시(예 24h).
 
 ### 3.4 버전·호환 정책
-- URL 버전(`/v1`) — **breaking change는 새 버전**, 하위호환 변경만 in-place.
-- Deprecation: 헤더 `Deprecation`/`Sunset` + 마이그레이션 노트 링크. (지침 05 예외군 = 버전드 API 문서)
+- URL 버전(`/v1`) — **breaking change는 새 major**, 하위호환 변경만 in-place. (공개 API 실용 기본; header/media-type 버전은 캐싱 복잡)
+- Deprecation/Sunset(RFC 9745 + RFC 8594): `Deprecation` 헤더(사용 비권장) → `Sunset` 헤더(제거 예정일, IMF-date). **`Sunset`은 `Deprecation`보다 이르면 안 됨.** 마이그레이션 창 정책 명시(B2B 통상 ~2년/1 major). (지침 05 예외군 = 버전드 API 문서)
+
+> **기계판독 정본 = OpenAPI 3.1**(JSON Schema 2020-12와 완전 정합 — 한 검증기로 설계·런타임 공용). design-first: 스펙을 코드보다 먼저 작성 → FE는 mock, BE는 병렬 구현, QA는 계약에서 테스트 생성. CI에서 Spectral 린트. AI 생성 스펙은 **auth·에러계약·엣지케이스 사람 검토** 필수.
 
 ---
 
