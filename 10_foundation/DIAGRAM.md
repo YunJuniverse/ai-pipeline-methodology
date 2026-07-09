@@ -21,7 +21,7 @@ flowchart TD
 flowchart TD
     A["Human adds planning TODO"] --> B["AI reads AGENTS/CLAUDE + HANDOFF"]
     B --> C["Research only what is needed"]
-    C --> D["Write dated snapshot in docs/snapshots"]
+    C --> D["Write dated snapshot in 40_dev/snapshots"]
     D --> E["Human reviews via PR or issue"]
     E --> F["AI updates HANDOFF.md and TODO.md"]
 ```
