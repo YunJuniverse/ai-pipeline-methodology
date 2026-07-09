@@ -1,9 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-071 데이터 모델 심화 · ERD·키·무중단 마이그레이션)
+# Checkpoint — 2026-07-09 (METH-072 다운스트림 일괄 sync)
 
-> ✅ METH-071: 문서별 심화 9번(개발명세 계열 마무리) = data-model. 웹리서치(PostgreSQL·pgvector·OWASP·RFC 9562) → 강화.
-> 핵심: Mermaid ERD · UUIDv7 키 · cascade · history 전략(SCD2/soft-delete) · **expand-contract 무중단 마이그레이션**(Class B rollback 증거) · PII/GDPR(파생 포함) · 벡터(조건부).
-> 🏁 다음: PR 리뷰·머지 → 심화 계속(기획서 지침군/agency 템플릿) 또는 **누적 다운스트림 sync**.
-> ⚙️ **070(#59) 충돌 해소 병합**(이 브랜치): 071(#60) 선머지로 라이브파일 충돌 → `git merge main`으로 해소(architecture.md 무충돌·_CATALOG 두 줄 병합·라이브=main/071 채택+070 기록). push 후 #59 머지 → 그다음 다운스트림 sync(063~071 전체).
+> ✅ METH-072: 문서별 심화 063~071(templates 15·guides)을 다운스트림에 전파.
+> **완료 2곳(clean)**: gamblescan(`fa92c3f`)·icons(`fbdb7cd6`). **홀드 3곳(dirty)**: ai-icons·cafe24-renewal·icons-invest.
+> 🏁 다음: PR 리뷰·머지 → 홀드 3곳 clean 후 sync 재개, 또는 심화 계속(기획서 지침군).
 
 ---
 
@@ -16,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-071-data-model-refresh` (fresh main=069 기준 — 070 #59 미머지, data-model과 disjoint. branch-first 준수)
+- Worktree: branch `claude/meth-072-downstream-sync` (fresh main 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -27,35 +26,28 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-071 — 데이터 모델(data-model.md) 심화** (문서별 심화 프로그램 9번, 개발명세 계열 마무리):
+**METH-072 — 다운스트림 일괄 sync** (문서별 심화 063~071 전파):
 
-- **방법**: 웹리서치 1차 소스(PostgreSQL docs·AWS/DynamoDB·pgvector·OWASP LLM Top10·RFC 9562·Kimball SCD2·expand-contract). 현행 7섹션(Entity/Fields/Relationships/Integrity/Privacy/Migration/Changelog) gap.
-- **변경 (`50_resources/templates/data-model.md`)**:
-  - **§1 Mermaid ERD**(crow's foot, diagrams-as-code) 신설.
-  - **키 전략**: surrogate 기본 · 분산/외부노출 = **UUIDv7/ULID**(시간정렬 인덱스 지역성; UUIDv4 PK 비권장) · 외부는 opaque public ID. §2 Entity List에 PK전략·History 컬럼.
-  - **Fields**: Key(PK/FK/UK)·Constraints(default·CHECK·enum)·Indexed?(왜) 컬럼 추가.
-  - **§4 Relationships**: **On Delete/Update**(CASCADE 일회용부품 / RESTRICT 독립중요 / SET NULL) — 고아 방지 스펙.
-  - **§5 Integrity**: 제약(스키마에 박기) · 감사컬럼 · **history 전략 태그**(soft-delete[GDPR 삭제 불충족]·SCD2·append-only·bi-temporal) · 인덱스 원칙(FK 명시·복합·covering·partial).
-  - **§6 PII**: 분류(public/internal/PII/민감)·암호화·접근·보존·삭제 표 + **GDPR Art.17**(파생 벡터·캐시·백업까지).
-  - **§7 Migration = Expand→Backfill(청크)→Contract**(단계별 가역·lock-safe `CONCURRENTLY`) = Class B rollback 증거.
-  - **§8 AI/Vector**(조건부): `vector(N)`·모델·전처리·HNSW·삭제 tombstone.
-  - 3NF 기본·비정규화 사유 명기 · 스키마 계약 버전 api-contract 연동 · _CATALOG 갱신.
+- **대상 판별**: 형제 디렉터리 중 `.methodology-version`+`.ai/context.json` 보유 5곳. clean(dirty=0) 2곳만 진행, dirty 3곳 홀드(METH-060과 동일 패턴).
+  - clean: **gamblescan**(fix/palette-slice-5-rose)·**icons**(claude/repo-as-product-planning)
+  - dirty(홀드): ai-icons(6)·cafe24-renewal(7)·icons-invest(8)
+- **방법**(clean 각각): 원 브랜치 기억 → `git checkout main` + `git pull --ff-only`(clean 확인) → 상류 methodology에서 `python3 60_tools/methodology.py sync --path ../<repo> --apply` → `git add -A && git commit --no-verify`(순수 sync, 다운스트림 wrap 훅 우회) → `git push`(main) → `git checkout <원 브랜치>`.
+- **결과**: 각 21파일 변경(shared: 20_guides 6·templates 15). 신규 파일 도착 = `20_guides/09_기획_핸드오프_재포맷_규칙.md`·`21_개발명세_작성_지침.md`·`50_resources/templates/api-contract.md`(다운스트림 last sync=METH-060 이후 신설분). 다운스트림 고유 파일 **보존**(prune 미사용 — 예: gamblescan `50_resources/prompts/design-token-setup.md`). CLAUDE/AGENTS는 이미 일치(unchanged). v4.0→v4.0(마이그레이션 없음).
+- gamblescan `792ad1e→fa92c3f` · icons `5564bc11→fbdb7cd6`.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-071 PR 리뷰·머지. **#59(070 architecture) 먼저 머지 권장** — 그 후 071 머지 시 라이브 파일(TODO/HANDOFF/checkpoint) 사소한 충돌만 해소(내용 파일은 disjoint라 무충돌).
-2. **문서별 심화** — 기획+개발명세 *템플릿* 계열 완료(063~071). 남은 축: 기획서 *지침*군(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs 등).
-3. **누적 심화(063~071)를 다운스트림에 일괄 sync** — 강력 권장 타이밍(9개 PR 상당 쌓임).
-4. METH-060 잔여(ai-icons 번호 정리 등).
+1. METH-072 PR 리뷰·머지.
+2. **홀드 3곳 sync 재개** — 각 repo working tree clean 후 위 방법으로. **ai-icons**는 dirty 정리 + 커스텀 guide 번호 충돌(04·05·21 ↔ 상류 05/09/21) dedup·마이그레이션 선행(기존 Open Issue).
+3. (선택) **문서별 심화 계속** — 기획서 *지침*군(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 070(#59)·071 병행 PR — 라이브 파일 2차 머지 충돌 예상(내용 무충돌). 머지 순서 #59→071 권장.
-- 누적 심화 sync 타이밍(세트로).
-- 심화 템플릿군 lean 유지 — data-model은 다수 조건부(벡터·SCD2·bi-temporal)라 기본은 최소, 필요분만.
+- 다운스트림 sync를 main 직접 push(--no-verify) 대신 PR로 할지 — 현재 METH-060 이래 main 직접(순수 sync, 검증 훅 우회). 다운스트림 브랜치 보호 도입 시 재검토.
+- 홀드 3곳 dirty 원인 = 사용자 진행 중 작업 — 사용자 정리 대기.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-071-data-model-refresh` (fresh main=069 기준). main 직접 PR. branch-first 준수.
-- 변경: `50_resources/templates/data-model.md`(재작성) + `_CATALOG.md`(한줄) + 라이브 4종.
-- 문서별 심화 진척: 063#53·064#54·065#55·066#56·068#57·069#58 머지 / 067 main직접(A) / 070 architecture #59 open / 071 data-model(이번). **기획+개발명세 템플릿 계열 완료.**
+- 브랜치: `claude/meth-072-downstream-sync` (fresh main 기준). main 직접 PR. branch-first 준수.
+- 변경(methodology): 라이브 3종(TODO·HANDOFF·checkpoint) + 관찰로그. (다운스트림 변경은 각 repo에 이미 커밋·push됨.)
+- 문서별 심화 진척: 063~071 전부 머지(#53~#60, 067 main직접A). 072 = 그 전파.
