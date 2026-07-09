@@ -92,7 +92,7 @@ cd ~/Projects/my-project
 
 1. 인간이 TODO를 적는다.
 2. AI가 필요한 외부 자료를 조사한다.
-3. 결과를 `docs/snapshots/`에 생성한다.
+3. 결과를 `40_dev/snapshots/`에 생성한다.
 4. 인간이 PR 또는 issue에서 검토한다.
 5. AI가 `HANDOFF.md`와 `TODO.md`를 갱신한다.
 

@@ -55,7 +55,7 @@ AGENTS.md와 HANDOFF.md를 읽고 planning-only 프로젝트를 세팅해줘.
 
 1. AGENTS.md와 CLAUDE.md의 Project Settings 빈칸을 먼저 채워줘.
 2. 아래 내용을 바탕으로 TODO.md를 research/planning backlog로 정리해줘.
-3. 첫 산출물을 docs/snapshots/ 아래 어떤 문서로 만들지 추천해줘.
+3. 첫 산출물을 40_dev/snapshots/ 아래 어떤 문서로 만들지 추천해줘.
 4. 필요한 외부 근거가 무엇인지 먼저 정리해줘.
 
 ## 프로젝트 브리프
