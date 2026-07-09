@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "62eb850a806f4a5b20ee1e30a1ca2302cb0847e2",
-  "last_validated_at": "2026-07-09T08:14:53Z",
+  "last_validated_commit": "cb0a3744f54af4dcc4b86c02fb34d4281cb1de3b",
+  "last_validated_at": "2026-07-09T08:20:37Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "8c8fb2dd682d1a32edf5e71a7edfaa81817c62f1bce5aaba0fb3d3b6f6bef640"
+      "sha256": "00978dab53767bfeaf3663a3ff7a928130f504a1c2549b3bd54cc98d684442b1"
     },
     "TODO.md": {
-      "sha256": "5705f71301e53a1148a1f8b571ab71677ca9451def60a2e935ea0b5aa2641970"
+      "sha256": "b6f37ac3cae4cb0db6cb71caedbbe3d674974480d565c9cb56205338757971d3"
     },
     ".ai/checkpoint.md": {
-      "sha256": "7dfcd68b10105014455df37943859449067375c4faeda5d1853a76f93c5067c1"
+      "sha256": "b8bbc930658b9e07652fc2a1389e2aaab85f5d01ed70bd6b58413265475ac010"
     }
   },
   "observations": {
@@ -97,6 +97,7 @@
       "50_resources/ai_observations/2026-07-09_meth-091-legacy-path-sweep.md",
       "50_resources/ai_observations/2026-07-09_meth-092-guide03-observation-deepen.md",
       "50_resources/ai_observations/2026-07-09_meth-093-agent-mechanics-deepen.md",
+      "50_resources/ai_observations/2026-07-09_meth-094-internal-guides-deepen.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
