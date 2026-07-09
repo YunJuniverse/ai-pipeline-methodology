@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "6c9683bec06af46384f673a376f847cb8a40df5f",
-  "last_validated_at": "2026-07-09T04:51:25Z",
+  "last_validated_commit": "ac9a67bb02c5beccad693f4064fc9fcdb6ce661b",
+  "last_validated_at": "2026-07-09T04:57:27Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "6c89de8e3a6d658685cc954050354979dabe07715d31a81c119f1993352fb802"
+      "sha256": "8274ca79d1288970132b8fbd2e0a1599e90a0fd35f356b579f72212281b86bc3"
     },
     "TODO.md": {
-      "sha256": "867974e6bdf135b964c618c32ed6da42b8bceee56cd3ffdc98b7374f5dd3b700"
+      "sha256": "055c5582ba53c6b2290e607ab7b4e482751b18d99b9f7bb3d72374e0f08dd4b4"
     },
     ".ai/checkpoint.md": {
-      "sha256": "32113f7420618bd6a3f6c3ca155435c957b4fc419eefb4989b16d4e859fce0a3"
+      "sha256": "6441b7d30b7606976c2e3fb5b6848be47db1bcd01554ca50b279bfa5cb3d9f9d"
     }
   },
   "observations": {
@@ -85,6 +85,7 @@
       "50_resources/ai_observations/2026-07-09_meth-079-orchestration-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-080-master-plan-ssot-refactor.md",
       "50_resources/ai_observations/2026-07-09_meth-081-prompts-modernization.md",
+      "50_resources/ai_observations/2026-07-09_meth-082-operating-principles-review.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
