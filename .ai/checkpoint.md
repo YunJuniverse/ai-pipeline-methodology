@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-09 (METH-084 skeleton 서브시스템 활성화)
+# Checkpoint — 2026-07-09 (METH-085 friction 캡처 규칙 — 학습 루프 가동)
 
-> ✅ METH-084: 사용자 "skeleton 필요한가?" 점검 → **유지 판정**(고유 환류 루프·자기완결·실체 있음, AI-LOG와 다름). 저활용 상태라 **활성화**: 파이프라인 end-to-end 검증 + 죽은 필드(`last_built`) 제거.
-> 🏁 다음: PR 리뷰·머지 → **누적 다운스트림 sync(073~084)** 또는 agency/ops 템플릿·나머지 메타 지침. skeleton 후속=레슨→catalog 축적.
+> ✅ METH-085: catalog→skeleton 학습 루프가 굶던 원인(재료 미수집, 72로그 중 friction 2건)을 해결. observe `--friction` 캡처 규칙을 헌법에 넣고 catalog _README에 파이프라인 진입점 명문화 + 실제 마찰 dogfood.
+> 🏁 다음: PR 리뷰·머지 → **누적 다운스트림 sync(073~085)** 또는 agency/ops 템플릿·나머지 메타 지침. 학습 루프 후속=세션마다 friction 축적→thinktank→catalog 승급.
 
 ---
 
@@ -14,7 +14,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-084-skeleton-activation` (#72 머지된 main tip 기준, branch-first 준수)
+- Worktree: branch `claude/meth-085-friction-capture-rule` (#73 머지된 main tip 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -25,28 +25,28 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-084 — `50_resources/skeletons/` 서브시스템 활성화 + 죽은 필드 정리** (사용자 "이거 필요한가?" 점검에서 파생):
+**METH-085 — friction 캡처 규칙 추가로 catalog→skeleton 학습 루프 가동** (사용자 "friction 캡처 규칙 넣어서 루프 가동해"):
 
-- **판정**: 유지. AI-LOG(유령·삼중 중복·헌법 오염)와 달리 skeleton은 **catalog→skeleton→새 프로젝트 주입 = 고유 환류 루프**(백서 §5 L2), 자기완결(세션 컨텍스트 미오염), base에 실체 코드 있음. 진짜 문제는 중복이 아니라 *저활용*(catalog active 1개, 이력 빈약).
-- **활성화 조치**:
-  - ① **end-to-end 검증** — `skeleton build frontend-design-tokens` + `apply`(스크래치패드)로 init→build→apply 전 구간 정상 확인(9 base files + `.methodology-skeleton.json` 주입). 파이프라인 작동함.
-  - ② **죽은 필드 제거** — `bakes-in.json.last_built`는 `init`에서 `null`로만 쓰이고 build가 갱신 안 하며 아무도 참조 안 함(실제 빌드시각 SSOT = lock `built_at`). AI-LOG 유령 필드와 동종 → `cmd_skeleton` init 페이로드(methodology.py) + `frontend-design-tokens`/`meta` bakes-in.json + `_README.md` 스키마 예시에서 제거. `_README`에 "bakes-in=사람 입력만, 빌드시각은 lock" 명문화.
-  - 양 도메인(frontend-design-tokens·meta) lock 재빌드(built_at=2026-07-09). build 재실행으로 JSON 유효성 확인.
-- **변경 파일**: `60_tools/methodology.py`, `50_resources/skeletons/{_README.md, frontend-design-tokens/{bakes-in.json,skeleton.lock.json}, meta/{bakes-in.json,skeleton.lock.json}}` + 라이브 4종.
+- **배경**: catalog가 C-001 1개에 머문 진짜 원인 = *재료 미수집*. observe `--friction` 필드는 존재하나 옵션이라 거의 스킵(72 관찰로그 중 2건만 채움) → thinktank가 집계할 마찰 없음 → 승급 후보 안 나옴 → catalog 굶음.
+- **변경**:
+  - ① `CLAUDE.md`·`AGENTS.md` §2 ④ observe 스텝에 규칙 추가: **"비자명한 문제·재발·막힘을 겪었으면 `--friction "where|cost_minutes|resolution|repeat_of"`도 남긴다"** (catalog→skeleton 루프 원료; thinktank ≥2회 승급 집계). **강제 아님 — 마찰 없으면 생략(노이즈 방지)**. 한 줄 추가라 194줄 유지.
+  - ② `50_resources/catalog/_README.md` §3에 "**원료 수집(파이프라인 진입점) — observe --friction**" 소절 신설: observe→thinktank→pending→active→skeleton 흐름 + "마찰 안 남기면 루프 굶는다" + "where는 같은 표현으로 적어야 ≥2 집계".
+  - ③ **dogfood** — 이번 세션의 실제 마찰(HANDOFF Working-on 단일 불릿을 부분 문장만 교체하면 이전 task 텍스트가 잔존, METH-083·084에서 2회 재발)을 observe `--friction`으로 첫 실물 캡처. 교훈: Working-on은 *불릿 전체를 통째로 교체*한다. thinktank 재실행으로 등록 확인.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-084 PR 리뷰·머지.
-2. **누적 다운스트림 sync(2차) 강력 추천** — gamblescan·icons 072까지 반영 → **073~084 추가 필요**(지침·prompts·헌법·_CATALOG·skeleton 등 shared_paths). 홀드 3곳(ai-icons·cafe24·icons-invest) clean 후.
-3. **skeleton 후속(지속)** — 적용 프로젝트에서 레슨 만날 때마다 `catalog`에 C-NNN 추가 → 관련 도메인 `bakes-in.json`에 넣고 `skeleton build`. 이게 "활성화"의 지속 실행분. 새 프론트 도메인 스켈레톤(예: webapp-next) 신설도 후보.
-4. 남은 후보 — agency/ops 템플릿(proposal-go-nogo·qa-*·operation-spec·profitability-sheet·execution-plan·work-request-ticket·wbs·glossary), 메타/dev 지침(02~09·19~20). graph.json 노드(02~09·19~21).
+1. METH-085 PR 리뷰·머지.
+2. **학습 루프 후속(지속)** — 이제 규칙이 있으니, 세션마다 진짜 마찰은 `--friction`으로 남긴다. 반복(≥2)이 쌓이면 `thinktank` 실행 → `_pending/P-NNN` 작성 → 승급 머지 → `C-NNN` → skeleton bake. (HANDOFF Working-on 마찰이 또 재발하면 P-002 승급 후보.)
+3. **누적 다운스트림 sync(2차)** — gamblescan·icons 072까지 → 073~085 추가 필요. 홀드 3곳 clean 후.
+4. 남은 후보 — agency/ops 템플릿, 메타/dev 지침(02~09·19~20), graph.json 노드(02~09·19~21).
 
 ## 미해결 결정사항 (Open Questions)
 
 - 점검·활성화 사이클을 여기서 일단락할지 vs 계속할지 — 사용자 판단.
-- 2차 다운스트림 sync 타이밍(073~084 누적) — 반영할 축적분 큼.
+- 2차 다운스트림 sync 타이밍(073~085 누적) — 반영할 축적분 큼.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-084-skeleton-activation` (#72 머지된 main tip 기준). branch-first 준수.
-- 진척: 063~071 템플릿 + 072 sync(#61) + 073~078 지침군 + 079 오케(#68) + 080 마스터플랜(#69) + 081 prompts(#70) + 082 운영원칙(#71) + 083 메타파일(#72) + **084 skeleton(이번)**.
+- 브랜치: `claude/meth-085-friction-capture-rule` (#73 머지된 main tip 기준). branch-first 준수.
+- 변경: `CLAUDE.md`·`AGENTS.md`(§2 ④, 194줄 유지) + `50_resources/catalog/_README.md`(§3) + 라이브 4종. observe에 --friction 실사용(첫 캡처).
+- 진척: 063~071 템플릿 + 072 sync + 073~078 지침군 + 079 오케 + 080 마스터플랜 + 081 prompts + 082 운영원칙 + 083 메타파일(#72) + 084 skeleton(#73) + **085 friction 루프(이번)**.

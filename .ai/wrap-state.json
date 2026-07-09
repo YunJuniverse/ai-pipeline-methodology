@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "81ae55c77bdb125b893cb1488e8df6ea97510cc9",
-  "last_validated_at": "2026-07-09T05:38:38Z",
+  "last_validated_commit": "5412c8bfa8ae5a2cbeaa091a1f8e6b2c8017929d",
+  "last_validated_at": "2026-07-09T05:52:08Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "b95fb07b73f8d9b7a62beb064f6237533b90422511a6f7bca5b35814af35b26a"
+      "sha256": "f4462ecde054a373af0c7cddeefbba35cb13536d31fbab09f650b417c7e44db5"
     },
     "TODO.md": {
-      "sha256": "fc39133a92617a3c30f22e30cb8100ebf9d27335fcc56be4c7df50cae7cdee6d"
+      "sha256": "891ee09889461ab9b9517d322a717e93271d2f09d134e09824374a4f0ba2dcd5"
     },
     ".ai/checkpoint.md": {
-      "sha256": "9039c41478469f90807d650dc27d7555ffffe7ee0544115cd3ab2e3165778906"
+      "sha256": "ff498c1fdb662fd140cb597ea6b659cffd77f86dfdcf2316e29f539f68dd3cf4"
     }
   },
   "observations": {
@@ -88,6 +88,7 @@
       "50_resources/ai_observations/2026-07-09_meth-082-operating-principles-review.md",
       "50_resources/ai_observations/2026-07-09_meth-083-meta-files-modernization.md",
       "50_resources/ai_observations/2026-07-09_meth-084-skeleton-activation.md",
+      "50_resources/ai_observations/2026-07-09_meth-085-friction-capture-rule.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

@@ -69,6 +69,11 @@ last_hit: 2026-03-22
 
 ## 3. 승급·아카이브 규칙
 
+### 원료 수집 (파이프라인 진입점) — `observe --friction`
+- Catalog 재료는 **L1 관찰 로그의 마찰 필드**에서 나온다. 비자명한 문제·재발·막힘을 겪은 세션은 wrap 시 `observe` 에 `--friction "where|cost_minutes|resolution|repeat_of"` 를 남긴다(CLAUDE.md/AGENTS.md §2 ④ 규칙). 마찰 없는 세션은 생략(강제 아님 — 노이즈 방지).
+- 흐름: `observe --friction`(원료) → `thinktank`(반복 ≥2회 후보 마킹) → `_pending/`(사람 작성) → 승급 머지 → active `C-NNN` → skeleton bake.
+- **마찰을 안 남기면 루프가 굶는다** — thinktank가 집계할 게 없어 승급 후보가 안 나오고 catalog가 비어 있게 된다. `where:` 는 재발 판정의 키이므로 *같은 표현*으로 적으면 ≥2 집계가 잡힌다.
+
 ### Pending Lesson
 - 1회 해결된 문제 중 재사용 가능성이 있으면 `_pending/P-NNN_<slug>.md`에 저장한다.
 - Pending Lesson은 학습 데이터이자 승급 후보일 뿐, Skeleton에 bake-in 하지 않는다.
