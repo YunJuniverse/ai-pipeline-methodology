@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "89b19047e53f17b5bbe8831f84d5cecb13dfdd1e",
-  "last_validated_at": "2026-07-09T03:53:16Z",
+  "last_validated_commit": "e8341e4f86f1d6c894eba7000aa1545ad37acfdd",
+  "last_validated_at": "2026-07-09T04:02:26Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "f308f3f0348e87caf1d57b9ac37ee36c0047dd549a71b623f4aa4a052575ae9f"
+      "sha256": "780574a4d3dfd0515f4ac44f78aff7d93776002e7d81ea7cbb512efac346da78"
     },
     "TODO.md": {
-      "sha256": "060b5fd2c34419dd00377259b02671cd0b8ecc2a6b311e146a44647969999f29"
+      "sha256": "f27e3bfa0ac331afe6fe734fea6d09c5689617bb9c59b685f3aaa98d91ed8cad"
     },
     ".ai/checkpoint.md": {
-      "sha256": "2d52d98f8afb2d46c8cf0dd9955b02ce60a024cf0e56f9a80b8785ae50fc4932"
+      "sha256": "b3abe6eb6f2343865cdd103ccb6fd75d1cb16161cc930260a9795d2bae62baf9"
     }
   },
   "observations": {
@@ -80,6 +80,7 @@
       "50_resources/ai_observations/2026-07-09_meth-074-marketing-plan-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-075-brand-plan-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-076-pm-plan-guide-refresh.md",
+      "50_resources/ai_observations/2026-07-09_meth-077-ai-feature-guide-refresh.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

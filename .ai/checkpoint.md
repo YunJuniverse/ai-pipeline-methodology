@@ -1,8 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-076 PM기획서 지침 심화 · PMBOK7·플로우/DORA·AI 에이전트 거버넌스)
+# Checkpoint — 2026-07-09 (METH-077 AI기능기획서 지침 심화 · 에이전트·MCP·RAG·컨텍스트 엔지니어링)
 
-> ✅ METH-076: 기획서 지침군 4번째 = guide 15 PM기획서(937줄·최대). 웹리서치(PMBOK7·Kanban/DORA·Cagan/Seiden·Flyvbjerg·RAID·AI 증강 PM) → §6에 7항목 신설(§6.18~6.24).
-> 핵심: 예측형 로그 구조를 **스펙트럼 디폴트**로 재프레이밍 + 플로우/확률예측·DORA·아웃컴/OKR·outside view·RAID·**AI 에이전트 작업 거버넌스**(방법론 자체 사례).
-> 🏁 다음: PR 리뷰·머지 → 지침군 마지막 2개(AI기능 16·평가 17) 또는 홀드 다운스트림 sync 재개.
+> ✅ METH-077: 기획서 지침군 5번째 = guide 16 AI기능기획서(AI-native ~2026-05). 웹리서치(Anthropic·MCP·RAGAS·OWASP LLM Top10) → §5에 7항목 신설(2026-05 이후 발전).
+> 핵심: **workflow vs agent 게이트+정지조건 · MCP 통합계약 · RAG-eval(faithfulness) · constrained decoding · 컨텍스트 엔지니어링(context rot)·모델 적응 사다리 · OWASP LLM Top10 feature 패스**.
+> 🏁 다음: PR 리뷰·머지 → 지침군 마지막 1개(평가·가드레일 17, 16과 짝) 또는 홀드 다운스트림 sync 재개.
 
 ---
 
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-076-pm-plan-guide-refresh` (fresh main 기준, branch-first 준수)
+- Worktree: branch `claude/meth-077-ai-feature-guide-refresh` (fresh main 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -26,32 +26,32 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-076 — PM기획서 지침(guide 15, 937줄) 심화** (기획서 지침군 프로그램 4번째):
+**METH-077 — AI기능기획서 지침(guide 16, 413줄) 심화** (기획서 지침군 프로그램 5번째):
 
-- **방법**: 웹리서치 1차 소스(PMBOK 7 원칙+도메인·2020 Scrum Guide·ProKanban 플로우·dora.dev 5지표·Seiden 'Outcomes over Output'/Cagan·Flyvbjerg 레퍼런스클래스·Klein 프리모템·PMI AI-augmented PM). 현행 §6(개요~KPI+운영원칙+Eval 포트폴리오+인간 검토 게이트 카탈로그+AI 위험 등록부, 예측형 로그 편향) gap.
-- **변경 (`20_guides/15_프로젝트_관리_기획서_작성_지침.md`)** — §6 신규 7항목:
-  - **§6.18 딜리버리 모델 선언** — 예측/하이브리드/애자일 스펙트럼 + 테일러링. 기존 구조=예측형 디폴트로 재프레이밍.
-  - **§6.19 플로우 메트릭 + Monte Carlo** — WIP/cycle/throughput/age/CFD·확률 예측(신뢰구간) vs %-complete.
-  - **§6.20 DORA 5지표** — 배포빈도·리드타임·변경실패율·복구시간·재작업률(딜리버리 성능, 운영 MTTR과 구분; AI 처리량↑ 불안정성↑).
-  - **§6.21 아웃컴/OKR** — 산출물→아웃컴 링크·선행/후행·feature factory 회피.
-  - **§6.22 레퍼런스클래스 예측** — inside(3점)+outside view·낙관편향 상향(Flyvbjerg).
-  - **§6.23 RAID + 프리모템** — 가정·의존을 1급 승격·크리티컬패스·kick-off 프리모템.
-  - **§6.24 AI 증강 PM + AI 에이전트 작업 거버넌스** — copilot(사람 accountability) + 에이전트 스코핑·자율예산/정지(지침07)·검토게이트(6.16 확장)·throughput/품질(DORA). *방법론 자체가 사례*.
-  - §8.1 목차(0번 모델 선언)·§16 체크리스트·§19.11 환류·README §3.2 갱신.
+- **방법**: 웹리서치 1차 소스(Anthropic Building Effective Agents·effective context engineering·MCP 스펙 2025·OpenAI structured outputs·RAGAS·OWASP LLM Top10 2025). 이 지침은 AI-native지만 ~2026-05 작성이라 그 이후 발전이 gap.
+- **변경 (`20_guides/16_AI_기능_기획서_작성_지침.md`)** — §5 신규 7항목:
+  - **§5.15 에이전트 아키텍처** — workflow vs agent 게이트(고정흐름=워크플로우, 동적일 때만 에이전트)·loop 패턴(ReAct/plan-execute/reflection)·**정지조건**(iter/tool/토큰 캡·no-progress·에스컬레이션)=LLM10 방어·지침07 feature판.
+  - **§5.16 에이전트 메모리** — short(컨텍스트)/long(벡터·파일)·TTL·메모리 PII.
+  - **§5.17 MCP 통합** — tools/resources/prompts·OAuth(RFC 8707)·스코프·tool 응답=미신뢰(LLM01).
+  - **§5.18 RAG 설계+RAG-eval** — chunking/임베딩/하이브리드/rerank·grounding/citation·RAGAS(context precision/recall·faithfulness·answer relevancy)·agentic RAG.
+  - **§5.19 구조화 출력 메커니즘** — JSON Schema·constrained decoding·strict function calling·실패 계약(LLM05).
+  - **§5.20 컨텍스트 엔지니어링 + 모델 적응 결정트리** — prompt caching·compaction·context rot·프롬프트→RAG→FT→추론 사다리(RAG-first).
+  - **§5.21 OWASP LLM Top10 2025** feature-level 위협 체크(조직 카탈로그는 17).
+  - §7 목차·§15.2 환류·README §3.4 갱신. 상호 배선(정지조건↔LLM10·MCP↔LLM01·grounding↔LLM09·구조화출력↔LLM05).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-076 PR 리뷰·머지.
-2. **기획서 지침군 심화 계속** — 남은 2개: AI기능(16)·평가(17). (16·17은 이미 v3 신설·AI 특화라 gap이 다를 수 있음 — 현행 정독 후 판단.)
-3. **홀드 다운스트림 sync 재개** — ai-icons·cafe24-renewal·icons-invest clean 후. 073~076 지침 심화분 포함.
+1. METH-077 PR 리뷰·머지.
+2. **기획서 지침군 심화 완료** — 마지막 = **평가·가드레일(17)**. 16(feature 인스턴스)의 org 카탈로그 짝 — eval 메트릭·LLM-as-judge·골든셋·4-카테고리 가드·EU AI Act·인간 게이트 표준. 현행 정독 후 gap(judge bias·agent trajectory eval·NIST AI RMF·EU AI Act GPAI 등) 판단.
+3. **홀드 다운스트림 sync 재개** — ai-icons·cafe24-renewal·icons-invest clean 후. 073~077 지침 심화분 포함.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 지침군 심화 완료 후(16·17까지) 누적 지침 심화분(073~077)을 다운스트림에 sync할 타이밍.
-- 지침 §6 항목 증가 — lean 위해 조건부/심화레이어/기존절 보강으로 관리 중. 실사용 무게 재점검.
+- 17까지 완료 후 지침 심화 누적분(073~078)을 다운스트림에 sync할 타이밍.
+- 지침 항목 증가 — lean 위해 조건부/기존절 보강으로 관리 중.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-076-pm-plan-guide-refresh` (fresh main 기준). main 직접 PR. branch-first 준수.
-- 변경: `20_guides/15_프로젝트_관리_기획서_작성_지침.md`(§6·§8·§16·§19) + `20_guides/README.md` + 라이브 4종.
-- 진척: 063~071 템플릿+072 sync(#61)+073 운영(#62)+074 마케팅(#63)+075 브랜드(#64)+**076 PM(이번)**. 지침군 남음: 16·17.
+- 브랜치: `claude/meth-077-ai-feature-guide-refresh` (fresh main 기준). main 직접 PR. branch-first 준수.
+- 변경: `20_guides/16_AI_기능_기획서_작성_지침.md`(§5·§7·§15) + `20_guides/README.md` + 라이브 4종.
+- 진척: 063~071 템플릿+072 sync+073~076 지침(운영·마케팅·브랜드·PM, #62~#65)+**077 AI기능(이번)**. 지침군 남음: 17.
