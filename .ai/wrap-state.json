@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "1fc337d6bddce2df9743ac44a08dfb5e250f2ff3",
-  "last_validated_at": "2026-07-09T07:14:16Z",
+  "last_validated_commit": "12eebd26d19f4488f25c5f1625b331f3447ee4fd",
+  "last_validated_at": "2026-07-09T07:48:21Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "0d413b7920f2100e0c032b5028d0480c4b0373dddba97750017703bcdcca72a3"
+      "sha256": "e742297e50a9148fd7bb41975742a014d3703b2fca1c29f5e4b9d210222d5c5c"
     },
     "TODO.md": {
-      "sha256": "c6a1a5c0243235aaa3a938349c30b29355e3c8ddce08f63d6ae9a29a88527ffa"
+      "sha256": "6ba8952e0e28035a9efd27bbb8eff8220006a4638867b57fb0dfd39dc8527413"
     },
     ".ai/checkpoint.md": {
-      "sha256": "87ad4c37432015ae1a029b4dcde4fcfa6db08a8997e62f52fb625496bee5bfe2"
+      "sha256": "ed800837a876f2a6042e1ed7c8be13d51bbb50d41d9307d4a156454cf3edb9d4"
     }
   },
   "observations": {
@@ -93,6 +93,7 @@
       "50_resources/ai_observations/2026-07-09_meth-087-downstream-sync-086.md",
       "50_resources/ai_observations/2026-07-09_meth-088-downstream-sync-holds.md",
       "50_resources/ai_observations/2026-07-09_meth-089-guide-number-remediation.md",
+      "50_resources/ai_observations/2026-07-09_meth-090-remove-legacy-skills.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
