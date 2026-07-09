@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "70b259feac7dd57b45f227570013cf76892ceea7",
-  "last_validated_at": "2026-07-09T05:24:07Z",
+  "last_validated_commit": "81ae55c77bdb125b893cb1488e8df6ea97510cc9",
+  "last_validated_at": "2026-07-09T05:38:38Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "3a45010c52bf3c249081c2eddcb7a96333e466db917344d259e1d89a201e95be"
+      "sha256": "b95fb07b73f8d9b7a62beb064f6237533b90422511a6f7bca5b35814af35b26a"
     },
     "TODO.md": {
-      "sha256": "2d9691bac5772c1b7d9ccf77f66eace38d5444e69ec807d09b0490d0d2b3e077"
+      "sha256": "fc39133a92617a3c30f22e30cb8100ebf9d27335fcc56be4c7df50cae7cdee6d"
     },
     ".ai/checkpoint.md": {
-      "sha256": "c083eb8520c0d9913258692952b96b9fe56d461651d20a26b298ef82ed06c8ac"
+      "sha256": "9039c41478469f90807d650dc27d7555ffffe7ee0544115cd3ab2e3165778906"
     }
   },
   "observations": {
@@ -87,6 +87,7 @@
       "50_resources/ai_observations/2026-07-09_meth-081-prompts-modernization.md",
       "50_resources/ai_observations/2026-07-09_meth-082-operating-principles-review.md",
       "50_resources/ai_observations/2026-07-09_meth-083-meta-files-modernization.md",
+      "50_resources/ai_observations/2026-07-09_meth-084-skeleton-activation.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
