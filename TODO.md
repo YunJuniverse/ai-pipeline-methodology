@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-078 · 평가·가드레일 지침 심화 (거버넌스 3축·judge bias·trajectory eval)
+- **notes**: 2026-07-09. Class A. PR 대기(main 직접). **기획서 지침군 심화 완결(12~17)**(guide 17, org eval/guard 카탈로그). 웹리서치(MT-Bench/G-Eval·RAGAS·NIST AI RMF+GenAI Profile·ISO 42001·EU AI Act GPAI CoP·OTel GenAI·Garak/PyRIT) → 신규: **§3.7 LLM-judge bias & 완화**(position/verbosity/self-preference/sycophancy + calibration 게이트·judge 버전 pin) · **§3.8 에이전트/trajectory eval**(task성공·tool-call·trajectory·비용) · **§3.9 RAG 메트릭(RAGAS)** · **§3.10 eval 데이터 위생**(오염·홀드아웃·버전) · **§4.4 EU AI Act GPAI 갱신** · **§4.5 레드팀 pre-release 게이트**(finding→regression) · **§4.6 거버넌스 매핑(NIST AI RMF+ISO 42001+EU)** · **§6 OTel GenAI 정렬** · §10 환류. README 갱신. 16↔17 경계 재확인. branch-first 준수.
+
 ### METH-077 · AI기능기획서 지침 심화 (에이전트·MCP·RAG·컨텍스트 엔지니어링)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 5번째(guide 16, AI-native ~2026-05). 웹리서치(Anthropic Building Effective Agents·context engineering·MCP 스펙·OpenAI structured outputs·RAGAS·OWASP LLM Top10 2025) → §5 신규 7항목(2026-05 이후 발전): **§5.15 에이전트 아키텍처**(workflow vs agent 게이트·loop 패턴·정지조건=LLM10 방어) · **§5.16 에이전트 메모리**(short/long-term) · **§5.17 MCP 통합**(tool/resource·OAuth·미신뢰 응답=LLM01) · **§5.18 RAG 설계+RAG-eval**(RAGAS faithfulness·agentic RAG) · **§5.19 구조화 출력 메커니즘**(JSON Schema·constrained decoding·strict=LLM05 방어) · **§5.20 컨텍스트 엔지니어링+모델 적응 결정트리**(context rot·프롬프트→RAG→FT→추론 사다리) · **§5.21 OWASP LLM Top10 feature 체크**. §7 목차·§15.2 환류·README 갱신. 조직 eval/guard 카탈로그는 17번(중복 회피). branch-first 준수.
 
@@ -24,8 +27,6 @@
 ### METH-075 · 브랜드기획서 지침 심화 (DBA·Share of Search·브랜드 in AI)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 3번째(guide 14, 737줄). 웹리서치(April Dunford·Play Bigger·Ehrenberg-Bass/Romaniuk·Binet·브랜드 아키텍처·WCAG·소닉) → §6 신규 8항목: **§6.14 Dunford 5요소 포지셔닝**(+카테고리 창출 분기=Class C) · **§6.15 Distinctive Brand Assets**(fame×uniqueness 등록부) · **§6.16 브랜드 아키텍처+버벌/네이밍** · **§6.17 브랜드 헬스**(퍼널·NPS·**Share of Search**) · **§6.18 브랜드 in AI 답변**(AI 인식 감사, GEO/AEO 브랜드판) · **§6.19 brand-as-code 확장**(voiceProfile·bodyOfWork) · **§6.20 WCAG 접근성**(4.5:1/3:1) · **§6.21 모션·소닉**. §8.1·§16·§19.7·README 갱신. branch-first 준수.
 
-### METH-074 · 마케팅기획서 지침 심화 (GEO/AEO·포스트쿠키 측정·그로스 루프)
-- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 2번째(guide 13, 860줄). 웹리서치(Reforge·Google Meridian·Ehrenberg-Bass/Binet&Field·GEO/AEO·한국 표시광고법/FTC/EU AI Act) → §6 신규 7항목: **§6.15 GEO/AEO**(AI 답변 인용 최적화 — 2025-26 최대 변화) · **§6.16 포스트쿠키 측정**(MMM+증분성+플랫폼 삼각측량·MER/POAS·consent mode/CDP) · **§6.17 Growth Loops**(퍼널 위 복리) · **§6.18 채널별 유닛 이코노믹스** · **§6.19 브랜드/퍼포먼스**(60:40·95-5·mental availability) · **§6.20 실험 엄밀성**(사전등록·가드레일·검정력) · **§6.21 AI 마케팅 공시/규제**(한국 표시광고법 2026.1·FTC·EU AI Act·HITL). §8.1·§16·§19.9·README 갱신. branch-first 준수.
 
 
 

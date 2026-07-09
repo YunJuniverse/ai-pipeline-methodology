@@ -77,7 +77,7 @@
 | 번호 | 문서 | 역할 |
 |------|------|------|
 | **16** | AI 기능 기획서 | AI 기능 단위의 입력·출력·평가·가드·fallback 원본 + 에이전트 아키텍처(workflow vs agent·정지조건)·메모리·MCP·RAG 설계+RAG-eval·구조화 출력·컨텍스트 엔지니어링·모델 적응 사다리·OWASP LLM Top10 |
-| **17** | 평가 및 가드레일 지침 | 평가·가드의 조직 표준 카탈로그 |
+| **17** | 평가 및 가드레일 지침 | 평가·가드의 조직 표준 카탈로그 + LLM-judge bias/mitigation·에이전트 trajectory eval·RAGAS 메트릭·eval 데이터 위생·NIST AI RMF+ISO 42001 거버넌스 매핑·EU AI Act GPAI·레드팀 게이트·OTel GenAI |
 
 ### 3.5 개발 전환 (v3.1 신설)
 | 번호 | 문서 | 역할 |

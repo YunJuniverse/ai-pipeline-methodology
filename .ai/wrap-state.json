@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "e8341e4f86f1d6c894eba7000aa1545ad37acfdd",
-  "last_validated_at": "2026-07-09T04:02:26Z",
+  "last_validated_commit": "0977595e5abe6967591b10e80329f20e901b0922",
+  "last_validated_at": "2026-07-09T04:12:19Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "780574a4d3dfd0515f4ac44f78aff7d93776002e7d81ea7cbb512efac346da78"
+      "sha256": "b4f37beee12aa3d4e3dd22a154bb783264392968327d28c69c3b0dbc20b12d7e"
     },
     "TODO.md": {
-      "sha256": "f27e3bfa0ac331afe6fe734fea6d09c5689617bb9c59b685f3aaa98d91ed8cad"
+      "sha256": "6c997861ca3049cff269bffc97bc567db39e6c12ba401e8e49a8183eb2ea9583"
     },
     ".ai/checkpoint.md": {
-      "sha256": "b3abe6eb6f2343865cdd103ccb6fd75d1cb16161cc930260a9795d2bae62baf9"
+      "sha256": "a0e1b24c48cede93365ae67f008b83de092720828d3b53556fe79f089a4ac4bf"
     }
   },
   "observations": {
@@ -81,6 +81,7 @@
       "50_resources/ai_observations/2026-07-09_meth-075-brand-plan-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-076-pm-plan-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-077-ai-feature-guide-refresh.md",
+      "50_resources/ai_observations/2026-07-09_meth-078-eval-guardrail-guide-refresh.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
