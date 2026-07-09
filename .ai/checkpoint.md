@@ -1,7 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-091 legacy 경로 sweep)
+# Checkpoint — 2026-07-09 (메타/dev 지침 심화 배치 — METH-092 guide 03)
 
-> ✅ METH-091: 라이브 문서 pre-v4 경로 sweep — `10_foundation/` 3건(`docs/snapshots/`→`40_dev/snapshots/`) 수정. 나머지 `docs/` 참조는 정당(정확한 인용·예시). docs sweep Open Issue Closed.
-> 🏁 다음: 남은 후보 전부 Low·선택(agency/ops 템플릿·메타지침 02~09·19~20·graph.json·v3.2 backward-compat 정리) 또는 일단락. 다른 repo: ai-icons 92 환류·talmo-com 실작업(킥오프 전달됨).
+> ✅ METH-092: guide 03(관찰 로그) 심화 — `observe` CLI 정본화 + friction 캡처 규칙 + 학습루프 파이프라인 명시.
+> 🔄 진행 중 배치(사용자 "전부"): 06·07·08 웹리서치 **3건 전부 도착**(아래 요약) → 093으로 반영 예정. 이후 094=05·09+02/19/20 경량.
+> 🏁 리서치 결과 요약은 이 파일 하단 "리서치 요약" 참조 — 다음 세션이 093을 이어서 하면 됨.
 
 ---
 
@@ -11,44 +12,36 @@
 
 ## 작성자
 
-- Agent: claude-opus-4-8
-- Tool: claude-code-cli
-- Host: darwin-25.5
-- Worktree: branch `claude/meth-091-legacy-path-sweep` (#79 머지된 main tip 기준, branch-first 준수)
+- Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
+- Worktree: branch `claude/meth-092-guide03-observation-deepen` (main tip 기준, branch-first)
 
 ## 부팅 계약
 
-1. Read `.ai/context.json`.
-2. Read every path in `must_read` in order.
-3. Use `last_session.checkpoint_file` (= 이 파일)를 즉시 인계로.
-4. "다음 사람에게" 첫 항목부터 시작.
+1. Read `.ai/context.json`. 2. `must_read` 순서대로. 3. `last_session.checkpoint_file`(이 파일) 즉시 인계. 4. "다음 사람에게" 첫 항목부터.
 
 ## 방금 한 것 (정확히)
 
-**METH-091 — legacy/archive 경로 sweep** (사용자 지시):
+**메타/dev 지침(02~09·19~20) 심화 배치** — 사용자 "전부". 계획: 092=guide 03(완료), 093=06·07·08(리서치), 094=05·09+02/19/20 경량. (02/19/20은 이미 성숙 → 경량 확인만.)
 
-- **범위**: 라이브 문서의 pre-v4 경로 참조 점검. *제외*: `90_archive/`(히스토리 의도 보존)·`migrations/`(옛 경로가 기능)·`ai_observations`/`snapshots`/변경이력(시점 기록).
-- **실제 stale 3건 발견·수정** (구조 개편 前 `docs/snapshots/` → v4 `40_dev/snapshots/`):
-  - `10_foundation/KICKOFF_PROMPT.md:58`
-  - `10_foundation/DIAGRAM.md:24`
-  - `10_foundation/HOW_TO_APPLY.md:95`
-  → 신규 사용자가 산출물을 없는 경로에 만들라는 오도 제거.
-- **정당 확인(유지)**: guide 19:3 `gamblescan:docs/snapshots/...retrospective` = gamblescan이 자체 `docs/`에 실제 보관하는 파일(검증함). api-contract `docs/openapi.yaml` = 프로젝트 예시 경로.
-- **부수 발견(별건 Open Issue)**: `methodology.py _wrap_obs_dirs`·dashboard의 v3.2 backward-compat 폴백(40_resources/60_meta/docs)은 현존 repo 7곳 전부 v4.0이라 dead. 단 코드 backward-compat라 제거=v3 지원 포기 결정 필요 → Low Open Issue로만 등재(마이그레이션 스크립트는 유지).
+- **METH-092(완료)**: guide 03. §5 수동 cat→`observe` CLI 정본화(cat 금지=wrap fail·헌법 §2④)+`--friction` positional(where\|cost\|resolution\|repeat_of)·캡처 규칙. §6 학습 파이프라인+catalog/skeleton 교차링크. v2 이력.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-091 PR 리뷰·머지.
-2. **남은 방법론 repo 작업(전부 Low·선택)**: agency/ops 템플릿 심화, 메타/dev 지침 심화(02~09·19~20), graph.json 노드 완성(02~09·19~21), v3.2 backward-compat 코드 정리(별건).
-3. **다른 repo(별도 세션, 킥오프 전달됨)**: ai-icons 92_LOCAL↔상류05 환류, `~/talmo-com` 탈모닷컴 실작업(방향=멀티브랜드 커머스 마켓플레이스로 확정된 상태 — 그 세션에서 진행 중).
-4. 학습 루프 후속: friction 축적→thinktank→catalog 승급.
+1. METH-092 PR 리뷰·머지.
+2. **METH-093 — guide 06·07·08 심화**(웹리서치 3건 이미 수행, 요약 하단). 각 guide에 반영:
+   - **06 컴팩션**: safest-first drop(raw tool output 먼저)·aggressive 위험 인용·임계치(harness ~95%/proactive ~60%)·scoped rule 재anchor·auto-survive 명시(파일 재읽기·CLAUDE.md 재주입)·post-compaction 검증·subagent isolation 교차링크(08)·API vs Claude Code 2층 모델.
+   - **07 자율/정지**: 이중 예산(runtime turns/USD + declared files/PR; "SDK 기본 무제한" 경고)·6 circuit breaker·ground-truth 진척(self-report 금지)·ask→clarify→escalate 사다리(over-asking도 실패)·"confirm before irreversible"=Class C 연결·stop report=ResultMessage 형태·budget 재선언 전 checkpoint·build/eval 분리.
+   - **08 서브에이전트**: fan-out(read/search/verify) vs single-writer(coupled generation, Cognition)·sizing heuristic(1/2-4/10+)·delegation 계약 필드(objective+output+boundaries)·per-subagent model/effort·concurrency 3-5 cap·LLM-judge completeness rubric·artifact/external-memory 집계·Workflow 스케일 escape+"복잡도는 이득 있을 때만".
+3. **METH-094 — 05·09 내부 정합 + 02/19/20 경량**(변경이력 신설 등, 필요 시).
+4. 다른 repo(별도 세션): ai-icons 92 환류·talmo-com 실작업.
 
-## 미해결 결정사항 (Open Questions)
+## 리서치 요약 (093 원료 — 1차 소스)
 
-- 점검·정합·구조·전파·정비 사이클(079~091) 일단락 여부 — 남은 건 전부 Low·선택. 큰 사이클 닫힘.
+- **06**: Anthropic context-engineering/harness, Claude Code compaction(~95-98% auto; API 150k trigger). 핵심: 파일 flush 먼저·smallest high-signal·JIT 포인터·context rot·safest drop=tool output·subagent isolation.
+- **07**: Anthropic Building Effective Agents/agent-loop(max_turns·max_budget_usd 기본 무제한)/harness/measuring-autonomy. 핵심: 이중 예산·ground truth·ask-vs-act·irreversible gate=Class C·ResultMessage stop report.
+- **08**: Anthropic multi-agent research(15× 토큰·3-5 병렬·sizing)/Building Effective Agents·Cognition single-writer. 핵심: breadth fan-out vs single-writer·context isolation·completeness critic·artifact memory·Workflow 스케일.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-091-legacy-path-sweep` (#79 머지된 main tip 기준). branch-first 준수.
-- 변경: `10_foundation/` 3파일(docs/snapshots→40_dev/snapshots) + 라이브 4종.
-- 진척: …088 홀드 sync + 089 번호 remediation + 090 skills 삭제 + **091 경로 sweep(이번)**. 별도: talmo-com v4 부트스트랩(방법론 밖).
+- 브랜치: `claude/meth-092-guide03-observation-deepen`. branch-first.
+- 진척: …091 경로 sweep + **092 guide03(이번)**. 남은 배치: 093(06/07/08)·094(05/09/02/19/20).

@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "3853990aa8960706a5995cd4152500bdc0961f94",
-  "last_validated_at": "2026-07-09T07:56:53Z",
+  "last_validated_commit": "732b7a122a193d3955c7f09303b48a327a94bba4",
+  "last_validated_at": "2026-07-09T08:08:22Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "17fe74812772e631701d25eb8abb8e9ce55e52e71594087e5e1b47307a254a0b"
+      "sha256": "b579d2be230a4964312fe5c4a3e141e8e4f95df46ccd3e4ae1c0fe4532ae4651"
     },
     "TODO.md": {
-      "sha256": "d7f6eb699ea4bd2cc114ebefc064433238caeb922e383963bdde8e515031c2aa"
+      "sha256": "7c1839621ad493205cf2d1eaa5b29621cac3cc7325eb34e8a0173939203f8b0f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "9ed1106ba0199d4e8aa6ed346541b200e88c8b1e8842ea7e55228415722398e0"
+      "sha256": "bb2869b876d85269bde5d899b7bfe48f2ed06fcd0bed747904c65386e26fc7de"
     }
   },
   "observations": {
@@ -95,6 +95,7 @@
       "50_resources/ai_observations/2026-07-09_meth-089-guide-number-remediation.md",
       "50_resources/ai_observations/2026-07-09_meth-090-remove-legacy-skills.md",
       "50_resources/ai_observations/2026-07-09_meth-091-legacy-path-sweep.md",
+      "50_resources/ai_observations/2026-07-09_meth-092-guide03-observation-deepen.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
