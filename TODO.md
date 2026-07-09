@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-074 · 마케팅기획서 지침 심화 (GEO/AEO·포스트쿠키 측정·그로스 루프)
+- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 2번째(guide 13, 860줄). 웹리서치(Reforge·Google Meridian·Ehrenberg-Bass/Binet&Field·GEO/AEO·한국 표시광고법/FTC/EU AI Act) → §6 신규 7항목: **§6.15 GEO/AEO**(AI 답변 인용 최적화 — 2025-26 최대 변화) · **§6.16 포스트쿠키 측정**(MMM+증분성+플랫폼 삼각측량·MER/POAS·consent mode/CDP) · **§6.17 Growth Loops**(퍼널 위 복리) · **§6.18 채널별 유닛 이코노믹스** · **§6.19 브랜드/퍼포먼스**(60:40·95-5·mental availability) · **§6.20 실험 엄밀성**(사전등록·가드레일·검정력) · **§6.21 AI 마케팅 공시/규제**(한국 표시광고법 2026.1·FTC·EU AI Act·HITL). §8.1·§16·§19.9·README 갱신. branch-first 준수.
+
 ### METH-073 · 운영기획서 지침 심화 (SRE·인시던트·AI 운영)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 — 기획서 *지침군* 첫 대상(guide 12, 760줄). 웹리서치(Google SRE·PagerDuty/incident.io·ITIL 4·L1/L2/L3·OWASP LLM·LLM 운영) → §6에 신규 8항목: **§6.15 SLO/Error Budget**(정책=기능 프리즈 레버) · **§6.16 형식 인시던트**(SEV1-4·IC 역할·MTTD/MTTA/MTTR) · **§6.17 on-call/에스컬레이션/블레임리스 포스트모템** · **§6.18 SLO 기반 알림**(multi-burn-rate·알림피로) · **§6.19 계층 지원 L1/L2/L3**(계층 SLA·CSAT/CES/FCR) · **§6.20 변경/릴리스 운영**(ITIL 유형·feature flag·롤백·프리즈) · **§6.21 Toil 예산** · **§6.22 AI 프로덕션 운영**(프로덕션 eval·가드레일=인시던트·provider failover·HITL 워크로드·토큰 FinOps). §8.1 목차·§16 체크리스트·§19.6 환류·README 갱신. branch-first 준수.
 
@@ -24,8 +27,6 @@
 ### METH-071 · 데이터 모델 심화 (ERD·키·무중단 마이그레이션)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 9번(개발명세 계열 마무리). 웹리서치(PostgreSQL·AWS·pgvector·OWASP·RFC 9562) → `data-model.md` 강화. 추가: **§1 Mermaid ERD**(crow's foot) · 키 전략(surrogate/**UUIDv7**·ULID·opaque public ID) · Fields에 Key/Constraints/Indexed 컬럼 · **cascade 규칙**(CASCADE/RESTRICT/SET NULL 결정) · 제약(NOT NULL/UNIQUE/CHECK/enum) · **history 전략 태그**(soft-delete/SCD2/append-only/bi-temporal + 감사컬럼) · 인덱스 원칙(FK 명시·복합·covering·partial) · **§7 expand-contract 무중단 마이그레이션**(3단계·단계별 가역·lock-safe) · **PII 분류/보존/GDPR 삭제**(파생 벡터·캐시·백업 포함) · **§8 벡터/pgvector**(조건부). 3NF 기본·비정규화 사유 명기. _CATALOG 갱신. branch-first 준수. (※ PR #59 architecture open — 파일 disjoint, 라이브만 2차 머지 시 사소 충돌 가능.)
 
-### METH-070 · 아키텍처 문서 심화 (arc42 + C4 + fitness functions)
-- **notes**: 2026-07-09. Class A. **PR #59** — 071(#60)이 먼저 머지돼 라이브파일 충돌 → main 병합으로 해소(architecture.md 무충돌, _CATALOG 두 줄 병합, 라이브는 main=071 채택 + 070 기록 추가). 문서별 심화 8번. 웹리서치(arc42·C4/Simon Brown·Richards&Ford·fitness functions·OWASP·LLM 게이트웨이) → `architecture.md` 강화(14→21섹션): §2 품질속성 top3(least-worst)·§16 적합성 함수(CI, 지침19)·§4 C4(Mermaid)·§6 런타임·§11 신뢰경계/위협(STRIDE)·§14 배포·§15 AI 아키텍처(조건부)·§20 리스크/기술부채. _CATALOG 갱신.
 
 
 
