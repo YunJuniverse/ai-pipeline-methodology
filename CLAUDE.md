@@ -20,42 +20,20 @@
 <!-- methodology:managed:start id=operating-rules -->
 ## 2. Operating Rules
 
-- Code is the source of truth for implementation details.
-- ADR is the source of truth for decisions that code cannot explain.
-- `HANDOFF.md` is the only live state file. Keep it under 150 lines.
-- `TODO.md` is the active backlog. Use stable IDs and acceptance criteria.
-- **세션·작업 종료 절차 (의무, 모든 AI 모델 공통)**: 자연스러운 작업 단위가 끝나면 다음 4개 라이브 파일을 *AI가 자동으로* 갱신한 뒤 `python3 60_tools/methodology.py wrap` 으로 검증 → 결과를 사용자에게 보고. 사용자는 다음 turn에서 결과를 보고 수정 요청 가능.
-  1. `TODO.md` — 완료 항목 Done 이동, 새 항목 추가
-  2. `HANDOFF.md` — Current Focus + Recent Changes 갱신 (최근 5건 유지)
-  3. `.ai/checkpoint.md` — 다음 사람·다른 AI를 위한 인계서 갱신 (백서 §2-2 형식)
-  4. **관찰 로그 작성 — 반드시 CLI 사용 (직접 `cat >` 금지)**:
-     ```
-     python3 60_tools/methodology.py observe \
-       --slug "<kebab-case-slug>" \
-       --task-type <bootstrap|feature|bugfix|refactor|research|docs> \
-       --summary "<50~150자 자유서술>"
-     ```
-     CLI 가 frontmatter·enum·길이 검증을 atomic 하게 처리. `cat > .md` 직접 작성은 형식 오류로 wrap·CI 실패 유발.
-  wrap 출력이 `4/4 ✓` 일 때만 종료. `✗` 가 있으면 누락 갱신 후 다시 호출. wrap v4.1+ 는 sha256 콘텐츠 해시 비교 — *실제 내용 갱신* 만 통과 (`touch`/동일 내용 재저장 차단).
-- **컨텍스트 컴팩션 경계 (의무, 긴 세션)**: 컨텍스트가 한계에 근접하거나 하네스가 요약(compaction)을 예고하면, *요약 전에* 라이브 파일(특히 `.ai/checkpoint.md`의 방금 한 것·다음 사람에게·미해결 결정)을 먼저 갱신한다. compaction 은 "세션 중간 인계" — 파일에 상태가 있으면 요약이 잃어도 복원된다. 보존/폐기 규칙·pre-compaction 체크리스트는 `20_guides/06_컨텍스트_컴팩션_프로토콜.md`. 핵심: *"compaction 후의 내가 이걸 잃으면 사용자에게 다시 물어야 하나?"* → 그렇다면 보존, 파일 재로드로 되는 것은 경로만 남기고 폐기.
-- **자율 진행 예산·정지 (권장, 대규모 자율 작업)**: 사람 확인 없이 여러 단계를 자율 진행할 땐 착수 전 개략 예산(파일/PR/반복 규모)을 선언하고, no-progress 2회·반복 캡·예산 초과 시 멈춰 보고한다("예산 내 자율, 초과 시 보고"). 범위를 줄이면 무엇을 남겼는지 반드시 보고. 상세: `20_guides/07_자율진행_예산_및_정지조건.md`. 멀티에이전트 팬아웃 규약은 `20_guides/08_서브에이전트_오케스트레이션.md`.
-- **commit/push 자동화 (권장)**: 위 4 파일 갱신 후 `python3 60_tools/methodology.py ship -m "<conventional commit message>"` 한 명령으로 wrap+manifest-check+sensitive 검사+(test/build)+commit+push 일괄 처리. 별도로 `git add`/`git commit`/`git push` 호출 금지 — *ship*만 사용.
-- **외주 인계 (코드만 추출)**: `python3 60_tools/methodology.py export --path <project> --dry-run` 으로 포함·제외 미리보기 후, `--dry-run` 빼고 재호출. `<project>-handover/` 폴더에 *방법론·메타·브리프 모두 제외*된 코드만 추출. sensitive 파일(.env/credentials/keys)은 *기본 차단* — 의도 확인 후 `--allow-sensitive`. `--zip` 으로 tar.gz 압축. 결과 검증: *방법론 흔적 잔존 0* 자동 보장.
-- **로컬 안전망 (1회 설치)**: `python3 60_tools/methodology.py hooks install` — `.git/hooks/pre-push`에 manifest-check + wrap --strict 자동 등록. push 직전 검증 실패 시 push 자체 차단. 우회는 `git push --no-verify` (의식적 비상 탈출).
-- Identifier and versioning rules (phase M0/M1, sprint S-NNN, TODO ID, ADR, doc version, AI feature ID) are defined in `20_guides/02_식별자_및_버전_관리_규칙.md`. Follow that file before creating any new identifier.
-- `40_dev/snapshots/` contains dated artifacts. Snapshots are never live source.
-- Human approval is only real when evidenced by a merged PR or a linked issue/ADR approval.
-- Default boot context is `CLAUDE.md` + `HANDOFF.md`.
-- Load `TODO.md`, related code/tests, and related ADRs only when needed.
-- **세션 부팅 시 브리프 자동 로드 (의무)**: `00_briefs/current/*.md` 의 모든 .md 파일을 *날짜 순* 으로 읽음. 인간이 던진 raw 입력(아이디어·리서치·회의록)을 *기획서·개발 산출물에 어떻게 반영* 했는지 작업 보고에 명시. *옛 브리프와 충돌* 발견 시 자동 결정 금지 — 사용자에게 확인. 자세히는 `00_briefs/_README.md`.
-- **세션 부팅 마지막 단계 (의무, 모든 AI 모델 공통)**: `must_read` 로드 + checkpoint 확인 후, **반드시** 다음을 호출하고 결과 URL을 사용자에게 첫 보고 메시지에 포함:
-  ```
-  python3 60_tools/methodology.py dashboard
-  ```
-  - 출력: `http://localhost:8765 (branch: <name>, commit: <sha>)`. 사용자가 ⌘+클릭으로 즉시 열어 *현재 브랜치 상태*를 확인.
-  - 이미 떠 있으면 중복 시작하지 않고 기존 URL 보고.
-  - dashboard는 *현재 작업 디렉터리·현재 브랜치*를 반영. main 고정 아님 — 브랜치 전환 후 다시 호출하면 그 브랜치 상태로 재빌드.
-- `AI-LOG.md` is optional. Use it only for short collaboration notes not yet captured in `HANDOFF.md`, `TODO.md`, a PR, or an ADR.
+<!-- 이 섹션은 원칙·load-bearing 규칙만 담는다(Anthropic 권장: <200줄, 준수율↑). 절차 상세는 지침이 정본 — 복제하지 않고 포인터. METH-083. -->
+
+- Code is the source of truth for implementation; ADR for decisions code can't explain.
+- `HANDOFF.md` is the only live state file (<150 lines). `TODO.md` is the active backlog (stable IDs + acceptance criteria).
+- **세션·작업 종료 (의무)**: 작업 단위가 끝나면 4개 라이브 파일을 갱신하고 `python3 60_tools/methodology.py wrap`(→`4/4 ✓`)로 검증 후 보고. ① `TODO.md`(완료→Done·신규) ② `HANDOFF.md`(Working-on + Recent Changes 최근 5건) ③ `.ai/checkpoint.md`(인계서, 백서 §2-2) ④ 관찰 로그 — **반드시 CLI**: `methodology.py observe --slug <kebab> --task-type <bootstrap|feature|bugfix|refactor|research|docs> --summary "<50~150자>"` (직접 `cat >` 금지 — 형식오류로 wrap 실패). wrap v4.1+ = sha256 콘텐츠 비교(실내용 갱신만 통과).
+- **commit/push (권장)**: 위 갱신 후 `methodology.py ship -m "<conventional>"` 하나로 wrap+manifest+sensitive+(test/build)+commit+push. 별도 `git add`/`commit`/`push` 금지 — *ship만*.
+- **컨텍스트 컴팩션 (의무, 긴 세션)**: 요약 예고 시 *요약 전에* 라이브 파일(특히 `.ai/checkpoint.md`) 먼저 갱신 — 파일에 있으면 요약이 잃어도 복원. 규칙 `20_guides/06_컨텍스트_컴팩션_프로토콜.md`.
+- **자율 진행 예산·정지 (권장)**: 다단계 자율 시 착수 전 예산(파일/PR/반복) 선언, no-progress 2회·예산 초과 시 멈춰 보고, 범위 축소 시 남긴 것 보고. `20_guides/07_자율진행_예산_및_정지조건.md` (멀티에이전트 팬아웃 `20_guides/08_서브에이전트_오케스트레이션.md`).
+- **외주 인계·로컬 안전망**: 코드만 추출 `methodology.py export --path <p> --dry-run`(방법론·sensitive 기본 차단; `--allow-sensitive`/`--zip`); push 가드 `methodology.py hooks install`(pre-push manifest+wrap --strict).
+- 식별자·버전 규칙은 `20_guides/02_식별자_및_버전_관리_규칙.md` 준수 후 새 ID 생성.
+- `40_dev/snapshots/`는 날짜 산출물 — 라이브 아님. 사람 승인은 머지된 PR 또는 링크된 ADR·이슈로만 성립.
+- Default boot context = `CLAUDE.md` + `HANDOFF.md`; `TODO.md`·관련 코드·테스트·ADR은 필요 시 로드.
+- **부팅 브리프 자동 로드 (의무)**: `00_briefs/current/*.md` 날짜순 전부 읽고 반영 내역 보고, 옛 브리프 충돌 시 자동 결정 금지·사용자 확인. `00_briefs/_README.md`.
+- **부팅 마지막 (의무)**: `methodology.py dashboard` 호출 → 결과 URL을 첫 보고에 포함(이미 떠 있으면 기존 URL 재보고). 현재 브랜치 상태 반영.
 - Do not keep sprint summaries, deliverable tables, or open-issue lists in this file.
 
 ---
@@ -117,7 +95,6 @@ Additional rule:
 | `AGENTS.md` | Codex-facing mirror of `CLAUDE.md` | Same restrictions as `CLAUDE.md` |
 | `HANDOFF.md` | Current focus, latest verified checks, latest local or merged work, open issues, next best actions, active links | Long project history, full sprint archives, methodology essays, duplicated ADR reasoning |
 | `TODO.md` | Active backlog items with stable IDs, mode, change class, owner, acceptance criteria | Full completion archives — move historical detail to git, PRs, or dated snapshots |
-| `AI-LOG.md` | Optional short collaboration notes not yet in a durable home | Duplicates of `HANDOFF.md`, `TODO.md`, PR descriptions, or ADR decisions |
 | `40_dev/adr/` | Durable decisions that code cannot explain | Implementation detail that belongs in code |
 | `40_dev/snapshots/` | Dated outputs, reviews, plans, runbooks | Live operating state — never promote a snapshot to a live document |
 | Output channel (`30_planning/*` 기획서, 서비스/랜딩 페이지, 앱 UI, 브랜드 카피 — 맥락 없는 외부 독자와 공유되는 배포물) | 독자가 알아야 할 순수·무시간적 내용 | 작업 메타 — 워크플로우 기제·결정 서사·편집 라벨 (메시지 채널로 라우팅; `20_guides/05_산출물_채널_분리_규칙.md`) |
