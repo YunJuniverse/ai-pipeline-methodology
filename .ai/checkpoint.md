@@ -1,8 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-072 다운스트림 일괄 sync)
+# Checkpoint — 2026-07-09 (METH-073 운영기획서 지침 심화 · SRE·인시던트·AI 운영)
 
-> ✅ METH-072: 문서별 심화 063~071(templates 15·guides)을 다운스트림에 전파.
-> **완료 2곳(clean)**: gamblescan(`fa92c3f`)·icons(`fbdb7cd6`). **홀드 3곳(dirty)**: ai-icons·cafe24-renewal·icons-invest.
-> 🏁 다음: PR 리뷰·머지 → 홀드 3곳 clean 후 sync 재개, 또는 심화 계속(기획서 지침군).
+> ✅ METH-073: 기획서 *지침군* 심화 첫 대상 = guide 12 운영기획서. 웹리서치(SRE·인시던트·ITIL·LLM 운영) → §6에 8항목 신설(§6.15~6.22).
+> 핵심: "모니터링 있음"을 **SLO/error-budget 정책(기능 프리즈 레버)·형식 인시던트(SEV+IC+MTTR)·블레임리스 포스트모템**으로 격상. AI 운영은 *가드레일 위반=인시던트*·HITL·토큰 FinOps.
+> 🏁 다음: PR 리뷰·머지 → 지침군 계속(마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17) 또는 홀드 다운스트림 sync 재개.
 
 ---
 
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-072-downstream-sync` (fresh main 기준, branch-first 준수)
+- Worktree: branch `claude/meth-073-ops-plan-guide-refresh` (fresh main 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -26,28 +26,33 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-072 — 다운스트림 일괄 sync** (문서별 심화 063~071 전파):
+**METH-073 — 운영기획서 지침(guide 12, 760줄) 심화** (기획서 지침군 프로그램 시작):
 
-- **대상 판별**: 형제 디렉터리 중 `.methodology-version`+`.ai/context.json` 보유 5곳. clean(dirty=0) 2곳만 진행, dirty 3곳 홀드(METH-060과 동일 패턴).
-  - clean: **gamblescan**(fix/palette-slice-5-rose)·**icons**(claude/repo-as-product-planning)
-  - dirty(홀드): ai-icons(6)·cafe24-renewal(7)·icons-invest(8)
-- **방법**(clean 각각): 원 브랜치 기억 → `git checkout main` + `git pull --ff-only`(clean 확인) → 상류 methodology에서 `python3 60_tools/methodology.py sync --path ../<repo> --apply` → `git add -A && git commit --no-verify`(순수 sync, 다운스트림 wrap 훅 우회) → `git push`(main) → `git checkout <원 브랜치>`.
-- **결과**: 각 21파일 변경(shared: 20_guides 6·templates 15). 신규 파일 도착 = `20_guides/09_기획_핸드오프_재포맷_규칙.md`·`21_개발명세_작성_지침.md`·`50_resources/templates/api-contract.md`(다운스트림 last sync=METH-060 이후 신설분). 다운스트림 고유 파일 **보존**(prune 미사용 — 예: gamblescan `50_resources/prompts/design-token-setup.md`). CLAUDE/AGENTS는 이미 일치(unchanged). v4.0→v4.0(마이그레이션 없음).
-- gamblescan `792ad1e→fa92c3f` · icons `5564bc11→fbdb7cd6`.
+- **방법**: 웹리서치 1차 소스(Google SRE workbook·PagerDuty/incident.io·ITIL 4·L1/L2/L3 지원·OWASP LLM01·LLM 프로덕션 운영/FinOps). 현행 §6(운영 프로세스·정책·CS·이슈대응·관리자기능·KPI·AIOps 관제·인간 검토 게이트·AI Incident) gap.
+- **변경 (`20_guides/12_운영기획서_작성_지침.md`)** — §6 신규 8항목:
+  - **§6.15 SLO/Error Budget** — SLI/SLO/SLA·Error Budget=1−SLO·소진 시 기능 프리즈 정책(거버넌스 레버).
+  - **§6.16 형식 인시던트** — SEV1~4·IC/Comms/Ops 역할분리·라이프사이클·MTTD/MTTA/MTTR.
+  - **§6.17 on-call/에스컬레이션/블레임리스 포스트모템**(핸드오프 오버랩·액션아이템 추적).
+  - **§6.18 SLO 기반 알림** — 증상 기반·multi-burn-rate·알림피로 통제(3 pillars).
+  - **§6.19 계층 지원 L1/L2/L3** — 계층 SLA·CSAT/CES/FCR·디플렉션·L3 부하 신호.
+  - **§6.20 변경/릴리스 운영** — ITIL Std/Normal/Emergency·feature flag·canary·롤백·프리즈.
+  - **§6.21 Toil 예산** — <50%·runbook 자동화·"제거한 toil" KPI.
+  - **§6.22 AI 프로덕션 운영** — 프로덕션 eval(groundedness/drift)·가드레일 위반=인시던트·프롬프트 인젝션(OWASP LLM01)·provider failover(멱등키)·HITL 워크로드·토큰 FinOps.
+  - §8.1 목차·§16 체크리스트·§19.6 환류 노트·README §3.2 갱신.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-072 PR 리뷰·머지.
-2. **홀드 3곳 sync 재개** — 각 repo working tree clean 후 위 방법으로. **ai-icons**는 dirty 정리 + 커스텀 guide 번호 충돌(04·05·21 ↔ 상류 05/09/21) dedup·마이그레이션 선행(기존 Open Issue).
-3. (선택) **문서별 심화 계속** — 기획서 *지침*군(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs).
+1. METH-073 PR 리뷰·머지.
+2. **기획서 지침군 심화 계속** — 마케팅(13)·브랜드(14)·PM(15)·AI기능(16)·평가(17). 같은 패턴(현행 §6/§19 고찰 → 웹리서치 → §6 신규 항목 + §8/§16/§19 갱신).
+3. **홀드 다운스트림 sync 재개** — ai-icons(dirty+커스텀 guide 충돌)·cafe24-renewal·icons-invest clean 후. 073~ 심화분도 다음 sync에 포함.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 다운스트림 sync를 main 직접 push(--no-verify) 대신 PR로 할지 — 현재 METH-060 이래 main 직접(순수 sync, 검증 훅 우회). 다운스트림 브랜치 보호 도입 시 재검토.
-- 홀드 3곳 dirty 원인 = 사용자 진행 중 작업 — 사용자 정리 대기.
+- 지침군 심화 시 §6 항목이 계속 늘어남(운영은 14→22) — lean 유지 위해 조건부(AI·규제) 표기로 완화 중. 실사용에서 무게 재점검.
+- 다운스트림 sync를 PR로 할지 main 직접(--no-verify)할지 — 현행 유지.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-072-downstream-sync` (fresh main 기준). main 직접 PR. branch-first 준수.
-- 변경(methodology): 라이브 3종(TODO·HANDOFF·checkpoint) + 관찰로그. (다운스트림 변경은 각 repo에 이미 커밋·push됨.)
-- 문서별 심화 진척: 063~071 전부 머지(#53~#60, 067 main직접A). 072 = 그 전파.
+- 브랜치: `claude/meth-073-ops-plan-guide-refresh` (fresh main 기준). main 직접 PR. branch-first 준수.
+- 변경: `20_guides/12_운영기획서_작성_지침.md`(§6·§8·§16·§19) + `20_guides/README.md` + 라이브 4종.
+- 문서별 심화 진척: 063~071 템플릿(머지) + 072 sync(#61) + **073 지침군 시작(운영기획서)**.
