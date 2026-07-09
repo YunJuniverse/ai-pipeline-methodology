@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "4db112fc515b7e21b2ecf0d3b3503d79ab9b6350",
-  "last_validated_at": "2026-07-09T04:21:53Z",
+  "last_validated_commit": "b34ef103d897a9c9746b3dcece5452da1ab4a0c0",
+  "last_validated_at": "2026-07-09T04:36:19Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "abadcdc5321dcc8277c3fd241fb891bfe81105451950bfe67c7c51aa944440df"
+      "sha256": "392cba48b925c8990cf6d5bf2fd854b3c492bcfbf0d22962d0db3c8f9282cb7d"
     },
     "TODO.md": {
-      "sha256": "121268060534ad5e88a802679f4a7d544b5fe410f50e4c72b6df5ae1fa86aaf4"
+      "sha256": "3491e92773b68dfaa8b6a4d064b55ae0c6b870e628d360aa42c8c42c73fccf38"
     },
     ".ai/checkpoint.md": {
-      "sha256": "9ba8593195d3b9c32ec22216aa2498db40f968d50a3f40723510cc47d4ef9cda"
+      "sha256": "dbc0e565fbe0d6cfb366ec402843129596b5cb1b172ba311d113b467beda423f"
     }
   },
   "observations": {
@@ -83,6 +83,7 @@
       "50_resources/ai_observations/2026-07-09_meth-077-ai-feature-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-078-eval-guardrail-guide-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-079-orchestration-guide-refresh.md",
+      "50_resources/ai_observations/2026-07-09_meth-080-master-plan-ssot-refactor.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
