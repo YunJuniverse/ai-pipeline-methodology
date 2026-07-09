@@ -236,7 +236,7 @@ python3 60_tools/methodology.py version          # 메소돌로지 자체 버전
 - [30_planning/](30_planning/) — 기획 산출물 v0
 - [40_dev/](40_dev/) — MASTER_PLAN / SPRINTS / ADR / snapshots
 - [50_resources/templates/](50_resources/templates/) — HANDOFF/TODO/ADR/SPRINTS/MASTER_PLAN
-- [50_resources/prompts/](50_resources/prompts/) — 스냅샷 생성 프롬프트
+- [50_resources/prompts/](50_resources/prompts/) — AI 실행 프롬프트 (기획서 생성 + 개발 전환 + 코드 기반 스냅샷; 인덱스 `_README.md`)
 - [60_tools/methodology.py](60_tools/methodology.py) — 배포·갱신 CLI (init / sync / status / diff / version)
 - [60_tools/generate-dashboard.py](60_tools/generate-dashboard.py) — 4탭 대시보드
 - [60_tools/methodology-graph.json](60_tools/methodology-graph.json) — 폴더·문서 관계 그래프
