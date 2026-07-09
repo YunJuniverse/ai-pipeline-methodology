@@ -467,7 +467,7 @@ CI에서 본 검증이 실패하면 **반드시** 배포 차단 — 실패는 �
 | **10** | Foundation (헌법·온보딩) | `10_foundation/` | WHITEPAPER, HOW_TO_APPLY, KICKOFF_PROMPT, DIAGRAM |
 | **20** | How (지침) | `20_guides/` | 도메인별 *작성 지침서* |
 | **30** | What (산출물) | `30_planning/` | 지침에 따라 작성된 *실제 기획서* |
-| **40** | Build (개발) | `40_dev/` | MASTER_PLAN, SPRINTS, ADR, snapshots |
+| **40** | Build (개발) | `40_dev/` | MASTER_PLAN, ADR, snapshots |
 | **50** | Resources (자원) | `50_resources/` | templates, prompts, catalog, skeletons, ai_observations |
 | **60** | Tools (도구) | `60_tools/` | `methodology.py` CLI, `generate-dashboard.py`, `methodology-graph.json` |
 | **70** | Meta-Methodology *(주입 제외)* | `70_meta/` | 본 저장소를 진화시키는 메타-방법론 자산 — RFC/회고/실험/메타관찰/메타카탈로그. 외부 프로젝트 주입 안 됨 (§13 참조) |

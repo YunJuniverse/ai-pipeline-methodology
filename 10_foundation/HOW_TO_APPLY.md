@@ -33,7 +33,7 @@ my-project/
 ├── 10_foundation/    # WHITEPAPER / HOW_TO_APPLY / KICKOFF / DIAGRAM
 ├── 20_guides/        # 작성 지침서 11종
 ├── 30_planning/      # 기획 산출물 v0
-├── 40_dev/           # MASTER_PLAN / SPRINTS / adr / snapshots
+├── 40_dev/           # MASTER_PLAN / adr / snapshots
 ├── 50_resources/     # templates / prompts
 ├── 60_tools/         # methodology.py / generate-dashboard.py / methodology-graph.json
 ├── src/              # fullstack만

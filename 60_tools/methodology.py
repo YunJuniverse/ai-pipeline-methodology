@@ -2416,6 +2416,20 @@ def cmd_wrap(args: argparse.Namespace) -> int:
     except Exception as e:
         warn(f"git status 실패: {e}")
 
+    # ── WIP 캡 린트 (METH-086) — TODO ## InProgress 최대 3 (경고, 실패 아님) ──
+    todo_p = target / "TODO.md"
+    if todo_p.exists():
+        try:
+            section = re.search(
+                r"^##\s+InProgress\s*$(.*?)(?=^##\s|\Z)",
+                read_text(todo_p), re.MULTILINE | re.DOTALL,
+            )
+            wip = len(re.findall(r"^###\s+", section.group(1), re.MULTILINE)) if section else 0
+            if wip > 3:
+                warn(f"WIP 캡 초과: InProgress {wip}건 (권장 ≤3) — 미완결 누적·AI 팬아웃 신호. 완료 처리하거나 Blocked/Ready로 이동 검토.")
+        except Exception:
+            pass
+
     print()
     if missing == 0:
         ok(

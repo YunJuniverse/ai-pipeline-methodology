@@ -45,7 +45,7 @@ Scenario: <시나리오명>
 ## 품질 게이트
 
 - **INVEST 자가검증**: [ ] Independent [ ] Negotiable [ ] Valuable [ ] Estimable [ ] Small [ ] Testable
-- **Definition of Ready** (스프린트 진입 전): [ ] 명확 [ ] 추정됨 [ ] INVEST 통과 [ ] AC 작성됨
+- **Definition of Ready** (작업 진입 전 · TODO Ready 승격): [ ] 명확 [ ] 추정됨 [ ] INVEST 통과 [ ] AC 작성됨
 - **Definition of Done** (완료): [ ] 코딩 [ ] 테스트 통과 [ ] 리뷰 [ ] 머지 [ ] 문서 갱신
 
 **원칙**: 좋은 스토리 = INVEST. 우선순위 = MoSCoW(Must/Should/Could/Won't). Backlog 분해 = Epic > Task > Sub-Task. **너무 크면 SPIDR로 분할** — Spike(불확실성 제거) / Path(경로별) / Interface(UI·기기별) / Data(데이터 부분집합) / Rules(비즈규칙 완화). AC 4개↑면 대개 분할 신호.

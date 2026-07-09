@@ -19,7 +19,7 @@
 | **lean** | 1인+AI 빠른 반복 | prd · architecture · context-glossary · ADR-template |
 | **ops** | 런칭 후 운영 | operation-spec · post-launch-monitoring · work-request-ticket · qa-acceptance-plan · qa-test-scenario · qa-acceptance-signoff |
 
-> **항상(모드 무관)**: `ADR-template`(비가역 결정) · 라이브 상태 파일 `TODO`·`HANDOFF`·`checkpoint`·`context.json`. `MASTER_PLAN`·`SPRINTS`는 `fullstack`/`dev`/`agency`에서 사용.
+> **항상(모드 무관)**: `ADR-template`(비가역 결정) · 라이브 상태 파일 `TODO`·`HANDOFF`·`checkpoint`·`context.json`. `MASTER_PLAN`은 `fullstack`/`dev`/`agency`에서 사용. (스프린트 층 폐지 — cadence는 flow 메트릭, 배치 그룹핑은 TODO `milestone:` 태그. METH-086)
 
 ---
 
@@ -79,8 +79,7 @@
 | 템플릿 | 한 줄 |
 |---|---|
 | `ADR-template.md` | 결정 기록 — 결정문장 제목·Considered Options·되돌리기 비용 |
-| `MASTER_PLAN.md` | 개발 마스터플랜 — 비전→페이즈·게이트 매핑 |
-| `SPRINTS.md` | 스프린트 추적 |
+| `MASTER_PLAN.md` | 개발 마스터플랜 — 비전→페이즈·게이트 매핑 (cadence는 flow 메트릭, `20_guides/15` §6.19~6.20) |
 
 ---
 
@@ -118,7 +117,6 @@
 | glossary | | | | | ✓ | | |
 | ADR-template | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | MASTER_PLAN | | | ✓ | ✓ | ✓ | | |
-| SPRINTS | | | ✓ | ✓ | ✓ | | |
 
 > **† `planning-handoff`의 산출물은 AI가 아닌 *사람 개발자*가 읽는다** — 위 세트를 지침 `20_guides/09_기획_핸드오프_재포맷_규칙.md`의 재포맷 규칙으로 변환해 산출한다: `wireframe-spec`은 ASCII 대신 **실제 목업/Figma**로, `service-policy`의 ON/OFF는 **must/should**로, `context-glossary`의 `_Avoid_`는 경량화, 그리고 **의도(왜)·읽는 순서·열린 질문 루프**를 얹는다. `architecture`·`data-model`은 개발자 소유이므로 기본 제외(필요 시 끌어 씀).
 
