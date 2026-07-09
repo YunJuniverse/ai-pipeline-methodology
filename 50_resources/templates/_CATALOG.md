@@ -33,7 +33,7 @@
 | `ia-spec.md` | 정보구조 기능정의서 — Screen-ID 규약·화면 인벤토리·메뉴트리·RBAC 매트릭스·IA 검증(카드소트/트리테스트) |
 | `service-policy.md` | 서비스 정책 정의서 — 의사결정 표(조건→액션·hit policy)·effective-dating·변경이력·AI 가드레일, 2-시트 |
 | `user-story.md` | 유저스토리·시나리오 — User/Job Story·Gherkin(G/W/T) AC·INVEST·DoR/DoD·SPIDR |
-| `kpi-tree.md` | KPI 단위경제 트리 + 마켓플레이스 10-패널·분석방법 배터리 |
+| `kpi-tree.md` | KPI 단위경제 — 비즈모델 top-line 토글(마켓/구독/거래/AI)·마진 워터폴·단위경제(LTV/CAC/payback)·NRR/GRR·자본효율(Rule40·burn multiple)·AI COGS·드라이버 트리(North Star) |
 | `context-glossary.md` | 도메인 용어집 — 표준어 + `_Avoid_`(금지 동의어) + 예시 대화 |
 | `microcopy.md` | UX 라이팅 — 콘텐츠원칙·Voice(상수)/Tone(맥락)·에러패턴·용어사전·i18n·AI 프롬프트 |
 
