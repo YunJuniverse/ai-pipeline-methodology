@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-075 · 브랜드기획서 지침 심화 (DBA·Share of Search·브랜드 in AI)
+- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 3번째(guide 14, 737줄). 웹리서치(April Dunford·Play Bigger·Ehrenberg-Bass/Romaniuk·Binet·브랜드 아키텍처·WCAG·소닉) → §6 신규 8항목: **§6.14 Dunford 5요소 포지셔닝**(+카테고리 창출 분기=Class C) · **§6.15 Distinctive Brand Assets**(fame×uniqueness 등록부) · **§6.16 브랜드 아키텍처+버벌/네이밍** · **§6.17 브랜드 헬스**(퍼널·NPS·**Share of Search**) · **§6.18 브랜드 in AI 답변**(AI 인식 감사, GEO/AEO 브랜드판) · **§6.19 brand-as-code 확장**(voiceProfile·bodyOfWork) · **§6.20 WCAG 접근성**(4.5:1/3:1) · **§6.21 모션·소닉**. §8.1·§16·§19.7·README 갱신. branch-first 준수.
+
 ### METH-074 · 마케팅기획서 지침 심화 (GEO/AEO·포스트쿠키 측정·그로스 루프)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 2번째(guide 13, 860줄). 웹리서치(Reforge·Google Meridian·Ehrenberg-Bass/Binet&Field·GEO/AEO·한국 표시광고법/FTC/EU AI Act) → §6 신규 7항목: **§6.15 GEO/AEO**(AI 답변 인용 최적화 — 2025-26 최대 변화) · **§6.16 포스트쿠키 측정**(MMM+증분성+플랫폼 삼각측량·MER/POAS·consent mode/CDP) · **§6.17 Growth Loops**(퍼널 위 복리) · **§6.18 채널별 유닛 이코노믹스** · **§6.19 브랜드/퍼포먼스**(60:40·95-5·mental availability) · **§6.20 실험 엄밀성**(사전등록·가드레일·검정력) · **§6.21 AI 마케팅 공시/규제**(한국 표시광고법 2026.1·FTC·EU AI Act·HITL). §8.1·§16·§19.9·README 갱신. branch-first 준수.
 
@@ -24,8 +27,6 @@
 ### METH-072 · 다운스트림 일괄 sync (심화 063~071 전파)
 - **notes**: 2026-07-09. Class A. 문서별 심화(063~071)로 갱신된 templates(15종)·guides를 다운스트림에 전파. **완료 2곳(clean)**: gamblescan(`fa92c3f`)·icons(`fbdb7cd6`) — main 전환→`sync --apply`(각 21파일: guides 6·templates 15, 신규 09·21·api-contract 포함)→`--no-verify` 순수 sync 커밋→push→원 브랜치 복귀. 다운스트림 고유 파일 보존(prune 안 함). **홀드 3곳(dirty)**: ai-icons(6, +커스텀 guide 충돌 기존 Open Issue)·cafe24-renewal(7)·icons-invest(8) — clean 후 재개. v4.0→v4.0(마이그레이션 없음). branch-first 준수.
 
-### METH-071 · 데이터 모델 심화 (ERD·키·무중단 마이그레이션)
-- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 9번(개발명세 계열 마무리). 웹리서치(PostgreSQL·AWS·pgvector·OWASP·RFC 9562) → `data-model.md` 강화. 추가: **§1 Mermaid ERD**(crow's foot) · 키 전략(surrogate/**UUIDv7**·ULID·opaque public ID) · Fields에 Key/Constraints/Indexed 컬럼 · **cascade 규칙**(CASCADE/RESTRICT/SET NULL 결정) · 제약(NOT NULL/UNIQUE/CHECK/enum) · **history 전략 태그**(soft-delete/SCD2/append-only/bi-temporal + 감사컬럼) · 인덱스 원칙(FK 명시·복합·covering·partial) · **§7 expand-contract 무중단 마이그레이션**(3단계·단계별 가역·lock-safe) · **PII 분류/보존/GDPR 삭제**(파생 벡터·캐시·백업 포함) · **§8 벡터/pgvector**(조건부). 3NF 기본·비정규화 사유 명기. _CATALOG 갱신. branch-first 준수. (※ PR #59 architecture open — 파일 disjoint, 라이브만 2차 머지 시 사소 충돌 가능.)
 
 
 
