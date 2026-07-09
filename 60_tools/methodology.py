@@ -734,7 +734,6 @@ def cmd_skeleton(args: argparse.Namespace) -> int:
                 "base_version": "v0",
                 "catalog_entries": [],
                 "verified_with": [],
-                "last_built": None,
             }
             write_text(bakes_in, json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
         ok(f"skeleton initialized: {domain_dir.relative_to(METHODOLOGY_ROOT)}")

@@ -38,10 +38,11 @@ ai_relevance: schema
   "domain": "webapp-next",
   "base_version": "v3",
   "catalog_entries": ["C-014", "C-022", "C-031"],
-  "verified_with": ["claude-sonnet-4-6"],
-  "last_built": "2026-05-07T19:30:00Z"
+  "verified_with": ["claude-sonnet-4-6"]
 }
 ```
+
+> `bakes-in.json`은 *사람이 관리하는 입력*(무엇을 베이크할지)만 담는다. 빌드 시각은 `skeleton build`가 `skeleton.lock.json`의 `built_at`에 기록한다(SSOT — bakes-in에 중복 두지 않는다).
 
 ## 3. 빌드·적용 명령
 

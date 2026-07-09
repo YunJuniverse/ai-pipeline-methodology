@@ -3,6 +3,5 @@
   "domain": "frontend-design-tokens",
   "base_version": "v1",
   "catalog_entries": ["C-001"],
-  "verified_with": ["claude-opus-4-8"],
-  "last_built": null
+  "verified_with": ["claude-opus-4-8"]
 }
