@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-09 (METH-088 다운스트림 sync 홀드 3곳 완료)
+# Checkpoint — 2026-07-09 (METH-089 guide 번호 충돌 remediation)
 
-> ✅ METH-088: 사용자가 dirty 해소 → 홀드 3곳(ai-icons·cafe24-renewal·icons-invest)을 086까지 sync. **관리 다운스트림 6곳 전부 086 반영 완료.** 커스텀 guide 전부 보존(데이터 손실 0).
-> 🏁 다음: agency/ops 템플릿 · `.claude/skills` 레거시 · ai-icons/icons-invest guide 번호 충돌 remediation · 또는 일단락.
+> ✅ METH-089: ai-icons·icons-invest 레거시 커스텀 guide(04/05/21)를 예약범위(90+)로 이관 — guide 02 §7 준수. 번호·doc_id 충돌 해소, origin/main 검증. 데이터 손실 0.
+> 🏁 다음: agency/ops 템플릿 · `.claude/skills` 레거시 · ai-icons 92↔상류05 환류 · graph.json 노드 · 또는 일단락.
 
 ---
 
@@ -14,7 +14,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-088-downstream-sync-holds` (#76 머지된 main tip 기준, branch-first 준수)
+- Worktree: branch `claude/meth-089-guide-number-remediation` (#77 머지된 main tip 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -25,29 +25,29 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-088 — 다운스트림 sync 홀드 3곳 완료** (사용자 "dirty 해소했어, 확인해봐"):
+**METH-089 — ai-icons·icons-invest guide 번호 충돌 remediation** (사용자 "진행하자"):
 
-- **확인**: ai-icons·cafe24-renewal·icons-invest 모두 dirty=0 확인 → 홀드 해제.
-- **sync 실행(repo당)**: dry-run 확인 → (cafe24는 feature 브랜치라 main 전환) → `sync --apply`(shared_paths 전파) → **stale SPRINTS.md `git rm`**(templates + ai-icons는 40_dev도) → `--no-verify` commit/push → 원 브랜치 복귀.
-- **origin/main 트리 검증**: 3곳 모두 SPRINTS.md 제거 ✓, WIP 린트 ✓, 대시보드 `DATA.sprints` 제거 ✓.
-- **데이터 손실 0**: 커스텀 guide 전부 보존. (검증 중 `git ls-tree`가 한글 경로를 octal-escape해 grep 오탐 → `-c core.quotepath=false`로 UTF-8 재확인, 커스텀 04_문서보관·05_회의록·21_산출물채널분리(ai-icons)·cafe24 6종·icons-invest 04/05 전부 존재 확정.)
-- **결과**: METH-087(gamblescan·icons·tshome) + 이번 3곳 = **관리 다운스트림 6곳 전부 086 반영**.
-- **sibling worktree**: ai-icons·icons-invest의 `.claude/worktrees/*`는 sync 기본 스킵(main만 반영) — 필요 시 `--include-worktrees`.
+- **원칙**: guide 02 §7 예약범위 — 상류 00-89 / 다운스트림-커스텀 90-99. 레거시 커스텀 guide가 상류 예약범위(04/05/21)를 점유 → 90+로 이관.
+- **ai-icons** (main): `04_문서보관→90` · `05_회의록→91` · `21_산출물채널분리→92_...LOCAL`. doc_id `guide-04/meeting-notes/21 → guide-90/91/92`. **21은 상류 05_산출물채널분리(정본)와 149줄 차이=로컬 발전분** → 삭제 않고 92로 보존 + 파일 상단에 "상류 05 정본, 재조정/환류 검토" 플래그.
+- **icons-invest** (main): `04→90` · `05_회의록→91`. (커스텀 21 없음.)
+- **참조 처리**: 기능적 라이브 참조만 갱신 — `00_briefs/meetings/_README.md`(04→90 링크), ai-icons `HANDOFF.md`(05_회의록→91 라이브 포인터). **이력 기록**(ai_observations·과거 ADR·checkpoint 과거 dated bullet·TODO Done)은 시점 기록이라 **보존**(당시 파일명 그대로).
+- **실행/검증**: `git mv`(rename+doc_id Edit) → `--no-verify` commit/push(main) → **origin/main 트리 검증**: 90+ 존재·04/05회의록/21산출물 충돌 0·상류 정본(05_산출물채널분리·21_개발명세) 유지·라이브 참조 옛번호 0·데이터 손실 0.
+- **주의**: 한글 파일 편집은 perl/sed hex가 개행·인코딩 깨뜨림 → **Read/Edit 도구(UTF-8 안전)로 재작업**. 검증도 `git -c core.quotepath=false`.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-088 PR 리뷰·머지(방법론 repo 라이브 파일 기록; 다운스트림은 이미 push).
-2. **ai-icons·icons-invest guide 번호 충돌 remediation**(각 repo 세션, Open Issue): 커스텀 05_회의록이 상류 05_산출물채널분리와, ai-icons 21_산출물채널분리가 상류 21_개발명세와 번호 충돌(+21 내용은 상류 05 중복). → 21_산출물채널분리를 상류 05로 dedup + 커스텀 04·05를 guide 02 §7 예약범위(90+)로 이관.
-3. 남은 후보: agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs), 메타/dev 지침(02~09·19~20), `.claude/skills` 레거시(ai-planning/ai-relay/vibe-coding — 옛 sprint/docs 모델).
+1. METH-089 PR 리뷰·머지(방법론 repo 기록; 다운스트림은 이미 push).
+2. **ai-icons 92_LOCAL↔상류 05 환류**(ai-icons 세션): 로컬 발전분(149줄)을 상류 05로 올릴지/버릴지 판단 후 92 삭제. (지금은 보존+플래그 상태.)
+3. 남은 후보: agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs), 메타/dev 지침(02~09·19~20), `.claude/skills` 레거시(ai-planning/ai-relay/vibe-coding — 옛 sprint/docs 모델), graph.json 노드 완성.
 4. 학습 루프 후속: friction 축적→thinktank→catalog 승급.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 점검·정합·구조·전파 사이클(079~088)을 여기서 일단락할지 vs 계속(remediation·agency·skills)할지 — 사용자 판단.
-- 다운스트림 auto-prune 부재(friction 로그 등재) → 향후 sync에 "상류-삭제분 선별 prune" 옵션 검토 여지.
+- 점검·정합·구조·전파·정비 사이클(079~089)을 여기서 일단락할지 vs 계속할지 — 사용자 판단.
+- ai-icons 92_LOCAL 최종 처리(환류 후 삭제 vs 로컬 유지) — ai-icons 세션 결정.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-088-downstream-sync-holds` (#76 머지된 main tip 기준). branch-first 준수.
-- 방법론 repo 콘텐츠 무변경 — 라이브 파일 기록 + 다운스트림 3곳 mutation(각 origin/main push 완료).
-- 진척: 063~071 템플릿 + 072 sync + 073~078 지침군 + 079~086(점검·정합·구조) + 087 다운스트림 clean 3곳 + **088 홀드 3곳(이번, 6곳 전부 완료)**.
+- 브랜치: `claude/meth-089-guide-number-remediation` (#77 머지된 main tip 기준). branch-first 준수.
+- 방법론 repo 콘텐츠 무변경 — 라이브 파일 기록 + 다운스트림 2곳 mutation(각 origin/main push 완료).
+- 진척: …079~086(점검·정합·구조) + 087 clean sync + 088 홀드 sync(6곳 전부) + **089 번호 remediation(이번)**.
