@@ -1,8 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-078 평가·가드레일 지침 심화 · 기획서 지침군 완결)
+# Checkpoint — 2026-07-09 (METH-079 오케스트레이션 지침 라우팅 갱신)
 
-> ✅ METH-078: 기획서 지침군(12~17) 심화 **완결** = guide 17 org eval/guard 카탈로그. 웹리서치(NIST AI RMF·ISO 42001·EU AI Act GPAI·G-Eval·RAGAS·OTel GenAI·Garak) → 8항목 신설.
-> 핵심: judge는 편향(순서스왑·calibration 게이트) · 에이전트는 *경로* 평가 · 거버넌스 3축(EU법+NIST방법+ISO경영) · 레드팀 배포전 게이트 · OTel GenAI 표준.
-> 🏁 다음: PR 리뷰·머지 → 문서별 심화 프로그램 대부분 완료. 남은 후보(agency/ops 템플릿·메타 지침) 또는 누적 다운스트림 sync.
+> ✅ METH-079: 라우터(guide 01)에 12~17 심화(073~078) 신규 영역 반영. 내부 정합성 작업(리서치 없음).
+> 핵심: §5.9 신규 영역 라우팅 표 + **AI 주제 경계 disambiguation**(brand in AI[14]/GEO[13]/AI기능[16], 에이전트 기능[16]/작업관리[15]/장애[12], feature[16]/org[17]) · §5.10 모드·템플릿 라우팅.
+> 🏁 다음: PR 리뷰·머지 → 남은 후보(agency/ops 템플릿·메타 지침) 또는 **누적 다운스트림 sync(073~079)**.
 
 ---
 
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-078-eval-guardrail-guide-refresh` (fresh main 기준, branch-first 준수)
+- Worktree: branch `claude/meth-079-orchestration-guide-refresh` (fresh main 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -26,33 +26,30 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-078 — 평가·가드레일 지침(guide 17, 316줄) 심화** = 기획서 지침군 프로그램 **완결(12~17)**:
+**METH-079 — 오케스트레이션 지침(guide 01) 라우팅 갱신** (사용자 지적: 라우터가 심화된 12~17을 아직 모름):
 
-- **방법**: 웹리서치 1차 소스(MT-Bench/G-Eval·RAGAS·NIST AI RMF AI 100-1+GenAI Profile AI 600-1·ISO/IEC 42001·EU AI Act GPAI Code of Practice·OpenTelemetry GenAI semconv·Garak/PyRIT). org 카탈로그(~2026-05) gap.
-- **변경 (`20_guides/17_평가_및_가드레일_지침.md`)**:
-  - **§3.7 LLM-judge bias & 완화** — position/verbosity/self-preference/sycophancy 표 + 순서스왑·pairwise·G-Eval·**calibration 게이트**(κ 미달 시 CI 사용금지)·judge 버전 pin·불신 조건.
-  - **§3.8 에이전트/trajectory eval** — task성공·tool-call 정확성·trajectory·비용, (state,action) judge 기하평균, 3레벨.
-  - **§3.9 RAG 메트릭 카탈로그**(RAGAS 4종·검색vs생성 실패 진단) — 16 feature가 참조.
-  - **§3.10 eval 데이터 위생**(오염·홀드아웃·버전·합성 검토).
-  - **§4.4 EU AI Act GPAI 갱신**(2025.8 적용/2026.8 집행/2027.8 레거시·CoP 3장·Art.55·Art.50).
-  - **§4.5 레드팀 pre-release 게이트**(Garak/PyRIT·finding→regression CI).
-  - **§4.6 거버넌스 3축 매핑**(NIST Govern/Map/Measure/Manage+600-1·ISO 42001 AIMS·EU) — 최대 gap이었음.
-  - **§6 OTel GenAI semconv 정렬**(gen_ai.* 속성·dual-emission).
-  - §10 환류 + README §3.4 갱신. 16(feature)↔17(org) 경계 재확인.
+- **성격**: *내부 정합성* — 웹리서치 없음. 12~17 심화(073~078)·신규 템플릿(api-contract)·신규 모드(planning-handoff)를 라우터에 반영.
+- **변경 (`20_guides/01_AI_기획_오케스트레이션_지침서.md`)**:
+  - **§5.9 2025-26 신규 영역 라우팅 표** — SLO/인시던트/AI운영→운영12 · GEO/AEO/MMM/growth loop→마케팅13 · DBA/Share of Search/brand in AI→브랜드14 · 딜리버리/DORA/OKR/에이전트 거버넌스→PM15 · MCP/RAG/구조화출력→AI기능16 · NIST/ISO/레드팀→평가17.
+  - **AI 주제 경계 disambiguation**(핵심): brand in AI 답변[14] vs GEO/AEO[13] vs AI기능 설계[16] / 에이전트 *기능설계*[16] vs 에이전트 *작업관리*[15] vs *장애·가드위반 대응*[12] / feature eval·guard 인스턴스[16] vs 조직 카탈로그[17].
+  - **§5.10 모드·템플릿 라우팅** — 01은 기획서 라우팅이 본령, 모드(planning-handoff 등)·템플릿(api-contract 등)은 _CATALOG(§1)·지침21이 정본.
+  - §5.7 키워드(MCP·구조화출력·컨텍스트 엔지니어링) · §18.1 빠른 분류 체크리스트 포인터.
+  - graph.json 노드 누락(guide 02~09·19~21) 발견 → Open Issue(별건, 대시보드 렌더 영향 확인 후).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-078 PR 리뷰·머지 → **기획서 지침군 12~17 심화 완결**.
-2. **문서별 심화 프로그램 현황**: 템플릿 13종(063~071)·서비스기획서 부모/자식·기획서 지침군 6종(073~078) 완료. 남은 후보 — agency/ops 템플릿(proposal-go-nogo·qa-*·operation-spec·post-launch-monitoring·profitability-sheet·execution-plan·work-request-ticket·wbs·glossary), 메타 지침(00~09·18~20). 사용자와 다음 대상 합의.
-3. **누적 다운스트림 sync** — 지침 심화분(073~078) + 홀드 3곳(ai-icons·cafe24·icons-invest) clean 후 재개. gamblescan·icons는 072까지 반영됨 → 073~ 추가 필요.
+1. METH-079 PR 리뷰·머지.
+2. **문서별 심화 프로그램 현황**: 템플릿 13종(063~071)·서비스기획서 부모/자식·기획서 지침군 6종(073~078)·오케스트레이션(079) 완료. 남은 후보 — agency/ops 템플릿(proposal-go-nogo·qa-*·operation-spec·post-launch-monitoring·profitability-sheet·execution-plan·work-request-ticket·wbs·glossary), 메타/dev 지침(00·02~09·18~20). 사용자와 합의.
+3. **누적 다운스트림 sync(2차)** — gamblescan·icons는 072까지 반영 → **073~079 지침 심화분 추가 필요**. 홀드 3곳(ai-icons·cafe24·icons-invest)은 clean 후. (지침·가이드·_CATALOG가 shared_paths라 sync로 전파됨.)
+4. **graph.json 노드 완성**(별건) — guide 02~09·19~21 추가, 대시보드 렌더 확인.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 지침 심화 완결 → 다운스트림 일괄 sync(2차) 타이밍. gamblescan·icons도 073~078 반영 필요.
-- 남은 심화 대상(agency/ops·메타 지침)을 계속할지 여기서 일단락할지 — 사용자 판단.
+- 심화 프로그램을 여기서 일단락할지(핵심 문서군 완료) vs agency/ops·메타 지침까지 이어갈지 — 사용자 판단.
+- 2차 다운스트림 sync 타이밍(073~079 누적).
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-078-eval-guardrail-guide-refresh` (fresh main 기준). main 직접 PR. branch-first 준수.
-- 변경: `20_guides/17_평가_및_가드레일_지침.md`(§3·§4·§6·§10) + `20_guides/README.md` + 라이브 4종.
-- 진척: 063~071 템플릿+072 sync(#61)+073~078 지침군 6종(운영·마케팅·브랜드·PM·AI기능·평가, #62~#66+이번). **기획서 지침군 완결.**
+- 브랜치: `claude/meth-079-orchestration-guide-refresh` (fresh main 기준). main 직접 PR. branch-first 준수.
+- 변경: `20_guides/01_AI_기획_오케스트레이션_지침서.md`(§5.7·§5.9·§5.10·§18.1) + 라이브 4종. (graph.json 미변경 — 별건.)
+- 진척: 063~071 템플릿+072 sync(#61)+073~078 지침군(#62~#67)+**079 오케스트레이션(이번)**.

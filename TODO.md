@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-079 · 오케스트레이션 지침(01) 라우팅 갱신 (심화 반영)
+- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 내부 정합성 작업(리서치 없음) — 12~17 심화(073~078)로 추가된 신규 영역을 라우터(guide 01)에 반영. **§5.9 신규 영역 라우팅 표**(SLO/인시던트/AI운영→12, GEO/AEO/MMM→13, DBA/Share of Search/brand in AI→14, 딜리버리/DORA/에이전트 거버넌스→15, MCP/RAG/구조화출력→16, NIST/ISO/레드팀→17) + **AI 주제 경계 disambiguation**(brand in AI[14] vs GEO[13] vs AI기능[16] / 에이전트 기능설계[16] vs 에이전트 작업관리[15] vs AI 장애대응[12] / feature eval[16] vs org 카탈로그[17]) · **§5.10 모드·템플릿 라우팅**(planning-handoff·개발명세 → _CATALOG/지침21) · §5.7 키워드(MCP·구조화출력·컨텍스트) · §18.1 체크리스트 포인터. **팔로우업**: graph.json에 guide 02~09·19~21 노드 누락(기존 staleness, 별건). branch-first 준수.
+
 ### METH-078 · 평가·가드레일 지침 심화 (거버넌스 3축·judge bias·trajectory eval)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). **기획서 지침군 심화 완결(12~17)**(guide 17, org eval/guard 카탈로그). 웹리서치(MT-Bench/G-Eval·RAGAS·NIST AI RMF+GenAI Profile·ISO 42001·EU AI Act GPAI CoP·OTel GenAI·Garak/PyRIT) → 신규: **§3.7 LLM-judge bias & 완화**(position/verbosity/self-preference/sycophancy + calibration 게이트·judge 버전 pin) · **§3.8 에이전트/trajectory eval**(task성공·tool-call·trajectory·비용) · **§3.9 RAG 메트릭(RAGAS)** · **§3.10 eval 데이터 위생**(오염·홀드아웃·버전) · **§4.4 EU AI Act GPAI 갱신** · **§4.5 레드팀 pre-release 게이트**(finding→regression) · **§4.6 거버넌스 매핑(NIST AI RMF+ISO 42001+EU)** · **§6 OTel GenAI 정렬** · §10 환류. README 갱신. 16↔17 경계 재확인. branch-first 준수.
 
@@ -24,8 +27,6 @@
 ### METH-076 · PM기획서 지침 심화 (PMBOK7·플로우/DORA·AI 에이전트 거버넌스)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 4번째(guide 15, 937줄·최대). 웹리서치(PMBOK 7·Scrum/Kanban·DORA·Seiden/Cagan·Flyvbjerg·RAID/프리모템·AI 증강 PM) → §6 신규 7항목: **§6.18 딜리버리 모델 선언**(예측/하이브리드/애자일, 예측형 로그를 스펙트럼 디폴트로 재프레이밍) · **§6.19 플로우 메트릭+Monte Carlo**(WIP/cycle/throughput/CFD·확률 예측) · **§6.20 DORA 5지표**(배포빈도·리드타임·변경실패율·복구·재작업률) · **§6.21 아웃컴/OKR**(feature factory 회피) · **§6.22 레퍼런스클래스 예측**(outside view·낙관편향 상향) · **§6.23 RAID+프리모템**(가정·의존 승격) · **§6.24 AI 증강 PM + AI 에이전트 작업 거버넌스**(스코핑·자율예산/정지·검토게이트·throughput/품질 — 방법론 자체 사례). §8.1·§16·§19.11·README 갱신. branch-first 준수.
 
-### METH-075 · 브랜드기획서 지침 심화 (DBA·Share of Search·브랜드 in AI)
-- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 기획서 지침군 3번째(guide 14, 737줄). 웹리서치(April Dunford·Play Bigger·Ehrenberg-Bass/Romaniuk·Binet·브랜드 아키텍처·WCAG·소닉) → §6 신규 8항목: **§6.14 Dunford 5요소 포지셔닝**(+카테고리 창출 분기=Class C) · **§6.15 Distinctive Brand Assets**(fame×uniqueness 등록부) · **§6.16 브랜드 아키텍처+버벌/네이밍** · **§6.17 브랜드 헬스**(퍼널·NPS·**Share of Search**) · **§6.18 브랜드 in AI 답변**(AI 인식 감사, GEO/AEO 브랜드판) · **§6.19 brand-as-code 확장**(voiceProfile·bodyOfWork) · **§6.20 WCAG 접근성**(4.5:1/3:1) · **§6.21 모션·소닉**. §8.1·§16·§19.7·README 갱신. branch-first 준수.
 
 
 
