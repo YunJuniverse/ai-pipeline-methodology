@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "6413942d9897cdbcf996871aa37fd057f52bc301",
-  "last_validated_at": "2026-07-08T09:09:00Z",
+  "last_validated_commit": "d322bdb01f1706287712b92cee9c315c095d0704",
+  "last_validated_at": "2026-07-09T01:17:55Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "9db622489a0384cfb9f5dcc2a64cbad2f11a98874afecf63066ce9ca50834ea5"
+      "sha256": "4ddd13af27d79b6fe647807394c799af4da07eea88f52245ebd48fba73b0e269"
     },
     "TODO.md": {
-      "sha256": "6f221f049c60bc9578b20aebc47961a01ab793027d0efdcf0f9162055930eba9"
+      "sha256": "b4b7b015f71c40f3aee48b51e6f1b517dc72511feb783eeac992ab55ff03543c"
     },
     ".ai/checkpoint.md": {
-      "sha256": "98beb180af42688d505a5824bc798b71ea7e79b24e17d534fd7af313c435aa86"
+      "sha256": "a71f14f8052880ab3d36e4c6cff7819d1ba0980aa6866cce3905cc3c413a6077"
     }
   },
   "observations": {
@@ -69,6 +69,7 @@
       "50_resources/ai_observations/2026-07-08_meth-063-business-plan-revamp.md",
       "50_resources/ai_observations/2026-07-08_meth-064-service-plan-index-model.md",
       "50_resources/ai_observations/2026-07-08_meth-065-child-templates-refresh.md",
+      "50_resources/ai_observations/2026-07-09_meth-066-requirements-spec-refresh.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
