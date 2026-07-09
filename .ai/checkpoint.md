@@ -1,8 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-069 도메인 용어집 심화 · 유비쿼터스 언어 + SKOS)
+# Checkpoint — 2026-07-09 (METH-071 데이터 모델 심화 · ERD·키·무중단 마이그레이션)
 
-> ✅ METH-069: 문서별 심화 7번(기획 템플릿 계열 마지막) = context-glossary. 웹리서치(DDD·SKOS·AI 그라운딩) → 유비쿼터스 언어 계약으로 재정의.
-> 핵심: 표준어가 **코드·UI에 그대로 흐름**(사전 아님) · 같은 단어 맥락별 다른 뜻은 **바운디드 컨텍스트로 분리**(false unification 금지).
-> 🏁 다음: PR 리뷰·머지 → 심화 계속(개발명세 또는 기획서 지침군) 또는 누적 다운스트림 sync.
+> ✅ METH-071: 문서별 심화 9번(개발명세 계열 마무리) = data-model. 웹리서치(PostgreSQL·pgvector·OWASP·RFC 9562) → 강화.
+> 핵심: Mermaid ERD · UUIDv7 키 · cascade · history 전략(SCD2/soft-delete) · **expand-contract 무중단 마이그레이션**(Class B rollback 증거) · PII/GDPR(파생 포함) · 벡터(조건부).
+> 🏁 다음: PR 리뷰·머지 → 심화 계속(기획서 지침군/agency 템플릿) 또는 **누적 다운스트림 sync**.
 
 ---
 
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-069-context-glossary-refresh` (fresh main 기준, branch-first 규율 준수)
+- Worktree: branch `claude/meth-071-data-model-refresh` (fresh main=069 기준 — 070 #59 미머지, data-model과 disjoint. branch-first 준수)
 
 ## 부팅 계약
 
@@ -26,33 +26,35 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-069 — 도메인 용어집(context-glossary.md) 심화** (문서별 심화 프로그램 7번, 기획 *템플릿* 계열 마지막):
+**METH-071 — 데이터 모델(data-model.md) 심화** (문서별 심화 프로그램 9번, 개발명세 계열 마무리):
 
-- **방법**: 웹리서치 1차 소스(Evans DDD Reference·Fowler·Agile Alliance·W3C SKOS·DataHub/Atlan glossary 표준·2026 AI 그라운딩 arXiv 2편). 현행(표준어+정의+`_Avoid_`+혼동쌍+예시대화) gap.
-- **위상 재정의**: 사전이 아니라 **유비쿼터스 언어(DDD) 계약** — 표준어가 대화·문서·UI·테스트·**코드에 그대로**. SKOS 매핑(표준어=prefLabel·동의어=altLabel·`_Avoid_`=hiddenLabel).
-- **변경 (`50_resources/templates/context-glossary.md`)** — 전부 *용어당 선택*(소규모 최소형 유지):
-  - **바운디드 컨텍스트** 섹션 — 같은 단어 맥락별 다른 뜻(Fowler meter/Customer/Order), false unification 금지, 컨텍스트 태그로 중복 등재 허용.
-  - **상태(Draft/Approved/Deprecated)/Owner** 메타, **See also**(skos:related, 혼동쌍과 구분).
-  - **Code/UI 식별자 매핑**(`OrderLine`/"주문 항목") — 유비쿼터스 언어의 핵심 + 린트 타깃.
-  - **약어** 표 — 다의어 약어의 AI 오해석 위험 → 고정.
-  - **AI 스티어링 훅**(CLAUDE/AGENTS/llms.txt 링크 = 그라운딩) + **린트 훅**(`_Avoid_` = Vale/CI 가드레일).
-  - _CATALOG 한줄 갱신.
+- **방법**: 웹리서치 1차 소스(PostgreSQL docs·AWS/DynamoDB·pgvector·OWASP LLM Top10·RFC 9562·Kimball SCD2·expand-contract). 현행 7섹션(Entity/Fields/Relationships/Integrity/Privacy/Migration/Changelog) gap.
+- **변경 (`50_resources/templates/data-model.md`)**:
+  - **§1 Mermaid ERD**(crow's foot, diagrams-as-code) 신설.
+  - **키 전략**: surrogate 기본 · 분산/외부노출 = **UUIDv7/ULID**(시간정렬 인덱스 지역성; UUIDv4 PK 비권장) · 외부는 opaque public ID. §2 Entity List에 PK전략·History 컬럼.
+  - **Fields**: Key(PK/FK/UK)·Constraints(default·CHECK·enum)·Indexed?(왜) 컬럼 추가.
+  - **§4 Relationships**: **On Delete/Update**(CASCADE 일회용부품 / RESTRICT 독립중요 / SET NULL) — 고아 방지 스펙.
+  - **§5 Integrity**: 제약(스키마에 박기) · 감사컬럼 · **history 전략 태그**(soft-delete[GDPR 삭제 불충족]·SCD2·append-only·bi-temporal) · 인덱스 원칙(FK 명시·복합·covering·partial).
+  - **§6 PII**: 분류(public/internal/PII/민감)·암호화·접근·보존·삭제 표 + **GDPR Art.17**(파생 벡터·캐시·백업까지).
+  - **§7 Migration = Expand→Backfill(청크)→Contract**(단계별 가역·lock-safe `CONCURRENTLY`) = Class B rollback 증거.
+  - **§8 AI/Vector**(조건부): `vector(N)`·모델·전처리·HNSW·삭제 tombstone.
+  - 3NF 기본·비정규화 사유 명기 · 스키마 계약 버전 api-contract 연동 · _CATALOG 갱신.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-069 PR 리뷰·머지.
-2. **문서별 심화 계속** — 대상 합의. 기획 *템플릿* 계열은 069로 일단락(prd·requirements·user-story·service-policy·ia·user-flow·functional·wireframe·api·microcopy·kpi·context-glossary 모두 최신화). 남은 축: **개발명세**(`architecture`·`data-model`), **기획서 지침군**(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), **agency/ops 템플릿**(proposal·qa·operation 등).
-3. **누적 심화(063~069)를 다운스트림에 일괄 sync** — 여러 PR 쌓였으니 세트로.
+1. METH-071 PR 리뷰·머지. **#59(070 architecture) 먼저 머지 권장** — 그 후 071 머지 시 라이브 파일(TODO/HANDOFF/checkpoint) 사소한 충돌만 해소(내용 파일은 disjoint라 무충돌).
+2. **문서별 심화** — 기획+개발명세 *템플릿* 계열 완료(063~071). 남은 축: 기획서 *지침*군(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs 등).
+3. **누적 심화(063~071)를 다운스트림에 일괄 sync** — 강력 권장 타이밍(9개 PR 상당 쌓임).
 4. METH-060 잔여(ai-icons 번호 정리 등).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 067 PRD main 직접 커밋(A) — 라이브 "PR 대기" 문구는 068에서 정정 완료.
-- 심화 다운스트림 sync 타이밍(세트로 한 번).
-- 심화 템플릿군 lean 유지 — context-glossary는 추가분 전부 용어당 선택이라 최소형 보존됨. 지속 점검.
+- 070(#59)·071 병행 PR — 라이브 파일 2차 머지 충돌 예상(내용 무충돌). 머지 순서 #59→071 권장.
+- 누적 심화 sync 타이밍(세트로).
+- 심화 템플릿군 lean 유지 — data-model은 다수 조건부(벡터·SCD2·bi-temporal)라 기본은 최소, 필요분만.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-069-context-glossary-refresh` (fresh main 기준). main 직접 PR. branch-first 규율 준수.
-- 변경: `50_resources/templates/context-glossary.md`(재작성) + `_CATALOG.md`(한줄) + 라이브 4종.
-- 문서별 심화 진척: 063#53·064#54·065#55·066#56 머지 / 067 PRD main직접(A) / 068 kpi-tree #57 머지 / 069 context-glossary(이번).
+- 브랜치: `claude/meth-071-data-model-refresh` (fresh main=069 기준). main 직접 PR. branch-first 준수.
+- 변경: `50_resources/templates/data-model.md`(재작성) + `_CATALOG.md`(한줄) + 라이브 4종.
+- 문서별 심화 진척: 063#53·064#54·065#55·066#56·068#57·069#58 머지 / 067 main직접(A) / 070 architecture #59 open / 071 data-model(이번). **기획+개발명세 템플릿 계열 완료.**
