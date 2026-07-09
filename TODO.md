@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-073 · 운영기획서 지침 심화 (SRE·인시던트·AI 운영)
+- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 — 기획서 *지침군* 첫 대상(guide 12, 760줄). 웹리서치(Google SRE·PagerDuty/incident.io·ITIL 4·L1/L2/L3·OWASP LLM·LLM 운영) → §6에 신규 8항목: **§6.15 SLO/Error Budget**(정책=기능 프리즈 레버) · **§6.16 형식 인시던트**(SEV1-4·IC 역할·MTTD/MTTA/MTTR) · **§6.17 on-call/에스컬레이션/블레임리스 포스트모템** · **§6.18 SLO 기반 알림**(multi-burn-rate·알림피로) · **§6.19 계층 지원 L1/L2/L3**(계층 SLA·CSAT/CES/FCR) · **§6.20 변경/릴리스 운영**(ITIL 유형·feature flag·롤백·프리즈) · **§6.21 Toil 예산** · **§6.22 AI 프로덕션 운영**(프로덕션 eval·가드레일=인시던트·provider failover·HITL 워크로드·토큰 FinOps). §8.1 목차·§16 체크리스트·§19.6 환류·README 갱신. branch-first 준수.
+
 ### METH-072 · 다운스트림 일괄 sync (심화 063~071 전파)
 - **notes**: 2026-07-09. Class A. 문서별 심화(063~071)로 갱신된 templates(15종)·guides를 다운스트림에 전파. **완료 2곳(clean)**: gamblescan(`fa92c3f`)·icons(`fbdb7cd6`) — main 전환→`sync --apply`(각 21파일: guides 6·templates 15, 신규 09·21·api-contract 포함)→`--no-verify` 순수 sync 커밋→push→원 브랜치 복귀. 다운스트림 고유 파일 보존(prune 안 함). **홀드 3곳(dirty)**: ai-icons(6, +커스텀 guide 충돌 기존 Open Issue)·cafe24-renewal(7)·icons-invest(8) — clean 후 재개. v4.0→v4.0(마이그레이션 없음). branch-first 준수.
 
@@ -24,8 +27,6 @@
 ### METH-070 · 아키텍처 문서 심화 (arc42 + C4 + fitness functions)
 - **notes**: 2026-07-09. Class A. **PR #59** — 071(#60)이 먼저 머지돼 라이브파일 충돌 → main 병합으로 해소(architecture.md 무충돌, _CATALOG 두 줄 병합, 라이브는 main=071 채택 + 070 기록 추가). 문서별 심화 8번. 웹리서치(arc42·C4/Simon Brown·Richards&Ford·fitness functions·OWASP·LLM 게이트웨이) → `architecture.md` 강화(14→21섹션): §2 품질속성 top3(least-worst)·§16 적합성 함수(CI, 지침19)·§4 C4(Mermaid)·§6 런타임·§11 신뢰경계/위협(STRIDE)·§14 배포·§15 AI 아키텍처(조건부)·§20 리스크/기술부채. _CATALOG 갱신.
 
-### METH-069 · 도메인 용어집 심화 (유비쿼터스 언어 + SKOS)
-- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 7번(기획 계열 마지막). 웹리서치(Evans/Fowler DDD·W3C SKOS·업계 glossary 표준·2026 AI 그라운딩 논문) → `context-glossary.md` 강화. 위상 재정의: **유비쿼터스 언어 계약**(표준어가 코드·UI에 그대로). SKOS 매핑(표준어=prefLabel·동의어=altLabel·`_Avoid_`=hiddenLabel). 추가(전부 용어당 선택): **바운디드 컨텍스트**(같은 단어 맥락별 다른 뜻, false unification 금지) · 상태(Draft/Approved/Deprecated)/Owner · See also(관련어) · **Code/UI 식별자 매핑**(린트 타깃) · 약어(다의어 AI 위험) · **AI 스티어링 훅**(CLAUDE/AGENTS/llms.txt 링크) · **린트 훅**(`_Avoid_`=CI 가드레일). _CATALOG 갱신. branch-first 준수.
 
 
 
