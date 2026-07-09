@@ -1,8 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-069 도메인 용어집 심화 · 유비쿼터스 언어 + SKOS)
+# Checkpoint — 2026-07-09 (METH-070 아키텍처 문서 심화 · arc42 + C4 + fitness functions)
 
-> ✅ METH-069: 문서별 심화 7번(기획 템플릿 계열 마지막) = context-glossary. 웹리서치(DDD·SKOS·AI 그라운딩) → 유비쿼터스 언어 계약으로 재정의.
-> 핵심: 표준어가 **코드·UI에 그대로 흐름**(사전 아님) · 같은 단어 맥락별 다른 뜻은 **바운디드 컨텍스트로 분리**(false unification 금지).
-> 🏁 다음: PR 리뷰·머지 → 심화 계속(개발명세 또는 기획서 지침군) 또는 누적 다운스트림 sync.
+> ✅ METH-070: 문서별 심화 8번(개발명세 계열 시작) = architecture. 웹리서치(arc42·C4·fitness functions·OWASP·AI 게이트웨이) → 강화.
+> 핵심: **품질 속성 top3(least-worst) + fitness function(CI 강제)** · C4 다이어그램 · 신뢰경계/위협 · AI 아키텍처(조건부).
+> 🏁 다음: PR 리뷰·머지 → 심화 계속(data-model 또는 기획서 지침군) 또는 누적 다운스트림 sync.
 
 ---
 
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-069-context-glossary-refresh` (fresh main 기준, branch-first 규율 준수)
+- Worktree: branch `claude/meth-070-architecture-refresh` (fresh main 기준, branch-first 규율 준수)
 
 ## 부팅 계약
 
@@ -26,33 +26,34 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-069 — 도메인 용어집(context-glossary.md) 심화** (문서별 심화 프로그램 7번, 기획 *템플릿* 계열 마지막):
+**METH-070 — 아키텍처 문서(architecture.md) 심화** (문서별 심화 프로그램 8번, 개발명세 계열 시작):
 
-- **방법**: 웹리서치 1차 소스(Evans DDD Reference·Fowler·Agile Alliance·W3C SKOS·DataHub/Atlan glossary 표준·2026 AI 그라운딩 arXiv 2편). 현행(표준어+정의+`_Avoid_`+혼동쌍+예시대화) gap.
-- **위상 재정의**: 사전이 아니라 **유비쿼터스 언어(DDD) 계약** — 표준어가 대화·문서·UI·테스트·**코드에 그대로**. SKOS 매핑(표준어=prefLabel·동의어=altLabel·`_Avoid_`=hiddenLabel).
-- **변경 (`50_resources/templates/context-glossary.md`)** — 전부 *용어당 선택*(소규모 최소형 유지):
-  - **바운디드 컨텍스트** 섹션 — 같은 단어 맥락별 다른 뜻(Fowler meter/Customer/Order), false unification 금지, 컨텍스트 태그로 중복 등재 허용.
-  - **상태(Draft/Approved/Deprecated)/Owner** 메타, **See also**(skos:related, 혼동쌍과 구분).
-  - **Code/UI 식별자 매핑**(`OrderLine`/"주문 항목") — 유비쿼터스 언어의 핵심 + 린트 타깃.
-  - **약어** 표 — 다의어 약어의 AI 오해석 위험 → 고정.
-  - **AI 스티어링 훅**(CLAUDE/AGENTS/llms.txt 링크 = 그라운딩) + **린트 훅**(`_Avoid_` = Vale/CI 가드레일).
+- **방법**: 웹리서치 1차 소스(arc42·C4/Simon Brown·Richards&Ford Fundamentals·ThoughtWorks fitness functions·OWASP STRIDE·Fairbanks·LLM 게이트웨이 2025-26). 현행 14섹션을 **arc42 12섹션에 매핑**해 gap 도출(crosscutting concepts는 이미 강함; 빠진 것 = 품질요구·런타임뷰·배포뷰·리스크).
+- **변경 (`50_resources/templates/architecture.md`)** — 14→21 섹션, 각 compact:
+  - **§2 품질 속성 우선순위 top3** — least-worst, 도메인 근거·측정 시나리오·트레이드오프·의도적 제외.
+  - **§16 적합성 함수** — 특성→지표→검사(도구)→임계→CI 위치. 지침19 가드레일과 연결.
+  - **§4 목표 아키텍처 = C4**(Context+Container, Mermaid diagrams-as-code). §6 **런타임 뷰**(핵심 시나리오 sequence).
+  - **§11 신뢰경계·위협**(STRIDE-lite, 경계별; 완화는 §8 권한·§9 멱등 재사용). **§14 배포 뷰**.
+  - **§15 AI 아키텍처**(조건부) — 게이트웨이/라우터·폴백·RAG·가드레일/eval 배치·비용·지연 예산 → 16/17·prd §9 링크.
+  - **§20 리스크/기술부채 register** — §21 미해결 *결정*과 구분.
+  - 프리앰블: risk-driven "just enough" + 이 문서+ADR+diagrams-as-code = AI 에이전트 컨텍스트.
   - _CATALOG 한줄 갱신.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-069 PR 리뷰·머지.
-2. **문서별 심화 계속** — 대상 합의. 기획 *템플릿* 계열은 069로 일단락(prd·requirements·user-story·service-policy·ia·user-flow·functional·wireframe·api·microcopy·kpi·context-glossary 모두 최신화). 남은 축: **개발명세**(`architecture`·`data-model`), **기획서 지침군**(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), **agency/ops 템플릿**(proposal·qa·operation 등).
-3. **누적 심화(063~069)를 다운스트림에 일괄 sync** — 여러 PR 쌓였으니 세트로.
+1. METH-070 PR 리뷰·머지.
+2. **문서별 심화 계속** — 대상 합의. 개발명세 남은 것: **`data-model`**(ERD·정규화·마이그레이션·인덱싱). 그 외: 기획서 *지침*군(운영 12·마케팅 13·브랜드 14·PM 15·AI기능 16·평가 17), agency/ops 템플릿(proposal·qa·operation·profitability 등).
+3. **누적 심화(063~070)를 다운스트림에 일괄 sync** — 여러 PR 쌓였으니 세트로(적용 프로젝트 반영).
 4. METH-060 잔여(ai-icons 번호 정리 등).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 067 PRD main 직접 커밋(A) — 라이브 "PR 대기" 문구는 068에서 정정 완료.
-- 심화 다운스트림 sync 타이밍(세트로 한 번).
-- 심화 템플릿군 lean 유지 — context-glossary는 추가분 전부 용어당 선택이라 최소형 보존됨. 지속 점검.
+- 067 PRD main 직접(A) — 라이브 문구 068에서 정정 완료.
+- 심화 다운스트림 sync 타이밍(세트로).
+- architecture가 21섹션으로 커짐 — 각 compact(표1개/블록1개)이고 다수 조건부(AI·규제·배포)라 lean-mode에선 해당분만. 실사용에서 무거우면 arc42 "risk-driven 생략" 원칙대로 스킵 안내.
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-069-context-glossary-refresh` (fresh main 기준). main 직접 PR. branch-first 규율 준수.
-- 변경: `50_resources/templates/context-glossary.md`(재작성) + `_CATALOG.md`(한줄) + 라이브 4종.
-- 문서별 심화 진척: 063#53·064#54·065#55·066#56 머지 / 067 PRD main직접(A) / 068 kpi-tree #57 머지 / 069 context-glossary(이번).
+- 브랜치: `claude/meth-070-architecture-refresh` (fresh main 기준). main 직접 PR. branch-first 준수.
+- 변경: `50_resources/templates/architecture.md`(재작성) + `_CATALOG.md`(한줄) + 라이브 4종.
+- 문서별 심화 진척: 063#53·064#54·065#55·066#56·068#57·069#58 머지 / 067 PRD main직접(A) / 070 architecture(이번). **기획 템플릿 계열 완료 → 개발명세 계열 진입.**
