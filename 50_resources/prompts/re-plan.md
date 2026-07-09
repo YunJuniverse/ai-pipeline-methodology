@@ -1,66 +1,56 @@
-# Re-Plan Prompt (재기획 — 변경 영향 분석 + 버전 업)
+# Re-Plan Prompt (재기획 — 변경 영향 분석 + 갱신)
 
-Use this when new ideas or direction changes require updating existing planning documents.
+> 실행 지시문 — 새 입력·방향 전환이 기존 기획서를 바꿀 때 영향 분석 후 갱신한다.
+> 산출물의 집: `30_planning/` (라이브, in-place 갱신 + git 이력).
 
 ## When To Use
 
-- `briefs/updates/` 에 새 파일이 추가된 후
+- `00_briefs/current/` 에 새 브리프가 추가된 뒤 (기존 방향과 충돌 가능)
 - 개발 중 방향 전환이 필요할 때
-- 사람이 "이걸 바꿔야 할 것 같아" 라고 언급했을 때
+- 사람이 "이걸 바꿔야 할 것 같아"라고 언급했을 때
 
 ## Instructions
 
-1. Read `briefs/updates/` — 새로 추가된 파일 모두.
-2. Read current latest versions of all 6 plan snapshots.
-3. Read `dev-spec` latest version (if exists).
-4. Analyze impact: which documents need updating?
-5. Present impact analysis to human BEFORE writing anything.
-6. Wait for human confirmation.
-7. After confirmation, write only the affected documents at v(N+1).
-8. If dev-spec is affected, note it — write dev-spec v(N+1) separately after plan approval.
-9. List TODOs that are invalidated or need revision.
-10. Update `HANDOFF.md` with change summary.
+1. `00_briefs/current/` 의 *새 파일*을 읽는다. 옛 브리프와 충돌하면 **자동 결정 금지 — 사용자에게 확인**.
+2. `30_planning/` 의 관련 기획서(라이브)를 읽는다.
+3. 개발 명세(있으면 `40_dev/snapshots/dev-spec-*.md` 또는 `30_planning`/개발명세)를 읽는다.
+4. 영향 분석: 어떤 문서가 갱신 필요한가?
+5. **쓰기 전에** 영향 분석을 사람에게 먼저 제시한다.
+6. 사람 확인을 기다린다.
+7. 확인 후 *영향받는 문서만* in-place로 갱신한다(git이 이력을 보존 — vN 스냅샷 파일 만들지 않음).
+8. 개발 명세가 영향받으면 표시하고, 기획 승인 후 별도 갱신.
+9. 무효화·수정 필요한 TODO를 나열한다.
+10. `HANDOFF.md`에 변경 요약을 기록한다.
 
-## Impact Analysis Output (present to human first)
+## Impact Analysis Output (사람에게 먼저 제시)
 
 ```
 ## 재기획 영향 분석
 
 ### 변경 트리거
-- 파일: briefs/updates/YYYY-MM-DD-[제목].md
+- 파일: 00_briefs/current/YYYY-MM-DD_<제목>.md
 - 핵심 변경: [한 줄 요약]
+- (옛 브리프와 충돌 시) 충돌 지점 + 사용자 확인 필요
 
-### 영향 받는 문서
-| 문서 | 현재 버전 | 변경 필요? | 이유 |
-|------|-----------|-----------|------|
-| 사업기획서 | v1 | ✅ 필요 | 수익 모델 변경 |
-| 서비스기획서 | v1 | ✅ 필요 | 기능 추가 |
-| 운영기획서 | v1 | ❌ 불필요 | 영향 없음 |
-| 마케팅기획서 | v1 | ❌ 불필요 | 영향 없음 |
-| 브랜드기획서 | v1 | ❌ 불필요 | 영향 없음 |
-| PM기획서 | v1 | ✅ 필요 | 일정 영향 |
-| 개발명세서 | v1 | ⚠ 대기 | 기획 승인 후 판단 |
+### 영향 받는 문서 (30_planning/)
+| 문서 | 변경 필요? | 이유 |
+|------|-----------|------|
+| 10 사업기획서 | ✅ 필요 | 수익 모델 변경 |
+| 11 서비스기획서 | ✅ 필요 | 기능 추가 |
+| 12 운영 | ❌ 불필요 | 영향 없음 |
+| ... | | |
 
 ### 영향 받는 TODO
 | TODO ID | 현재 상태 | 처리 방향 |
 |---------|-----------|-----------|
-| TODO-005 | In Progress | 재검토 필요 |
-| TODO-008 | Ready | 무효화 가능성 |
 
 ### ADR 필요 여부
-[이 변경이 코드로 설명 안 되는 결정인 경우 ADR 제안]
+[코드로 설명 안 되는 결정이면 ADR 제안 — Class B/C면 필수]
 ```
 
 ## Versioning Rules
 
-- 영향 받는 문서만 버전 업
-- 버전 번호는 해당 문서 내 연속 번호 (business는 business 기준으로만)
-- 각 새 버전 frontmatter의 `supersedes`, `trigger` 필드 반드시 기입
-- 변경 사유가 중요한 결정이면 ADR 추가 후 `adr` 필드에 연결
-
-## File Naming
-
-```
-40_dev/snapshots/plans/business/v2-2026-05-15.md
-40_dev/snapshots/plans/service/v2-2026-05-15.md
-```
+- 영향받는 문서만 갱신. 갱신은 `30_planning/`에서 **in-place**(git이 버전 이력).
+- 각 문서 frontmatter의 `last_updated`·(있으면)`trigger`를 기입.
+- 변경 사유가 비가역 결정이면 ADR 추가 후 문서에서 링크.
+- 마일스톤 시점 캡처가 필요하면 그때만 `40_dev/snapshots/<type>-YYYY-MM-DD.md`로 스냅샷.

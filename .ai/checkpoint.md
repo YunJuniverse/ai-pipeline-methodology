@@ -1,8 +1,8 @@
-# Checkpoint — 2026-07-09 (METH-080 마스터플랜 SSOT 정합)
+# Checkpoint — 2026-07-09 (METH-081 prompts/ 층 전면 현행화)
 
-> ✅ METH-080: 마스터플랜(지침18) 역할 재점검 → **슬롯은 고유(폐기 아님)**, 단 v2 "11 기능 정의 인라인 복제"를 **ID 참조 + 페이즈 오버레이(v5)**로 완화. 15↔18 경계 재조정(METH-076 반영). 내부 정합성(리서치 없음).
-> 핵심 통찰: 인라인 복제 = 개발기획서 재번들·서비스기획서 컨테이너 논쟁과 *동형 안티패턴* → SSOT("각 내용은 집 하나")로 교정.
-> 🏁 다음: PR 리뷰·머지 → 남은 후보(agency/ops 템플릿·메타 지침 00·02~09·19~20) 또는 **누적 다운스트림 sync(073~080)**.
+> ✅ METH-081: 사용자 질문(운영원칙 지침00·prompts 역할)에서 **프롬프트층이 나머지 방법론과 심하게 drift** 발견(라우터 079 문제와 동종) → 전면 현행화.
+> 핵심: 입력 `briefs/`→`00_briefs/current/`, 산출 `snapshots/plans/vN`→`30_planning/` 라이브, "항상 6종"→모드 선택, **목차 복제 제거**(구조 SSOT=지침, 080과 동형 교정). +ai-feature(16)·eval-guardrail(17) 신설 + `_README.md` 신설.
+> 🏁 다음: PR 리뷰·머지 → 남은 후보(agency/ops 템플릿·메타 지침) 또는 **누적 다운스트림 sync(073~081)**.
 
 ---
 
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-080-master-plan-ssot-refactor` (#68 머지된 main tip 기준, branch-first 준수)
+- Worktree: branch `claude/meth-081-prompts-modernization` (#69 머지된 main tip 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -26,29 +26,33 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-080 — 마스터플랜(지침18) SSOT 정합** (사용자 요청: "마스터플랜 안 건드린 이유 + 역할·필요성 다시 점검"):
+**METH-081 — `50_resources/prompts/` 층 전면 현행화** (사용자 질문 "운영원칙·prompts 역할이 뭐냐"에서 파생):
 
-- **왜 안 건드렸었나**: 18은 dev-transition 밴드(18~20)라 체계적으로 심화한 *기획서 지침군(12~17)* 순번 밖 + 이미 v4로 성숙(공백 작음). 의도적 배제 아님.
-- **역할 재점검 결론**: **마스터플랜 슬롯은 고유 — 폐기 아님.** "빌드 순서·페이즈(M0/M1/M2)·MVP 확정·게이트 인스턴스" 층은 10(비즈니스)·11(기능)·15(PM 표준)·16(AI명세)·SPRINTS(스프린트 일정) 어디도 소유하지 않음. HANDOFF(live churn)·SPRINTS(스프린트)·TODO(태스크) 사이 durable 빌드 전략 슬롯을 18만 채움.
-- **고친 것 (설계 냄새 1건)**: v2 "11 기능 정의 *인라인 복제*" → 11↔18 이중관리·동기화 부담 = SSOT 위반. 개발기획서 재번들·서비스기획서 컨테이너 논쟁과 동형. **v5: ID 참조 + 얇은 페이즈 요약 + 11번 링크**로 완화.
-  - `20_guides/18_...md`: §0 인트로 · §1 목적 · §14.1(11경계) · §16(실수 1·2) · §17 프롬프트(OUTPUT#3·RULES·BOUNDARY) · 변경이력 v5.
-  - **§14.2(15경계) 재조정**: METH-076으로 15에 딜리버리 모델·플로우·DORA·OKR 추가됨 → "15=표준 정의 → 18=프로젝트 인스턴스" 4항목 명문화.
-  - `50_resources/templates/MASTER_PLAN.md`: SSOT 주석 추가 + stale 경로(`docs/archive/planning-guides`→`20_guides`) 수정. (템플릿 본문은 이미 ID 참조 기반이라 구조 변경 불필요.)
+- **역할 정리(질문 답)**: 방법론 3층 = **지침**(20_guides, 표준·목차) → **템플릿**(50_resources/templates, 빈 양식) → **프롬프트**(50_resources/prompts, 복붙 실행 지시). 운영원칙(지침00)은 그 위 최상위 헌법(문서 위계·SSOT·Eval-First·금지패턴·품질).
+- **발견한 drift**: 프롬프트가 구모델 고착 — 입력 `briefs/`(존재 안 함, 실제 `00_briefs/current/`), 산출 `40_dev/snapshots/plans/xxx/vN`(존재 안 함, 실제 `30_planning/NN_*.md` 라이브), "항상 6종 전체"(모드 선택 로딩과 충돌), 심화분(12~17)·모드·개발명세 미반영, _README 부재.
+- **고친 것 (17 파일)**:
+  - 기획서 프롬프트 6종 재작성(business/service/ops/marketing/brand/pm) → `30_planning/` 라이브 산출 + 심화 포인트 반영 + **목차 복제 제거**(지침이 구조 SSOT).
+  - **신설 2종**: `ai-feature.md`(16)·`eval-guardrail.md`(17) — 기획서 8종 전체 커버(기존 6종만 있었음).
+  - 코드-역문서화 4종(architecture/data-model/api-spec/service-spec) → "전방 설계=템플릿 vs 역문서화=프롬프트" 역할 명확화, 스냅샷 경로 유지.
+  - `dev-spec.md` 현행화(지침21·개발명세 5종·planning-handoff 분기), `plan-routing`/`re-plan`/`plan` 현행화.
+  - **`_README.md` 신설**: 프롬프트↔지침↔템플릿↔모드 매핑표(_CATALOG 대응).
+  - 상위 문서 정정: `README.md`·`50_resources/_README.md`의 "스냅샷 생성 프롬프트"→"AI 실행 프롬프트".
+- **sync**: `50_resources/prompts`가 통째로 shared_path → 신규 파일 포함 자동 전파(별도 등록 불필요).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-080 PR 리뷰·머지.
-2. **심화 프로그램 현황**: 템플릿 13종(063~071)·기획서 지침군 6종(073~078)·오케스트레이션(079)·마스터플랜 SSOT(080). 남은 후보 — agency/ops 템플릿(proposal-go-nogo·qa-*·operation-spec·profitability-sheet·execution-plan·work-request-ticket·wbs·glossary), 메타/dev 지침(00·02~09·19~20). 19(클린아키)·21(개발명세)는 이미 심화됨.
-3. **누적 다운스트림 sync(2차)** — gamblescan·icons 072까지 반영 → **073~080 추가 필요**. 홀드 3곳(ai-icons·cafe24·icons-invest) clean 후.
+1. METH-081 PR 리뷰·머지.
+2. **심화 프로그램 현황**: 템플릿 13종(063~071)·기획서 지침군 6종(073~078)·오케스트레이션(079)·마스터플랜 SSOT(080)·prompts 층(081). 남은 후보 — agency/ops 템플릿(proposal-go-nogo·qa-*·operation-spec·profitability-sheet·execution-plan·work-request-ticket·wbs·glossary), 메타/dev 지침(00·02~09·19~20). ※ 지침00(운영원칙)도 후보 — 이번에 읽어보니 573줄 성숙하나 심화분(12~17) 신규 영역 반영은 점검 여지.
+3. **누적 다운스트림 sync(2차)** — gamblescan·icons 072까지 반영 → **073~081 추가 필요**. 홀드 3곳(ai-icons·cafe24·icons-invest) clean 후.
 4. **graph.json 노드 완성**(별건) — guide 02~09·19~21.
 
 ## 미해결 결정사항 (Open Questions)
 
-- 심화 프로그램을 여기서 일단락할지 vs agency/ops·메타 지침까지 이어갈지 — 사용자 판단.
-- 2차 다운스트림 sync 타이밍(073~080 누적).
+- 심화 프로그램을 여기서 일단락할지 vs agency/ops·메타 지침(특히 운영원칙00)까지 이어갈지 — 사용자 판단.
+- 2차 다운스트림 sync 타이밍(073~081 누적).
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-080-master-plan-ssot-refactor` (#68 머지된 main tip 기준). branch-first 준수.
-- 변경: `20_guides/18_...md` + `50_resources/templates/MASTER_PLAN.md` + 라이브 4종.
-- 진척: 063~071 템플릿 + 072 sync(#61) + 073~078 지침군(#62~#67) + 079 오케스트레이션(#68) + **080 마스터플랜 SSOT(이번)**.
+- 브랜치: `claude/meth-081-prompts-modernization` (#69 머지된 main tip 기준). branch-first 준수.
+- 변경: `50_resources/prompts/` 17개(수정 14 + 신설 3: _README·ai-feature·eval-guardrail) + `README.md` + `50_resources/_README.md` + 라이브 4종.
+- 진척: 063~071 템플릿 + 072 sync(#61) + 073~078 지침군(#62~#67) + 079 오케(#68) + 080 마스터플랜(#69) + **081 prompts(이번)**.
