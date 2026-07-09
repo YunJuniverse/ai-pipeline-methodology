@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "f4216073e9d380b62664c049979c9958cac1e09f",
-  "last_validated_at": "2026-07-09T08:33:49Z",
+  "last_validated_commit": "8685e75de508ed17ae1dae222ffe818b7313c3da",
+  "last_validated_at": "2026-07-09T08:43:32Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "73674a91825448d31092f07d0393094cff10ceb6075c95ae2982a58248ea1c8d"
+      "sha256": "7523512c5bc85fdc62c8fa19a2db90f1822acde2abe04b43c94f9d5269e2d108"
     },
     "TODO.md": {
-      "sha256": "7efecb32628ff62bab13ab20b89361b4ae30886585e2c02aaf662fcdfee6da39"
+      "sha256": "290d4a3676a6fafe8b36a3611faff5e1e62575fbb3a895cb82e3c77d247265a2"
     },
     ".ai/checkpoint.md": {
-      "sha256": "4511e2b741b7aa2d9cd848f60802f38c63e47956dcc5400088566d76d4b7c579"
+      "sha256": "6f5f7edf561c12d491136d986c7b32f026cec714d7407e8b7331ecbc0956e9c7"
     }
   },
   "observations": {
@@ -99,6 +99,7 @@
       "50_resources/ai_observations/2026-07-09_meth-093-agent-mechanics-deepen.md",
       "50_resources/ai_observations/2026-07-09_meth-094-internal-guides-deepen.md",
       "50_resources/ai_observations/2026-07-09_meth-095-qa-templates-deepen.md",
+      "50_resources/ai_observations/2026-07-09_meth-096-proposal-templates-deepen.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
