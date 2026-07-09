@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-099 · methodology-graph.json 노드 보강 + 096~098 stranded 복구
+- **notes**: 2026-07-09. Class A. PR base=main 대기. 대시보드 관계 그래프 노드 불완전(METH-079 Open Issue) 종결. 노드 29→42: guide 10개(02·03·05·06·07·08·09·19·20·21; 04 미존재 제외) + 학습루프(observations·catalog·skeletons) + checkpoint, stale ai-log 제거. 엣지 39→53(g00 parent-of 메타룰·g18→g21→g19/g20·observe→catalog→skeleton). tier6·learning kind·v3.2. dashboard 렌더 검증(nodes=42)·JSON 정합 0오류. **부수**: 스택-PR 재타깃 함정으로 #85/#86/#87이 중간 브랜치 머지→096/097/098 main 미반영이던 것을 이 단일 PR(base=main)로 복구. branch-first 준수.
+
 ### METH-098 · agency/ops 템플릿 배치 4 — glossary + 배치 완결
 - **notes**: 2026-07-09. Class A. PR 대기. glossary.md(SI 단계별 용어규약집) 심화. 핵심=**SSOT 경계 명시**(glossary=계약·산출물 표면 라벨 통일 / context-glossary=도메인 개념 canon·코드까지, 중복 금지·링크만). 표준용어 표에 예시(용례)·상태(Approved/Deprecated) 열, 관리자=분쟁 해결권자, 폐기어 추적성. **배치 완결**: agency/ops 12종(095 QA 3·096 수주 5·097 ops 3·098 glossary 1) 전부 lean 폼 필드 보강 + 지침 참조(SSOT)로 완료. branch-first 준수.
 
@@ -23,9 +26,6 @@
 
 ### METH-096 · agency/ops 템플릿 배치 2 — 수주 5종 (Shipley·APMP·PMBOK·SOW)
 - **notes**: 2026-07-09. Class A. PR 대기. 수주 클러스터 5종 lean 폼 필드 보강. proposal-go-nogo(결정소유자+게이트일자·경쟁포지션 axis·cost-to-pursue·kill 규칙[1축 미달=포기]·Shipley 5요인). research-collection(시장 3버킷 + 프로젝트셋업 4버킷[사업목표/성공KPI·BANT·컴플라이언스·기존자산]+출처열). profitability-sheet(과금모델 enum·리스크 컨틴전시[근거=과거초과율]·gross/net 분리·손익분기·변경요청 별도). execution-plan(가정·범위제외·인수기준+승인권자·리스크레지스터·커뮤니케이션·인계 + §5 W1-W4→Phase/Milestone 재프레임). wbs(100%룰·PM/QA포함·work package 롤업·비고=WBS dictionary). 남음: 097 ops 3종·098 glossary. branch-first 준수.
-
-### METH-095 · agency/ops 템플릿 배치 1 — QA 3종 (ISO 29119-3·ISTQB)
-- **notes**: 2026-07-09. Class A. PR 대기. agency/ops 12종 심화(전부 웹리서치) 배치. 리서치 3건(QA·수주·ops). QA 클러스터: qa-acceptance-plan(진입기준·검수유형·정량 exit·심각도≠우선순위·테스트데이터·RTM), qa-test-scenario(케이스ID·요구사항·사전조건·실제결과·부정/경계 태그·GWT 옵션), qa-acceptance-signoff(버전 pin·종료기준 충족·개방결함+웨이버·조건부 기한·증거·하자보수). 3종=RTM 폐루프. lean 폼. 남음: 096 수주 5종·097 ops 3종·098 glossary. branch-first 준수.
 
 
 
