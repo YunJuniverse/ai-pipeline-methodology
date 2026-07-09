@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-08 (METH-065 서비스기획서 자식 산출물 8종 최신화)
+# Checkpoint — 2026-07-09 (METH-066 요구사항정의서 심화 · ISO/IEC/IEEE 29148)
 
-> ✅ METH-065: 문서별 심화 3번. 064가 정한 서비스기획서 자식 8종을 4개 병렬 웹리서치(1차 소스)로 2025-26 최신화.
-> 공통 수렴: **사람이 읽는 표 + 기계판독/추적 미러 + AI가 빠뜨리는 "불행 경로"(에러·상태) 강제.**
+> ✅ METH-066: 문서별 심화 4번 = 요구사항정의서. 웹리서치(29148·BABOK·RTM) → `requirements-spec` 대장 강화.
+> functional-spec(EARS)의 *상류 = shall 대장*. 추가: 유형·인수기준·검증(I/A/D/T)·상태 생명주기·하위추적·변경등급·품질특성·RTM.
 > 🏁 다음: PR 리뷰·머지 → 문서별 심화 계속(대상 선정).
 
 ---
@@ -15,7 +15,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-065-child-templates-refresh` (fresh main 기준 — 064 머지 후 pull → 브랜치, 프로세스 교훈 준수)
+- Worktree: branch `claude/meth-066-requirements-spec-refresh` (fresh main 기준, #55 머지 후 pull — 프로세스 교훈 준수)
 
 ## 부팅 계약
 
@@ -26,37 +26,34 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-065 — 서비스기획서 자식 산출물 8종 최신화** (사용자: "산출물 전체를 최신 방법론·양식·샘플로 업데이트"):
+**METH-066 — 요구사항정의서(requirements-spec) 심화** (문서별 심화 프로그램 4번):
 
-- **방법**: 4개 병렬 웹리서치 서브에이전트(그룹: story+func / policy+ia / flow+wireframe / api+microcopy), 1차 소스
-  (INVEST·Gherkin·EARS·DMN·OPA·NN/g·OpenAPI 3.1·RFC 9457·Mailchimp·GOV.UK 등) → 각 문서 gap 도출 → 적용.
-- **8종 변경 (`50_resources/templates/`)**:
-  - `user-story`: Job Story 폼 · **Gherkin(G/W/T) AC 블록**(```gherkin, AI 스펙+검증) · INVEST 6체크 · DoR/DoD · SPIDR · Story ID/링크.
-  - `functional-spec`: **EARS 표기**(5패턴) · State Transition 표 · 측정가능 NFR 표 · 추적표(요구↔AC↔테스트↔코드).
-  - `service-policy`: **의사결정 표**(조건→액션·**hit policy**·Default 행) · **effective-dating**(버전·시행일, 이력 보존) · 예외=우선순위 행 · 변경이력 · **AI 가드레일 정책** 시트.
-  - `ia-spec`: **Screen-ID 명명 규약** · 화면 인벤토리(Parent-ID) · 메뉴트리(global/local/utility) · **RBAC**(CRUD·default-deny·SoD) · 라벨링/택소노미 · **IA 검증**(카드소트/트리테스트 75%+).
-  - `user-flow`: **Mermaid** flowchart/sequence 블록 · 3열 경로표(해피+불행) · Decision Y/N · **엣지케이스 체크리스트** · actor 태그.
-  - `wireframe-spec`: **5-state**(Empty/Loading/**Partial**/Error/Success — AI 92% 누락) · 번호 콜아웃 표 · 접근성·반응형 · **Figma 링크·Ready-for-dev**.
-  - `api-contract`: **RFC 9457 Problem Details**(`application/problem+json`) · RFC 9745/8594 Deprecation/Sunset · **cursor 페이지네이션** · 표준 RateLimit-* · Idempotency 상태규칙 · OpenAPI 3.1 정본.
-  - `microcopy`: 콘텐츠 원칙 · **Voice(상수)/Tone(맥락) 표** · 에러 패턴(무엇+왜+복구) · 상태별 인벤토리 · 용어사전 · 포용/i18n 체크 · **AI 프롬프트 스캐폴드**.
-  - `_CATALOG.md` §2 한줄 8개 갱신(특히 wireframe 3-state→5-state 팩트 수정).
+- **방법**: 웹리서치 서브에이전트 1차 소스(ISO/IEC/IEEE 29148 SRS·BABOK 요구 분류·RTM·검증방법·우선순위·요구 생명주기) → 현행 대장(15줄, 단일 표) gap → 적용.
+- **핵심 포지셔닝**: `requirements-spec` = *상류 대장*(VOC→요구→수용→추적, **shall** 선언형), `functional-spec` = 하류 구현 명세(**EARS**). 둘의 문법을 분리 유지.
+- **변경 (`50_resources/templates/requirements-spec.md`)**:
+  - **§1 범위·전제**(목적·제약·가정·정의) 섹션 신설.
+  - **대장 컬럼 확장**: 유형(BABOK 계층: business/stakeholder/functional/**NFR**/transition/constraint) · **인수기준**(측정가능) · **검증방법(I/A/D/T)** · **상태 생명주기**(제안→검토→승인→구현→검증 / 보류·반려·취소, 사유필수) · **하위추적(FS-ID/US/TC)** · **변경등급(A/B/C)**.
+  - **§3 작성 규율**: shall 규약(shall/should/will/may) · atomic(and/or 금지) · 금지 모호어 · 개별 9특성 + SET 5특성(29148).
+  - **§4 검증방법 범례**(Inspection/Analysis/Demonstration/Test).
+  - **§5 우선순위 프레임**: MoSCoW+Pn 기본 / 버킷 내 WSJF·RICE / 발굴 Kano.
+  - **§6 RTM 양방향**: 후방(출처)·전방(테스트), **링크 복사금지**(하류는 요구ID 참조).
+  - 경량 최소 컬럼 명시(과설계 방지) + `_CATALOG.md` 한줄 갱신.
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-065 PR 리뷰·머지.
-2. **문서별 심화 계속** — 대상 사용자와 합의. 후보: 요구사항정의서(requirements-spec)·prd·kpi-tree·context-glossary, 또는 다른 기획서(운영/마케팅/브랜드).
-3. 자식 8종 실사용 시 EARS/의사결정표/Mermaid 실전 예를 지침 §19 craft로 환류.
-4. guide 09·21 + api-contract + 갱신 8종을 다음 다운스트림 sync 대상에 포함.
-5. METH-060 잔여: ai-icons 번호 정리 + cafe24·icons-invest clean 후 sync.
+1. METH-066 PR 리뷰·머지.
+2. **문서별 심화 계속** — 대상 사용자와 합의. 기획 계열 남은 것: `prd` · `kpi-tree` · `context-glossary`. 또는 다른 기획서 지침(운영 12·마케팅 13·브랜드 14)·PM 15·AI기능 16·평가 17.
+3. 심화 산출물 실사용 시 실전 예(EARS/의사결정표/29148 검증)를 지침 §19 craft로 환류.
+4. 갱신 템플릿들을 다음 다운스트림 sync 대상에 포함. METH-060 잔여(ai-icons 번호 정리 등).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 서비스기획서 §6.0 산출물 인덱스 자동 생성 도구화 여부(064 open) — 유지.
-- 캔버스(P4, 063)·Lean Canvas 별도 템플릿화 여부 — 유지.
-- 갱신된 자식 템플릿이 커져도 lean 유지 원칙과 충돌 없는지 — 각 여전히 1스크린 내. 실사용 피드백으로 재점검.
+- 문서별 심화 완료 후 "심화 세트"를 다운스트림에 일괄 sync하는 타이밍 — 여러 PR 누적됐으니 한 번에.
+- 요구사항 대장 컬럼이 13개로 늘어 넓음 — 경량 최소 6컬럼 병기로 완화. 실사용에서 폭 불편하면 상세/RTM을 별 표로 분리 검토.
+- 갱신된 템플릿군이 lean 원칙과 충돌 없는지 지속 점검(각 1스크린 유지 목표).
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-065-child-templates-refresh` (fresh main 기준, 064 포함). main 직접 PR.
-- 변경: `50_resources/templates/` 8종(user-story·functional-spec·service-policy·ia-spec·user-flow·wireframe-spec·api-contract·microcopy) + `_CATALOG.md` + 라이브 4종.
-- 선행 061·062·063·064 = PR #51·#52·#53·#54 머지 완료(main 반영).
+- 브랜치: `claude/meth-066-requirements-spec-refresh` (fresh main 기준). main 직접 PR.
+- 변경: `50_resources/templates/requirements-spec.md`(재작성) + `_CATALOG.md`(한줄) + 라이브 4종.
+- 선행 061~065 = PR #51~#55 머지 완료(main 반영).

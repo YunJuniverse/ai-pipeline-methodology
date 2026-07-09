@@ -29,7 +29,7 @@
 | 템플릿 | 한 줄 |
 |---|---|
 | `prd.md` | 제품 요구사항(무엇) — 비전·목표/비목표·범위·기능요구(M/S·Pn=출시순서)·규제 요구사항·출시단계 |
-| `requirements-spec.md` | 요구사항 추적 대장 — ID·중요도·출처(VOC)·수용여부 enum·사유·M/S+Pn |
+| `requirements-spec.md` | 요구사항 추적 대장(ISO/IEC/IEEE 29148) — ID·유형(계층)·shall·인수기준·검증(I/A/D/T)·상태 생명주기·RTM 양방향 추적·M/S+Pn |
 | `ia-spec.md` | 정보구조 기능정의서 — Screen-ID 규약·화면 인벤토리·메뉴트리·RBAC 매트릭스·IA 검증(카드소트/트리테스트) |
 | `service-policy.md` | 서비스 정책 정의서 — 의사결정 표(조건→액션·hit policy)·effective-dating·변경이력·AI 가드레일, 2-시트 |
 | `user-story.md` | 유저스토리·시나리오 — User/Job Story·Gherkin(G/W/T) AC·INVEST·DoR/DoD·SPIDR |
