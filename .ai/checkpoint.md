@@ -3,6 +3,7 @@
 > ✅ METH-071: 문서별 심화 9번(개발명세 계열 마무리) = data-model. 웹리서치(PostgreSQL·pgvector·OWASP·RFC 9562) → 강화.
 > 핵심: Mermaid ERD · UUIDv7 키 · cascade · history 전략(SCD2/soft-delete) · **expand-contract 무중단 마이그레이션**(Class B rollback 증거) · PII/GDPR(파생 포함) · 벡터(조건부).
 > 🏁 다음: PR 리뷰·머지 → 심화 계속(기획서 지침군/agency 템플릿) 또는 **누적 다운스트림 sync**.
+> ⚙️ **070(#59) 충돌 해소 병합**(이 브랜치): 071(#60) 선머지로 라이브파일 충돌 → `git merge main`으로 해소(architecture.md 무충돌·_CATALOG 두 줄 병합·라이브=main/071 채택+070 기록). push 후 #59 머지 → 그다음 다운스트림 sync(063~071 전체).
 
 ---
 
