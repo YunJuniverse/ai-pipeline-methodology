@@ -41,7 +41,7 @@
 | 템플릿 | 한 줄 |
 |---|---|
 | `architecture.md` | 아키텍처(어떻게) — as-built→목표(C4)→이전경로 · 품질속성 top3 · fitness functions · 신뢰경계/위협(STRIDE) · 런타임/배포 뷰 · AI 아키텍처 · 리스크/기술부채 (arc42 매핑) |
-| `data-model.md` | 데이터 모델 — 엔티티·필드·관계·무결성·마이그레이션 |
+| `data-model.md` | 데이터 모델 — Mermaid ERD·키 전략(UUIDv7)·인덱스·cascade·제약·history(SCD2/soft-delete)·**expand-contract 무중단 마이그레이션**·PII 분류/GDPR·벡터(pgvector) |
 | `api-contract.md` | API·인터페이스 계약 — 엔드포인트·요청/응답·에러·버전·인증 (개발리드→개발자, FE/BE 병렬 조율축). functional-spec의 상위 시스템 레벨 |
 | `user-flow.md` | 사용자 플로우 — Mermaid 다이어그램·정상/대안/실패(+복구)/분기·엣지케이스 체크리스트·actor 태그 |
 | `wireframe-spec.md` | 화면설계(텍스트 ASCII) — 화면별 번호 콜아웃·**5-state**(Empty/Loading/Partial/Error/Success)·접근성·반응형·Figma 링크 |

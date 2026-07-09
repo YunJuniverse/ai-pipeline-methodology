@@ -2,16 +2,16 @@
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
   "last_validated_commit": "f3497d27a7d05ecb008076818eda0ff016253c13",
-  "last_validated_at": "2026-07-09T02:02:47Z",
+  "last_validated_at": "2026-07-09T02:15:50Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "6ef42ee76ca3c72b0844999f41ec54e1187baf65a114363fe69fdf5ef34535ae"
+      "sha256": "e34520a8ddbe8b0900c3aee02f484a709452b1ab27ea159b33f1a4a0d333991b"
     },
     "TODO.md": {
-      "sha256": "26f8e6479f76bcb30c1f283ff5b29d49348c26defe1a6ccc4e3ada8c44fe8297"
+      "sha256": "6c02fdbcb561467813fd4b243f051372830f4b8118ffaf8aed9fb451f69dc91f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "6cf1afceec185f39dabcb7936c9e17c9051628aca337b048f192306edaf545c2"
+      "sha256": "fbcf93bfba1f7ab7b371f3333e5d4f45d95de6d9b29206fb65009538a9c2c6db"
     }
   },
   "observations": {
@@ -73,7 +73,7 @@
       "50_resources/ai_observations/2026-07-09_meth-067-prd-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-068-kpi-tree-refresh.md",
       "50_resources/ai_observations/2026-07-09_meth-069-context-glossary-refresh.md",
-      "50_resources/ai_observations/2026-07-09_meth-070-architecture-refresh.md",
+      "50_resources/ai_observations/2026-07-09_meth-071-data-model-refresh.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
