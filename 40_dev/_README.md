@@ -5,7 +5,6 @@
 ## 구성
 
 - `MASTER_PLAN.md` — 18번 지침 기반. 프로젝트당 1개의 살아있는 페이즈/MVP/게이트 단일 출처
-- `SPRINTS.md` — 15번 + 18번 기반. 주/격주 단위 스프린트. 대시보드가 파싱
 - `adr/` — Architecture Decision Records (Class B/C 결정 기록)
 - `snapshots/` — 날짜별 산출물·리뷰·런북
 
@@ -16,9 +15,7 @@
    ↓
 40_dev/MASTER_PLAN.md (어느 페이즈에)
    ↓
-40_dev/SPRINTS.md (어느 스프린트에)
-   ↓
-TODO.md (어느 작업으로)
+TODO.md (어느 작업으로 · 선택: milestone: 태그)
    ↓
 code + adr/ + snapshots/
 ```

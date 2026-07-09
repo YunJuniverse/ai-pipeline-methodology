@@ -4,8 +4,7 @@
 하는 일:
   1) docs/methodology-graph.json 을 읽어 방법론 그래프 + 라이프사이클을 시각화
   2) TODO.md 의 5개 섹션(Backlog/Ready/InProgress/Blocked/Done)을 칸반으로 파싱
-  3) SPRINTS.md 의 ### S-NNN 블록을 타임라인(주/월/연 토글)으로 파싱
-  4) CLAUDE.md, HANDOFF.md, docs/archive/planning-guides/README.md 일부를 가이드 탭에 인라인
+  3) CLAUDE.md, HANDOFF.md, 20_guides/README.md 일부를 가이드 탭에 인라인
 
 산출물: dashboard.html (자기완결, CDN: d3.v7)
 
@@ -126,55 +125,6 @@ def parse_todo(path: Path) -> dict[str, list[Card]]:
     if current_card and current_section:
         out[current_section].append(current_card)
 
-    return out
-
-
-@dataclass
-class Sprint:
-    id: str
-    fields: dict[str, str] = field(default_factory=dict)
-    goals: list[tuple[bool, str]] = field(default_factory=list)
-
-
-def parse_sprints(path: Path) -> list[Sprint]:
-    """SPRINTS.md 를 ### S-NNN 블록 단위로 파싱."""
-    out: list[Sprint] = []
-    if not path.exists():
-        return out
-
-    text = path.read_text(encoding="utf-8")
-    current: Sprint | None = None
-    in_goals = False
-
-    for raw in text.splitlines():
-        line = raw.rstrip()
-
-        m = re.match(r"^###\s+(S-\d+|s-\d+)\s*$", line)
-        if m:
-            if current:
-                out.append(current)
-            current = Sprint(id=m.group(1).upper())
-            in_goals = False
-            continue
-
-        if current is None:
-            continue
-
-        m = re.match(r"^-\s+\*\*([^*]+)\*\*\s*:\s*(.*)$", line)
-        if m:
-            key, val = m.group(1).strip().lower(), m.group(2).strip()
-            current.fields[key] = val
-            in_goals = key == "goals"
-            continue
-
-        if in_goals:
-            m = re.match(r"^\s*-\s+\[( |x|X)\]\s+(.+)$", line)
-            if m:
-                current.goals.append((m.group(1).lower() == "x", m.group(2).strip()))
-                continue
-
-    if current:
-        out.append(current)
     return out
 
 
@@ -365,12 +315,6 @@ def assemble(root: Path) -> dict[str, Any]:
         if not todo_path.exists():
             todo_path = cand
 
-    # SPRINTS: <dev> → 루트 → <res>/templates → docs/templates
-    sprints_path = root / dev / "SPRINTS.md"
-    for cand in [root / "SPRINTS.md", root / res / "templates" / "SPRINTS.md", root / "docs" / "templates" / "SPRINTS.md"]:
-        if not sprints_path.exists():
-            sprints_path = cand
-
     handoff_path = root / "HANDOFF.md"
     for cand in [root / res / "templates" / "HANDOFF.md", root / "docs" / "templates" / "HANDOFF.md"]:
         if not handoff_path.exists():
@@ -392,7 +336,6 @@ def assemble(root: Path) -> dict[str, Any]:
         "nodes": [], "edges": [], "lifecycle": {"stages": []}, "kinds": {}
     }
     kanban_raw = parse_todo(todo_path)
-    sprints = parse_sprints(sprints_path)
 
     kanban = {
         section: [
@@ -401,9 +344,6 @@ def assemble(root: Path) -> dict[str, Any]:
         ]
         for section, cards in kanban_raw.items()
     }
-    sprints_json = [
-        {"id": s.id, "fields": s.fields, "goals": s.goals} for s in sprints
-    ]
 
     # 그래프 노드의 path를 따라 실제 파일 내용 로드 (클릭 시 하단 패널에 표시)
     node_contents = {}
@@ -472,7 +412,6 @@ def assemble(root: Path) -> dict[str, Any]:
         "stack": stack_data,
         "graph": graph,
         "kanban": kanban,
-        "sprints": sprints_json,
         "node_contents": node_contents,
         "master_plan_text": read_text_safe(master_plan_path, 50000),
         "master_plan_path": str(master_plan_path.relative_to(root)) if master_plan_path.exists() else "",
@@ -492,8 +431,6 @@ def assemble(root: Path) -> dict[str, Any]:
             "kanban_summary": {sec: len(cards) for sec, cards in kanban.items()},
             "adr_count":     count_files(root / dev / "adr", ".md"),
             "snapshot_count": count_files(root / dev / "snapshots", ".md"),
-            "sprint_total":   len(sprints_json),
-            "sprint_active":  sum(1 for s in sprints_json if s["fields"].get("status", "").lower() == "active"),
             "methodology_assets": read_methodology_assets(root),
         },
         "guides_readme": read_text_safe(readme_path, 50000),
@@ -897,9 +834,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
     <div class="tab active" data-page="overview"><span class="num">01</span><span>프로젝트 개요</span></div>
     <div class="tab" data-page="guide"><span class="num">02</span><span>가이드 · 백서</span></div>
     <div class="tab" data-page="graph"><span class="num">03</span><span>관계 그래프</span></div>
-    <div class="tab" data-page="timeline"><span class="num">04</span><span>타임라인</span></div>
-    <div class="tab" data-page="kanban"><span class="num">05</span><span>칸반 보드</span></div>
-    <div class="tab" data-page="exec"><span class="num">06</span><span>통합 뷰</span></div>
+    <div class="tab" data-page="kanban"><span class="num">04</span><span>칸반 보드</span></div>
+    <div class="tab" data-page="exec"><span class="num">05</span><span>통합 뷰</span></div>
   </nav>
 
   <!-- Page 01: Overview -->
@@ -912,8 +848,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
         <div class="badge-row" id="hero-badges"></div>
       </div>
       <div class="hero-right">
-        <span class="eyebrow">Current sprint</span>
-        <div id="hero-sprint-content"><span style="color:var(--muted)">—</span></div>
+        <span class="eyebrow">Current phase</span>
+        <div id="hero-phase-content"><span style="color:var(--muted)">—</span></div>
       </div>
     </section>
     <section class="stat-row" id="stat-row"></section>
@@ -1018,27 +954,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
     <div class="legend" style="margin-top:14px" id="graph-legend-bottom"></div>
   </section>
 
-  <!-- Page 04: Timeline -->
-  <section class="page" id="page-timeline">
-    <div class="section-head" style="margin-top:0">
-      <h2>스프린트 <em>타임라인</em>.</h2>
-      <div class="timeline-toolbar" style="margin:0">
-        <div class="seg">
-          <button class="active" id="view-btn-month" data-view="month">Month</button>
-          <button id="view-btn-year" data-view="year">Year</button>
-        </div>
-      </div>
-    </div>
-    <div class="card" style="padding:0;overflow:hidden">
-      <div class="gantt" id="gantt"></div>
-    </div>
-    <div class="legend" style="margin-top:18px">
-      <span><span class="lg-dot" style="background:var(--ok)"></span>done</span>
-      <span><span class="lg-dot" style="background:var(--accent)"></span>active</span>
-      <span><span class="lg-dot" style="background:transparent;border:1px dashed var(--info)"></span>planned</span>
-      <span><span class="lg-dot" style="background:var(--danger);opacity:.4"></span>cancelled</span>
-    </div>
-  </section>
 
   <!-- Page 05: Kanban -->
   <section class="page" id="page-kanban">
@@ -1144,25 +1059,23 @@ document.querySelectorAll('.tab').forEach(t=>{
   ].filter(Boolean).join('');
 })();
 
-// ── Hero sprint card ──────────────────────────────────────────
+// ── Hero phase card (2층 구조 — 스프린트 폐지, METH-086) ─────────
 (function(){
-  const cur = (DATA.sprints||[]).find(s=>(s.fields.status||'').toLowerCase()==='active');
-  const el = document.getElementById('hero-sprint-content');
-  if(!cur){el.innerHTML='<span style="color:var(--muted)">진행 중 스프린트 없음</span>';return;}
-  const goals=cur.goals||[], done=goals.filter(g=>g[0]).length;
-  const perc=goals.length?Math.round(done/goals.length*100):(cur.fields.status==='done'?100:0);
+  const mp = (DATA.project_overview||{}).master_plan_meta || {};
+  const el = document.getElementById('hero-phase-content');
+  if(!el) return;
+  const phase = mp.current_phase || '—';
+  const gate = mp.next_gate || '—';
+  const blocking = mp.blocking_decisions;
   el.innerHTML=`
     <div style="display:flex;align-items:baseline;gap:14px;margin-top:4px">
-      <div style="font-family:var(--font-display);font-weight:800;font-size:42px;line-height:1;letter-spacing:-0.035em;color:var(--accent)">${esc(cur.id)}</div>
-      <div style="font-family:var(--font-display);font-weight:700;font-size:36px;line-height:1;letter-spacing:-0.04em">${perc}<span style="font-family:var(--font-mono);font-size:13px;color:var(--muted);letter-spacing:.08em;margin-left:4px">%</span></div>
+      <div style="font-family:var(--font-display);font-weight:800;font-size:42px;line-height:1;letter-spacing:-0.035em;color:var(--accent)">${esc(phase)}</div>
     </div>
-    <div style="font-size:15px;color:var(--text);font-weight:500;margin-top:8px;line-height:1.4">${esc(cur.fields.title||'')}</div>
-    <div class="mini-bar" style="margin-top:12px"><div style="width:${perc}%"></div></div>
     <ul class="kv" style="margin-top:14px">
-      <li><span class="k">window</span><span class="v"><span class="mono">${esc(cur.fields.start||'—')} → ${esc(cur.fields.end||'—')}</span></span></li>
-      <li><span class="k">cadence</span><span class="v">${esc(cur.fields.cadence||'—')}</span></li>
-      <li><span class="k">gate</span><span class="v" style="font-size:12.5px">${esc(cur.fields.gate||'—')}</span></li>
-    </ul>`;
+      <li><span class="k">next gate</span><span class="v" style="font-size:12.5px">${esc(gate)}</span></li>
+      <li><span class="k">blocking</span><span class="v" style="font-size:12.5px">${esc(Array.isArray(blocking)?(blocking.join(', ')||'none'):(blocking||'none'))}</span></li>
+    </ul>
+    <div style="font-size:12px;color:var(--muted);margin-top:12px">cadence·forecast: flow metrics (WIP · throughput · Monte Carlo)</div>`;
 })();
 
 // ── Stat row ──────────────────────────────────────────────────
@@ -1171,7 +1084,7 @@ function buildStatHtml(){
   const total=Object.values(ks).reduce((a,b)=>a+b,0);
   const now=ks.InProgress||0,next=ks.Ready||0,blocked=ks.Blocked||0;
   return [
-    {label:'Sprints',value:ov.sprint_total||0,sub:`${ov.sprint_active||0} active`},
+    {label:'WIP',value:now,sub:`InProgress · cap 3`},
     {label:'TODO',value:total,sub:`${now} NOW · ${next} NEXT · ${blocked} blocked`},
     {label:'ADR',value:ov.adr_count||0,sub:'40_dev/adr/'},
     {label:'Snapshots',value:ov.snapshot_count||0,sub:'40_dev/snapshots/'},
@@ -1364,8 +1277,8 @@ function openStackModal(it){
 
 // ── Kanban ────────────────────────────────────────────────────
 const KANBAN_MAP=[
-  {sec:'InProgress',id:'now',      title:'NOW',       hint:'이번 sprint에서 진행 중인 작업'},
-  {sec:'Ready',     id:'next',     title:'NEXT',      hint:'다음 sprint 후보'},
+  {sec:'InProgress',id:'now',      title:'NOW',       hint:'진행 중인 작업 (WIP cap 3)'},
+  {sec:'Ready',     id:'next',     title:'NEXT',      hint:'다음 작업 후보'},
   {sec:'Done',      id:'library',  title:'LIBRARY',   hint:'완료된 작업 아카이브'},
   {sec:'Backlog',   id:'thinktank',title:'THINKTANK', hint:'아이디어 인큐베이터'},
   {sec:'Blocked',   id:'blocked',  title:'BLOCKED',   hint:'외부 의존으로 보류 중'},
@@ -1402,8 +1315,7 @@ function renderKanban(){
           </div>
           <div class="title">${esc(c.fields.title||c.id)}</div>
           <div class="meta">
-            <span>${esc(c.fields.sprint||'—')}</span>
-            <span class="sep">·</span>
+            ${c.fields.milestone?`<span>${esc(c.fields.milestone)}</span><span class="sep">·</span>`:''}
             <span>${esc(c.fields.owner||'—')}</span>
             ${c.fields['blocked-on']?`<span class="sep">·</span><span style="color:var(--danger)">${esc(c.fields['blocked-on'])}</span>`:''}
           </div>
@@ -1427,57 +1339,6 @@ document.getElementById('kanban-collapse-all').onclick=()=>{KANBAN_MAP.forEach(c
 document.getElementById('kanban-expand-all').onclick=()=>{KANBAN_MAP.forEach(c=>delete collapseState[c.id]);renderKanban();};
 renderKanban();
 
-// ── Timeline / Gantt ──────────────────────────────────────────
-(function(){
-  const sprints=DATA.sprints||[];
-  const ganttEl=document.getElementById('gantt');
-  if(!sprints.length){ganttEl.innerHTML='<div style="padding:24px;color:var(--muted)">스프린트 없음</div>';return;}
-  function parseDate(s){if(!s||s.includes('YYYY')||s==='—')return null;try{return new Date(s);}catch{return null;}}
-  const dates=sprints.flatMap(s=>[parseDate(s.fields.start),parseDate(s.fields.end)]).filter(Boolean);
-  const minDate=dates.length?new Date(Math.min(...dates.map(d=>d.getTime()))):new Date(new Date().getFullYear(),0,1);
-  const maxDate=dates.length?new Date(Math.max(...dates.map(d=>d.getTime()))):new Date(new Date().getFullYear(),11,31);
-  const span=Math.max(maxDate-minDate,1);
-  const now=new Date();
-  const nowPct=((now-minDate)/span*100).toFixed(2);
-  const MN=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  const months=[];
-  let d=new Date(minDate.getFullYear(),minDate.getMonth(),1);
-  while(d<=maxDate){months.push(new Date(d));d=new Date(d.getFullYear(),d.getMonth()+1,1);}
-  const nc=Math.max(months.length,1);
-  ganttEl.style.gridTemplateColumns='200px 1fr';
-  // Header
-  const hdrLabel=document.createElement('div');hdrLabel.className='hcell';hdrLabel.textContent='Sprint';
-  const hdrTrack=document.createElement('div');
-  hdrTrack.style.cssText=`display:grid;grid-template-columns:repeat(${nc},1fr);border-bottom:1px solid var(--hairline);background:var(--surface-2)`;
-  months.forEach(m=>{const tick=document.createElement('div');tick.className='tick';tick.textContent=MN[m.getMonth()]+" '"+String(m.getFullYear()).slice(2);hdrTrack.appendChild(tick);});
-  ganttEl.appendChild(hdrLabel);ganttEl.appendChild(hdrTrack);
-  // Rows
-  sprints.forEach(s=>{
-    const start=parseDate(s.fields.start),end=parseDate(s.fields.end);
-    const status=(s.fields.status||'planned').toLowerCase();
-    const goals=s.goals||[],done=goals.filter(g=>g[0]).length;
-    const perc=goals.length?Math.round(done/goals.length*100):(status==='done'?100:0);
-    const lft=start?Math.max(0,((start-minDate)/span*100)).toFixed(2):0;
-    const wid=(start&&end)?Math.max(1,((end-start)/span*100)).toFixed(2):20;
-    const lbl=document.createElement('div');lbl.className='label';
-    lbl.innerHTML=`<span class="id">${esc(s.id)}</span><span class="ttl">${esc(s.fields.title||'')}</span><span class="dt">${esc(s.fields.start||'?')} → ${esc(s.fields.end||'?')}</span>`;
-    lbl.onclick=()=>openSprintModal(s);
-    const lane=document.createElement('div');lane.className='lane';
-    lane.onclick=()=>openSprintModal(s);
-    const bar=document.createElement('div');bar.className='gantt-bar '+status;
-    bar.style.left=lft+'%';bar.style.width=wid+'%';
-    const barTitle=(s.fields.title||'').split('·')[0].split('—')[0].trim();
-    bar.innerHTML=`<span>${esc(status==='cancelled'?'cancelled':barTitle)}</span>`;
-    if(status!=='planned'&&status!=='cancelled'){const pEl=document.createElement('span');pEl.className='perc';pEl.textContent=perc+'%';bar.appendChild(pEl);}
-    lane.appendChild(bar);
-    if(now>=minDate&&now<=maxDate){const nl=document.createElement('div');nl.className='now-line';nl.style.left=nowPct+'%';lane.appendChild(nl);}
-    ganttEl.appendChild(lbl);ganttEl.appendChild(lane);
-  });
-  // View toggle (cosmetic — same data, just label)
-  document.querySelectorAll('[data-view]').forEach(btn=>{
-    btn.onclick=()=>{document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===btn));};
-  });
-})();
 
 // ── Graph ─────────────────────────────────────────────────────
 let graphInited=false;
@@ -1635,7 +1496,7 @@ function initGraph(){
           <li><span class="k">메타</span><span class="v"><span class="mono">(root)</span> · CLAUDE / AGENTS / HANDOFF / TODO</span></li>
           <li><span class="k">지침서</span><span class="v"><span class="mono">20_guides/</span> · 어떻게 쓰는가 (00–18)</span></li>
           <li><span class="k">기획 산출물</span><span class="v"><span class="mono">30_planning/</span> · 무엇을 만드는가</span></li>
-          <li><span class="k">개발 산출물</span><span class="v"><span class="mono">40_dev/</span> · MASTER_PLAN / SPRINTS / ADR</span></li>
+          <li><span class="k">개발 산출물</span><span class="v"><span class="mono">40_dev/</span> · MASTER_PLAN / ADR / snapshots</span></li>
           <li><span class="k">재사용 자원</span><span class="v"><span class="mono">50_resources/</span> · templates / prompts</span></li>
         </ul>
       </div>
@@ -1690,38 +1551,6 @@ function closeModal(){
   if(overlay._removeEsc){overlay._removeEsc();overlay._removeEsc=null;}
 }
 
-function openSprintModal(s){
-  const goals=s.goals||[],done=goals.filter(g=>g[0]).length;
-  const status=(s.fields.status||'planned').toLowerCase();
-  const stCls={done:'ok',active:'accent',planned:'warn',cancelled:'danger'}[status]||'';
-  const perc=goals.length?Math.round(done/goals.length*100):(status==='done'?100:0);
-  const todoIds=(s.fields['todo-ids']||'').replace(/[\[\]]/g,'').split(/[,\s]+/).filter(x=>x&&x!=='—');
-  const allCards=Object.entries(DATA.kanban||{}).flatMap(([sec,cards])=>cards.map(c=>({...c,_sec:sec})));
-  const relTodos=todoIds.map(tid=>allCards.find(c=>c.id===tid)).filter(Boolean);
-  const body=`
-    <div class="section">
-      <div class="tag-row" style="margin-bottom:14px">
-        <span class="tg ${stCls}">${status}</span>
-        ${s.fields.cadence?`<span class="tg">${esc(s.fields.cadence)}</span>`:''}
-        ${s.fields.owner?`<span class="tg">${esc(s.fields.owner)}</span>`:''}
-        ${perc>0&&perc<100?`<span class="tg accent">${perc}% complete</span>`:''}
-      </div>
-      <p class="modal-prose">${esc(s.fields.notes||s.fields.title||'')}</p>
-    </div>
-    <div class="section">
-      <span class="eyebrow">Meta</span>
-      <div class="meta-grid">
-        <div class="cell"><div class="l">Start</div><div class="v">${esc(s.fields.start||'—')}</div></div>
-        <div class="cell"><div class="l">End</div><div class="v">${esc(s.fields.end||'—')}</div></div>
-        <div class="cell"><div class="l">Cadence</div><div class="v">${esc(s.fields.cadence||'—')}</div></div>
-        <div class="cell"><div class="l">Owner</div><div class="v">${esc(s.fields.owner||'—')}</div></div>
-      </div>
-    </div>
-    ${goals.length?`<div class="section"><span class="eyebrow">Goals · ${done}/${goals.length}</span><ul class="checklist">${goals.map(g=>`<li class="${g[0]?'done':''}"><span class="box">${g[0]?'&#x2713;':''}</span><span class="t">${esc(g[1])}</span></li>`).join('')}</ul></div>`:''}
-    <div class="section"><span class="eyebrow">Gate</span><p class="modal-prose">${esc(s.fields.gate||'—')}</p></div>
-    ${relTodos.length?`<div class="section"><span class="eyebrow">Related TODOs · ${relTodos.length}</span><ul class="rel-list">${relTodos.map(c=>{const col=KANBAN_MAP.find(k=>k.sec===c._sec);return `<li onclick="openTodoModal(window._findCard('${esc(c.id)}'),KANBAN_MAP.find(k=>k.sec==='${c._sec}'))" style="cursor:pointer"><span class="rid">${esc(c.id)}</span><span class="rttl">${esc(c.fields.title||c.id)}</span><span class="rpri">[${esc(c.fields['change-class']||'—')}]</span></li>`;}).join('')}</ul></div>`:''}`;
-  openModal(`Sprint · ${s.id}`,s.fields.title||s.id,body);
-}
 window._findCard=function(id){const all=Object.entries(DATA.kanban||{}).flatMap(([sec,cards])=>cards.map(c=>({...c,_sec:sec})));return all.find(c=>c.id===id)||{id,fields:{},criteria:[],_sec:'Backlog'};};
 
 function openTodoModal(card,colData){
@@ -1730,14 +1559,13 @@ function openTodoModal(card,colData){
   const cls=(card.fields['change-class']||'').replace(/\s/g,'').toUpperCase();
   const priCss={A:'ok',B:'warn',C:'danger'}[cls]||'';
   const colId=colData&&colData.id||'';const colTitle=colData&&colData.title||'';
-  const sprintId=card.fields.sprint||'';
-  const sprint=(DATA.sprints||[]).find(s=>s.id===sprintId);
+  const milestone=card.fields.milestone||'';
   const body=`
     <div class="section">
       <div class="tag-row" style="margin-bottom:14px">
         ${cls?`<span class="tg ${priCss}">Priority [${esc(cls)}]</span>`:''}
         ${colTitle?`<span class="tg ${colId==='now'?'accent':''}">${esc(colTitle)}</span>`:''}
-        ${sprintId?`<span class="tg">${esc(sprintId)}</span>`:''}
+        ${milestone?`<span class="tg">${esc(milestone)}</span>`:''}
         ${card.fields.owner?`<span class="tg">${esc(card.fields.owner)}</span>`:''}
       </div>
       <p class="modal-prose">${esc(card.fields.notes||card.fields.title||card.id)}</p>
@@ -1747,15 +1575,14 @@ function openTodoModal(card,colData){
       <div class="meta-grid">
         <div class="cell"><div class="l">ID</div><div class="v">${esc(card.id)}</div></div>
         <div class="cell"><div class="l">Mode</div><div class="v">${esc(card.fields.mode||'—')}</div></div>
-        <div class="cell"><div class="l">Sprint</div><div class="v">${esc(sprintId||'—')}</div></div>
+        <div class="cell"><div class="l">Milestone</div><div class="v">${esc(milestone||'—')}</div></div>
         <div class="cell"><div class="l">Owner</div><div class="v">${esc(card.fields.owner||'—')}</div></div>
       </div>
     </div>
     ${acc.length?`<div class="section"><span class="eyebrow">Acceptance criteria · ${doneAcc}/${acc.length}</span><div class="mini-bar ${doneAcc===acc.length?'done':''}" style="margin-bottom:14px"><div style="width:${acc.length?doneAcc/acc.length*100:0}%"></div></div><ul class="checklist">${acc.map(a=>`<li class="${a[0]?'done':''}"><span class="box">${a[0]?'&#x2713;':''}</span><span class="t">${esc(a[1])}</span></li>`).join('')}</ul></div>`:''}
-    ${sprint?`<div class="section"><span class="eyebrow">Sprint</span><ul class="rel-list"><li onclick="openSprintModal(window._findSprint('${esc(sprint.id)}'))" style="cursor:pointer"><span class="rid">${esc(sprint.id)}</span><span class="rttl">${esc(sprint.fields.title||sprint.id)}</span><span class="rpri">${esc(sprint.fields.status||'—')}</span></li></ul></div>`:''}`;
+    `;
   openModal(`TODO · ${card.id}`,card.fields.title||card.id,body);
 }
-window._findSprint=function(id){return(DATA.sprints||[]).find(s=>s.id===id)||{id,fields:{},goals:[]};};
 
 // ── Exec view ─────────────────────────────────────────────────
 function renderExec(){
@@ -1960,7 +1787,7 @@ def main() -> int:
     data = assemble(root)
     out.write_text(render_html(data), encoding="utf-8")
     print(f"[ok] {out}  (kanban={sum(len(v) for v in data['kanban'].values())} cards, "
-          f"sprints={len(data['sprints'])}, nodes={len(data['graph'].get('nodes',[]))})", file=sys.stderr)
+          f"nodes={len(data['graph'].get('nodes',[]))})", file=sys.stderr)
 
     if args.serve:
         _serve_with_api(out, args.port, root)

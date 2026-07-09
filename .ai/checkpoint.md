@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-09 (METH-085 friction 캡처 규칙 — 학습 루프 가동)
+# Checkpoint — 2026-07-09 (METH-086 SPRINTS 완전 붕괴 + TODO WIP 캡)
 
-> ✅ METH-085: catalog→skeleton 학습 루프가 굶던 원인(재료 미수집, 72로그 중 friction 2건)을 해결. observe `--friction` 캡처 규칙을 헌법에 넣고 catalog _README에 파이프라인 진입점 명문화 + 실제 마찰 dogfood.
-> 🏁 다음: PR 리뷰·머지 → **누적 다운스트림 sync(073~085)** 또는 agency/ops 템플릿·나머지 메타 지침. 학습 루프 후속=세션마다 friction 축적→thinktank→catalog 승급.
+> ✅ METH-086: 웹리서치 2건 → TODO=베스트프랙티스(무변경), SPRINTS=잉여 중간층+명칭 모순 → **3층(페이즈→스프린트→TODO)을 2층(페이즈→TODO)으로 붕괴**. cadence=flow 메트릭, 배치 그룹핑=TODO `milestone:` 태그, 게이트=페이즈. + TODO InProgress WIP≤3 wrap 린트.
+> 🏁 다음: PR 리뷰·머지 → **누적 다운스트림 sync(073~086) 강력 추천** 또는 agency/ops 템플릿·`.claude/skills` 레거시 정리.
 
 ---
 
@@ -14,7 +14,7 @@
 - Agent: claude-opus-4-8
 - Tool: claude-code-cli
 - Host: darwin-25.5
-- Worktree: branch `claude/meth-085-friction-capture-rule` (#73 머지된 main tip 기준, branch-first 준수)
+- Worktree: branch `claude/meth-086-sprints-collapse-todo-wip` (#74 머지된 main tip 기준, branch-first 준수)
 
 ## 부팅 계약
 
@@ -25,28 +25,32 @@
 
 ## 방금 한 것 (정확히)
 
-**METH-085 — friction 캡처 규칙 추가로 catalog→skeleton 학습 루프 가동** (사용자 "friction 캡처 규칙 넣어서 루프 가동해"):
+**METH-086 — SPRINTS 완전 붕괴(2층화) + TODO WIP 캡** (사용자 지시 + 웹리서치 2건):
 
-- **배경**: catalog가 C-001 1개에 머문 진짜 원인 = *재료 미수집*. observe `--friction` 필드는 존재하나 옵션이라 거의 스킵(72 관찰로그 중 2건만 채움) → thinktank가 집계할 마찰 없음 → 승급 후보 안 나옴 → catalog 굶음.
-- **변경**:
-  - ① `CLAUDE.md`·`AGENTS.md` §2 ④ observe 스텝에 규칙 추가: **"비자명한 문제·재발·막힘을 겪었으면 `--friction "where|cost_minutes|resolution|repeat_of"`도 남긴다"** (catalog→skeleton 루프 원료; thinktank ≥2회 승급 집계). **강제 아님 — 마찰 없으면 생략(노이즈 방지)**. 한 줄 추가라 194줄 유지.
-  - ② `50_resources/catalog/_README.md` §3에 "**원료 수집(파이프라인 진입점) — observe --friction**" 소절 신설: observe→thinktank→pending→active→skeleton 흐름 + "마찰 안 남기면 루프 굶는다" + "where는 같은 표현으로 적어야 ≥2 집계".
-  - ③ **dogfood** — 이번 세션의 실제 마찰(HANDOFF Working-on 단일 불릿을 부분 문장만 교체하면 이전 task 텍스트가 잔존, METH-083·084에서 2회 재발)을 observe `--friction`으로 첫 실물 캡처. 교훈: Working-on은 *불릿 전체를 통째로 교체*한다. thinktank 재실행으로 등록 확인.
+- **리서치 판정**: TODO(칸반·stable ID·acceptance·active-only·CLI 편집)는 2025-26 베스트프랙티스를 독립 재현 → **무변경**(선택 개선 중 WIP 캡만 채택). SPRINTS는 solo+AI에서 **잉여 중간층**(팀 동기화 불요·이해관계자 체크포인트는 페이즈 게이트가 담당) + **명칭 모순**("기간 고정 안 함"이라 sprint 아님) + velocity baggage가 METH-076 flow 메트릭과 충돌.
+- **결정(사용자)**: **완전 붕괴** — 3층(페이즈→스프린트→TODO) → 2층(페이즈→TODO). cadence·예측=flow 메트릭(WIP·throughput·Monte Carlo), 배치 그룹핑=TODO `milestone:` 태그, 게이트=페이즈(MASTER_PLAN).
+- **변경(다중 파일)**:
+  - `20_guides/02`: §3 스프린트 절 삭제·이후 절 재번호(§4→3…§9→8)·계층 다이어그램 2층·Backlog/Ready·요약표·v3 이력.
+  - `20_guides/18`: §14.5 2층 재작성·§10.2 velocity→throughput·§238·§405 문구·v6 이력.
+  - `50_resources/templates/_CATALOG.md`(always 노트·카테고리·매트릭스 3곳), `TODO.md`(sprint→milestone·WIP 주석).
+  - `60_tools/methodology-graph.json`: sprints 노드 + 엣지(master-plan→sprints, sprints→todo, templates→sprints) 제거, master-plan→todo 직결, L5/L9 라벨.
+  - `60_tools/generate-dashboard.py`: Sprint 클래스·parse_sprints·sprints_json·overview stats 제거 / Timeline 탭·페이지·gantt IIFE·openSprintModal·_findSprint 제거 / hero "Current sprint"→"Current phase"(master_plan_meta) / Sprints 타일→WIP 타일 / 카드 sprint→milestone. **렌더+compile 검증 통과**.
+  - mention 스윕: README·WHITEPAPER·HOW_TO_APPLY·40_dev/_README·50_resources/_README·user-story·guide11(IA보드)·guide12(RTM)·30_planning/15.
+  - **삭제**: `40_dev/SPRINTS.md`, `50_resources/templates/SPRINTS.md`.
+  - **wrap 린트**: `cmd_wrap`에 TODO `## InProgress` `### ` 개수 >3 시 경고(실패 아님).
 
 ## 다음 사람에게 (구체적 첫 행동)
 
-1. METH-085 PR 리뷰·머지.
-2. **학습 루프 후속(지속)** — 이제 규칙이 있으니, 세션마다 진짜 마찰은 `--friction`으로 남긴다. 반복(≥2)이 쌓이면 `thinktank` 실행 → `_pending/P-NNN` 작성 → 승급 머지 → `C-NNN` → skeleton bake. (HANDOFF Working-on 마찰이 또 재발하면 P-002 승급 후보.)
-3. **누적 다운스트림 sync(2차)** — gamblescan·icons 072까지 → 073~085 추가 필요. 홀드 3곳 clean 후.
-4. 남은 후보 — agency/ops 템플릿, 메타/dev 지침(02~09·19~20), graph.json 노드(02~09·19~21).
+1. METH-086 PR 리뷰·머지. (대시보드 큰 변경 — 머지 후 `methodology.py dashboard`로 실제 렌더 눈으로 확인 권장: Timeline 탭 사라짐·hero=Current phase·WIP 타일.)
+2. **누적 다운스트림 sync(2차) 강력 추천** — gamblescan·icons 072까지 → **073~086 추가**(지침·prompts·헌법·_CATALOG·graph·대시보드·CLI 전부 shared_paths). 홀드 3곳 clean 후. ※ 다운스트림에 옛 SPRINTS.md 있으면 sync가 지우지 않음(prune opt-in) — 수동 정리 안내 필요.
+3. 남은 후보: agency/ops 템플릿, 메타/dev 지침(02~09·19~20), **`.claude/skills` 레거시**(ai-planning/ai-relay/vibe-coding — 옛 sprint/docs 모델, Open Issue).
 
 ## 미해결 결정사항 (Open Questions)
 
-- 점검·활성화 사이클을 여기서 일단락할지 vs 계속할지 — 사용자 판단.
-- 2차 다운스트림 sync 타이밍(073~085 누적) — 반영할 축적분 큼.
+- 점검·정합·구조 사이클(079~086)을 여기서 일단락할지 vs 계속(agency/skills)할지 — 사용자 판단.
+- 2차 다운스트림 sync 타이밍(073~086 누적, 축적분 큼).
 
 ## 환경 메모
 
-- 브랜치: `claude/meth-085-friction-capture-rule` (#73 머지된 main tip 기준). branch-first 준수.
-- 변경: `CLAUDE.md`·`AGENTS.md`(§2 ④, 194줄 유지) + `50_resources/catalog/_README.md`(§3) + 라이브 4종. observe에 --friction 실사용(첫 캡처).
-- 진척: 063~071 템플릿 + 072 sync + 073~078 지침군 + 079 오케 + 080 마스터플랜 + 081 prompts + 082 운영원칙 + 083 메타파일(#72) + 084 skeleton(#73) + **085 friction 루프(이번)**.
+- 브랜치: `claude/meth-086-sprints-collapse-todo-wip` (#74 머지된 main tip 기준). branch-first 준수.
+- 진척: 063~071 템플릿 + 072 sync + 073~078 지침군 + 079 오케 + 080 마스터플랜 + 081 prompts + 082 운영원칙 + 083 메타파일 + 084 skeleton + 085 friction루프(#74) + **086 SPRINTS 붕괴(이번)**.

@@ -4,8 +4,7 @@
 
 - `templates/` — 풀 템플릿 (`methodology.py init`이 새 프로젝트로 복사하는 원본)
   - `MASTER_PLAN.md` — 18번 풀 템플릿 (40_dev/MASTER_PLAN.md는 v0 스켈레톤)
-  - `SPRINTS.md` — 풀 템플릿
-  - `TODO.md` — 5섹션 칸반 헤더 포함
+  - `TODO.md` — 5섹션 칸반 헤더 포함 (스프린트 폐지 — cadence는 flow 메트릭, 그룹핑은 `milestone:` 태그)
   - `HANDOFF.md` — 라이브 상태 템플릿
   - `ADR-template.md`
 - `prompts/` — AI 실행 프롬프트 (기획서 생성 + 개발 전환 + 코드 기반 스냅샷). 인덱스: `prompts/_README.md`

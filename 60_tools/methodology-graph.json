@@ -94,9 +94,6 @@
     { "id": "master-plan", "label": "MASTER_PLAN.md", "kind": "live-state", "category": "dev", "tier": 1,
       "path": "40_dev/MASTER_PLAN.md",
       "role": "프로젝트당 1개의 살아있는 마스터플랜 — 페이즈·MVP·게이트의 단일 출처" },
-    { "id": "sprints", "label": "SPRINTS.md", "kind": "live-state", "category": "dev", "tier": 1,
-      "path": "40_dev/SPRINTS.md",
-      "role": "스프린트 타임라인 (대시보드가 파싱)" },
     { "id": "adr", "label": "adr/", "kind": "decisions", "category": "dev", "tier": 2,
       "path": "40_dev/adr/",
       "role": "Architecture Decision Records — Class B/C 결정의 단일 출처" },
@@ -106,7 +103,7 @@
 
     { "id": "templates", "label": "templates/", "kind": "templates", "category": "resources", "tier": 2,
       "path": "50_resources/templates/",
-      "role": "풀 템플릿 (HANDOFF/TODO/ADR/SPRINTS/MASTER_PLAN)" },
+      "role": "풀 템플릿 (HANDOFF/TODO/ADR/MASTER_PLAN)" },
     { "id": "prompts", "label": "prompts/", "kind": "prompts", "category": "resources", "tier": 2,
       "path": "50_resources/prompts/",
       "role": "스냅샷 생성 프롬프트 카탈로그" }
@@ -148,14 +145,12 @@
     { "from": "p16", "to": "master-plan", "kind": "phased-by" },
     { "from": "p10", "to": "adr", "kind": "decisions-go-to" },
     { "from": "p11", "to": "adr", "kind": "decisions-go-to" },
-    { "from": "master-plan", "to": "sprints", "kind": "drives" },
-    { "from": "sprints", "to": "todo", "kind": "expands-to" },
+    { "from": "master-plan", "to": "todo", "kind": "expands-to" },
     { "from": "master-plan", "to": "adr", "kind": "decisions-go-to" },
 
     { "from": "templates", "to": "handoff", "kind": "templates-for" },
     { "from": "templates", "to": "todo", "kind": "templates-for" },
     { "from": "templates", "to": "master-plan", "kind": "templates-for" },
-    { "from": "templates", "to": "sprints", "kind": "templates-for" },
     { "from": "prompts", "to": "snapshots", "kind": "kicks-off" },
     { "from": "prompts", "to": "g00", "kind": "kicks-off" }
   ],
@@ -167,11 +162,11 @@
       { "id": "L2", "label": "기획서 작성", "produces": ["30_planning/*"], "guides": ["g01", "g10", "g11", "g12", "g13", "g14", "g15", "g16", "g17"], "next": "L3", "human_gate": "Planning → Dev Spec" },
       { "id": "L3", "label": "프로젝트 세팅", "produces": ["CLAUDE.md", "HANDOFF.md", "TODO.md"], "guides": ["g00"], "next": "L4", "human_gate": false },
       { "id": "L4", "label": "개발 마스터 플랜", "produces": ["40_dev/MASTER_PLAN.md"], "guides": ["g15", "g18"], "next": "L5", "human_gate": "master-plan-approval" },
-      { "id": "L5", "label": "개발 명세 & 스프린트", "produces": ["40_dev/SPRINTS.md", "TODO.md"], "guides": ["g15", "g16"], "next": "L6", "human_gate": "Dev Spec → Build" },
+      { "id": "L5", "label": "개발 명세 & 태스크", "produces": ["개발명세 5종", "TODO.md"], "guides": ["g15", "g16", "g21"], "next": "L6", "human_gate": "Dev Spec → Build" },
       { "id": "L6", "label": "개발", "produces": ["code", "tests", "PR", "40_dev/adr/"], "guides": ["g00"], "next": "L7", "human_gate": false },
       { "id": "L7", "label": "환류 / 신규 입력", "produces": ["40_dev/snapshots/feedback-YYYY-MM-DD.md"], "guides": ["g15", "g17"], "next": "L8", "human_gate": "Build → Feedback" },
       { "id": "L8", "label": "기획 업데이트", "produces": ["30_planning/* 갱신"], "guides": ["g01"], "next": "L9", "human_gate": false },
-      { "id": "L9", "label": "명세·스프린트 업데이트", "produces": ["40_dev/SPRINTS.md 갱신", "TODO.md 재배치"], "guides": ["g15"], "next": "L6", "human_gate": "Feedback → Next Sprint", "loops_to": "L6" }
+      { "id": "L9", "label": "명세·태스크 업데이트", "produces": ["개발명세 갱신", "TODO.md 재배치"], "guides": ["g15"], "next": "L6", "human_gate": "Feedback → 다음 배치", "loops_to": "L6" }
     ]
   },
 

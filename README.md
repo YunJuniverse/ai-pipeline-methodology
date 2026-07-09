@@ -89,7 +89,6 @@ my-project/
 │   └── 17_평가_가드레일.md
 ├── 40_dev/                       # 개발 산출물
 │   ├── MASTER_PLAN.md            # 18번 기반, 프로젝트당 1개
-│   ├── SPRINTS.md                # 스프린트 타임라인
 │   ├── adr/                      # Class B/C 결정 기록
 │   └── snapshots/                # 날짜별 산출물
 ├── 50_resources/                 # 재사용 자원
@@ -112,7 +111,7 @@ my-project/
 | 헌법 / 온보딩 | `10_foundation/` | 백서(WHITEPAPER)·HOW_TO_APPLY·KICKOFF·DIAGRAM |
 | 지침서 | `20_guides/` | *어떻게* 문서를 작성하는가의 표준 (11종) |
 | 기획 산출물 | `30_planning/` | *무엇을 만드는가* — 지침에 따라 채워지는 v0 스켈레톤 |
-| 개발 산출물 | `40_dev/` | *어떤 순서로 어떻게 빌드하는가* — MASTER_PLAN/SPRINTS/ADR/snapshots |
+| 개발 산출물 | `40_dev/` | *어떤 순서로 어떻게 빌드하는가* — MASTER_PLAN/ADR/snapshots |
 | 재사용 자원 | `50_resources/` | 템플릿·프롬프트 |
 | 도구 | `60_tools/` | `methodology.py` CLI · `generate-dashboard.py` · `methodology-graph.json` |
 | 아카이브 | `90_archive/` | 레거시 자료 |
@@ -234,8 +233,8 @@ python3 60_tools/methodology.py version          # 메소돌로지 자체 버전
 - [10_foundation/DIAGRAM.md](10_foundation/DIAGRAM.md)
 - [20_guides/](20_guides/) — 작성 지침서 카탈로그
 - [30_planning/](30_planning/) — 기획 산출물 v0
-- [40_dev/](40_dev/) — MASTER_PLAN / SPRINTS / ADR / snapshots
-- [50_resources/templates/](50_resources/templates/) — HANDOFF/TODO/ADR/SPRINTS/MASTER_PLAN
+- [40_dev/](40_dev/) — MASTER_PLAN / ADR / snapshots
+- [50_resources/templates/](50_resources/templates/) — HANDOFF/TODO/ADR/MASTER_PLAN
 - [50_resources/prompts/](50_resources/prompts/) — AI 실행 프롬프트 (기획서 생성 + 개발 전환 + 코드 기반 스냅샷; 인덱스 `_README.md`)
 - [60_tools/methodology.py](60_tools/methodology.py) — 배포·갱신 CLI (init / sync / status / diff / version)
 - [60_tools/generate-dashboard.py](60_tools/generate-dashboard.py) — 4탭 대시보드
