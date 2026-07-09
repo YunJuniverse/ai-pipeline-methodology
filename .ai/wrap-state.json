@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "8685e75de508ed17ae1dae222ffe818b7313c3da",
-  "last_validated_at": "2026-07-09T08:43:32Z",
+  "last_validated_commit": "aeabb067f4328a8e5a5a43070da44e7c99a54563",
+  "last_validated_at": "2026-07-09T08:48:30Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "7523512c5bc85fdc62c8fa19a2db90f1822acde2abe04b43c94f9d5269e2d108"
+      "sha256": "ec6985c6e28ff2ff2e652f21100b5b786253321de97db8159dadd6fc56ab4cab"
     },
     "TODO.md": {
-      "sha256": "290d4a3676a6fafe8b36a3611faff5e1e62575fbb3a895cb82e3c77d247265a2"
+      "sha256": "9389ec55ca273f190f2b7c138c0947b57e262954b4df79e81907d7f006528f0f"
     },
     ".ai/checkpoint.md": {
-      "sha256": "6f5f7edf561c12d491136d986c7b32f026cec714d7407e8b7331ecbc0956e9c7"
+      "sha256": "5b2f54cd51a0ba38c5b7405eb52af03ba6e77314304d3c9767954fe05f16c435"
     }
   },
   "observations": {
@@ -100,6 +100,7 @@
       "50_resources/ai_observations/2026-07-09_meth-094-internal-guides-deepen.md",
       "50_resources/ai_observations/2026-07-09_meth-095-qa-templates-deepen.md",
       "50_resources/ai_observations/2026-07-09_meth-096-proposal-templates-deepen.md",
+      "50_resources/ai_observations/2026-07-09_meth-097-ops-templates-deepen.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-097 · agency/ops 템플릿 배치 3 — ops 3종 (SRE·ITIL4·OTel·DORA)
+- **notes**: 2026-07-09. Class A. PR 대기. ops 클러스터 3종. guide 12(§6.15~6.22)가 이미 성숙 → 템플릿은 이론 재설명 없이 **값만 채우는 lean 폼 + 지침 참조**(SSOT). operation-spec(runbook): §0 신뢰성 계약(SLI/SLO/SLA·error-budget 소진액션+집행자·의존성·SEV1-4·롤백 RTO/RPO·break-glass·유지보수창·AI-Ops)+서비스오너/on-call. post-launch-monitoring: A 골든시그널(latency/traffic/errors/saturation+임계치·burn-rate>14.4/1h 페이지·비즈니스·AI·trace_id 상관) + B 결함추적 + 리뷰 케이던스. work-request-ticket: 티켓유형(request/incident/change)·우선순위=영향×긴급 P1-P4·완료기준 DoD·변경관리(변경유형 Std/Normal/Emergency+Change Class A/B/C+롤백)·위험변경만 승인게이트·상태 워크플로. 남음: 098 glossary. branch-first 준수.
+
 ### METH-096 · agency/ops 템플릿 배치 2 — 수주 5종 (Shipley·APMP·PMBOK·SOW)
 - **notes**: 2026-07-09. Class A. PR 대기. 수주 클러스터 5종 lean 폼 필드 보강. proposal-go-nogo(결정소유자+게이트일자·경쟁포지션 axis·cost-to-pursue·kill 규칙[1축 미달=포기]·Shipley 5요인). research-collection(시장 3버킷 + 프로젝트셋업 4버킷[사업목표/성공KPI·BANT·컴플라이언스·기존자산]+출처열). profitability-sheet(과금모델 enum·리스크 컨틴전시[근거=과거초과율]·gross/net 분리·손익분기·변경요청 별도). execution-plan(가정·범위제외·인수기준+승인권자·리스크레지스터·커뮤니케이션·인계 + §5 W1-W4→Phase/Milestone 재프레임). wbs(100%룰·PM/QA포함·work package 롤업·비고=WBS dictionary). 남음: 097 ops 3종·098 glossary. branch-first 준수.
 
@@ -23,9 +26,6 @@
 
 ### METH-094 · guide 20 DTCG 상호운용 + 메타/dev 배치 완결
 - **notes**: 2026-07-09. Class A. PR #83 머지. 배치 3번(마무리). guide 20에 실제 gap(W3C DTCG 미언급) → §8 상호운용 표준 신설(DTCG JSON·Style Dictionary·Tokens Studio·도입 트리거·4기둥↔DTCG 매핑·"필요할 때만"·v3). **05·09·02·19는 검토=성숙, 콘텐츠 추가 없음**(bloat 회피). 배치 총괄: 심화분 03·06·07·08·20 완료, 나머지 5개 적정 확인. branch-first 준수.
-
-### METH-093 · guide 06·07·08 심화 — 에이전트 메카닉 웹리서치
-- **notes**: 2026-07-09. Class B. PR 대기(#81 위 스택). 메타/dev 배치 2번, 리서치 3건. 얇던 3개에 §SOTA 보강+v2: 06=두층 임계치·auto-survive·safest-first·post검증·subagent isolation / 07=이중예산(SDK 무제한 경고)·6 circuit breaker·ground-truth·ask→escalate·비가역=Class C·stop report·재선언 전 checkpoint / 08=fan-out vs single-writer(Cognition)·sizing·model/effort·concurrency cap·completeness critic·artifact memory·Workflow escape. 남음: 094=05·09+02/19/20. branch-first 준수.
 
 
 
