@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-068 · KPI 단위경제 트리 심화 (unit economics + 드라이버 트리)
+- **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 6번. 웹리서치(a16z·Bessemer·Skok·Reforge·Amplitude 1차) → `kpi-tree.md` 강화(현행=마켓플레이스 GMV 워터폴). 추가: **§1 비즈모델 top-line 토글**(마켓/구독 MRR·NRR/GRR/거래 AOV/사용량 AI) · **§2 단위경제**(CAC·**gross-margin LTV**·LTV:CAC 3~5:1[>5=과소투자]·**CAC payback**·CM/단위) · **§3 리텐션**(NRR/GRR·로고vs매출 churn·코호트 평탄=PMF) · **§4 자본효율**(Rule of 40·Burn Multiple·Magic Number·Quick Ratio) · **§5 AI COGS**(추론/토큰비·AI GM 50~60%·CPAU·워크플로우당 CM) · **§6 드라이버 트리**(North Star→입력레버, 워터폴과 구분) · 벤치마크 스트립. 지침 §19.11 중복은 링크. _CATALOG 갱신. **branch-first 준수(메모리 반영).**
+
 ### METH-067 · PRD 심화 (AI 시대 PRD + metric tree)
 - **notes**: 2026-07-09. Class A. PR 대기(main 직접). 문서별 심화 5번. 웹리서치(AI-era PRD·HEART·North Star·가드레일 지표·RAT) → `prd.md` 강화(이미 11섹션 탄탄 → 진짜 공백만). 추가: **§9 AI 제품 요구**(확률적이라 이진 AC로 표현 불가 → eval 임계 3단[launch/target/aspirational]·가드레일[입력필터/출력검증/행동경계/에스컬레이션]·실패모드→fallback[품질/가용성]·모델전략·비용, 상세는 16/17 링크) · **§4.3 불변식(DO-NOT-CHANGE)**(AI 구현자 보호표면) · §5 **테스트가능 AC+예시**(에이전트 소비) · **§11 성공지표 metric tree**(North Star+HEART+가드레일/카운터·AI는 모델품질/제품성과 분리) · **§12 가정 검증 레지스터**(검증계획·confidence·RAT). 리빙문서 버전 헤더. lean 유지(2-3p). _CATALOG 갱신.
 
@@ -23,9 +26,6 @@
 
 ### METH-065 · 서비스기획서 자식 산출물 8종 최신화 (2025-26 웹리서치)
 - **notes**: 2026-07-08. Class A. PR 대기(main 직접). 문서별 심화 3번 — 064에서 정한 자식 산출물 8종을 4개 병렬 리서치 에이전트(1차 소스)로 최신화. **user-story**(Job Story·**Gherkin AC**·INVEST·DoR/DoD·SPIDR) · **functional-spec**(**EARS 표기**·상태전이·측정 NFR·추적표) · **service-policy**(**의사결정 표+hit policy**·effective-dating·변경이력·AI 가드레일) · **ia-spec**(Screen-ID 규약·메뉴트리·RBAC·IA 검증) · **user-flow**(**Mermaid**·엣지케이스 체크리스트·actor) · **wireframe**(**5-state** Empty/Loading/Partial/Error/Success·콜아웃·a11y/반응형·Figma) · **api-contract**(**RFC 9457** Problem Details·RFC 9745/8594 deprecation·cursor 페이지네이션·OpenAPI 3.1) · **microcopy**(콘텐츠원칙·Voice/Tone·에러패턴·용어사전·i18n·AI 스캐폴드). _CATALOG 한줄 8개 갱신. 공통 수렴: **사람 표 + 기계판독/추적 미러 + AI가 빠뜨리는 "불행 경로" 강제.**
-
-### METH-064 · 서비스기획서 = 부모(인덱스) 모델
-- **notes**: 2026-07-08. Class A. **PR #54 머지 완료.** 문서별 심화 2번. 사용자 통찰("서비스기획서는 여러 문서의 총합 아닌가")이 지침11 내부 모순(§2/§6=컨테이너 vs §19.2="12 중 한 장")을 드러냄. 웹리서치(GitHub Spec Kit spec.md·Cagan·Amazon PR/FAQ·Shape Up No-gos·한국 화면설계서 해체) → **결정적으로 index(컨테이너 아님)**. 반영: §2.2 위상 재정의(부모=의도·결정·경계 소유 / 자식=상세·열거) · §6 각 항목 [원본]/[인덱스→자식] 재라벨 · §6.0 산출물 인덱스(척추, 자식 링크+상태) · §8.1 척추 재정렬 · 비목표(Non-Goals) 1급화 · §16 인덱스 모델 체크 · §19.14 환류 · 스켈레톤 `30_planning/11` 재작성. **프로세스 사고: stale local main 기준 브랜치→복구(pull 후 재베이스).**
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
