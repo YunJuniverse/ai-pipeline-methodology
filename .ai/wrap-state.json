@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "07f6c6334ec5671d62527dc4b23e6dea30ba31ef",
-  "last_validated_at": "2026-07-09T06:31:09Z",
+  "last_validated_commit": "616fef9f069befb0cb3bf924bac0f199d03df7d6",
+  "last_validated_at": "2026-07-09T06:43:44Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "e8c5ee2550c347bf47f58388e00b887aedf088b31cf58fdf97a331e638cb5b0d"
+      "sha256": "09074dcb8954be013c01d6dc09de262f13fdccd79cc735a522b51e0ad936eca5"
     },
     "TODO.md": {
-      "sha256": "13d51cc8d91938fc2a4c3f9a23d33dfe6a3d539ddc944c8853437b9442f288fb"
+      "sha256": "b20cc2c54a2aca2cac1acac944c907d208a65f3d4108fcb642e81e4e71cfb3e8"
     },
     ".ai/checkpoint.md": {
-      "sha256": "08761adbb710df250da66d1678983b51f0c4c06419e918a60460b9361df2bd44"
+      "sha256": "0d790982a52c958de259cd5372e9fd75d38fca1c78efc6385824f4e4fcfe0fc5"
     }
   },
   "observations": {
@@ -90,6 +90,7 @@
       "50_resources/ai_observations/2026-07-09_meth-084-skeleton-activation.md",
       "50_resources/ai_observations/2026-07-09_meth-085-friction-capture-rule.md",
       "50_resources/ai_observations/2026-07-09_meth-086-sprints-collapse-todo-wip.md",
+      "50_resources/ai_observations/2026-07-09_meth-087-downstream-sync-086.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
