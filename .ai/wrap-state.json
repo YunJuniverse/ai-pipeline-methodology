@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "ac9a67bb02c5beccad693f4064fc9fcdb6ce661b",
-  "last_validated_at": "2026-07-09T04:57:27Z",
+  "last_validated_commit": "70b259feac7dd57b45f227570013cf76892ceea7",
+  "last_validated_at": "2026-07-09T05:24:07Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "8274ca79d1288970132b8fbd2e0a1599e90a0fd35f356b579f72212281b86bc3"
+      "sha256": "3a45010c52bf3c249081c2eddcb7a96333e466db917344d259e1d89a201e95be"
     },
     "TODO.md": {
-      "sha256": "055c5582ba53c6b2290e607ab7b4e482751b18d99b9f7bb3d72374e0f08dd4b4"
+      "sha256": "2d9691bac5772c1b7d9ccf77f66eace38d5444e69ec807d09b0490d0d2b3e077"
     },
     ".ai/checkpoint.md": {
-      "sha256": "6441b7d30b7606976c2e3fb5b6848be47db1bcd01554ca50b279bfa5cb3d9f9d"
+      "sha256": "c083eb8520c0d9913258692952b96b9fe56d461651d20a26b298ef82ed06c8ac"
     }
   },
   "observations": {
@@ -86,6 +86,7 @@
       "50_resources/ai_observations/2026-07-09_meth-080-master-plan-ssot-refactor.md",
       "50_resources/ai_observations/2026-07-09_meth-081-prompts-modernization.md",
       "50_resources/ai_observations/2026-07-09_meth-082-operating-principles-review.md",
+      "50_resources/ai_observations/2026-07-09_meth-083-meta-files-modernization.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
