@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-09 (메타/dev 지침 심화 배치 완결)
+# Checkpoint — 2026-07-09 (agency/ops 템플릿 심화 배치 — 095 QA)
 
-> ✅ 메타/dev 지침(02~09·19~20) 심화 배치 **완결** — 092(guide 03)·093(06·07·08)·094(guide 20 DTCG). 심화 필요분 5개(03·06·07·08·20) 완료, 나머지 5개(02·05·09·19) 검토·적정(bloat 회피로 무변경).
-> 🏁 문서별 심화 프로그램(063~094) 사실상 전종 완료. 남은 건 전부 Low·선택 또는 별도 repo.
+> ✅ agency/ops 템플릿(12종) 심화 배치 착수 — 리서치 3건(QA·수주·ops) **전부 완료**(요약 하단). **095=QA 3종 완료.** 남음: 096 수주 5종·097 ops 3종·098 glossary.
+> 🏁 다음 세션이 096/097/098을 이어서 하면 배치 완결. 리서치 요약이 하단에 있어 재리서치 불요.
 
 ---
 
@@ -10,37 +10,36 @@
 > 형식 정의: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
-
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `claude/meth-094-internal-guides-deepen` (#82 위 스택, branch-first)
+- Worktree: branch `claude/meth-095-qa-templates-deepen` (main tip 기준, branch-first)
 
 ## 부팅 계약
+1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
-1. Read `.ai/context.json`. 2. `must_read` 순서대로. 3. `last_session.checkpoint_file`(이 파일) 즉시 인계. 4. "다음 사람에게" 첫 항목부터.
+## 방금 한 것
+**agency/ops 템플릿(12종) 심화 배치** — 사용자 "전부 웹리서치 기반". 클러스터별 PR: 095=QA·096=수주·097=ops·098=glossary. 템플릿=**lean 폼**(essay 금지, 필드 완성도만).
+- **095(완료)**: QA 3종. qa-acceptance-plan(진입기준·검수유형·정량 exit·심각도≠우선순위·테스트데이터·RTM·Out-of-scope), qa-test-scenario(케이스ID·요구사항·사전조건·단계·실제결과·부정/경계 태그·GWT 옵션·AI-draft 표기), qa-acceptance-signoff(버전 pin·종료기준 충족·개방결함(심각도별)+웨이버·조건부 기한·증거·하자보수). 3종=요구사항 ID RTM 폐루프.
 
-## 방금 한 것 (정확히)
+## 다음 사람에게 (096·097·098 원료 = 하단 리서치 요약)
+1. 095 PR 리뷰·머지.
+2. **METH-096 — 수주 5종**(proposal-go-nogo·research-collection-checklist·profitability-sheet·execution-plan·wbs). Shipley·APMP·PMBOK·SOW·PS-margin:
+   - proposal-go-nogo: 결정소유자+게이트일자·경쟁포지션 axis·cost-to-pursue·치명결함(kill) 규칙(1축 미달=포기).
+   - research-collection: 기존 3버킷(시장) + 신규 4버킷(사업목표·성공KPI / 예산·일정·의사결정권자 BANT / 제약·컴플라이언스 / 기존자산·연동) + 출처/수집일.
+   - profitability-sheet: 과금모델 enum(T&M/고정가/마일스톤/리테이너)·리스크 컨틴전시(직접비×5~15%, 근거=과거초과율)·gross vs net 분리·손익분기·변경요청 반영.
+   - execution-plan: 가정·범위제외·인수기준+승인권자·리스크 레지스터·커뮤니케이션 케이던스·인계/종료+변경관리·필요 고객 입력물. 추진일정 **W1-W4→Phase→Milestone 재프레임**(sprint 금지).
+   - wbs: 100% 규칙·PM/QA도 산출물 포함·산출물(명사)중심·work package=견적 롤업·비고=WBS dictionary.
+3. **METH-097 — ops 3종**(operation-spec·post-launch-monitoring·work-request-ticket). SRE·ITIL4·OTel·DORA, **guide 12 정합(재설명 말고 참조)**:
+   - operation-spec(runbook): ownership+온콜·SLO/SLI+error budget policy(소진 시 액션+집행자)·의존성·인시던트 SEV1-4·rollback/DR(RTO/RPO)·모니터링 refs·access/break-glass·비용/유지보수창·AI-ops row.
+   - post-launch-monitoring: 골든시그널(latency/traffic/errors/saturation)+임계치·burn-rate(>14.4/1h page)·SLI 대시보드·trace_id 상관·비즈니스 지표·온콜 라우팅·리뷰 케이던스·AI 시그널.
+   - work-request-ticket: 티켓유형(request/incident/change)·priority=impact×urgency(P1-P4)·done 기준·상태 워크플로·**Class A/B/C 링크**·change type(Standard/Normal/Emergency)·rollback(type=change&class≥B)·위험변경만 승인게이트.
+4. **METH-098 — glossary** 경량(DDD ubiquitous language·용어→정의→예시; context-glossary 지침이 깊은 버전이라 이건 간단).
+5. 다른 repo(별도 세션): ai-icons 92 환류·talmo-com.
 
-**메타/dev 지침(02~09·19~20) 심화 배치 완결** — 사용자 "전부". 3 PR:
-- **092(#81)**: guide 03(관찰 로그) — observe CLI 정본화 + friction 캡처 + 학습루프. v2.
-- **093(#82)**: guide 06·07·08 웹리서치 심화(에이전트 메카닉) — 컴팩션 두층/임계치/auto-survive·자율 이중예산/ground-truth/비가역=Class C·서브에이전트 fan-out vs single-writer/sizing/completeness critic. 각 v2.
-- **094(이 브랜치)**: guide 20에 W3C DTCG 상호운용 §8 신설(DTCG JSON·Style Dictionary·Tokens Studio·도입 트리거·4기둥↔DTCG 매핑, "필요할 때만"). v3. **05·09·02·19는 검토=이미 성숙 → 무변경**(padding=bloat 회피, 세션 관통 원칙).
-
-## 다음 사람에게 (구체적 첫 행동)
-
-1. METH-092(#81)·093(#82)·094 PR 리뷰·머지(스택 순서).
-2. **문서별 심화 프로그램은 사실상 완료** — 남은 건 전부 Low·선택:
-   - graph.json 노드 완성(guide 02~09·19~21 누락 — 대시보드 그래프)
-   - v3.2 backward-compat 코드 정리(별건, 7 repo 전부 v4.0이라 dead)
-   - agency/ops 템플릿(proposal·qa·operation·profitability·execution-plan·wbs) — 원래 심화 후보였으나 미착수
-3. **다른 repo(별도 세션, 킥오프 프롬프트 전달됨)**: ai-icons 92_LOCAL↔상류05 환류, `~/talmo-com` 탈모닷컴 실작업(방향=멀티브랜드 커머스로 확정).
-4. 학습 루프 후속: friction 축적→thinktank→catalog 승급.
-
-## 미해결 결정사항 (Open Questions)
-
-- 방법론 정비는 사실상 일단락(핵심·정합·구조·전파·정비·심화 사이클 완료). 계속 vs 마무리는 사용자 판단.
+## 리서치 요약 (1차 소스)
+- **수주**: Shipley bid/no-bid(5요인)·APMP 게이트(소유자+일자)·PMBOK WBS 100%룰·SOW discovery(BANT·exclusions·acceptance)·PS margin(gross40-60%·util75-80%·PMI contingency).
+- **QA**(반영됨): ISO/IEC/IEEE 29119-3·ISTQB(entry/exit·severity≠priority)·RTM thin·BDD Gherkin 옵션.
+- **ops**: Google SRE(runbook·SLO·burn-rate·on-call)·ITIL4(request/incident/change·priority matrix·change type)·OTel 골든시그널·DORA·LLM observability.
 
 ## 환경 메모
-
-- 브랜치: `claude/meth-094-internal-guides-deepen` (#82 위 스택). branch-first.
-- 변경: guide 20(§8 DTCG) + 라이브 4종. (05/09/02/19 무변경 — 검토만.)
-- 진척: 메타/dev 배치 092·093·094 완결. 세션 총: 079~094(정합·구조·전파·정비·심화) + talmo-com 부트스트랩(방법론 밖).
+- 브랜치: `claude/meth-095-qa-templates-deepen`. branch-first.
+- 진척: 메타/dev 배치(092-094) 완결 + **agency/ops 배치 095(QA) 완료**, 096/097/098 남음.
