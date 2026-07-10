@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "e85b65eb0df428f535d43b488f8a57fe493a4336",
-  "last_validated_at": "2026-07-10T01:30:55Z",
+  "last_validated_commit": "ab40783392918e08a96d564daeea0a914d25902d",
+  "last_validated_at": "2026-07-10T01:57:47Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "ee6180fb9ede6e125f11b584823ec5afff9f2d08f636465a4a16e38ed33efc90"
+      "sha256": "594e1c8cbf1cfa128a7243440e6b0df72fe46025cb8699d51a30c902533dd57f"
     },
     "TODO.md": {
-      "sha256": "9eb9490805580ef36d035240ef991ac2b28cc9122ba307bd1c8ece8c2f2f27a0"
+      "sha256": "efd1d4f0cce9914ef06b8d73773172824b2669d5ce185e454656b87cb1cadc1e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "a4900c04cd80b57caf9ce385517b0397c1bd998576df851946a46674440a96b9"
+      "sha256": "d145f65ff118874aa3d9d19d25557d98f6942b4770fbbff6cf26720044f1c331"
     }
   },
   "observations": {
@@ -105,6 +105,7 @@
       "50_resources/ai_observations/2026-07-09_meth-099-graph-nodes.md",
       "50_resources/ai_observations/2026-07-10_meth-100-v32-compat-cleanup.md",
       "50_resources/ai_observations/2026-07-10_meth-101-boot-cmd-size-lint.md",
+      "50_resources/ai_observations/2026-07-10_meth-102-livefile-boundary-standing-briefs.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

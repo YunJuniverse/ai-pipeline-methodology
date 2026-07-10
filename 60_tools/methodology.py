@@ -80,6 +80,7 @@ MANIFEST = {
     # sync가 항상 덮어쓰는 디렉터리·파일 (재귀 복사)
     "shared_paths": [
         "00_briefs/_README.md",
+        "00_briefs/standing/SOP_template.md",
         "20_guides",
         "50_resources/templates",
         "50_resources/prompts",
@@ -106,6 +107,7 @@ MANIFEST = {
     ],
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
+        "00_briefs/standing",
         "00_briefs/current",
         "00_briefs/archived",
         "00_briefs/meetings",
@@ -2457,18 +2459,27 @@ def cmd_boot(args: argparse.Namespace) -> int:
     ok("methodology boot — 세션 시작 브리핑")
     print()
 
-    # [1] 브리프 로드 목록
-    print("\033[1m[1] 부팅 브리프\033[0m (00_briefs/current — 날짜순 전부 읽고 반영 보고, 옛 브리프 충돌 시 사용자 확인)")
-    briefs_dir = target / "00_briefs" / "current"
-    if briefs_dir.is_dir():
-        mds = sorted(p for p in briefs_dir.rglob("*.md") if p.name != "_README.md")
-        if mds:
-            for p in mds:
-                print(f"    · {p.relative_to(target)}")
-        else:
-            print("    (브리프 없음)")
+    # [1] 브리프 로드 목록 — standing(상시·항상 최상단) 먼저, 그다음 current(날짜순)
+    print("\033[1m[1] 부팅 브리프\033[0m (전부 읽고 반영 보고, 옛 브리프 충돌 시 사용자 확인)")
+    standing_dir = target / "00_briefs" / "standing"
+    standing = sorted(
+        p for p in standing_dir.rglob("*.md")
+        if p.name != "_README.md" and "template" not in p.name.lower()
+    ) if standing_dir.is_dir() else []
+    if standing:
+        print("  \033[1m★ 상시 SOP (반복·정기 작업 — 착수 전 반드시 확인):\033[0m")
+        for p in standing:
+            print(f"    ★ {p.relative_to(target)}")
+    curr_dir = target / "00_briefs" / "current"
+    curr = sorted(
+        p for p in curr_dir.rglob("*.md") if p.name != "_README.md"
+    ) if curr_dir.is_dir() else []
+    print("  현재 브리프(날짜순):")
+    if curr:
+        for p in curr:
+            print(f"    · {p.relative_to(target)}")
     else:
-        print("    (00_briefs/current 폴더 없음)")
+        print("    (없음)")
     print()
 
     # [2] HANDOFF 현재 포커스

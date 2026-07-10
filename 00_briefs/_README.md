@@ -31,6 +31,8 @@ ai_relevance: rule
 ```
 00_briefs/
 ├── _README.md              ← 본 문서
+├── standing/               ← 상시 브리프 (날짜 없음·아카이브 안 됨·매 세션 항상 로드)
+│   └── SOP_<topic>.md          반복·정기 작업 절차(SOP)·불변 참조
 ├── current/                ← 활성 브리프 (AI 가 매 세션 읽음)
 │   ├── YYYY-MM-DD_<topic>.md
 │   └── ...
@@ -39,13 +41,18 @@ ai_relevance: rule
     └── YYYY-MM-DD_<topic>.md
 ```
 
-**파일명 컨벤션**: `YYYY-MM-DD_<topic-slug>.md` — 시간 순 자동 정렬.
+**파일명 컨벤션**: `current/`·`meetings/` = `YYYY-MM-DD_<topic-slug>.md`(시간순 정렬). **`standing/` = 날짜 없음** `SOP_<topic>.md`·`REF_<topic>.md`(상시 유지).
+
+### `standing/` — 반복 작업이 잊히지 않게 하는 곳
+> **문제**: 정기·반복 작업(예: 업무기술서 처리·주간 리포트·배포 절차)의 *방법*이 관찰 로그·커밋에만 흩어져 있으면, 새 세션이 능동적으로 캐야만 알고 — 못 캐면 프로세스를 모른 채 시작한다(실제 사고 사례).
+> **해결**: 그 절차를 `standing/SOP_<topic>.md` 한 장으로 박제한다. 날짜가 없어 *아카이브되지 않고*, `boot` 이 **항상 최상단에 노출**한다. 반복 작업을 시작하기 전 이 파일부터 확인.
+> **무엇을 담나**: 트리거(언제 도는가)·입력·단계별 절차·산출물 위치·주의점. 절차가 바뀌면 이 파일을 갱신(SSOT).
 
 ## 3. AI 가 언제 읽는가
 
 | 시점 | 동작 |
 |---|---|
-| **매 세션 시작** | `.ai/context.json` `must_read_optional` 에 `00_briefs/current/*.md` 자동 포함 |
+| **매 세션 시작** | `boot` 이 `standing/*`(항상·최상단) + `current/*.md`(날짜순) 로드 목록 출력 → 본문 전부 읽음 |
 | **사용자 요청 시** | "브리프 다시 봐줘" → AI 가 `current/` 전체 재로드 |
 | **자동 트리거 (향후)** | brief 파일 mtime 변경 감지 → 다음 세션에 highlight |
 
@@ -54,6 +61,7 @@ ai_relevance: rule
 - 인간이 *수시로* `current/` 에 새 파일 추가 또는 기존 파일 수정
 - 일정 기간 후 (인간 판단) `archived/` 로 이동
 - *삭제 금지* — 옛 맥락도 학습 데이터
+- **`standing/` 은 아카이브하지 않는다** — 반복 작업이 살아 있는 한 유지. 절차가 바뀌면 *덮어써* 갱신(AI 도 절차 변경을 감지하면 갱신 제안)
 
 ## 5. AI 측 규칙 (CLAUDE.md / AGENTS.md 반영)
 
