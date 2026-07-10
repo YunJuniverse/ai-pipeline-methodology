@@ -24,7 +24,7 @@
 
 - Code is the source of truth for implementation; ADR for decisions code can't explain.
 - `HANDOFF.md` is the only live state file (<150 lines). `TODO.md` is the active backlog (stable IDs + acceptance criteria).
-- **세션·작업 종료 (의무)**: 작업 단위가 끝나면 4개 라이브 파일을 갱신하고 `python3 60_tools/methodology.py wrap`(→`4/4 ✓`)로 검증 후 보고. ① `TODO.md`(완료→Done·신규) ② `HANDOFF.md`(Working-on + Recent Changes 최근 5건) ③ `.ai/checkpoint.md`(인계서, 백서 §2-2) ④ 관찰 로그 — **반드시 CLI**: `methodology.py observe --slug <kebab> --task-type <bootstrap|feature|bugfix|refactor|research|docs> --summary "<50~150자>"` (직접 `cat >` 금지 — 형식오류로 wrap 실패). **비자명한 문제·재발·막힘을 겪었으면 `--friction "where|cost_minutes|resolution|repeat_of"`도 남긴다** — catalog→skeleton 학습 루프의 원료(thinktank가 반복 마찰 ≥2회를 승급 후보로 집계). 마찰 없으면 생략(강제 아님 — 노이즈 방지). 상세 `50_resources/catalog/_README.md`. wrap v4.1+ = sha256 콘텐츠 비교(실내용 갱신만 통과).
+- **세션·작업 종료 (의무)**: 작업 단위가 끝나면 4개 라이브 파일을 갱신하고 `python3 60_tools/methodology.py wrap`(→`4/4 ✓`)로 검증 후 보고. ① `TODO.md`(완료→Done·신규) ② `HANDOFF.md`(Working-on + Recent Changes 최근 5건) ③ `.ai/checkpoint.md`(인계서, 백서 §2-2) ④ 관찰 로그 — **반드시 CLI**: `methodology.py observe --slug <kebab> --task-type <bootstrap|feature|bugfix|refactor|research|docs> --summary "<50~150자>"` (직접 `cat >` 금지 — 형식오류로 wrap 실패). **비자명한 문제·재발·막힘을 겪었으면 `--friction "where|cost_minutes|resolution|repeat_of"`도 남긴다** — catalog→skeleton 학습 루프의 원료(thinktank가 반복 마찰 ≥2회를 승급 후보로 집계). 마찰 없으면 생략(강제 아님 — 노이즈 방지). 상세 `50_resources/catalog/_README.md`. wrap v4.1+ = sha256 콘텐츠 비교(실내용 갱신만 통과) + 라이브 파일 비대화 경고(METH-101: HANDOFF>150줄·checkpoint>200줄·Done>6건) — 초과 시 오래된 내용을 git·`40_dev/snapshots`로 이관하고 요지만 남긴다(비대한 HANDOFF은 부팅 프라이머로 무력).
 - **commit/push (권장)**: 위 갱신 후 `methodology.py ship -m "<conventional>"` 하나로 wrap+manifest+sensitive+(test/build)+commit+push. 별도 `git add`/`commit`/`push` 금지 — *ship만*.
 - **컨텍스트 컴팩션 (의무, 긴 세션)**: 요약 예고 시 *요약 전에* 라이브 파일(특히 `.ai/checkpoint.md`) 먼저 갱신 — 파일에 있으면 요약이 잃어도 복원. 규칙 `20_guides/06_컨텍스트_컴팩션_프로토콜.md`.
 - **자율 진행 예산·정지 (권장)**: 다단계 자율 시 착수 전 예산(파일/PR/반복) 선언, no-progress 2회·예산 초과 시 멈춰 보고, 범위 축소 시 남긴 것 보고. `20_guides/07_자율진행_예산_및_정지조건.md` (멀티에이전트 팬아웃 `20_guides/08_서브에이전트_오케스트레이션.md`).
@@ -32,8 +32,7 @@
 - 식별자·버전 규칙은 `20_guides/02_식별자_및_버전_관리_규칙.md` 준수 후 새 ID 생성.
 - `40_dev/snapshots/`는 날짜 산출물 — 라이브 아님. 사람 승인은 머지된 PR 또는 링크된 ADR·이슈로만 성립.
 - Default boot context = `AGENTS.md` + `HANDOFF.md`; `TODO.md`·관련 코드·테스트·ADR은 필요 시 로드.
-- **부팅 브리프 자동 로드 (의무)**: `00_briefs/current/*.md` 날짜순 전부 읽고 반영 내역 보고, 옛 브리프 충돌 시 자동 결정 금지·사용자 확인. `00_briefs/_README.md`.
-- **부팅 마지막 (의무)**: `methodology.py dashboard` 호출 → 결과 URL을 첫 보고에 포함(이미 떠 있으면 기존 URL 재보고). 현재 브랜치 상태 반영.
+- **부팅 시작 (의무)**: 세션 시작 시 *먼저* `python3 60_tools/methodology.py boot` 실행 — 브리프 목록·HANDOFF 포커스·checkpoint 요지·라이브 파일 사이즈 경고·dashboard URL을 한 번에 출력(부팅 계약을 실행 명령으로 격상, METH-101). 그 뒤 ① 나열된 `00_briefs/current` 브리프 본문을 날짜순 *전부* 읽고 반영 내역 보고(옛 브리프 충돌 시 자동 결정 금지·사용자 확인, `00_briefs/_README.md`) ② dashboard URL을 첫 보고에 포함. **IR·작업 질문에 곧바로 뛰어들지 말 것** — 부팅 없이 시작하면 기존 프로세스·기록을 모른 채 오답을 낸다.
 - Do not keep sprint summaries, deliverable tables, or open-issue lists in this file.
 
 ---

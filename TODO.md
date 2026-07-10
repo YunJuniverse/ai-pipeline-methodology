@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-101 · 부팅 강제 + 라이브 파일 비대화 방지
+- **notes**: 2026-07-10. Class A(7 repo 전파). PR base=main 대기. ai-icons 새 세션이 부팅 건너뛰고 기존 프로세스 모른 채 시작(오답)한 사고의 상류 진단·수정. 진단: 기록 유실 아님. 원인 ① 부팅 의무가 강제 없는 서술뿐 ② 라이브 파일 비대화 무통제(wrap이 사이즈 안 봄→ai-icons HANDOFF 81KB 등). 수정(사용자 "둘 다"): (A) `methodology.py boot` 신설(브리프·HANDOFF·checkpoint·사이즈·dashboard 한 번에) (B) wrap 사이즈 린트(`live_file_size_warnings` 공용, HANDOFF>150·checkpoint>200·Done>6 경고). CLAUDE/AGENTS managed block: 부팅 의무를 boot 실행 정본화·"IR 질문에 바로 뛰어들지 말 것"·wrap 비대화 경고 명기. py_compile·boot 실행·린트 발화 검증. branch-first 준수.
+
 ### METH-100 · v3.2 backward-compat 코드 정리
 - **notes**: 2026-07-10. Class A. PR base=main 대기(096~099 포함). 현존 repo 7곳 전부 v4.0이라 dead였던 v3.2 폴백 제거. methodology.py: `_LAYOUT_V32`+`methodology_layout()` 삭제→v4.0 고정, `_observation_dir`/`_wrap_obs_dirs` 50_resources/70_meta 하드코딩. generate-dashboard.py: `_LAYOUT_V32`+`dash_layout`+`resolve_methodology_py` 탐지 삭제→v4.0 고정, `_count_observations`·`assemble`의 docs//40_resources/60_meta/legacy-root 폴백 삭제(50_resources/templates 유효 폴백만 유지), 푸터 v3.2→v4.0·stale 도크스트링. **보존**: migrations/v3.2_to_v4.0.py·런처/훅 부트스트랩 3-tier(범위 밖·synced 리스크). 검증: py_compile·dashboard 재생성(obs 107 양쪽 dir)·wrap. branch-first 준수.
 

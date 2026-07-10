@@ -2246,6 +2246,51 @@ def commit_wrap_state(target: Path) -> None:
     save_wrap_state(target, state)
 
 
+# 라이브 파일 사이즈 규정 (줄수) — 비대화 방지.
+# HANDOFF/checkpoint 는 부팅 프라이머·인계서라 *꽉 짜인* 상태여야 부팅 컨텍스트로 작동한다.
+# 초과 시 "기본 부팅 컨텍스트 = CLAUDE.md + HANDOFF" 설계가 무력화(현재 포커스가 노이즈에 묻힘).
+LIVE_FILE_LINE_LIMITS = {
+    "HANDOFF.md": 150,          # 템플릿 규정: ≤150줄
+    ".ai/checkpoint.md": 200,   # 백서 §2-2: ≤200줄
+}
+TODO_DONE_SOFT_CAP = 6          # 템플릿 규정: 최근 완료 ~4건만 유지
+
+
+def live_file_size_warnings(target: Path) -> list[str]:
+    """라이브 파일 비대화 경고 목록 — wrap·boot 공용.
+
+    HANDOFF/checkpoint 줄수 초과 + TODO Done 아카이브 과다를 탐지.
+    경고만 반환(실패 아님) — 이미 초과된 다운스트림의 ship 을 즉시 막지 않기 위함.
+    """
+    warnings: list[str] = []
+    for rel, limit in LIVE_FILE_LINE_LIMITS.items():
+        p = target / rel
+        if not p.exists():
+            continue
+        n = len(read_text(p).splitlines())
+        if n > limit:
+            warnings.append(
+                f"{rel}: {n}줄 (규정 ≤{limit}줄, {n/limit:.1f}×) — 트리밍 필요. "
+                "오래된 내용은 git·40_dev/snapshots 로 이관하고 요지만 남긴다."
+            )
+    todo_p = target / "TODO.md"
+    if todo_p.exists():
+        try:
+            section = re.search(
+                r"^##\s+Done\s*$(.*?)(?=^##\s|\Z)",
+                read_text(todo_p), re.MULTILINE | re.DOTALL,
+            )
+            done = len(re.findall(r"^###\s+", section.group(1), re.MULTILINE)) if section else 0
+            if done > TODO_DONE_SOFT_CAP:
+                warnings.append(
+                    f"TODO.md Done {done}건 (권장 ~4건) — 완료 아카이브 과다. "
+                    "이전 완료는 git log·snapshots 로 이관."
+                )
+        except Exception:
+            pass
+    return warnings
+
+
 def cmd_wrap(args: argparse.Namespace) -> int:
     """세션·작업 종료 검증 — 4개 라이브 파일 *실제 콘텐츠 갱신* 점검.
 
@@ -2371,6 +2416,12 @@ def cmd_wrap(args: argparse.Namespace) -> int:
         except Exception:
             pass
 
+    # ── 라이브 파일 사이즈 린트 (METH-101) — 비대화 방지 (경고, 실패 아님) ──
+    # 비대한 HANDOFF/checkpoint 는 부팅 프라이머로 무력 → 새 세션이 '프로세스를 모른 채' 시작하는 주원인.
+    size_warns = live_file_size_warnings(target)
+    for w in size_warns:
+        warn(f"사이즈: {w}")
+
     print()
     if missing == 0:
         ok(
@@ -2384,6 +2435,96 @@ def cmd_wrap(args: argparse.Namespace) -> int:
             "(mtime 만 갱신해서는 통과 안 됨)"
         )
         return 1 if args.strict else 0
+
+
+def cmd_boot(args: argparse.Namespace) -> int:
+    """세션 시작 브리핑 — 부팅 계약(CLAUDE.md §2)을 한 번에 실행·점검.
+
+    서술 의무였던 부팅 절차를 *실행 가능한 명령*으로 격상. 출력:
+      [1] 00_briefs/current 브리프 로드 목록 (날짜순 — 본문은 AI가 직접 읽음)
+      [2] HANDOFF 현재 포커스 + 최근 변경 1건
+      [3] checkpoint 최신 인계 요지
+      [4] 라이브 파일 사이즈 경고 (비대화 탐지 — 비대하면 부팅 프라이머로 무력)
+      [5] dashboard 빌드·서빙 URL
+    새 세션은 `methodology boot` 로 시작해 IR 질문에 바로 뛰어드는 실수를 방지.
+    """
+    def _clip(s: str, n: int) -> str:
+        s = s.strip()
+        return s if len(s) <= n else s[:n] + "…"
+
+    target = Path(args.path or ".").resolve()
+    print()
+    ok("methodology boot — 세션 시작 브리핑")
+    print()
+
+    # [1] 브리프 로드 목록
+    print("\033[1m[1] 부팅 브리프\033[0m (00_briefs/current — 날짜순 전부 읽고 반영 보고, 옛 브리프 충돌 시 사용자 확인)")
+    briefs_dir = target / "00_briefs" / "current"
+    if briefs_dir.is_dir():
+        mds = sorted(p for p in briefs_dir.rglob("*.md") if p.name != "_README.md")
+        if mds:
+            for p in mds:
+                print(f"    · {p.relative_to(target)}")
+        else:
+            print("    (브리프 없음)")
+    else:
+        print("    (00_briefs/current 폴더 없음)")
+    print()
+
+    # [2] HANDOFF 현재 포커스
+    print("\033[1m[2] HANDOFF 현재 포커스\033[0m")
+    hp = target / "HANDOFF.md"
+    if hp.exists():
+        txt = read_text(hp)
+        m = re.search(r"^-\s+\*\*Working on\*\*:\s*(.+)$", txt, re.MULTILINE)
+        print(f"    Working on: {_clip(m.group(1), 500) if m else '(미기재)'}")
+        rc = re.search(r"^##\s+Recent Changes.*?\n(.*?)(?=^##\s|\Z)", txt, re.MULTILINE | re.DOTALL)
+        first = re.search(r"^-\s+(.+)$", rc.group(1), re.MULTILINE) if rc else None
+        if first:
+            print(f"    최근 변경: {_clip(first.group(1), 300)}")
+    else:
+        print("    (HANDOFF.md 없음)")
+    print()
+
+    # [3] checkpoint 최신 인계 요지 (상단 헤딩 + 요지 블록)
+    print("\033[1m[3] checkpoint 인계 요지\033[0m")
+    cp = target / ".ai" / "checkpoint.md"
+    if cp.exists():
+        shown = 0
+        for ln in read_text(cp).splitlines():
+            if ln.strip():
+                print(f"    {_clip(ln, 180)}")
+                shown += 1
+            if shown >= 4:
+                break
+    else:
+        print("    (.ai/checkpoint.md 없음)")
+    print()
+
+    # [4] 라이브 파일 사이즈
+    print("\033[1m[4] 라이브 파일 사이즈\033[0m")
+    sw = live_file_size_warnings(target)
+    if sw:
+        for w in sw:
+            warn(f"사이즈: {w}")
+    else:
+        print("    ✓ 규정 이내 (HANDOFF ≤150 · checkpoint ≤200 · TODO Done ~4)")
+    print()
+
+    # [5] dashboard
+    print("\033[1m[5] 대시보드\033[0m")
+    if not args.no_dashboard:
+        dash_ns = argparse.Namespace(
+            path=str(target), branch=args.branch, port=None,
+            no_serve=False, out=None, open=False, dashboard_cmd=None,
+        )
+        cmd_dashboard(dash_ns)
+    else:
+        print("    (--no-dashboard: skip)")
+    print()
+
+    info("다음: 브리프 본문을 직접 읽고 반영 내역 보고 → 옛 브리프 충돌 시 사용자 확인 → 작업 착수(branch-first).")
+    return 0
 
 
 # ─── 외주 인계용 export ─────────────────────────────────────────────────────
@@ -2679,6 +2820,12 @@ def main(argv: list[str] | None = None) -> int:
     pex.add_argument("--force", action="store_true", help="target 덮어쓰기 / methodology-source 도 export")
     pex.add_argument("--verbose", "-v", action="store_true", help="포함·제외 파일 목록 출력")
     pex.set_defaults(func=cmd_export)
+
+    pb = sub.add_parser("boot", help="세션 시작 브리핑 — 브리프 목록·HANDOFF 포커스·checkpoint·사이즈 경고·dashboard URL을 한 번에")
+    pb.add_argument("--path", help="대상 폴더 (기본: 현재)")
+    pb.add_argument("--branch", help="dashboard 대상 브랜치 (기본: 현재 working tree)")
+    pb.add_argument("--no-dashboard", action="store_true", help="dashboard 빌드/서빙 skip")
+    pb.set_defaults(func=cmd_boot)
 
     pw = sub.add_parser("wrap", help="작업·세션 종료 검증 — 4개 라이브 파일(HANDOFF/TODO/checkpoint/observation) 갱신 누락 점검")
     pw.add_argument("--path", help="대상 폴더 (기본: 현재)")

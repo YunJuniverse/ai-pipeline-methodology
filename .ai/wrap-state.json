@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "66651f0246cbfc9e41bfd2d819b1afeee10830de",
-  "last_validated_at": "2026-07-10T01:12:07Z",
+  "last_validated_commit": "e85b65eb0df428f535d43b488f8a57fe493a4336",
+  "last_validated_at": "2026-07-10T01:30:55Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "985e4eae159858f5ff52191d30df873edb780395132b1554f4284a5c85265562"
+      "sha256": "ee6180fb9ede6e125f11b584823ec5afff9f2d08f636465a4a16e38ed33efc90"
     },
     "TODO.md": {
-      "sha256": "36e0095487d036c16de6ee80dd8c0d8e4b1cb708b40e94301c1ef0f6bea901f2"
+      "sha256": "9eb9490805580ef36d035240ef991ac2b28cc9122ba307bd1c8ece8c2f2f27a0"
     },
     ".ai/checkpoint.md": {
-      "sha256": "6191b540d6802cecab88e45b5eab1a437442e387131d6829e27a1df8490da706"
+      "sha256": "a4900c04cd80b57caf9ce385517b0397c1bd998576df851946a46674440a96b9"
     }
   },
   "observations": {
@@ -104,6 +104,7 @@
       "50_resources/ai_observations/2026-07-09_meth-098-glossary-template.md",
       "50_resources/ai_observations/2026-07-09_meth-099-graph-nodes.md",
       "50_resources/ai_observations/2026-07-10_meth-100-v32-compat-cleanup.md",
+      "50_resources/ai_observations/2026-07-10_meth-101-boot-cmd-size-lint.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
