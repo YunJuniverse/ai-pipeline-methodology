@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-10 (METH-104 SOP 트리거 "인식 신호")
+# Checkpoint — 2026-07-10 (METH-105 브리프 자동 분류·정리 체계)
 
-> ✅ **METH-104**: SOP 템플릿 트리거에 "인식 신호"(어떤 요청/말이 이 작업을 의미하는가) 항목 추가 — 반복작업 매칭이 문자열이 아닌 LLM 의미추론이라, 이 앵커로 매칭 신뢰도↑. SOP_template + _README §standing. Class A(7 repo).
-> 🧭 base=main 단일 PR (095~103 = #84·#89·#91·#92 머지 완료, 스택 아님).
+> ✅ **METH-105**: 사용자가 브리프를 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더(research/reference/ideas 신설 + meetings/standing) + `_README §자동 분류` 규칙표 + CLAUDE/AGENTS §2 규칙 + boot 유형별 그룹 노출. Class A(7 repo).
+> 🧭 base=main 단일 PR (095~104 = #84·#89·#91·#92·#93 머지 완료, 스택 아님).
 
 ---
 
@@ -11,23 +11,24 @@
 
 ## 작성자
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `claude/meth-104-sop-recognition-cues` (updated main 기준, branch-first)
+- Worktree: branch `claude/meth-105-brief-auto-filing` (updated main 기준, branch-first)
 
 ## 부팅 계약
 1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
 ## 방금 한 것 (이번 세션)
-**METH-104 — SOP 트리거에 "인식 신호" 항목 추가.** 사용자 질문("반복작업 다시 하려면 키워드로 추론해서 알아서 하나?")에서 도출:
-- **답/진단**: 문자열 키워드 엔진이 아니라 **LLM 의미추론**이다(boot이 SOP 로드 → 요청을 의미로 매칭 → 절차 따르되 SOP의 주의점·게이트 지킴). 신뢰도의 레버 = SOP 트리거가 "어떤 요청/말이 이 작업을 의미하는가"를 명시하는 것. 기존 템플릿 트리거는 *주기/이벤트*만 담아 이 앵커가 없었다.
-- **수정**: `SOP_template.md` 트리거를 **인식 신호**(요청/말 앵커, 예: "업무기술서 확인해줘") + **주기/이벤트**로 분리. `00_briefs/_README §standing`의 "무엇을 담나"에 인식 신호 명시.
-- 검증: 편집 2파일, 형식 확인.
+**METH-105 — 브리프 자동 분류·정리 체계.** 사용자 요청("브리프 넣으면 니가 알아서 분류해 폴더 정리하는 체계 원함 — 회의→회의록, 리서치→리서치, 레퍼런스→레퍼런스"):
+- **유형 폴더 정립**: 기존 meetings/·standing/ + **신설 research/·reference/·ideas/**. `current/`는 레거시(기존 repo 호환, boot이 읽음)·신규는 ideas/가 미분류 기본.
+- **자동 분류 규칙**: `00_briefs/_README §자동 분류` 규칙표(회의→meetings / 조사·분석→research / 외부 원본·링크→reference / 아이디어·방향→ideas / 반복 절차→standing/SOP / 애매하면 사용자 확인). research vs reference = "내가 소화·정리"vs"외부 원본 날것". CLAUDE/AGENTS §2에 "브리프 자동 분류" operating rule(synced).
+- **boot 개편**: [1]을 유형 폴더별 그룹으로 노출(standing ★ 최상단·archived 제외·template/_README 필터). 폴더 추가돼도 자동 인식(generic iterdir).
+- MANIFEST init_paths에 research/reference/ideas 추가(current 제거). 검증: py_compile·boot 그룹 스캔(4폴더)·manifest·managed sync.
 
 ## 다음 사람에게
-1. **METH-104 PR(base=main) 머지** — SOP 템플릿 개선이 7 repo 전파.
-2. **ai-icons(별도 세션)**: "업무기술서 처리를 반복작업으로 기억해줘" → SOP 작성 시 **인식 신호에 "업무기술서 확인/처리·회수함" 등 실제 사용자 문구**를 넣으면 다음 세션이 정확히 매칭. + 비대 라이브파일 트리밍(101 린트).
-3. 방법론 부팅 개선 시리즈(101 boot·102 경계+상시브리프·103 쓰기트리거·104 인식신호) **완결**.
+1. **METH-105 PR(base=main) 머지** — 브리프 분류 체계 7 repo 전파. 이후 브리프 던지면 AI가 유형별 폴더로 정리.
+2. **ai-icons(별도 세션)**: boot으로 시작 → 회의/리서치/참고자료 던지면 자동 분류. 업무기술서 SOP는 standing/에. + 비대 라이브파일 트리밍.
+3. 부팅·브리프 개선 시리즈(101 boot·102 상시브리프·103 쓰기트리거·104 인식신호·105 자동분류) **완결**.
 
 ## 환경 메모
-- 브랜치: `claude/meth-104-sop-recognition-cues` (updated main). branch-first. #92까지 머지 완료라 스택 아님.
+- 브랜치: `claude/meth-105-brief-auto-filing` (updated main). branch-first. #93까지 머지 완료라 스택 아님.
 - 누적 상태(오픈이슈·PR 목록)는 **HANDOFF 참조** — 여기 복제 안 함(경계 규칙 dogfooding).
-- 진척: …+v3.2(100)+부팅(101)+경계/상시브리프(102)+쓰기트리거(103)+**인식신호(104)**.
+- 진척: …+부팅(101)+상시브리프(102)+쓰기트리거(103)+인식신호(104)+**브리프 자동분류(105)**.

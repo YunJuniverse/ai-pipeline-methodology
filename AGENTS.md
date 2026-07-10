@@ -34,6 +34,7 @@
 - Default boot context = `AGENTS.md` + `HANDOFF.md`; `TODO.md`·관련 코드·테스트·ADR은 필요 시 로드.
 - **부팅 시작 (의무)**: 세션 시작 시 *먼저* `python3 60_tools/methodology.py boot` 실행 — 브리프 목록·HANDOFF 포커스·checkpoint 요지·라이브 파일 사이즈 경고·dashboard URL을 한 번에 출력(부팅 계약을 실행 명령으로 격상, METH-101). 그 뒤 ① 나열된 브리프 본문을 *전부* 읽고 반영 보고 — **`00_briefs/standing/`(상시 SOP·반복작업 절차, 아카이브 안 됨)을 항상 먼저**, 그다음 `00_briefs/current/`(날짜순, 옛 브리프 충돌 시 자동 결정 금지·사용자 확인). `00_briefs/_README.md` ② dashboard URL을 첫 보고에 포함. **IR·작업 질문에 곧바로 뛰어들지 말 것** — 부팅 없이·SOP 없이 시작하면 기존 프로세스를 모른 채 오답을 낸다. **반복 작업은 착수 전 해당 `standing/SOP_*`부터 확인.**
 - **반복 작업 기억 (요청 시)**: 사용자가 반복·정기 작업을 "기억해줘 / 이건 반복(정기) 작업이야"라고 하면 → `00_briefs/standing/SOP_<topic>.md`로 박제(`00_briefs/standing/SOP_template.md` 형식: 트리거·입력·절차·산출물·주의점). 절차가 바뀌는 걸 감지하면 해당 SOP 갱신 제안. **구분**: 반복 *작업 절차* = repo `standing/` SOP(팀 공유·boot 노출·이 저장소 전용) / 사용자 개인 선호·사실 = 도구 메모리(별개 시스템).
+- **브리프 자동 분류**: 사용자가 브리프를 던지면 AI가 유형 판별해 해당 폴더에 배치 — 회의→`00_briefs/meetings/`, 리서치·분석→`research/`, 외부 참고자료·링크→`reference/`, 아이디어·방향→`ideas/`, 반복 절차→`standing/SOP_*`. 유형 폴더 파일명 `YYYY-MM-DD_<slug>.md`. 애매하면 사용자에게 유형 확인(그래도 불명확 시 `ideas/`). 규칙표: `00_briefs/_README.md §자동 분류`.
 - Do not keep sprint summaries, deliverable tables, or open-issue lists in this file.
 
 ---

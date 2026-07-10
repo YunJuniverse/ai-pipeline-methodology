@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "80f28a91ff0dbee22957ed834133e74e7888aa2b",
-  "last_validated_at": "2026-07-10T02:17:13Z",
+  "last_validated_commit": "0f0647cee0b43844f7004c16ca98b9d1e29d717b",
+  "last_validated_at": "2026-07-10T02:33:15Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "fb21399398bb8da30f75945d19b2a21de50d6cf419b06cb593f94bdb76f7b2e0"
+      "sha256": "2e897e50962c0fd7db8dc2d41010ea8c99e756b72060dc99ea340b488b1135e7"
     },
     "TODO.md": {
-      "sha256": "c8ba614c9d54211cec02bc7acb54ab6b76d7d1ac3ec6926e8f82740ee044ebd1"
+      "sha256": "4d84f821f8a381c4f52b4637b4e432badec50a1d6f095322ce7c4990cfa66ccd"
     },
     ".ai/checkpoint.md": {
-      "sha256": "9370d0c62ee400439a3e33d506394a517f84f62996f330da9ccae6b51d938c7f"
+      "sha256": "fcd325b38746c7db093452f63c0810dedede5c38081b42bd2c98d22e389bb127"
     }
   },
   "observations": {
@@ -108,6 +108,7 @@
       "50_resources/ai_observations/2026-07-10_meth-102-livefile-boundary-standing-briefs.md",
       "50_resources/ai_observations/2026-07-10_meth-103-standing-write-trigger.md",
       "50_resources/ai_observations/2026-07-10_meth-104-sop-recognition-cues.md",
+      "50_resources/ai_observations/2026-07-10_meth-105-brief-auto-filing.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
