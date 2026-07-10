@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "80fc5586bc8d7c61ee25f20ce0150ea33b482724",
-  "last_validated_at": "2026-07-09T09:08:31Z",
+  "last_validated_commit": "66651f0246cbfc9e41bfd2d819b1afeee10830de",
+  "last_validated_at": "2026-07-10T01:12:07Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "31b2f46a82e2fa7e26e2b2edba2f3d358fbfece83879a8b399f8f8a2b15ee2f5"
+      "sha256": "985e4eae159858f5ff52191d30df873edb780395132b1554f4284a5c85265562"
     },
     "TODO.md": {
-      "sha256": "c7b23711b483a5ea281c187142602e6a793b9e7ca051aa624d0464b8d2ef6c52"
+      "sha256": "36e0095487d036c16de6ee80dd8c0d8e4b1cb708b40e94301c1ef0f6bea901f2"
     },
     ".ai/checkpoint.md": {
-      "sha256": "066713a5a5358508558f5bb40b3a160ed05f823d047bb0fa79d5174e3b2e255e"
+      "sha256": "6191b540d6802cecab88e45b5eab1a437442e387131d6829e27a1df8490da706"
     }
   },
   "observations": {
@@ -103,6 +103,7 @@
       "50_resources/ai_observations/2026-07-09_meth-097-ops-templates-deepen.md",
       "50_resources/ai_observations/2026-07-09_meth-098-glossary-template.md",
       "50_resources/ai_observations/2026-07-09_meth-099-graph-nodes.md",
+      "50_resources/ai_observations/2026-07-10_meth-100-v32-compat-cleanup.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
