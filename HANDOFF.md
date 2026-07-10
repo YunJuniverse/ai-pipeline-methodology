@@ -4,14 +4,14 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-103 — 상시 SOP **쓰기 트리거** 규칙 신설. "반복작업 기억해줘" → `00_briefs/standing/SOP_*` 작성을 operating rule로 못박음(102는 읽기만 완비, 쓰기 반사신경 없던 구멍). Class A(7 repo). PR base=main 대기. 상세는 checkpoint.
+- **Working on**: METH-104 — SOP 템플릿 트리거에 **"인식 신호"** 항목 추가. 반복작업 매칭 신뢰도↑(어떤 요청/말이 이 SOP를 의미하는지 앵커 명시). SOP_template + _README §standing. Class A(7 repo). PR base=main 대기. 상세는 checkpoint.
 - **Current mode**: fullstack
-- **Next TODO**: 079~102 점검·정비 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint 참조.
+- **Next TODO**: 079~104 점검·정비 + 부팅개선(101~104) 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·업무기술서 SOP 박제, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
 
 ## Active Links
 
-- Current PR: METH-103 상시SOP 쓰기트리거 (신규, base=main) · 095~102 = #84·#89·#91 머지 완료 · 063~094 = #53~#83 머지
+- Current PR: METH-104 SOP 인식신호 (신규, base=main) · 095~103 = #84·#89·#91·#92 머지 완료 · 063~094 = #53~#83 머지
 - Current issue:
 - Relevant ADRs:
 - Relevant snapshots: `40_dev/snapshots/implementation-plan-2026-05-07.md`, `40_dev/snapshots/transfer-drill-2026-05-08.md`
@@ -39,8 +39,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-07-10: **METH-103 상시 SOP 쓰기 트리거 규칙 (Class A, PR base=main 대기)** — 102가 standing SOP의 *읽기*(boot 노출)만 완비하고 *쓰기* 반사신경이 없던 구멍을 메움. CLAUDE/AGENTS managed block에 "반복 작업 기억 (요청 시)" 규칙: 사용자가 "기억해줘/반복작업이야" → `standing/SOP_<topic>.md` 박제 + 절차 변경 시 갱신 제안 + 작업SOP(repo) vs 개인메모리(도구) 구분. _README §5도 반영. managed sync 확인.
+- 2026-07-10: **METH-104 SOP 트리거에 "인식 신호" 항목 추가 (Class A, PR base=main 대기)** — 반복작업 매칭이 문자열 아닌 LLM 의미추론이라, SOP 트리거에 "어떤 요청/말이 이 작업을 의미하는가"(인식 신호) 앵커를 명시하면 매칭 신뢰도↑. `SOP_template.md` 트리거 = 인식신호 + 주기/이벤트로 분리, `_README §standing` 반영.
+- 2026-07-10: **METH-103 상시 SOP 쓰기 트리거 규칙 (Class A, PR #92 머지)** — 102가 standing SOP의 *읽기*(boot 노출)만 완비하고 *쓰기* 반사신경이 없던 구멍을 메움. CLAUDE/AGENTS managed block에 "반복 작업 기억 (요청 시)" 규칙: 사용자가 "기억해줘/반복작업이야" → `standing/SOP_<topic>.md` 박제 + 절차 변경 시 갱신 제안 + 작업SOP(repo) vs 개인메모리(도구) 구분. _README §5도 반영. managed sync 확인.
 - 2026-07-10: **METH-102 라이브파일 경계 재분리 + 상시 브리프 (Class A, PR #91 머지)** — HANDOFF=상태보드/checkpoint=서사 경계를 §4·§2·템플릿·에 못박아 중복 제거(checkpoint의 "미해결 결정사항"=HANDOFF Open Issues 중복 제거). `00_briefs/standing/`(반복작업 SOP·아카이브 안 됨) 신설, boot이 ★로 항상 최상단 노출. 반복 작업이 새 세션에 안 잊히게. #90(boot) 포함 base=main.
 - 2026-07-10: **METH-101 부팅 강제 + 비대화 린트 (Class A, PR #90 OPEN)** — `methodology.py boot` 신설 + wrap 사이즈 린트(`live_file_size_warnings`). ai-icons 부팅 스킵 사고 상류 대응.
 - 2026-07-10: **METH-100 v3.2 backward-compat 코드 정리 (Class A, PR #89 머지)** — 현존 repo 7곳 전부 v4.0이라 dead였던 v3.2 폴백을 두 핵심 툴에서 제거. **methodology.py**: `_LAYOUT_V32`+`methodology_layout()` 구조탐지 삭제(→v4.0 고정), `_observation_dir`/`_wrap_obs_dirs`를 50_resources/70_meta 하드코딩(40_resources/60_meta 폴백 삭제). **generate-dashboard.py**: `_LAYOUT_V32`+`dash_layout`+`resolve_methodology_py` 3-tier 탐지 삭제(→v4.0 고정), `_count_observations`·`assemble`의 `docs/`·`40_resources`·`60_meta`·legacy-root 폴백 삭제(v4.0 유효한 `50_resources/templates` 폴백만 유지), 푸터 "v3.2"→"v4.0"·stale 도크스트링 수정. **의도적 보존**: `migrations/v3.2_to_v4.0.py`(v3.2→v4.0 이관=유일 escape hatch)·런처(_start/*)·pre-push 훅의 3-tier 탐지(Python 실행 전 툴을 찾는 부트스트랩 tolerance, 트래킹 이슈 범위 밖·synced 7곳 리스크). 검증: py_compile 2개·dashboard 재생성(nodes=42, obs 카운트 107=50_resources 87+70_meta 21 양쪽 정상)·wrap. 079~100 점검·정비 사이클 마무리.
-- 2026-07-09: **METH-099 methodology-graph.json 노드 보강 + 096~098 stranded 복구 (Class A, PR #88 대기)** — 대시보드 관계 그래프가 guide 00·01·10~18만 담아 **02~21 상당수 누락**(METH-079 발견 Open Issue)을 종결. **노드 29→42**: guide 10개(02 식별자·03 관찰로그·05 채널분리·06 컴팩션·07 자율진행·08 서브에이전트·09 핸드오프재포맷·19 클린아키텍처·20 디자인토큰·21 개발명세; **04는 미존재라 제외**) + 학습루프 3종(ai_observations·catalog·skeletons) + checkpoint(핵심 라이브인데 누락). **엣지 39→53**: g00 parent-of 메타룰 7·g18→g21→g19/g20 dev트랙·observe→catalog→skeleton 학습루프·templates→checkpoint. **stale ai-log 노드 제거**(AI-LOG.md는 083서 삭제됨=dead). tier6 "개발 트랙 규칙" 신설·learning kind 추가·v3.2. dashboard 재생성 렌더 검증(nodes=42)·JSON 정합(dangling/dup 0·경로 전부 존재·lifecycle g21 참조 해소). **부수(중요)**: 스택-PR 재타깃 함정으로 #85/#86/#87이 main 아닌 중간 브랜치로 머지→096/097/098 main 미반영이던 것을 이 단일 PR(base=main)로 복구.
