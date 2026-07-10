@@ -4,14 +4,14 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-105 — 브리프 **자동 분류·정리 체계**. 유형 폴더(meetings/research/reference/ideas + standing) + "브리프 던지면 AI가 유형 판별해 배치" 규칙 + boot이 유형별 그룹 노출. Class A(7 repo). PR base=main 대기. 상세는 checkpoint.
+- **Working on**: METH-106 — 다운스트림 5곳(icons-invest·cafe24·gamblescan·icons·tshome) v4.0 sync 완료(092~105 전파). feature 브랜치 4곳 main 체크아웃 후 sync·복원. ai-icons·talmo는 더티·타세션이라 제외(각 세션에서). 커스텀 guide 보존(no --prune). 상세는 checkpoint.
 - **Current mode**: fullstack
 - **Next TODO**: 079~105 점검·정비 + 부팅/브리프 개선(101~105) 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·업무기술서 SOP 박제, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
 
 ## Active Links
 
-- Current PR: METH-105 브리프 자동분류 (신규, base=main) · 095~104 = #84·#89·#91·#92·#93 머지 완료 · 063~094 = #53~#83 머지
+- Current PR: METH-106 다운스트림 sync (신규, base=main) · 095~105 = #84~#94 머지 완료 · 063~094 = #53~#83 머지
 - Current issue:
 - Relevant ADRs:
 - Relevant snapshots: `40_dev/snapshots/implementation-plan-2026-05-07.md`, `40_dev/snapshots/transfer-drill-2026-05-08.md`
@@ -34,13 +34,15 @@
 | - | ~~`methodology-graph.json` 노드 불완전~~ | — | **Closed(METH-099)** — guide 10종(02·03·05·06·07·08·09·19·20·21) + 학습루프(observations·catalog·skeletons) + checkpoint 노드 추가, stale ai-log 제거. 노드 29→42·엣지 39→53. dashboard 렌더 검증(nodes=42)·JSON 정합 0 오류. (04는 미존재라 제외) |
 | - | ⚠️ **스택-PR 재타깃 함정** — #85/#86/#87이 main 아닌 중간 브랜치로 머지됨(096/097/098 main 미반영) | — | **복구중(METH-099)** — 099 브랜치가 095-098 온전 보존 브랜치 기준 → base=main 단일 PR로 096+097+098+099 한 번에 복구. 교훈: 스택-PR은 순서·브랜치 삭제 타이밍 취약 → **main 직행 단일 PR 선호** |
 | - | ~~`.claude/skills` 레거시 3종~~ | — | **Closed(METH-090)** — ai-planning·ai-relay·vibe-coding 삭제. 기능은 guide 01/08/19+prompts가 정본. 90_archive 히스토리는 보존 |
+| - | icons-invest sync 커밋(f4e6605)에 `30_planning/10_사업기획서.md` 3줄 WIP 혼입 | Low | METH-106 sync 시 `git add -A`가 미커밋 WIP 쓸어담음. 내용 정당(미정 placeholder·Class C 미침범)·main 보존·유실 없음. 히스토리 재작성 안 함. **교훈: sync 커밋은 타깃 스테이징**(observe friction 기록) |
+| - | ai-icons·talmo-com 다운스트림 sync 미적용(더티·타세션) | Low | METH-106에서 제외. 각 repo 세션에서 boot·sync로 최신화 필요(092~105 미반영 상태) |
 
 ## Recent Changes
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-07-10: **METH-105 브리프 자동 분류·정리 체계 (Class A, PR base=main 대기)** — 사용자가 브리프를 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더 신설(`research/`·`reference/`·`ideas/`; 기존 meetings/·standing/) + `_README §자동 분류` 규칙표(회의→meetings/조사→research/외부원본→reference/방향→ideas/반복절차→standing; 애매하면 확인) + CLAUDE/AGENTS §2 "브리프 자동 분류" 규칙 + boot이 유형별 그룹으로 노출(standing ★ 최상단). MANIFEST init_paths 반영. 검증: py_compile·boot 그룹 스캔·manifest·managed sync.
+- 2026-07-10: **METH-106 다운스트림 sync 5곳 (Class A, PR base=main 대기)** — 092~105 전파. icons-invest(main)·cafe24·gamblescan·icons·tshome(feature 브랜치→main 체크아웃 후 sync·원 브랜치 복원). 각 29파일 shared+managed 머지, 다운스트림 커스텀 guide(90/91 등) --prune 없이 보존, main 직접 push(--no-verify, established 절차). **혼입 1건**: icons-invest add -A가 사업기획서 3줄 WIP 쓸어담음(정당·유실 없음, Open Issue 등재). **제외**: ai-icons·talmo(더티·타세션→각 세션에서). friction 기록: sync 커밋 타깃 스테이징.
+- 2026-07-10: **METH-105 브리프 자동 분류·정리 체계 (Class A, PR #94 머지)** — 사용자가 브리프를 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더 신설(`research/`·`reference/`·`ideas/`; 기존 meetings/·standing/) + `_README §자동 분류` 규칙표(회의→meetings/조사→research/외부원본→reference/방향→ideas/반복절차→standing; 애매하면 확인) + CLAUDE/AGENTS §2 "브리프 자동 분류" 규칙 + boot이 유형별 그룹으로 노출(standing ★ 최상단). MANIFEST init_paths 반영. 검증: py_compile·boot 그룹 스캔·manifest·managed sync.
 - 2026-07-10: **METH-104 SOP 트리거에 "인식 신호" 항목 추가 (Class A, PR #93 머지)** — 반복작업 매칭이 문자열 아닌 LLM 의미추론이라, SOP 트리거에 "어떤 요청/말이 이 작업을 의미하는가"(인식 신호) 앵커를 명시하면 매칭 신뢰도↑. `SOP_template.md` 트리거 = 인식신호 + 주기/이벤트로 분리, `_README §standing` 반영.
 - 2026-07-10: **METH-103 상시 SOP 쓰기 트리거 규칙 (Class A, PR #92 머지)** — 102가 standing SOP의 *읽기*(boot 노출)만 완비하고 *쓰기* 반사신경이 없던 구멍을 메움. CLAUDE/AGENTS managed block에 "반복 작업 기억 (요청 시)" 규칙: 사용자가 "기억해줘/반복작업이야" → `standing/SOP_<topic>.md` 박제 + 절차 변경 시 갱신 제안 + 작업SOP(repo) vs 개인메모리(도구) 구분. _README §5도 반영. managed sync 확인.
 - 2026-07-10: **METH-102 라이브파일 경계 재분리 + 상시 브리프 (Class A, PR #91 머지)** — HANDOFF=상태보드/checkpoint=서사 경계를 §4·§2·템플릿·에 못박아 중복 제거(checkpoint의 "미해결 결정사항"=HANDOFF Open Issues 중복 제거). `00_briefs/standing/`(반복작업 SOP·아카이브 안 됨) 신설, boot이 ★로 항상 최상단 노출. 반복 작업이 새 세션에 안 잊히게. #90(boot) 포함 base=main.
-- 2026-07-10: **METH-101 부팅 강제 + 비대화 린트 (Class A, PR #90 OPEN)** — `methodology.py boot` 신설 + wrap 사이즈 린트(`live_file_size_warnings`). ai-icons 부팅 스킵 사고 상류 대응.
