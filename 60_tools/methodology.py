@@ -72,55 +72,8 @@ METHODOLOGY_VERSION = "v4.0"
 METHODOLOGY_ROOT = Path(__file__).resolve().parent.parent
 
 
-# ─── 구조 탐지 (v3.2 vs v4.0) ───────────────────────────────────────────────
-# 같은 repo 안에서도 worktree 마다 옛 구조(50_tools/40_resources/00_foundation 등)
-# vs 새 구조(60_tools/50_resources/10_foundation 등) 가 공존할 수 있음.
-# 모든 경로 하드코딩 대신 이 함수를 사용해 *해당 target* 의 구조를 탐지.
-#
-# 정합성 안전망: pre-push hook / .app 런처 / CI / wrap 모두 동일 로직을 공유.
-
-_LAYOUT_V4 = {
-    "version":    "v4.0",
-    "tools":      "60_tools",
-    "resources":  "50_resources",
-    "foundation": "10_foundation",
-    "guides":     "20_guides",
-    "planning":   "30_planning",
-    "dev":        "40_dev",
-    "briefs":     "00_briefs",
-    "meta":       "70_meta",
-}
-
-_LAYOUT_V32 = {
-    "version":    "v3.2",
-    "tools":      "50_tools",
-    "resources":  "40_resources",
-    "foundation": "00_foundation",
-    "guides":     "10_guides",
-    "planning":   "20_planning",
-    "dev":        "30_dev",
-    "briefs":     None,  # v3.2 에는 briefs 폴더 없음
-    "meta":       "60_meta",
-}
-
-
-def methodology_layout(target: Path) -> dict[str, str | None]:
-    """v3.2/v4.0 구조 자동 탐지.
-
-    탐지 우선순위:
-      1. v4.0 시그니처 — `60_tools/methodology.py` 존재
-      2. v3.2 시그니처 — `50_tools/methodology.py` 존재
-      3. 둘 다 없으면 v4.0 으로 가정 (신규 init 직후 등)
-
-    모든 호출지는 이 함수 결과의 키만 사용:
-        layout = methodology_layout(target)
-        obs_dir = target / layout["resources"] / "ai_observations"
-    """
-    if (target / "60_tools" / "methodology.py").exists():
-        return _LAYOUT_V4
-    if (target / "50_tools" / "methodology.py").exists():
-        return _LAYOUT_V32
-    return _LAYOUT_V4  # default to latest for fresh init
+# 구조는 v4.0 고정 (60_tools / 50_resources / 70_meta ...).
+# v3.2 이하 지원 종료 — 옛 구조 저장소는 `migrations/v3.2_to_v4.0.py` 로 먼저 이관.
 
 # ─── 매니페스트 ─────────────────────────────────────────────────────────────
 MANIFEST = {
@@ -210,9 +163,8 @@ OBSERVATION_DIR = Path("50_resources/ai_observations")  # default (v4.0). 실제
 
 
 def _observation_dir(target: Path) -> Path:
-    """관찰 로그 디렉터리 — layout 기반. v3.2: 40_resources, v4.0: 50_resources."""
-    layout = methodology_layout(target)
-    return target / layout["resources"] / "ai_observations"
+    """관찰 로그 디렉터리 (v4.0 고정)."""
+    return target / "50_resources" / "ai_observations"
 CATALOG_DIR = Path("50_resources/catalog")
 SKELETONS_DIR = Path("50_resources/skeletons")
 INSIGHTS_DIR = Path("40_dev/snapshots/insights")
@@ -2189,23 +2141,12 @@ _WRAP_TRACKED: list[tuple[str, str]] = [
     (".ai/checkpoint.md",  ".ai/checkpoint.md"),
 ]
 def _wrap_obs_dirs(target: Path) -> tuple[str, ...]:
-    """관찰 로그 디렉터리 — layout 기반 동적 탐지.
+    """관찰 로그 디렉터리 (v4.0 고정).
 
-    v3.2: 40_resources/ai_observations + 60_meta/observations
-    v4.0: 50_resources/ai_observations + 70_meta/observations
-    구조 마이그레이션 중간 상태도 처리 (양쪽 모두 검사).
+    50_resources/ai_observations — 적용 프로젝트·source 공통.
+    70_meta/observations — source 저장소 전용(메타-방법론 격리).
     """
-    layout = methodology_layout(target)
-    dirs = [
-        f"{layout['resources']}/ai_observations",
-        f"{layout['meta']}/observations",
-    ]
-    # 마이그레이션 직후 양쪽 구조가 잠시 공존할 수 있음 — 양쪽 모두 추적
-    if layout["version"] == "v4.0":
-        dirs += ["40_resources/ai_observations", "60_meta/observations"]
-    else:
-        dirs += ["50_resources/ai_observations", "70_meta/observations"]
-    return tuple(dirs)
+    return ("50_resources/ai_observations", "70_meta/observations")
 
 
 def wrap_state_path(target: Path) -> Path:

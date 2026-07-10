@@ -2,7 +2,7 @@
 """generate-dashboard.py — 방법론 대시보드 단일 파일 빌더.
 
 하는 일:
-  1) docs/methodology-graph.json 을 읽어 방법론 그래프 + 라이프사이클을 시각화
+  1) 60_tools/methodology-graph.json 을 읽어 방법론 그래프 + 라이프사이클을 시각화
   2) TODO.md 의 5개 섹션(Backlog/Ready/InProgress/Blocked/Done)을 칸반으로 파싱
   3) CLAUDE.md, HANDOFF.md, 20_guides/README.md 일부를 가이드 탭에 인라인
 
@@ -33,32 +33,20 @@ ROOT = Path(__file__).resolve().parent.parent
 KANBAN_SECTIONS = ["Backlog", "Ready", "InProgress", "Blocked", "Done"]
 
 
-# ─── 구조 탐지 (v3.2 vs v4.0) ───────────────────────────────────────────────
-# generate-dashboard.py 는 standalone (methodology.py import 안 함) 이라
-# layout 탐지를 자체 보유. methodology.py 의 methodology_layout() 와 동일 규칙.
-# v4.0: 60_tools / 50_resources / 70_meta — v3.2: 50_tools / 40_resources / 60_meta
+# ─── 구조 (v4.0 고정) ───────────────────────────────────────────────────────
+# v3.2 이하 지원 종료 — 옛 구조는 `migrations/v3.2_to_v4.0.py` 로 먼저 이관.
 
 _LAYOUT_V4 = {"tools": "60_tools", "resources": "50_resources",
               "meta": "70_meta", "dev": "40_dev", "version": "v4.0"}
-_LAYOUT_V32 = {"tools": "50_tools", "resources": "40_resources",
-               "meta": "60_meta", "dev": "30_dev", "version": "v3.2"}
 
 
 def dash_layout(root: Path) -> dict[str, str]:
-    """대상 프로젝트의 v3.2/v4.0 구조 탐지. 모든 NN_ 경로 하드코딩 대신 사용."""
-    if (root / "60_tools" / "methodology.py").exists():
-        return _LAYOUT_V4
-    if (root / "50_tools" / "methodology.py").exists():
-        return _LAYOUT_V32
-    return _LAYOUT_V4  # 신규/탐지 실패 시 최신 가정
+    """v4.0 고정 레이아웃(60_tools / 50_resources / 70_meta ...)."""
+    return _LAYOUT_V4
 
 
 def resolve_methodology_py(root: Path) -> Path:
-    """methodology.py 경로 — 3-tier (60_tools → 50_tools → root). 미발견 시 v4.0 경로 반환."""
-    for rel in ("60_tools/methodology.py", "50_tools/methodology.py", "methodology.py"):
-        p = root / rel
-        if p.exists():
-            return p
+    """methodology.py 경로 (v4.0 고정: 60_tools/)."""
     return root / "60_tools" / "methodology.py"
 
 
@@ -259,11 +247,9 @@ def read_json_safe(path: Path) -> dict:
 def _count_observations(root: Path) -> int:
     """관찰 로그 카운트 — 50_resources/ai_observations + 70_meta/observations 모두 포함.
     적용 프로젝트는 50_resources 만 가짐 (70_meta 는 source 전용). source 저장소는 양쪽 합산.
-    v3.2 fallback (40_resources / 60_meta) 도 추가 검사.
     """
     total = 0
-    for rel in ("50_resources/ai_observations", "70_meta/observations",
-                "40_resources/ai_observations", "60_meta/observations"):
+    for rel in ("50_resources/ai_observations", "70_meta/observations"):
         d = root / rel
         if not d.is_dir():
             continue
@@ -303,34 +289,25 @@ def assemble(root: Path) -> dict[str, Any]:
     L = dash_layout(root)
     tools, res, dev = L["tools"], L["resources"], L["dev"]
 
-    # graph: <tools>/ 우선, 루트 fallback, docs/ fallback (이전 구조 호환)
+    # graph: <tools>/ (v4.0 고정)
     graph_path = root / tools / "methodology-graph.json"
-    for cand in [root / "methodology-graph.json", root / "docs" / "methodology-graph.json"]:
-        if not graph_path.exists():
-            graph_path = cand
 
-    # TODO: 루트 → <res>/templates → docs/templates
+    # TODO / HANDOFF: 적용 프로젝트는 루트, source 저장소 뷰는 templates fallback
     todo_path = root / "TODO.md"
-    for cand in [root / res / "templates" / "TODO.md", root / "docs" / "templates" / "TODO.md"]:
-        if not todo_path.exists():
-            todo_path = cand
+    if not todo_path.exists():
+        todo_path = root / res / "templates" / "TODO.md"
 
     handoff_path = root / "HANDOFF.md"
-    for cand in [root / res / "templates" / "HANDOFF.md", root / "docs" / "templates" / "HANDOFF.md"]:
-        if not handoff_path.exists():
-            handoff_path = cand
+    if not handoff_path.exists():
+        handoff_path = root / res / "templates" / "HANDOFF.md"
 
-    # MASTER_PLAN: <dev> → root → <res>/templates
+    # MASTER_PLAN: <dev> → <res>/templates
     master_plan_path = root / dev / "MASTER_PLAN.md"
-    for cand in [root / "MASTER_PLAN.md", root / res / "templates" / "MASTER_PLAN.md"]:
-        if not master_plan_path.exists():
-            master_plan_path = cand
+    if not master_plan_path.exists():
+        master_plan_path = root / res / "templates" / "MASTER_PLAN.md"
 
     claude_path = root / "CLAUDE.md"
-    # README: 새 구조 → 구 구조 fallback
     readme_path = root / "20_guides" / "README.md"
-    if not readme_path.exists():
-        readme_path = root / "docs" / "archive" / "planning-guides" / "README.md"
 
     graph = json.loads(graph_path.read_text(encoding="utf-8")) if graph_path.exists() else {
         "nodes": [], "edges": [], "lifecycle": {"stages": []}, "kinds": {}
@@ -1487,7 +1464,7 @@ function initGraph(){
   document.getElementById('guide-content').innerHTML=`
     <div class="section-head" style="margin-top:0">
       <h2>방법론 <em>백서</em>.</h2>
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">v3.2 · Evidence-Driven AI Development</span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">v4.0 · Evidence-Driven AI Development</span>
     </div>
     <div class="row2">
       <div class="card">
