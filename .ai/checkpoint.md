@@ -1,7 +1,7 @@
-# Checkpoint — 2026-07-10 (METH-100 v3.2 compat 정리)
+# Checkpoint — 2026-07-10 (METH-102 라이브파일 경계 재분리 + 상시 브리프)
 
-> ✅ **METH-100**: v3.2 backward-compat 코드 제거(methodology.py·generate-dashboard.py 구조탐지·폴백 → v4.0 고정). migrations 스크립트·런처/훅 부트스트랩 탐지는 보존. py_compile·dashboard·wrap 검증.
-> ⚠️ **미머지 스택 상태**: 이 브랜치는 #99(=096~099) 위에 100을 얹음. #88(OPEN)이 아직 안 머지됨. 이 PR(base=main)에 096+097+098+099+100 전부 포함 → 이거 하나 머지하면 다 반영(#88은 중복이라 close 가능).
+> ✅ **METH-102**: (b) HANDOFF(상태보드) ↔ checkpoint(서사) 경계 재분리로 중복 제거 + `00_briefs/standing/`(반복작업 SOP, boot이 ★ 항상 노출) 신설. Class A(7 repo).
+> ⚠️ **#90(METH-101 boot)이 아직 OPEN**(미머지) — 이 브랜치는 #90 위에 얹혀 base=main PR에 boot+102 전부 포함. 이 PR 하나 머지하면 다 반영, #90은 close.
 
 ---
 
@@ -11,30 +11,23 @@
 
 ## 작성자
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `claude/meth-100-v32-compat-cleanup` (#99 브랜치 기준=095~099 온전 보존, branch-first)
+- Worktree: branch `claude/meth-102-livefile-boundary-standing-briefs` (#90/101 브랜치 위 스택, branch-first)
 
 ## 부팅 계약
 1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
-## 방금 한 것
-**METH-100 — v3.2 backward-compat 코드 정리.** 현존 repo 7곳 전부 v4.0이라 dead였던 v3.2 폴백 제거:
-- **methodology.py**: `_LAYOUT_V32`+`methodology_layout()` 구조탐지 삭제(→v4.0 고정). `_observation_dir`/`_wrap_obs_dirs`를 50_resources/70_meta 하드코딩(40_resources/60_meta 폴백 삭제).
-- **generate-dashboard.py**: `_LAYOUT_V32`+`dash_layout`+`resolve_methodology_py` 3-tier 탐지 삭제(→v4.0 고정). `_count_observations`·`assemble`의 `docs/`·`40_resources`·`60_meta`·legacy-root 폴백 삭제(v4.0 유효한 `50_resources/templates` 폴백만 유지). 푸터 "v3.2"→"v4.0"·stale 도크스트링 수정.
-- **의도적 보존**: `migrations/v3.2_to_v4.0.py`(v3.2→v4.0 이관=유일 escape hatch) · 런처(_start/*)·pre-push 훅의 3-tier 탐지(Python 실행 전 툴을 찾는 부트스트랩 tolerance, 트래킹 이슈 범위 밖·synced 7곳 리스크).
-- 검증: py_compile 2개 · dashboard 재생성(nodes=42, obs 카운트 107=50_resources 87+70_meta 21 양쪽 정상) · wrap.
-
-**직전(099)**: methodology-graph.json 노드 29→42·엣지 39→53(METH-079 Open Issue 종결) + 스택-PR 함정 복구.
-
-## ⚠️ 미머지 스택 상태 (중요)
-- **#88(OPEN, base=main)**: 096+097+098+099 복구 PR. 아직 안 머지됨.
-- 이 브랜치(100)는 #99 브랜치 위에 얹혀 있어 **096+097+098+099+100 전부 포함**. base=main PR 하나 머지하면 다 반영 → **#88은 중복이므로 close 가능**.
-- 095만 main에 있음(#84). 나머지는 전부 이 PR에 담김.
+## 방금 한 것 (이번 세션)
+**METH-102 — 라이브파일 경계 재분리(b) + 상시 브리프.** 사용자 질문("파일이 왜 이렇게 나뉘나 / 반복작업을 새 세션이 기억 못하나")에서 두 가지 도출:
+- **(b) HANDOFF ↔ checkpoint 경계 재분리** (중복 제거): 둘 다 "현재 상태+인계"라 30~40% 겹쳐 이중 기입하던 것을 못박음. **HANDOFF = 누적 상태 보드**(현재포커스·오픈이슈/결정·링크·Recent terse 1줄·대시보드 파싱). **checkpoint = 이번 세션 서사 바통**(방금 한 것·다음 구체행동·막힌 것·환경, 콜드스타트·컴팩션 앵커). checkpoint의 "미해결 결정사항" 섹션 삭제(→HANDOFF Open Issues 참조). 반영처: 템플릿 2개 헤더 + CLAUDE/AGENTS §4에 checkpoint 행 신설·HANDOFF 행 타이트닝 + §2 세션종료 규칙 ②③ 경계 명기.
+- **상시 브리프 신설** (반복작업 기억 구멍): 반복·정기 작업 SOP가 obs/커밋에만 흩어져 새 세션이 못 찾던 문제 → `00_briefs/standing/`(날짜없음·아카이브 안 됨) 신설, `SOP_template.md` 스캐폴드, `boot`이 ★로 항상 최상단 노출(템플릿은 필터). `00_briefs/_README`에 standing 규칙, boot 규칙·MANIFEST(shared+init) 반영.
+- 검증: py_compile · boot 실행(standing ★ + current 분리 출력, 실제 SOP 뜨는 것까지) · manifest-check · managed block 동일(self-ref만 차이).
 
 ## 다음 사람에게
-1. **METH-100 PR(base=main) 머지** = 096~100 한 번에 반영. 머지 후 #88 close + origin 중간 스택 브랜치(095/096/097/099 deepen) 삭제.
-2. 남은 것: 079~100 점검·정비 사이클 **완료**. 다른 repo(별도 세션): ai-icons 92 환류·talmo-com.
-3. **교훈(반영됨)**: 스택-PR 재타깃 취약 → main 직행 단일 PR 선호([[prefer-main-direct-pr]] 메모리).
+1. **METH-102 PR(base=main) 머지** = #90(boot)+101(사이즈린트)+102(경계+상시브리프) 전부 반영. 머지 후 #90 close.
+2. ⚠️ **#90이 아직 OPEN** — 사용자가 "머지했다"고 했으나 gh 기준 미머지(#85~87에 이어 2번째). 사용자에게 실제 머지 여부 확인 권고.
+3. **각 repo 세션**: 반복작업은 `00_briefs/standing/SOP_*`로 박제. ai-icons는 업무기술서 처리 SOP를 이걸로 만들면 재발 방지. + 비대 라이브파일 트리밍(101 린트).
 
 ## 환경 메모
-- 브랜치: `claude/meth-100-v32-compat-cleanup` (#99 기준=095~099 온전). branch-first.
-- 진척: 메타/dev(092-094) + agency/ops(095-098) + graph(099) + **v3.2 compat 정리(100)**. 점검·정합·구조·전파·정비 사이클(079~100) **마무리**.
+- 브랜치: `claude/meth-102-livefile-boundary-standing-briefs` (#90/101 브랜치 위). branch-first.
+- 누적 상태(오픈이슈·PR 목록)는 **HANDOFF 참조** — 여기 복제 안 함(이번 경계 규칙 dogfooding).
+- 진척: 메타/dev(092-094)+agency/ops(095-098)+graph(099)+v3.2(100)+부팅/비대화(101)+**경계/상시브리프(102)**.
