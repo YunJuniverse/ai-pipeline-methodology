@@ -65,9 +65,10 @@ ai_relevance: rule
 
 ## 5. AI 측 규칙 (CLAUDE.md / AGENTS.md 반영)
 
-- **세션 부팅 시** must_read 로 `current/*.md` 일별 정렬 후 *전부 읽음*
+- **세션 부팅 시** `boot` 이 `standing/*`(항상 먼저) + `current/*.md`(날짜순) 나열 → 본문 *전부 읽음*
 - 작업 진행 중 *그 브리프 내용을 어떻게 반영했는지* 명시 (예: "TALMOCOM-042 는 2026-05-14_onboarding.md 의 §3 반영")
 - *옛 브리프와 충돌* 발생 시 사용자에게 확인 — 자동 결정 금지
+- **반복 작업 기억 요청 시** ("기억해줘/이건 반복 작업이야") → `standing/SOP_<topic>.md` 작성(`SOP_template.md` 형식). 절차 변경 감지 시 갱신 제안
 
 ## 6. 안티패턴
 
