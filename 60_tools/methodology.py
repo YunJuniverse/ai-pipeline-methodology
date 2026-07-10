@@ -108,9 +108,11 @@ MANIFEST = {
     # init이 1회 생성하는 디렉터리·파일 (sync 무시)
     "init_paths": [
         "00_briefs/standing",
-        "00_briefs/current",
-        "00_briefs/archived",
         "00_briefs/meetings",
+        "00_briefs/research",
+        "00_briefs/reference",
+        "00_briefs/ideas",
+        "00_briefs/archived",
         "30_planning",
         "40_dev",
         "50_resources/catalog/_pending",
@@ -2459,27 +2461,34 @@ def cmd_boot(args: argparse.Namespace) -> int:
     ok("methodology boot — 세션 시작 브리핑")
     print()
 
-    # [1] 브리프 로드 목록 — standing(상시·항상 최상단) 먼저, 그다음 current(날짜순)
+    # [1] 브리프 로드 목록 — 유형 폴더별 그룹 (standing ★ 최상단, archived 제외)
     print("\033[1m[1] 부팅 브리프\033[0m (전부 읽고 반영 보고, 옛 브리프 충돌 시 사용자 확인)")
-    standing_dir = target / "00_briefs" / "standing"
-    standing = sorted(
-        p for p in standing_dir.rglob("*.md")
-        if p.name != "_README.md" and "template" not in p.name.lower()
-    ) if standing_dir.is_dir() else []
-    if standing:
-        print("  \033[1m★ 상시 SOP (반복·정기 작업 — 착수 전 반드시 확인):\033[0m")
-        for p in standing:
-            print(f"    ★ {p.relative_to(target)}")
-    curr_dir = target / "00_briefs" / "current"
-    curr = sorted(
-        p for p in curr_dir.rglob("*.md") if p.name != "_README.md"
-    ) if curr_dir.is_dir() else []
-    print("  현재 브리프(날짜순):")
-    if curr:
-        for p in curr:
-            print(f"    · {p.relative_to(target)}")
-    else:
-        print("    (없음)")
+    briefs_root = target / "00_briefs"
+    # 표시 순서·라벨 (정의 안 된 폴더는 이름 그대로, 맨 뒤)
+    BRIEF_LABELS = {
+        "standing": "★ 상시 SOP (반복작업 — 착수 전 확인)",
+        "meetings": "회의록", "research": "리서치", "reference": "참고자료",
+        "ideas": "아이디어·방향", "current": "현재·미분류",
+    }
+    order = ["standing", "meetings", "research", "reference", "ideas", "current"]
+    found_any = False
+    if briefs_root.is_dir():
+        subs = [p for p in briefs_root.iterdir() if p.is_dir() and p.name != "archived"]
+        subs.sort(key=lambda p: (order.index(p.name) if p.name in order else len(order), p.name))
+        for sub in subs:
+            files = sorted(
+                p for p in sub.glob("*.md")
+                if p.name != "_README.md" and "template" not in p.name.lower()
+            )
+            if not files:
+                continue
+            found_any = True
+            star = sub.name == "standing"
+            print(f"  \033[1m{BRIEF_LABELS.get(sub.name, sub.name)} ({sub.name}/):\033[0m")
+            for p in files:
+                print(f"    {'★' if star else '·'} {p.relative_to(target)}")
+    if not found_any:
+        print("    (브리프 없음)")
     print()
 
     # [2] HANDOFF 현재 포커스
