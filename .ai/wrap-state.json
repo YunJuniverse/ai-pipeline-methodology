@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "ab40783392918e08a96d564daeea0a914d25902d",
-  "last_validated_at": "2026-07-10T01:57:47Z",
+  "last_validated_commit": "0e1796e7cf0bb2e1178176321641044598ad6e1a",
+  "last_validated_at": "2026-07-10T02:06:44Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "594e1c8cbf1cfa128a7243440e6b0df72fe46025cb8699d51a30c902533dd57f"
+      "sha256": "b2fe20d6c88a1100aca2e543d6ffc95ca8f49998c5ef4bace97dde02a2be0c28"
     },
     "TODO.md": {
-      "sha256": "efd1d4f0cce9914ef06b8d73773172824b2669d5ce185e454656b87cb1cadc1e"
+      "sha256": "131468ae9478750be50bb6e5c26d0540eb28d10de377b946d0f2c69068af42dd"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d145f65ff118874aa3d9d19d25557d98f6942b4770fbbff6cf26720044f1c331"
+      "sha256": "438a37ecb26b7eb0b2f36e9fa10c7e5d28afd8b9d04dec367838f0971381eebf"
     }
   },
   "observations": {
@@ -106,6 +106,7 @@
       "50_resources/ai_observations/2026-07-10_meth-100-v32-compat-cleanup.md",
       "50_resources/ai_observations/2026-07-10_meth-101-boot-cmd-size-lint.md",
       "50_resources/ai_observations/2026-07-10_meth-102-livefile-boundary-standing-briefs.md",
+      "50_resources/ai_observations/2026-07-10_meth-103-standing-write-trigger.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
