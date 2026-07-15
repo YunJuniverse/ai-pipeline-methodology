@@ -81,6 +81,7 @@ def test_dashboard_co_build_writes_viz() -> None:
 
 def test_dashboard_embeds_graph_iframe() -> None:
     # 대시보드가 그래프 탭에 graph-viz 를 iframe 으로 임베드하고 d3 CDN 을 제거했는지.
+    import re
     import subprocess
     import sys
     import tempfile
@@ -94,6 +95,15 @@ def test_dashboard_embeds_graph_iframe() -> None:
         assert 'id="graph-frame"' in html, "graph 탭 iframe 없음"
         assert "methodology-graph-viz.html" in html, "graph-viz 참조 없음"
         assert "d3js.org" not in html, "죽은 d3 CDN 잔존"
+        # 슬림화(METH-112): 3탭만, 운영/중복 서피스 제거.
+        pages = sorted(set(re.findall(r'id="page-(\w+)"', html)))
+        assert pages == ["docs", "graph", "status"], pages
+        for dead in ("exec-stat-row", "guide-content", "dev-servers-table",
+                     "dashboards-table", "stack-grid", "commands-list"):
+            assert dead not in html, f"컷 대상 잔존: {dead}"
+        for core in ("kanban-board", "file-tabs", "stat-row"):
+            assert core in html, f"핵심 서피스 없음: {core}"
+        assert "node_contents" not in html, "죽은 node_contents 페이로드 잔존"
 
 
 def main() -> int:
