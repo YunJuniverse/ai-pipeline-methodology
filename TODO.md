@@ -15,6 +15,9 @@
 
 ## Done
 
+### sync-all 보류분 처리 (ai-icons·cafe24)
+- **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-ai-icons-residual). ai-icons: WIP(tier2_ai_text.py=프로젝트 코드) 보존한 채 방법론만 sync·push(add -A→WIP reset로 안전 스테이징). main==origin 5a2547c. cafe24: 피처브랜치+skin184 활성 WIP 91건 → 사용자 결정으로 그 세션 위임(미처리). 관리 10곳 중 9 최신·1 보류. branch-first.
+
 ### sync-all 다운스트림 전파 (88b9382)
 - **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-all-propagate). 방법론 최신(graph-viz·dagre·대시보드 통합·슬림화)을 다운스트림 일괄 전파. `sync-all --apply`(가드 skip dirty·비-main) → main-clean 4곳 처리; clean 피처브랜치 4곳(gamblescan·icons·lifeManager·tshome)은 main 체크아웃→sync→push→복원. 8/10 반영(main==origin 0/0). 보류 2: ai-icons·cafe24(dirty WIP). friction: 타깃 스테이징이 루트 shared(ONBOARDING.md) 누락→추가 커밋. branch-first.
 
@@ -23,9 +26,6 @@
 
 ### METH-111 · 지식그래프 대시보드 통합
 - **notes**: 2026-07-15. Class A. PR base=main 대기(feat/dashboard-graph-embed). "아티팩트 말고 대시보드에 통합". 대시보드 '관계 그래프' 탭(기존 자체 d3 force 시뮬)을 우리 dagre graph-viz iframe 임베드로 교체(탭 첫 진입 lazy-load, sibling `methodology-graph-viz.html`). 죽은 d3 CDN·force 140줄·graph CSS 제거→단일 렌더러. `.graph-frame` 82vh. `tests/test_graph_viz.py` 대시보드 임베드 테스트 추가 7/7 + 브라우저 검증(탭→iframe 42/53 로드). branch-first.
-
-### METH-110 · graph-viz 레이아웃 dagre 교체
-- **notes**: 2026-07-15. Class A. PR base=main 대기(feat/graph-viz-dagre). 사용자 "지저분" 지적 → 손 배치 격자 엣지 교차가 원인. 수단 조사(dataviz 스킬·mermaid·그래프 레이아웃 lib) 후 dagre 채택. `60_tools/vendor/dagre.min.js`(40KB, MIT) 벤더링·인라인 → 브라우저 rankdir=LR 계층 레이아웃·엣지 라우팅. 파이썬은 데이터만 주입, 클릭→상세·라이프사이클·테마 유지. dataviz 정돈. `tests/test_graph_viz.py` 6개 + 브라우저 DOM 검증(42노드 9랭크·교차↓·클릭 동작·오류0). 아티팩트 갱신. branch-first.
 
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.

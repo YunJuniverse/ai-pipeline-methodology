@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "88b938260be651ade365c94af0f8cc6389c8b81a",
-  "last_validated_at": "2026-07-15T08:13:48Z",
+  "last_validated_commit": "5a2547cd8cbae53dc02531621ca965d95ad06f88",
+  "last_validated_at": "2026-07-15T08:30:00Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "7d30e98e5430582860c4a02b45168e207fa3305197be11273f33e332f5a4238d"
+      "sha256": "444d8f6a20c4be9baa540c7e69349e16f4c878e8d41d749980a17eaf25b166a7"
     },
     "TODO.md": {
-      "sha256": "e9f24d5f8d36f1e1a64a3ed4e275c209da761d9a860c823a31bcc1af3a50b5f2"
+      "sha256": "3e3dc30ea503f0d7fba85235cc36e43dcf0bf5b19a2b7e2a4fdb701470a577f3"
     },
     ".ai/checkpoint.md": {
-      "sha256": "e4814093f9fd92cd1d99eec65d1abcdac5d3561b0ad1e2c3dde2d9c7efe36ca2"
+      "sha256": "589e158af8816aceea15108792a497872beb01d780a22db8719094bd79e2269e"
     }
   },
   "observations": {
@@ -116,6 +116,7 @@
       "50_resources/ai_observations/2026-07-15_graph-viz-autobuild.md",
       "50_resources/ai_observations/2026-07-15_graph-viz-dagre.md",
       "50_resources/ai_observations/2026-07-15_graph-viz-generator.md",
+      "50_resources/ai_observations/2026-07-15_sync-ai-icons-residual.md",
       "50_resources/ai_observations/2026-07-15_sync-all-helper.md",
       "50_resources/ai_observations/2026-07-15_sync-all-propagate.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
