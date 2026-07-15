@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "757389962a63db89d890f05ac848c0c7393e97ad",
-  "last_validated_at": "2026-07-15T05:34:18Z",
+  "last_validated_commit": "8250077b22833163f58b9c9541a59a80c7e1c3d1",
+  "last_validated_at": "2026-07-15T07:30:03Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "aeeceae601c3be181a6b9865ee78931a80a00b95e7423edcb9e8e6c7ecc104d6"
+      "sha256": "f444ca128b0ebba9c05a4cea394d9528883b0ddd36c26e57c6553ac94fe11df6"
     },
     "TODO.md": {
-      "sha256": "d5ce457bbbcd19dbb9a6673aa50f6f868404f181afacdd56e63bf239eddede20"
+      "sha256": "bf98941cfcd0dc4cf97316c30a72476faeee86da01114856189198fa0accf559"
     },
     ".ai/checkpoint.md": {
-      "sha256": "8ddbd958fa8142a47343beac05a6c1288a24249ea07cdffea3351e2d56a29592"
+      "sha256": "130154178a3caa49833f7784c88b78bdd9077b7a2502d8802f22d2d258d751ab"
     }
   },
   "observations": {
@@ -111,6 +111,7 @@
       "50_resources/ai_observations/2026-07-10_meth-105-brief-auto-filing.md",
       "50_resources/ai_observations/2026-07-10_meth-106-downstream-sync.md",
       "50_resources/ai_observations/2026-07-15_ai-icons-talmo-sync.md",
+      "50_resources/ai_observations/2026-07-15_dashboard-graph-embed.md",
       "50_resources/ai_observations/2026-07-15_graph-viz-autobuild.md",
       "50_resources/ai_observations/2026-07-15_graph-viz-dagre.md",
       "50_resources/ai_observations/2026-07-15_graph-viz-generator.md",

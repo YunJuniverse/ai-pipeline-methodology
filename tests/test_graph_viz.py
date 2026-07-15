@@ -79,6 +79,23 @@ def test_dashboard_co_build_writes_viz() -> None:
         assert "<svg" in txt and "dagre.layout" in txt
 
 
+def test_dashboard_embeds_graph_iframe() -> None:
+    # 대시보드가 그래프 탭에 graph-viz 를 iframe 으로 임베드하고 d3 CDN 을 제거했는지.
+    import subprocess
+    import sys
+    import tempfile
+    builder = ROOT / "60_tools" / "generate-dashboard.py"
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "dashboard.html"
+        subprocess.check_call(
+            [sys.executable, str(builder), "--root", str(ROOT), "--out", str(out)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        html = out.read_text(encoding="utf-8")
+        assert 'id="graph-frame"' in html, "graph 탭 iframe 없음"
+        assert "methodology-graph-viz.html" in html, "graph-viz 참조 없음"
+        assert "d3js.org" not in html, "죽은 d3 CDN 잔존"
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
