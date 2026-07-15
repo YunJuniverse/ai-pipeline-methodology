@@ -15,6 +15,9 @@
 
 ## Done
 
+### METH-108 · 지식그래프 시각화 생성기
+- **notes**: 2026-07-15. Class A. PR base=main 대기(feat/graph-viz-generator). `60_tools/generate-graph-viz.py`: 정본 `methodology-graph.json`(42/53)을 문서역할 지식그래프 HTML로 자동 렌더 → 하드코딩 아티팩트(v3.1 30/41) 드리프트 해결. 노드 좌표=category열/guides tier분할 결정적 배치, 엣지 primary/보조 분류, 라이프사이클+상세패널 상호작용 포팅. 기본 출력 body-content(Artifact용), --standalone 완전문서. `tests/test_graph_viz.py` 8/8 + 브라우저 DOM 검증. 사용자 아티팩트(e3d2f0cc) 갱신. branch-first.
+
 ### METH-107 · sync-all 일괄 sync 헬퍼
 - **notes**: 2026-07-15. Class A. PR base=main 대기(feat/sync-all-helper). `methodology sync-all`: root(기본 `~/`) 아래 `.methodology-version` 프로젝트 자동 발견→사전 스캔 표(version·branch·dirty·behind)→각 `cmd_sync` 위임(main-only)→요약. --apply 안전 가드: dirty·비-main skip(METH-106 교훈 박제), --include-dirty/--allow-nonmain override. commit/push는 각 repo 개별. `tests/test_sync_all.py` 9개(의존성 없는 자체 러너, py_compile+9/9 pass). 실측 10곳 dry-run 정상. branch-first.
 
@@ -23,9 +26,6 @@
 
 ### METH-106 · 다운스트림 sync 5곳 (092~105 전파)
 - **notes**: 2026-07-10. Class A. PR base=main 대기. icons-invest·cafe24·gamblescan·icons·tshome에 092~105 sync·push(feature 브랜치 4곳 main 체크아웃 후·원 브랜치 복원). 각 29파일 shared+managed 머지, 커스텀 guide --prune 없이 보존. ai-icons·talmo 제외(더티·타세션). **혼입 1건**: icons-invest add -A가 사업기획서 3줄 WIP 쓸어담음(정당·유실 없음, Open Issue). friction: sync 커밋 타깃 스테이징. branch-first.
-
-### METH-105 · 브리프 자동 분류·정리 체계
-- **notes**: 2026-07-10. Class A(7 repo). PR base=main 대기. 브리프 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더 신설(research/reference/ideas + 기존 meetings/standing) + `_README §자동 분류` 규칙표(회의→meetings/조사→research/외부원본→reference/방향→ideas/반복→standing; 애매하면 확인) + CLAUDE/AGENTS §2 "브리프 자동 분류" 규칙 + boot 유형별 그룹 노출(generic iterdir). MANIFEST init_paths. 검증: py_compile·boot 그룹 스캔·manifest·managed sync. branch-first.
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
