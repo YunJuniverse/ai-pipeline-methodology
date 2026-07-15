@@ -322,30 +322,6 @@ def assemble(root: Path) -> dict[str, Any]:
         for section, cards in kanban_raw.items()
     }
 
-    # 그래프 노드의 path를 따라 실제 파일 내용 로드 (클릭 시 하단 패널에 표시)
-    node_contents = {}
-    for n in graph.get("nodes", []):
-        rel = n.get("path")
-        if not rel:
-            continue
-        p = root / rel
-        if p.is_file():
-            try:
-                txt = p.read_text(encoding="utf-8")
-                node_contents[n["id"]] = {"kind": "file", "text": txt, "size": len(txt)}
-            except Exception as e:
-                node_contents[n["id"]] = {"kind": "error", "text": f"(읽기 실패: {e})"}
-        elif p.is_dir():
-            entries = []
-            for child in sorted(p.iterdir()):
-                entries.append({
-                    "name": child.name,
-                    "is_dir": child.is_dir(),
-                    "size": child.stat().st_size if child.is_file() else None,
-                })
-            node_contents[n["id"]] = {"kind": "dir", "entries": entries, "rel": rel}
-        else:
-            node_contents[n["id"]] = {"kind": "missing", "text": f"(경로 없음: {rel})"}
 
     # 현재 git 브랜치·HEAD short SHA — dashboard가 *어느 브랜치/시점*의 상태인지 명시
     git_branch = "unknown"
@@ -389,7 +365,6 @@ def assemble(root: Path) -> dict[str, Any]:
         "stack": stack_data,
         "graph": graph,
         "kanban": kanban,
-        "node_contents": node_contents,
         "master_plan_text": read_text_safe(master_plan_path, 50000),
         "master_plan_path": str(master_plan_path.relative_to(root)) if master_plan_path.exists() else "",
         "project_overview": {
@@ -794,15 +769,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
 
   <!-- Tabs -->
   <nav class="tabs">
-    <div class="tab active" data-page="overview"><span class="num">01</span><span>프로젝트 개요</span></div>
-    <div class="tab" data-page="guide"><span class="num">02</span><span>가이드 · 백서</span></div>
+    <div class="tab active" data-page="status"><span class="num">01</span><span>상태</span></div>
+    <div class="tab" data-page="docs"><span class="num">02</span><span>문서</span></div>
     <div class="tab" data-page="graph"><span class="num">03</span><span>관계 그래프</span></div>
-    <div class="tab" data-page="kanban"><span class="num">04</span><span>칸반 보드</span></div>
-    <div class="tab" data-page="exec"><span class="num">05</span><span>통합 뷰</span></div>
   </nav>
 
   <!-- Page 01: Overview -->
-  <section class="page active" id="page-overview">
+  <section class="page active" id="page-status">
     <section class="hero">
       <div class="hero-left">
         <span class="eyebrow">Project / <span id="hero-project-name">methodology</span></span>
@@ -817,93 +790,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
     </section>
     <section class="stat-row" id="stat-row"></section>
     <div class="row2" id="stack-progress-row"></div>
-    <div class="card" style="margin-top:var(--gap-card)">
-      <div class="card-head">
-        <h3>파일 <em>뷰어</em></h3>
-        <span class="meta">live state · meta files</span>
-      </div>
-      <div class="file-tabs" id="file-tabs"></div>
-      <div class="file-body" id="file-body"></div>
-    </div>
-    <div class="card" style="margin-top:var(--gap-card)">
-      <div class="card-head">
-        <h3>커맨드 <em>팔레트</em></h3>
-        <span class="meta">click to copy</span>
-      </div>
-      <div class="cmd-tabs" id="commands-tabs"></div>
-      <div class="cmd-list" id="commands-list"></div>
-      <div id="commands-toast" style="min-height:18px;margin-top:12px;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--accent)"></div>
-    </div>
-    <div class="card" style="margin-top:var(--gap-card)">
-      <div class="card-head">
-        <h3>로컬 <em>대시보드</em></h3>
-        <span class="meta">~/.methodology-dashboards.json</span>
-      </div>
-      <table class="tbl" id="dashboards-table">
-        <thead><tr><th>Port</th><th>Project</th><th>Branch</th><th>Commit</th><th>Started</th><th></th></tr></thead>
-        <tbody><tr><td colspan="6" style="padding:14px;color:var(--muted)">Loading…</td></tr></tbody>
-      </table>
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-        <button class="btn" id="dashboards-refresh">↺ Refresh</button>
-        <span id="dashboards-status" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
-      </div>
-    </div>
-    <div class="card" style="margin-top:var(--gap-card)">
-      <div class="card-head">
-        <h3>브랜치 · <em>worktree</em></h3>
-        <span class="meta">spawn isolated dashboard</span>
-      </div>
-      <p style="color:var(--text-dim);font-weight:300;font-size:13px;margin:0 0 14px;max-width:68ch">라디오 선택 → <strong>Open →</strong> 누르면 그 브랜치의 dashboard가 별도 포트에 spawn됩니다.</p>
-      <div id="branches-list"></div>
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-        <button class="btn btn-primary" id="branches-spawn">Open →</button>
-        <button class="btn" id="branches-refresh">↺ Refresh</button>
-        <span id="branches-status" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
-      </div>
-    </div>
-    <div class="card" style="margin-top:var(--gap-card)">
-      <div class="card-head">
-        <h3>Dev <em>servers</em></h3>
-        <span class="meta">auto-port 3000-3099</span>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <input id="dev-cwd" placeholder="cwd" style="flex:1;min-width:240px;background:var(--surface-2);border:1px solid var(--hairline);padding:9px 12px;color:var(--text);font-family:var(--font-mono);font-size:12px"/>
-        <input id="dev-cmd" value="pnpm dev" style="width:140px;background:var(--surface-2);border:1px solid var(--hairline);padding:9px 12px;color:var(--text);font-family:var(--font-mono);font-size:12px"/>
-        <button class="btn btn-primary" id="dev-start">Start ↗</button>
-        <button class="btn btn-danger" id="dev-kill-all">Kill 3000–3099</button>
-        <button class="btn" id="dev-refresh">↺</button>
-      </div>
-      <table class="tbl" id="dev-servers-table">
-        <thead><tr><th>Port</th><th>PID</th><th>CWD</th><th>Cmd</th><th>Started</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <div id="dev-servers-status" style="margin-top:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)"></div>
-    </div>
-
-    <!-- Stack bento -->
-    <div id="stack-section" style="margin-top:var(--gap-card)">
-      <div class="section-head" style="margin-top:0;margin-bottom:18px">
-        <h2>기술 <em>스택</em>.</h2>
-        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase" id="stack-meta">카드 클릭 → 선택 이유</span>
-      </div>
-      <div class="stack-wrap" id="stack-grid"></div>
-    </div>
-  </section>
-
-  <!-- Page 02: Guide -->
-  <section class="page" id="page-guide">
-    <div id="guide-content"></div>
-  </section>
-
-  <!-- Page 03: Graph — 문서 파이프라인 & 역할 지식그래프 (generate-graph-viz.py 임베드) -->
-  <section class="page" id="page-graph">
-    <iframe id="graph-frame" class="graph-frame" title="문서 파이프라인 & 역할 지식그래프" loading="lazy"></iframe>
-  </section>
-
-
-  <!-- Page 05: Kanban -->
-  <section class="page" id="page-kanban">
-    <div class="section-head" style="margin-top:0">
+    <div class="section-head" style="margin-top:var(--gap-card)">
       <h2>칸반 <em>보드</em>.</h2>
       <div class="row">
         <span id="kanban-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase"></span>
@@ -914,17 +801,23 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
     <div class="kanban" id="kanban-board"></div>
   </section>
 
-  <!-- Page 06: Exec -->
-  <section class="page" id="page-exec">
-    <div class="section-head" style="margin-top:0">
-      <h2>통합 <em>뷰</em>.</h2>
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">quick scan · all surfaces</span>
+  <!-- Page 02: Docs -->
+  <section class="page" id="page-docs">
+    <div class="card" style="margin-top:0">
+      <div class="card-head"><h3>문서 <em>뷰어</em></h3><span class="meta">live state · meta files</span></div>
+      <div class="file-tabs" id="file-tabs"></div>
+      <div class="file-body" id="file-body"></div>
     </div>
-    <section class="stat-row" id="exec-stat-row"></section>
-    <div class="row2" style="margin-top:var(--gap-card)" id="exec-row"></div>
-    <div id="exec-dashboards" style="margin-top:var(--gap-card)"></div>
-    <div id="exec-branches" style="margin-top:var(--gap-card)"></div>
   </section>
+
+
+  <!-- Page 03: Graph — 문서 파이프라인 & 역할 지식그래프 (generate-graph-viz.py 임베드) -->
+  <section class="page" id="page-graph">
+    <iframe id="graph-frame" class="graph-frame" title="문서 파이프라인 & 역할 지식그래프" loading="lazy"></iframe>
+  </section>
+
+
+
 
 </div><!-- .app -->
 
@@ -981,7 +874,6 @@ document.querySelectorAll('.tab').forEach(t=>{
     t.classList.add('active');
     document.getElementById('page-'+t.dataset.page).classList.add('active');
     if(t.dataset.page==='graph') initGraph();
-    if(t.dataset.page==='exec') renderExec();
   };
 });
 
@@ -1104,123 +996,6 @@ document.getElementById('stat-row').innerHTML = buildStatHtml();
   show('claude');
 })();
 
-// ── Commands ──────────────────────────────────────────────────
-(function(){
-  const cmdData=DATA.commands;
-  const tabsEl=document.getElementById('commands-tabs');
-  const listEl=document.getElementById('commands-list');
-  const toastEl=document.getElementById('commands-toast');
-  const fallback={categories:[
-    {id:'dashboard',label:'Dashboard',commands:[
-      {label:'Dashboard 빌드+서빙',command:'python3 60_tools/generate-dashboard.py --serve',description:'현재 브랜치·commit 반영'},
-      {label:'세션 wrap (4/4 ✓)',command:'methodology wrap',description:'TODO/HANDOFF/checkpoint/observation 갱신 확인'},
-    ]},
-  ]};
-  const data=(cmdData&&cmdData.categories&&cmdData.categories.length)?cmdData:fallback;
-  function render(catId){
-    tabsEl.innerHTML=data.categories.map(c=>`<div class="cmd-cat ${c.id===catId?'active':''}" data-cat="${esc(c.id)}">${esc(c.label)}</div>`).join('');
-    tabsEl.querySelectorAll('.cmd-cat').forEach(b=>b.onclick=()=>render(b.dataset.cat));
-    const cat=data.categories.find(c=>c.id===catId)||data.categories[0];
-    listEl.innerHTML=(cat&&cat.commands||[]).map(c=>`
-      <div class="cmd-item">
-        <div><div class="lbl">${esc(c.label||c.command)}</div></div>
-        <div class="desc">${esc(c.description||c.desc||'')}</div>
-        <div class="run" data-cmd="${esc(c.command)}" title="copy">${esc(c.command)}</div>
-      </div>`).join('');
-    listEl.querySelectorAll('.run').forEach(el=>{
-      el.onclick=()=>{
-        const cmd=el.dataset.cmd;
-        if(navigator.clipboard)navigator.clipboard.writeText(cmd).catch(()=>{});
-        toastEl.textContent='copied — '+cmd;
-        setTimeout(()=>toastEl.textContent='',1800);
-      };
-    });
-  }
-  if(data.categories.length)render(data.categories[0].id);
-})();
-
-// ── Stack — 카테고리별 그룹, 정렬된 카드 그리드 ────────────────
-// 디자인 변경 이력 (PR #12, stack-cleanup):
-//   - hero 의 grid row-span 으로 자동 배치가 깨지던 문제 → size 는 *강조 등급* 으로 의미 전환.
-//   - hero = 좌측 액센트 + ★ PRIMARY 배지 + 살짝 다른 톤 (layout 변경 X).
-//   - 카테고리 라벨 매 카드 반복 → 카테고리 그룹 헤더 1회.
-//   - role 라벨 uppercase 제거 (한글 줄바꿈 회피).
-//   - 모든 카드에 reason 3-line clamp 노출.
-(function(){
-  const stackData=DATA.stack||{};
-  const wrap=document.getElementById('stack-grid');
-  const metaEl=document.getElementById('stack-meta');
-  const section=document.getElementById('stack-section');
-  if(!wrap)return;
-  const items=stackData.items||[];
-  const cats=stackData.categories||[];
-  if(!items.length){section.style.display='none';return;}
-  const sizeRank={hero:0,mid:1,sm:2};
-  wrap.innerHTML=cats.map((cat,i)=>{
-    const list=items.filter(x=>x.category===cat.id)
-      .sort((a,b)=>(sizeRank[a.size]??9)-(sizeRank[b.size]??9));
-    if(!list.length)return '';
-    const heroCount=list.filter(x=>x.size==='hero').length;
-    return `
-      <div class="stack-cat">
-        <div class="stack-cat-head">
-          <div class="num">${String(i+1).padStart(2,'0')} / ${esc(cat.short||cat.id.toUpperCase())}</div>
-          <div class="lbl">${esc(cat.label)}${heroCount?`<span class="primary-note">★ ${heroCount} primary</span>`:''}</div>
-          <div class="count"><b>${list.length}</b> items</div>
-        </div>
-        <div class="stack-cat-grid">
-          ${list.map(it=>{
-            const hero=it.size==='hero';
-            return `
-              <div class="stack-card ${hero?'hero':''}" data-id="${esc(it.id)}">
-                ${hero?'<span class="star">★ PRIMARY</span>':''}
-                <div class="role">${esc(it.role||'')}</div>
-                <div class="name">${esc(it.name)}</div>
-                ${it.tag?`<div class="tag">${esc(it.tag)}</div>`:''}
-                ${it.reason?`<div class="reason">${esc(it.reason)}</div>`:''}
-                <div class="chev">→</div>
-              </div>`;
-          }).join('')}
-        </div>
-      </div>`;
-  }).join('');
-  // 카드 클릭 → 모달
-  wrap.querySelectorAll('.stack-card').forEach(el=>{
-    el.onclick=()=>{
-      const it=items.find(x=>x.id===el.dataset.id);
-      if(it)openStackModal(it);
-    };
-  });
-  metaEl.textContent=`${items.length} items · ${cats.length} categories`;
-})();
-
-function openStackModal(it){
-  const stackData=DATA.stack||{};
-  const cats=stackData.categories||[];
-  const cat=cats.find(c=>c.id===it.category);
-  const body=`
-    <div class="section">
-      <div class="tag-row" style="margin-bottom:14px">
-        <span class="tg accent">${esc(cat?cat.label:it.category)}</span>
-        ${it.tag?`<span class="tg">${esc(it.tag)}</span>`:''}
-        ${it.role?`<span class="tg">${esc(it.role)}</span>`:''}
-        ${it.size==='hero'?`<span class="tg">hero</span>`:''}
-      </div>
-      <p class="modal-prose">${esc(it.reason||'(이유 미작성)')}</p>
-    </div>
-    <div class="section">
-      <span class="eyebrow">Meta</span>
-      <div class="meta-grid">
-        <div class="cell"><div class="l">id</div><div class="v">${esc(it.id)}</div></div>
-        <div class="cell"><div class="l">category</div><div class="v">${esc(it.category)}</div></div>
-        <div class="cell"><div class="l">role</div><div class="v">${esc(it.role||'—')}</div></div>
-        <div class="cell"><div class="l">size</div><div class="v">${esc(it.size||'sm')}</div></div>
-      </div>
-    </div>
-    ${it.url?`<div class="section"><span class="eyebrow">Docs</span><p class="modal-prose"><a href="${esc(it.url)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">${esc(it.url)} →</a></p></div>`:''}`;
-  openModal(`Stack · ${cat?cat.label:it.category}`,it.name,body);
-}
-
 // ── Kanban ────────────────────────────────────────────────────
 const KANBAN_MAP=[
   {sec:'InProgress',id:'now',      title:'NOW',       hint:'진행 중인 작업 (WIP cap 3)'},
@@ -1296,56 +1071,6 @@ function initGraph(){
   if(f&&!f.getAttribute('src')) f.setAttribute('src','methodology-graph-viz.html');
 }
 
-// ── Guide / Whitepaper ────────────────────────────────────────
-(function(){
-  document.getElementById('guide-content').innerHTML=`
-    <div class="section-head" style="margin-top:0">
-      <h2>방법론 <em>백서</em>.</h2>
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase">v4.0 · Evidence-Driven AI Development</span>
-    </div>
-    <div class="row2">
-      <div class="card">
-        <div class="card-head"><h3><em>5</em> 영역 설계</h3><span class="meta">zones</span></div>
-        <ul class="kv">
-          <li><span class="k">메타</span><span class="v"><span class="mono">(root)</span> · CLAUDE / AGENTS / HANDOFF / TODO</span></li>
-          <li><span class="k">지침서</span><span class="v"><span class="mono">20_guides/</span> · 어떻게 쓰는가 (00–18)</span></li>
-          <li><span class="k">기획 산출물</span><span class="v"><span class="mono">30_planning/</span> · 무엇을 만드는가</span></li>
-          <li><span class="k">개발 산출물</span><span class="v"><span class="mono">40_dev/</span> · MASTER_PLAN / ADR / snapshots</span></li>
-          <li><span class="k">재사용 자원</span><span class="v"><span class="mono">50_resources/</span> · templates / prompts</span></li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>핵심 <em>원칙</em></h3><span class="meta">principles</span></div>
-        <ul class="kv">
-          <li><span class="k">Eval-First</span><span class="v">작성보다 평가 정의를 먼저</span></li>
-          <li><span class="k">Harness 분리</span><span class="v">Plan / Generate / Evaluate 를 같은 세션에 묶지 않음</span></li>
-          <li><span class="k">Guardrails</span><span class="v">프롬프트가 아닌 시스템 컴포넌트로 강제</span></li>
-          <li><span class="k">사람-AI 공용</span><span class="v">자연어 + 기계 판독</span></li>
-          <li><span class="k">단일 출처</span><span class="v">모든 정보는 정확히 한 군데에서만 산다</span></li>
-        </ul>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="card">
-        <div class="card-head"><h3>변경 <em>등급</em></h3><span class="meta">change class</span></div>
-        <ul class="kv">
-          <li><span class="k" style="color:var(--ok)">Class A</span><span class="v">일반 기능 · UI 카피 · 내부 리팩토링 — 게이트: 머지된 PR</span></li>
-          <li><span class="k" style="color:var(--warn)">Class B</span><span class="v">스키마 · auth · 외부 계약 · destructive — 영향·롤백 명시 의무</span></li>
-          <li><span class="k" style="color:var(--danger)">Class C</span><span class="v">가격 · 법무 · 브랜드 · 공개 출시 — 명시적 휴먼 승인 + ADR</span></li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>Sync <em>정책</em></h3><span class="meta">file class</span></div>
-        <ul class="kv">
-          <li><span class="k">shared</span><span class="v"><span class="mono">20_guides/</span>, <span class="mono">50_resources/</span> — sync가 항상 덮어씀</span></li>
-          <li><span class="k">managed</span><span class="v">CLAUDE / AGENTS — 마커 사이만 머지</span></li>
-          <li><span class="k">scaffolds</span><span class="v"><span class="mono">30_planning/</span>, <span class="mono">40_dev/</span> — init 1회, sync 무시</span></li>
-          <li><span class="k">local</span><span class="v">HANDOFF · TODO · MASTER_PLAN · ADR — 절대 안 건드림</span></li>
-        </ul>
-      </div>
-    </div>`;
-})();
-
 // ── Modal ─────────────────────────────────────────────────────
 function openModal(eyebrow,title,bodyHtml){
   document.getElementById('modal-eyebrow').textContent=eyebrow;
@@ -1397,150 +1122,6 @@ function openTodoModal(card,colData){
     `;
   openModal(`TODO · ${card.id}`,card.fields.title||card.id,body);
 }
-
-// ── Exec view ─────────────────────────────────────────────────
-function renderExec(){
-  if(window._execRendered)return;window._execRendered=true;
-  document.getElementById('exec-stat-row').innerHTML=buildStatHtml();
-  const ov=DATA.project_overview||{};
-  const handoff=ov.handoff_md||'';
-  const recentLines=handoff.split('\n').filter(l=>/^\d{4}-\d{2}-\d{2}/.test(l)).slice(0,5);
-  document.getElementById('exec-row').innerHTML=`
-    <div class="card">
-      <div class="card-head"><h3>최근 <em>활동</em></h3><span class="meta">HANDOFF.md</span></div>
-      <ul class="kv">${recentLines.map(l=>{const m=l.match(/^(\d{4}-\d{2}-\d{2})[\s—\-]*(.*)$/);return m?`<li><span class="k">${esc(m[1])}</span><span class="v">${renderInline(esc(m[2]))}</span></li>`:''}).join('')||'<li><span class="k" style="color:var(--muted)">없음</span><span class="v"></span></li>'}</ul>
-    </div>
-    <div class="card">
-      <div class="card-head"><h3>칸반 <em>요약</em></h3><span class="meta">kanban · all columns</span></div>
-      <ul class="kv">${KANBAN_MAP.map(col=>`<li><span class="k">${col.title}</span><span class="v"><strong>${(DATA.kanban[col.sec]||[]).length}</strong> · ${col.hint}</span></li>`).join('')}</ul>
-    </div>`;
-  document.getElementById('exec-dashboards').innerHTML=`
-    <div class="card">
-      <div class="card-head"><h3>로컬 <em>대시보드</em></h3><span class="meta">~/.methodology-dashboards.json</span></div>
-      <table class="tbl" id="exec-dashboards-table"><thead><tr><th>Port</th><th>Project</th><th>Branch</th><th>Commit</th><th>Started</th><th></th></tr></thead><tbody><tr><td colspan="6" style="padding:14px;color:var(--muted)">Loading…</td></tr></tbody></table>
-    </div>`;
-  document.getElementById('exec-branches').innerHTML=`
-    <div class="card">
-      <div class="card-head"><h3>브랜치 · <em>worktree</em></h3><span class="meta">git branches</span></div>
-      <div id="exec-branches-list" style="color:var(--muted);font-size:13px;padding:8px 0">Loading…</div>
-    </div>`;
-  dashboardsRefresh();branchesRefresh();
-}
-
-// ── Dev Servers API ───────────────────────────────────────────
-const devApi={
-  list:async()=>(await fetch('/api/servers')).json(),
-  start:async(cwd,cmd)=>{const r=await fetch('/api/servers/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cwd,cmd})});return{ok:r.ok,body:await r.json()};},
-  stop:async(pid)=>{const r=await fetch(`/api/servers/${pid}/stop`,{method:'POST'});return{ok:r.ok,body:await r.json()};},
-  killRange:async(from,to)=>{const r=await fetch('/api/servers/kill-range',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from,to})});return{ok:r.ok,body:await r.json()};},
-};
-const devStatus=document.getElementById('dev-servers-status');
-const devTbody=document.querySelector('#dev-servers-table tbody');
-const devCwdInput=document.getElementById('dev-cwd');
-if(devCwdInput&&DATA.root)devCwdInput.placeholder=`cwd (기본: ${DATA.root})`;
-async function devRefresh(){
-  try{
-    const{servers}=await devApi.list();
-    devTbody.innerHTML='';
-    if(!servers||!servers.length){devTbody.innerHTML='<tr><td colspan="6" style="padding:14px;color:var(--muted)">추적 중인 서버 없음</td></tr>';}
-    else{
-      for(const s of servers){
-        const tr=document.createElement('tr');
-        tr.innerHTML=`<td><a href="http://localhost:${s.port}" target="_blank" class="port">${s.port} ↗</a></td><td class="mono">${s.pid}</td><td class="mono" style="font-size:11px">${esc(s.cwd||'')}</td><td class="mono" style="font-size:11px">${esc((s.cmd||[]).join(' '))}</td><td class="mono">${s.started_at||''}</td><td><button data-pid="${s.pid}" class="dev-stop-btn btn btn-danger">Stop</button></td>`;
-        devTbody.appendChild(tr);
-      }
-      devTbody.querySelectorAll('.dev-stop-btn').forEach(b=>{b.onclick=async e=>{const pid=e.target.dataset.pid;e.target.disabled=true;e.target.textContent='Stopping…';const{ok,body}=await devApi.stop(pid);if(!ok)alert(`stop 실패: ${body.error||'unknown'}`);devRefresh();};});
-    }
-    devStatus.textContent=`${(servers||[]).length}개 추적 중 · ${new Date().toLocaleTimeString()}`;
-  }catch(e){devStatus.textContent=`갱신 실패: ${e.message}`;}
-}
-document.getElementById('dev-start').onclick=async()=>{
-  const cwd=devCwdInput.value.trim()||DATA.root;
-  const cmd=document.getElementById('dev-cmd').value.trim()||'pnpm dev';
-  devStatus.textContent=`Starting ${cmd} in ${cwd} ...`;
-  const{ok,body}=await devApi.start(cwd,cmd);
-  if(!ok){devStatus.textContent=`start 실패: ${body.error||'unknown'}`;alert(`start 실패: ${body.error||'unknown'}`);return;}
-  devStatus.textContent=`Started PID ${body.pid} on port ${body.port}`;devRefresh();
-};
-document.getElementById('dev-kill-all').onclick=async()=>{
-  if(!confirm('포트 3000-3099 의 모든 LISTEN 프로세스를 종료합니다. 진행할까요?'))return;
-  devStatus.textContent='Killing 3000-3099 ...';
-  const{ok,body}=await devApi.killRange(3000,3099);
-  if(!ok){alert(`kill 실패: ${body.error}`);return;}
-  devStatus.textContent=`${(body.killed||[]).length}개 프로세스 종료`;devRefresh();
-};
-document.getElementById('dev-refresh').onclick=devRefresh;
-devRefresh();setInterval(devRefresh,5000);
-
-// ── Dashboards API ────────────────────────────────────────────
-const dashApi={
-  list:async()=>(await fetch('/api/dashboards')).json(),
-  stop:async(port)=>{const r=await fetch('/api/dashboard/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({port})});return{ok:r.ok,body:await r.json()};},
-};
-async function dashboardsRefresh(){
-  try{
-    const{dashboards}=await dashApi.list();
-    function renderTbody(tbodyEl){
-      tbodyEl.innerHTML='';
-      if(!dashboards||!dashboards.length){tbodyEl.innerHTML='<tr><td colspan="6" style="padding:14px;color:var(--muted)">등록된 dashboard 없음</td></tr>';return;}
-      for(const d of dashboards){
-        const tr=document.createElement('tr');
-        const isCurrent=d.root===DATA.root&&d.branch===(DATA.git_branch||'');
-        const projName=(d.root||'').split('/').pop()||'?';
-        tr.innerHTML=`<td><a href="http://localhost:${d.port}" target="_blank" class="port">${d.port} ↗</a>${isCurrent?'<span style="font-size:10px;color:var(--accent);margin-left:4px">← THIS</span>':''}</td><td>${esc(projName)}</td><td class="mono">${esc(d.branch||'?')}</td><td class="mono">${esc(d.commit||'?')}</td><td class="mono">${esc(d.started_at||'')}</td><td><button data-port="${d.port}" class="dash-stop-btn btn btn-danger">Stop</button></td>`;
-        tbodyEl.appendChild(tr);
-      }
-      tbodyEl.querySelectorAll('.dash-stop-btn').forEach(b=>{b.onclick=async e=>{const port=parseInt(e.target.dataset.port);if(!confirm(`포트 ${port} dashboard를 종료할까요?`))return;e.target.disabled=true;e.target.textContent='Stopping…';const{ok,body}=await dashApi.stop(port);if(!ok)alert(`stop 실패: ${body.error||'unknown'}`);dashboardsRefresh();};});
-    }
-    const t1=document.querySelector('#dashboards-table tbody');if(t1)renderTbody(t1);
-    const t2=document.querySelector('#exec-dashboards-table tbody');if(t2)renderTbody(t2);
-    const ds=document.getElementById('dashboards-status');if(ds)ds.textContent=`${(dashboards||[]).length}개 · ${new Date().toLocaleTimeString()}`;
-  }catch(e){
-    const t1=document.querySelector('#dashboards-table tbody');
-    if(t1)t1.innerHTML=`<tr><td colspan="6" style="color:var(--danger);padding:14px">갱신 실패: ${esc(e.message)}</td></tr>`;
-  }
-}
-document.getElementById('dashboards-refresh').onclick=dashboardsRefresh;
-dashboardsRefresh();setInterval(dashboardsRefresh,5000);
-
-// ── Branches API ──────────────────────────────────────────────
-const branchApi={
-  list:async()=>(await fetch('/api/branches')).json(),
-  spawn:async(branch)=>{const r=await fetch('/api/dashboard/spawn',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({branch})});return{ok:r.ok,body:await r.json()};},
-};
-const branchesList=document.getElementById('branches-list');
-const branchesStatus=document.getElementById('branches-status');
-async function branchesRefresh(){
-  branchesStatus.textContent='Loading…';
-  try{
-    const{current,branches}=await branchApi.list();
-    if(!branches||!branches.length){branchesList.innerHTML='<span style="color:var(--muted);font-size:12px">git 브랜치 미발견</span>';branchesStatus.textContent='';return;}
-    branchesList.innerHTML='';
-    for(const b of branches){
-      const id='br_'+b.replace(/[^a-zA-Z0-9]/g,'_');
-      const lbl=document.createElement('label');
-      lbl.style.cssText='display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;padding:4px 6px;';
-      lbl.innerHTML=`<input type="radio" name="branch-select" value="${esc(b)}" id="${id}"${b===current?' checked':''} style="accent-color:var(--accent)"/><code style="flex:1;font-family:var(--font-mono);font-size:12px;color:${b===current?'var(--accent)':'var(--text)'}">${esc(b)}</code>${b===current?'<span style="font-family:var(--font-mono);font-size:10px;color:var(--ok);letter-spacing:.14em">CURRENT</span>':''}`;
-      branchesList.appendChild(lbl);
-    }
-    // Also update exec branches if rendered
-    const execBr=document.getElementById('exec-branches-list');
-    if(execBr)execBr.innerHTML=branchesList.innerHTML;
-    branchesStatus.textContent=`${branches.length}개 브랜치 (current: ${current||'?'})`;
-  }catch(e){branchesList.innerHTML=`<span style="color:var(--danger)">로드 실패: ${esc(e.message)}</span>`;branchesStatus.textContent='';}
-}
-document.getElementById('branches-refresh').onclick=branchesRefresh;
-document.getElementById('branches-spawn').onclick=async()=>{
-  const selected=document.querySelector('input[name="branch-select"]:checked');
-  if(!selected){alert('브랜치를 선택하세요.');return;}
-  const branch=selected.value;
-  branchesStatus.textContent=`Spawning dashboard for ${branch} ...`;
-  const{ok,body}=await branchApi.spawn(branch);
-  if(!ok){alert(`spawn 실패: ${body.error||'unknown'}\n\n${body.output||''}`);branchesStatus.textContent=`spawn 실패: ${body.error}`;return;}
-  branchesStatus.textContent=`Spawned: ${body.url}`;
-  window.open(body.url,'_blank');dashboardsRefresh();
-};
-branchesRefresh();
 
 // ── 소스 변경 감지 → 새로고침 배너 (서버 재시작 불필요) ──────────────
 // TODO.md/HANDOFF.md 등이 바뀌면 서버가 dashboard.html 을 재생성한다.
