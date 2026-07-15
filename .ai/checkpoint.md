@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-15 (sync-all 다운스트림 전파)
+# Checkpoint — 2026-07-15 (sync-all 보류분 처리: ai-icons·cafe24)
 
-> ✅ 방법론 최신(88b9382)을 다운스트림 8/10에 전파. 보류 2(ai-icons·cafe24, dirty WIP). chore/sync-all-propagate, PR 대기.
+> ✅ ai-icons WIP 보존한 채 방법론 sync 완료. cafe24는 활성 세션 몫으로 위임. 관리 10곳 중 9 최신. chore/sync-ai-icons-residual, PR 대기.
 
 ---
 
@@ -10,29 +10,25 @@
 
 ## 작성자
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `chore/sync-all-propagate-20260715` (updated main=88b9382 기준, branch-first)
+- Worktree: branch `chore/sync-ai-icons-residual` (updated main=5a2547c 기준, branch-first)
 
 ## 부팅 계약
 1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
 ## 방금 한 것 (이번 세션)
-사용자 "전체 다운스트림 10곳에 sync-all 적용".
-- **dry-run**으로 상태 표 확인 → **`sync-all --apply`**(안전 가드: dirty·비-main skip).
-  - **처리 4곳(main·clean)**: icons-invest·icons-marketing·insta-toon·talmo-com — 파일 적용 후 각 타깃 스테이징 commit + `--no-verify` push.
-  - **skip 6곳**: dirty 2(ai-icons 1·cafe24 91) + 비-main 4(gamblescan·icons·lifeManager·tshome).
-- **clean 피처브랜치 4곳**은 METH-106 절차로 개별 처리: 원 브랜치 저장 → `git checkout main` → pull → `sync --path --main-only --apply` → 타깃 commit → `--no-verify` push → **원 브랜치 복원**. 전부 복원 확인.
-- **결과**: 8/10 반영, 각 main == origin/main (0/0). **보류 2**: ai-icons·cafe24(dirty=WIP, 각 세션 몫).
-- 전파 내용: graph-viz 생성기(#98)·autobuild(#99)·dagre(#100)·대시보드 통합(#101)·슬림화(#102) = `60_tools/generate-dashboard.py`·`methodology.py`·`.methodology-version`(+icons-invest ONBOARDING.md).
-
-## friction (기록)
-- 타깃 스테이징 목록(00_briefs·10_foundation·20_guides·50_resources·60_tools·.methodology-version·CLAUDE·AGENTS)이 **루트 shared 파일(ONBOARDING.md)을 누락** → icons-invest에 미커밋 1건 잔존, 추가 커밋으로 해소. 교훈: clean repo면 sync 변경 파일 전체를 스테이징(루트 shared 포함)하거나 `git add -A`(dirty 없을 때만).
+사용자 "ai-icons·cafe24 dirty 정리하고 sync". → 각 dirty의 **성격을 먼저 확인**(폐기·무단 커밋 금지).
+- **ai-icons** (main, 0/0): dirty 1건 = `30_planning/…/tier2_ai_text.py` = **프로젝트 코드 WIP**(방법론 아님·scaffold 경로라 sync 무관). 안전 처리:
+  - `sync --path --main-only --apply`(방법론만 변경) → `git add -A` 후 **WIP만 `git reset`로 언스테이징** → 루트 shared 포함·WIP 제외 스테이징(지난 friction 교훈 반영) → commit + `--no-verify` push.
+  - 검증: main==origin 5a2547c, **WIP 1건 그대로 dirty**(그 세션 미훼손). 커스텀 guide 90/91 보존.
+- **cafe24** (피처브랜치 `fix/dev-fixes-260625`, WIP 91건): `.ai/checkpoint`·HANDOFF·TODO + skin184 제품 코드 대량 + **오늘자 관찰로그 = 활성 세션**. 커밋/stash/폐기 모두 부적절(다른 세션 작업)이라 판단 → 사용자에게 옵션 제시 → **"그 세션에 맡김" 선택**. 미처리(정당).
+- **결과**: 관리 다운스트림 10곳 중 **9 최신·1 보류(cafe24)**.
 
 ## 다음 사람에게
-1. **이 bookkeeping PR(base=main) 머지** — chore/sync-all-propagate.
-2. **보류 2곳 최신화**(각 repo 세션): ai-icons·cafe24는 dirty 해소 후 `methodology sync --apply`. cafe24는 비-main+dirty 91이라 주의.
-3. sync-all 타깃 스테이징 개선 후보: 루트 shared 파일(ONBOARDING.md 등)까지 커버하도록 절차/헬퍼 보완 검토(friction 반복 시 승급).
+1. **이 bookkeeping PR(base=main) 머지** — chore/sync-ai-icons-residual.
+2. **cafe24 최신화**(그 repo 세션): skin184 WIP 커밋·랜딩 → main 현행화 → `methodology sync --apply`. 피처브랜치라 main 체크아웃 dance 필요.
+3. (미해결, 별도) ai-icons 자체 라이브파일 비대(과거 이슈) — 그 repo 세션 몫.
 
 ## 환경 메모
-- 브랜치: `chore/sync-all-propagate-20260715` (updated main). branch-first.
-- 관리 다운스트림 10곳 중 8 최신·2 보류(dirty).
+- 브랜치: `chore/sync-ai-icons-residual` (updated main). branch-first.
+- **패턴 확인됨**: dirty repo sync = 방법론 파일만 targeted(`add -A` → WIP `reset`), WIP 절대 미훼손. 피처브랜치+대량 WIP는 그 세션 몫.
 - 누적 상태(오픈이슈·PR)는 **HANDOFF 참조**.
