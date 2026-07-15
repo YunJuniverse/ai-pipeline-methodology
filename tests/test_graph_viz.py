@@ -85,6 +85,21 @@ def test_render_injects_all_placeholders() -> None:
     assert "CLAUDE.md" in html
 
 
+def test_dashboard_co_build_writes_viz() -> None:
+    # cmd_dashboard 이 부르는 _build_graph_viz 가 실제 파일을 생성하는지(통합).
+    import tempfile
+    _m = importlib.util.spec_from_file_location(
+        "methodology_mod", ROOT / "60_tools" / "methodology.py")
+    mod = importlib.util.module_from_spec(_m)
+    _m.loader.exec_module(mod)
+    with tempfile.TemporaryDirectory() as tmp:
+        out_dir = Path(tmp)
+        mod._build_graph_viz(ROOT, out_dir)
+        f = out_dir / "methodology-graph-viz.html"
+        assert f.exists(), "viz 파일 미생성"
+        assert "<svg" in f.read_text(encoding="utf-8")
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

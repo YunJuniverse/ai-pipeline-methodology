@@ -1880,6 +1880,28 @@ python3 "$METH" wrap --strict
     return 2
 
 
+def _build_graph_viz(build_root: Path, out_dir: Path) -> None:
+    """methodology-graph.json → 지식그래프 시각화 HTML 을 대시보드와 함께 빌드.
+
+    generate-graph-viz.py 가 없거나(미sync 다운스트림) 실패해도 대시보드 빌드를
+    막지 않는다 — 경고만 남기고 넘어간다(부수 산출물).
+    """
+    gen = build_root / "60_tools" / "generate-graph-viz.py"
+    if not gen.exists():
+        gen = METHODOLOGY_ROOT / "60_tools" / "generate-graph-viz.py"
+    if not gen.exists():
+        return
+    out = out_dir / "methodology-graph-viz.html"
+    try:
+        subprocess.check_call(
+            [sys.executable, str(gen), "--standalone", "--out", str(out)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        ok(f"graph-viz built: {out}")
+    except subprocess.CalledProcessError as e:
+        warn(f"graph-viz 빌드 실패 (대시보드는 계속): {e}")
+
+
 def cmd_dashboard(args: argparse.Namespace) -> int:
     """대시보드 빌드 + 서빙 + URL 출력.
 
@@ -1973,6 +1995,9 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
         return 1
+
+    # 2b) 지식그래프 시각화 동반 빌드 (methodology-graph.json → viz HTML)
+    _build_graph_viz(build_root, out_path.parent)
 
     # commit 정보
     commit = "unknown"

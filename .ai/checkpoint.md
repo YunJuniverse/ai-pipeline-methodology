@@ -1,7 +1,6 @@
-# Checkpoint — 2026-07-15 (METH-108 지식그래프 시각화 생성기)
+# Checkpoint — 2026-07-15 (METH-109 graph-viz를 dashboard/boot에 통합)
 
-> ✅ `60_tools/generate-graph-viz.py` 구현·테스트 완료. feat/graph-viz-generator, PR 대기.
-> 사용자가 공유한 문서역할 지식그래프 아티팩트가 하드코딩 스냅샷이라 정본에서 드리프트(v3.1 30/41 vs 현 42/53)한 걸 data-driven 생성기로 해결.
+> ✅ cmd_dashboard가 대시보드 빌드 직후 graph-viz를 동반 빌드. boot 경유로 매 세션 자동 최신화. feat/graph-viz-autobuild, PR 대기.
 
 ---
 
@@ -11,31 +10,25 @@
 
 ## 작성자
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `feat/graph-viz-generator` (updated main 기준, branch-first)
+- Worktree: branch `feat/graph-viz-autobuild` (updated main 기준, branch-first)
 
 ## 부팅 계약
 1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
 ## 방금 한 것 (이번 세션)
-사용자가 문서역할 지식그래프 **아티팩트 URL**(e3d2f0cc)을 주며 "업데이트해야하지 않아?" 물음.
-- **진단**: 그 아티팩트는 `methodology-graph.json` 데이터를 HTML에 **하드코딩한 스냅샷**(v3.1-2026-05·30노드/41엣지)이라, 정본(현 **v3.2-2026-07·42노드/53엣지**, METH-099에서 확장)에서 한 버전 드리프트. repo JSON은 최신이고 **아티팩트만** 낡음. sync-all과 같은 "하드코딩→드리프트" 문제.
-- **해결(사용자 선택=생성기)**: `60_tools/generate-graph-viz.py` — JSON 읽어 지식그래프 HTML 자동 렌더.
-  - 노드 좌표 **결정적 배치**: category=열, guides(21개)는 tier(3~6)별 하위 열로 분할. `build_columns`+`layout`(최장 열 기준 세로 중앙정렬).
-  - 엣지 primary(실선, 생산·서열·라우팅)/보조(점선, 부팅·참조·템플릿) 분류(`PRIMARY_KINDS`).
-  - 라이프사이클 파이프라인(L1~L9, 게이트·순환)·노드 클릭 상세패널 **상호작용은 원 아티팩트 JS 포팅**, 데이터만 `/*__KEY__*/` 자리표시자로 주입.
-  - 기본 출력 = Artifact 게시용 **body-content**(doctype/html/head/body 없음), `--standalone`이면 완전 문서. 기본 경로 `_start/.cache/`(gitignore).
-  - 헤더/각주 카운트·버전을 JSON에서 동적 표기 → "30노드·v3.1" 하드코딩 낡음 자동 소거.
-- **테스트**: `tests/test_graph_viz.py` 8개(열이 전 노드 포함·guides tier분할·좌표유일·좌우순서·열내 비겹침·루프판정·자리표시자 완전치환) 8/8. `py_compile` OK.
-- **브라우저 검증**: Claude_Browser 스크린샷이 다크+와이드 SVG에서 빈 화면 반복 → `javascript_tool`로 DOM 직접 조회: 42노드/53엣지 렌더·좌표·fill 정상·노드 클릭→상세("CLAUDE.md")·콘솔 오류 0 확인.
-- **아티팩트 갱신**: 이 생성기 출력으로 사용자 아티팩트(e3d2f0cc) 업데이트 (같은 URL).
+METH-108(graph-viz 생성기) 후속 — 사용자 요청으로 **dashboard/boot에 통합**해 자동 최신화.
+- **통합 지점**: `cmd_boot` → `cmd_dashboard`(기존 호출) → `generate-dashboard.py`. 여기 `cmd_dashboard`의 대시보드 빌드 subprocess **직후**에 `_build_graph_viz(build_root, out_path.parent)` 추가.
+- **`_build_graph_viz`**: `<build_root>/60_tools/generate-graph-viz.py`(없으면 METHODOLOGY_ROOT fallback)를 `--standalone --out <cache>/methodology-graph-viz.html`로 subprocess 실행. 생성기 미존재(미sync 다운스트림)·실패해도 대시보드 빌드 **안 막음**(warn만, 부수 산출물). 성공 시 `ok("graph-viz built: ...")`.
+- 결과: boot·`dashboard` 양쪽이 매번 graph-viz를 정본 JSON에서 재생성 → 수동 실행 불필요.
+- **테스트**: `tests/test_graph_viz.py`에 통합 테스트 1개 추가(`_build_graph_viz`가 실제 파일 생성·`<svg` 포함) → **9/9**. sync-all 9/9 회귀 없음.
+- **실측**: `dashboard --no-serve` → "graph-viz built" + 파일 생성, 주입 상수 NCOUNT=42·ECOUNT=53·VERSION=v3.2-2026-07 확인.
 
 ## 다음 사람에게
-1. **METH-108 PR(base=main) 머지** — feat/graph-viz-generator.
-2. (선택) 생성기를 `generate-dashboard.py`/boot 파이프라인에 엮으면 그래프 변경 시 뷰가 자동 최신화(현재는 수동 `python3 60_tools/generate-graph-viz.py`). 지금은 독립 명령.
-3. 주의: `60_tools/*`는 shared라 이 생성기도 다음 sync 때 다운스트림 전파.
-4. graph JSON version 필드가 `v3.2-2026-07`인데 방법론 자체는 v4.0 — 그래프 내부 버전 문자열은 별도 스킴(혼선 시 정리 검토).
+1. **METH-109 PR(base=main) 머지** — feat/graph-viz-autobuild.
+2. 머지 후 다음 sync 때 이 통합(methodology.py)이 다운스트림 10곳에 전파 → 각 repo boot도 자동 graph-viz 생성.
+3. (선택) graph-viz를 서빙 URL로 노출하고 싶으면 dashboard 서버가 cache 디렉터리를 서빙하므로 `…/methodology-graph-viz.html` 경로로 접근 가능(현재는 파일만 생성).
 
 ## 환경 메모
-- 브랜치: `feat/graph-viz-generator` (updated main). branch-first.
-- 이번 세션 = 오늘 3번째 PR(다운스트림 처리 → sync-all(107) → graph-viz(108)).
+- 브랜치: `feat/graph-viz-autobuild` (updated main). branch-first.
+- 오늘 세션 = 4번째 PR(다운스트림 처리 → sync-all #97 → graph-viz #98 → autobuild).
 - 누적 상태(오픈이슈·PR)는 **HANDOFF 참조**.
