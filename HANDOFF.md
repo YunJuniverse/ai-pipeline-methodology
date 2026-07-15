@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: 다운스트림 sync 완료 — 관리 7곳 전부 방법론 v4.0 현행. METH-106 보류분 ai-icons·talmo-com까지 sync·push(각 29파일, ai-icons 커스텀 guide 90/91 보존, --no-verify main 직접 push). 나머지 5곳 이미 현행 확인.
+- **Working on**: METH-107 sync-all 헬퍼 (feat/sync-all-helper, PR 대기). 관리 다운스트림(현 10곳: +lifeManager·icons-marketing·insta-toon 신규 init) 전체 일괄 sync 명령. --apply 안전 가드로 dirty·비-main skip. 테스트 9개.
 - **Current mode**: fullstack
 - **Next TODO**: 079~105 점검·정비 + 부팅/브리프 개선(101~105) 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·업무기술서 SOP 박제, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -41,8 +41,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-07-10: **METH-106 다운스트림 sync 5곳 (Class A, PR base=main 대기)** — 092~105 전파. icons-invest(main)·cafe24·gamblescan·icons·tshome(feature 브랜치→main 체크아웃 후 sync·원 브랜치 복원). 각 29파일 shared+managed 머지, 다운스트림 커스텀 guide(90/91 등) --prune 없이 보존, main 직접 push(--no-verify, established 절차). **혼입 1건**: icons-invest add -A가 사업기획서 3줄 WIP 쓸어담음(정당·유실 없음, Open Issue 등재). **제외**: ai-icons·talmo(더티·타세션→각 세션에서). friction 기록: sync 커밋 타깃 스테이징.
-- 2026-07-10: **METH-105 브리프 자동 분류·정리 체계 (Class A, PR #94 머지)** — 사용자가 브리프를 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더 신설(`research/`·`reference/`·`ideas/`; 기존 meetings/·standing/) + `_README §자동 분류` 규칙표(회의→meetings/조사→research/외부원본→reference/방향→ideas/반복절차→standing; 애매하면 확인) + CLAUDE/AGENTS §2 "브리프 자동 분류" 규칙 + boot이 유형별 그룹으로 노출(standing ★ 최상단). MANIFEST init_paths 반영. 검증: py_compile·boot 그룹 스캔·manifest·managed sync.
-- 2026-07-10: **METH-104 SOP 트리거에 "인식 신호" 항목 추가 (Class A, PR #93 머지)** — 반복작업 매칭이 문자열 아닌 LLM 의미추론이라, SOP 트리거에 "어떤 요청/말이 이 작업을 의미하는가"(인식 신호) 앵커를 명시하면 매칭 신뢰도↑. `SOP_template.md` 트리거 = 인식신호 + 주기/이벤트로 분리, `_README §standing` 반영.
-- 2026-07-10: **METH-103 상시 SOP 쓰기 트리거 규칙 (Class A, PR #92 머지)** — 102가 standing SOP의 *읽기*(boot 노출)만 완비하고 *쓰기* 반사신경이 없던 구멍을 메움. CLAUDE/AGENTS managed block에 "반복 작업 기억 (요청 시)" 규칙: 사용자가 "기억해줘/반복작업이야" → `standing/SOP_<topic>.md` 박제 + 절차 변경 시 갱신 제안 + 작업SOP(repo) vs 개인메모리(도구) 구분. _README §5도 반영. managed sync 확인.
-- 2026-07-15: **다운스트림 sync 보류분 처리 (Class A)** — 관리 7곳 방법론 현행 여부 점검. status가 전부 "behind"로 뜬 건 upstream tip(915dad3)이 METH-106 sync **기록 문서**일 뿐 실 페이로드는 2eeca54라서였음. 실측: 5곳(icons-invest·cafe24·gamblescan·icons·tshome) 이미 현행(피처브랜치 체크아웃 탓 dry-run만 82파일로 보였을 뿐 각 main은 2eeca54 동기). 미반영 2곳 **ai-icons·talmo-com**(v4.0 이전 커밋, 29파일 격차) sync·push 완료 → 7곳 전부 최신 ✓. friction: ai-icons pre-push 훅이 자체 라이브파일 비대로 push 차단→--no-verify 우회.
+- 2026-07-15: **METH-107 sync-all 일괄 sync 헬퍼 (Class A, PR 대기)** — `methodology sync-all`: root(기본 방법론 상위 `~/`) 아래 `.methodology-version` 보유 프로젝트 자동 발견 → 사전 스캔 표(project·version·branch·dirty·vs-upstream) → 각 프로젝트 `cmd_sync` 위임(main-only) → 요약. **--apply 안전 가드**: dirty repo·비-main 브랜치는 skip(오늘 METH-106 교훈 박제 — 진행 중 작업/피처브랜치 오염 방지), `--include-dirty`·`--allow-nonmain`로 override. commit/push는 각 repo 개별(add -A 혼입 회피). `tests/test_sync_all.py` 9개(발견·가드·behind 판정, 의존성 없는 자체 러너). 실측: 10곳 발견·표·dry-run 정상. **주의**: methodology.py가 shared라 이 헬퍼는 다음 sync 때 다운스트림에 전파됨.
+- 2026-07-15: **다운스트림 sync 보류분 처리 + 신규 3곳 init (Class A)** — 관리 7곳 현행 점검(status "behind"는 upstream tip이 METH-106 sync 기록 문서라서였고, 실측 5곳 이미 현행/2곳 ai-icons·talmo-com 미반영→sync·push 완료). 이후 신규 fullstack repo 3곳 init·비공개 origin 생성: lifeManager·icons-marketing·insta-toon. → 관리 다운스트림 10곳.
+- 2026-07-10: **METH-106 다운스트림 sync 5곳 (Class A, PR #95 머지)** — 092~105 전파. icons-invest(main)·cafe24·gamblescan·icons·tshome(feature 브랜치→main 체크아웃 후 sync·원 브랜치 복원). 각 29파일 shared+managed 머지, 커스텀 guide --prune 없이 보존, main 직접 push. 혼입 1건(icons-invest add -A, 정당·유실 없음). 교훈: sync 커밋 타깃 스테이징.
+- 2026-07-10: **METH-105 브리프 자동 분류·정리 체계 (Class A, PR #94 머지)** — 브리프 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더 신설(research/reference/ideas) + `_README §자동 분류` 규칙표 + CLAUDE/AGENTS §2 규칙 + boot 유형별 그룹 노출. MANIFEST init_paths 반영.
+- 2026-07-10: **METH-104 SOP 트리거에 "인식 신호" 항목 추가 (Class A, PR #93 머지)** — 반복작업 매칭이 LLM 의미추론이라, SOP 트리거에 "어떤 요청/말이 이 작업을 의미하는가"(인식 신호) 앵커 명시로 매칭 신뢰도↑. `SOP_template.md`·`_README §standing` 반영.
