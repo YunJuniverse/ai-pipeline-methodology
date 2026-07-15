@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "09c86b01da2b6082318095636717c8ce47e3228f",
-  "last_validated_at": "2026-07-15T07:54:45Z",
+  "last_validated_commit": "88b938260be651ade365c94af0f8cc6389c8b81a",
+  "last_validated_at": "2026-07-15T08:13:48Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "9be028e63d95817deac15e7d885b056c13eb9ed0eb9b06b89358b2751bb5ecaa"
+      "sha256": "7d30e98e5430582860c4a02b45168e207fa3305197be11273f33e332f5a4238d"
     },
     "TODO.md": {
-      "sha256": "36b37e20dc75e989a7a00b7a4320eeff98b8e67496e93b89333176029262fcec"
+      "sha256": "e9f24d5f8d36f1e1a64a3ed4e275c209da761d9a860c823a31bcc1af3a50b5f2"
     },
     ".ai/checkpoint.md": {
-      "sha256": "093978fa848eca9155d68031fe10904889c27132ed19799d65c59985cc61011e"
+      "sha256": "e4814093f9fd92cd1d99eec65d1abcdac5d3561b0ad1e2c3dde2d9c7efe36ca2"
     }
   },
   "observations": {
@@ -117,6 +117,7 @@
       "50_resources/ai_observations/2026-07-15_graph-viz-dagre.md",
       "50_resources/ai_observations/2026-07-15_graph-viz-generator.md",
       "50_resources/ai_observations/2026-07-15_sync-all-helper.md",
+      "50_resources/ai_observations/2026-07-15_sync-all-propagate.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
