@@ -6,7 +6,7 @@
   2) TODO.md 의 5개 섹션(Backlog/Ready/InProgress/Blocked/Done)을 칸반으로 파싱
   3) CLAUDE.md, HANDOFF.md, 20_guides/README.md 일부를 가이드 탭에 인라인
 
-산출물: dashboard.html (자기완결, CDN: d3.v7)
+산출물: dashboard.html (자기완결 — 외부 CDN 없이 폰트만, 그래프는 generate-graph-viz.py iframe 임베드)
 
 사용 (저장소 루트에서 실행):
   python 60_tools/generate-dashboard.py                 # dashboard.html 생성
@@ -427,7 +427,6 @@ HTML_TEMPLATE = r"""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Noto+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
 :root{
   --bg:        oklch(0.165 0.006 70);
@@ -663,19 +662,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
 .now-line::after{content:"NOW";position:absolute;top:-18px;left:-16px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.18em;color:var(--accent);}
 
 /* Graph */
-.graph-grid{display:grid;grid-template-columns:1fr 320px;gap:1px;background:var(--hairline-soft);border:1px solid var(--hairline-soft);}
-.graph-canvas{background:var(--surface);padding:24px;min-height:560px;position:relative;overflow:hidden;}
-.graph-detail{background:var(--surface);padding:24px;}
-.graph-detail .eyebrow{margin-bottom:8px;}
-.graph-detail h4{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-0.025em;margin:0 0 6px;color:var(--text);}
-.graph-detail .path{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-bottom:18px;}
-.graph-detail p{color:var(--text-dim);font-weight:300;font-size:13.5px;line-height:1.65;}
-.graph-detail .conn-block{margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline-soft);}
-.graph-detail .conn-block .eyebrow{margin-bottom:10px;}
-.graph-detail .conn-block ul{list-style:none;padding:0;margin:0;}
-.graph-detail .conn-block li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--hairline-soft);font-size:12.5px;}
-.graph-detail .conn-block li:last-child{border-bottom:none;}
-.graph-detail .conn-block li .ek{font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+.graph-frame{width:100%;height:82vh;min-height:600px;border:1px solid var(--hairline-soft);border-radius:12px;background:var(--surface);display:block;}
 .legend{display:flex;flex-wrap:wrap;gap:18px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;color:var(--text-dim);}
 .legend span{display:flex;align-items:center;gap:6px;text-transform:uppercase;}
 .legend .lg-dot{width:9px;height:9px;display:inline-block;border-radius:50%;}
@@ -771,7 +758,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
   .hero-right{padding-left:0;padding-top:32px;}
   .stat-row{grid-template-columns:repeat(2,1fr);}
   .kanban{grid-template-columns:repeat(2,1fr);}
-  .graph-grid{grid-template-columns:1fr;}
 }
 @media(max-width:680px){
   .app{padding:0 20px 60px;}
@@ -909,26 +895,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
     <div id="guide-content"></div>
   </section>
 
-  <!-- Page 03: Graph -->
+  <!-- Page 03: Graph — 문서 파이프라인 & 역할 지식그래프 (generate-graph-viz.py 임베드) -->
   <section class="page" id="page-graph">
-    <div class="section-head" style="margin-top:0">
-      <h2>관계 <em>그래프</em>.</h2>
-      <div class="row">
-        <div class="timeline-toolbar" style="margin:0"><div class="seg"><button class="active">계층</button></div></div>
-      </div>
-    </div>
-    <div class="graph-grid">
-      <div class="graph-canvas">
-        <svg id="graph-svg" viewBox="0 0 720 540" width="100%" height="560" style="display:block"></svg>
-        <div class="legend" id="graph-legend" style="position:absolute;left:24px;bottom:18px"></div>
-      </div>
-      <aside class="graph-detail" id="graph-detail">
-        <span class="eyebrow">노드를 클릭하세요</span>
-        <h4 style="margin:8px 0 6px">—</h4>
-        <p style="color:var(--muted)">그래프 노드를 선택하면 상세 정보가 여기 표시됩니다.</p>
-      </aside>
-    </div>
-    <div class="legend" style="margin-top:14px" id="graph-legend-bottom"></div>
+    <iframe id="graph-frame" class="graph-frame" title="문서 파이프라인 & 역할 지식그래프" loading="lazy"></iframe>
   </section>
 
 
@@ -1321,142 +1290,10 @@ renderKanban();
 let graphInited=false;
 function initGraph(){
   if(graphInited)return;graphInited=true;
-  const graph=DATA.graph||{},nodes=graph.nodes||[],edges=graph.edges||[];
-  const W=720,H=540,svg=document.getElementById('graph-svg');
-  if(!nodes.length){svg.innerHTML='<text x="360" y="280" text-anchor="middle" fill="var(--muted)" font-family="var(--font-mono)" font-size="13">그래프 데이터 없음</text>';return;}
-  const KIND_COLOR={meta:'oklch(0.78 0.05 75)',guides:'oklch(0.78 0.13 155)',planning:'oklch(0.74 0.17 25)',dev:'oklch(0.78 0.14 60)',resources:'oklch(0.75 0.11 240)',tools:'oklch(0.72 0.13 300)','root-doc':'oklch(0.78 0.05 75)','live-state':'oklch(0.78 0.10 75)',guide:'oklch(0.78 0.13 155)'};
-  const catColors={};(graph.categories||[]).forEach(c=>catColors[c.id]=c.color||'#888');
-  function nodeColor(n){return KIND_COLOR[n.kind]||KIND_COLOR[n.category]||catColors[n.category]||'oklch(0.60 0.02 75)';}
-  // Force-directed layout: repulsion + edge springs + categorical anchor gravity
-  const CATS=['meta','guides','planning','dev','resources'];
-  const posMap=new Map();
-  const bucketSizeMap=new Map(); // nodeId → same-anchor-bucket size (for label toggle)
-  (function(){
-    const nodeById=new Map(nodes.map(n=>[n.id,n]));
-    const edgePairs=edges.map(e=>[nodeById.get(e.from||e.source),nodeById.get(e.to||e.target)]).filter(([a,b])=>a&&b);
-    // Anchor: categorical home position (category→x column, tier→y row)
-    const anchors=new Map();
-    nodes.forEach(n=>{
-      const ci=CATS.indexOf(n.category);
-      anchors.set(n.id,{
-        x:ci>=0?(ci+0.5)/CATS.length*(W-60)+30:W/2,
-        y:n.tier!=null?(n.tier+0.5)/7*(H-60)+30:H/2
-      });
-    });
-    // Track bucket size (same anchor) for label visibility
-    const bmap=new Map();
-    nodes.forEach(n=>{
-      const a=anchors.get(n.id);
-      const k=`${Math.round(a.x)},${Math.round(a.y)}`;
-      bmap.set(k,(bmap.get(k)||0)+1);
-    });
-    nodes.forEach(n=>{
-      const a=anchors.get(n.id);
-      const k=`${Math.round(a.x)},${Math.round(a.y)}`;
-      bucketSizeMap.set(n.id,bmap.get(k)||1);
-    });
-    // Initial positions: anchor + small deterministic offset to break symmetry
-    const vels=new Map();
-    nodes.forEach((n,i)=>{
-      const a=anchors.get(n.id);
-      posMap.set(n.id,{x:a.x+(i%7-3)*12,y:a.y+(Math.floor(i/7)%5-2)*10});
-      vels.set(n.id,{x:0,y:0});
-    });
-    // Simulation constants
-    const REPULSE=4800,SPRING_K=0.055,REST=95,ANCHOR_K=0.038,DAMP=0.78,PAD=32;
-    for(let iter=0;iter<280;iter++){
-      const cool=Math.max(0.18,1-iter/320);
-      // Node-node repulsion
-      for(let i=0;i<nodes.length;i++){
-        for(let j=i+1;j<nodes.length;j++){
-          const pi=posMap.get(nodes[i].id),pj=posMap.get(nodes[j].id);
-          const dx=pj.x-pi.x,dy=pj.y-pi.y;
-          const d2=(dx*dx+dy*dy)||0.01,d=Math.sqrt(d2);
-          const f=REPULSE*cool/d2,nx=dx/d,ny=dy/d;
-          const vi=vels.get(nodes[i].id),vj=vels.get(nodes[j].id);
-          vi.x-=nx*f;vi.y-=ny*f;vj.x+=nx*f;vj.y+=ny*f;
-        }
-      }
-      // Edge spring attraction
-      edgePairs.forEach(([na,nb])=>{
-        const pa=posMap.get(na.id),pb=posMap.get(nb.id);
-        const dx=pb.x-pa.x,dy=pb.y-pa.y;
-        const d=Math.sqrt(dx*dx+dy*dy)||0.1;
-        const f=SPRING_K*(d-REST),nx=dx/d,ny=dy/d;
-        vels.get(na.id).x+=nx*f;vels.get(na.id).y+=ny*f;
-        vels.get(nb.id).x-=nx*f;vels.get(nb.id).y-=ny*f;
-      });
-      // Anchor gravity (keeps nodes near their categorical home)
-      nodes.forEach(n=>{
-        const p=posMap.get(n.id),a=anchors.get(n.id),v=vels.get(n.id);
-        v.x+=(a.x-p.x)*ANCHOR_K;v.y+=(a.y-p.y)*ANCHOR_K;
-      });
-      // Integrate + dampen + boundary clamp
-      nodes.forEach(n=>{
-        const p=posMap.get(n.id),v=vels.get(n.id);
-        v.x*=DAMP;v.y*=DAMP;
-        p.x=Math.max(PAD,Math.min(W-PAD,p.x+v.x));
-        p.y=Math.max(PAD,Math.min(H-PAD,p.y+v.y));
-      });
-    }
-  })();
-  function nodePos(n){return posMap.get(n.id)||{x:W/2,y:H/2};}
-  let selId=nodes[0].id;
-  function render(){
-    svg.innerHTML=`<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-dim)"/></marker><marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/></marker></defs>`;
-    edges.forEach(e=>{
-      const na=nodes.find(n=>n.id===(e.from||e.source)),nb=nodes.find(n=>n.id===(e.to||e.target));
-      if(!na||!nb)return;
-      const pa=nodePos(na),pb=nodePos(nb),active=na.id===selId||nb.id===selId;
-      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',pa.x);line.setAttribute('y1',pa.y);line.setAttribute('x2',pb.x);line.setAttribute('y2',pb.y);
-      line.setAttribute('stroke',active?'var(--accent)':'var(--text-dim)');
-      line.setAttribute('stroke-width',active?1.8:1.2);
-      if(!active)line.setAttribute('stroke-dasharray','2 5');
-      line.setAttribute('stroke-linecap','round');
-      line.setAttribute('marker-end',active?'url(#arr-a)':'url(#arr)');
-      line.setAttribute('opacity',active?1:0.55);
-      svg.appendChild(line);
-    });
-    nodes.forEach(n=>{
-      const p=nodePos(n),active=n.id===selId,color=nodeColor(n);
-      const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-      g.style.cursor='pointer';
-      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',active?16:11);
-      c.setAttribute('fill',active?color:'var(--surface-2)');c.setAttribute('stroke',color);c.setAttribute('stroke-width',active?3:1.5);
-      // Show label only for selected node or singleton buckets (avoids text-collision in dense clusters)
-      const showLabel=active||(bucketSizeMap.get(n.id)||1)===1;
-      if(showLabel){
-        const label=n.label||n.id;
-        const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-        tx.setAttribute('x',p.x);tx.setAttribute('y',p.y+(active?28:24));tx.setAttribute('text-anchor','middle');
-        tx.setAttribute('font-family','var(--font-mono)');tx.setAttribute('font-size','9');
-        tx.setAttribute('fill',active?'var(--text)':'var(--text-dim)');
-        tx.textContent=label.length>16?label.slice(0,15)+'…':label;
-        g.appendChild(tx);
-      }
-      g.appendChild(c);
-      g.onclick=()=>{selId=n.id;render();updateDetail(n);};
-      svg.appendChild(g);
-    });
-  }
-  function updateDetail(n){
-    const detail=document.getElementById('graph-detail');
-    const connEdges=edges.filter(e=>(e.from||e.source)===n.id||(e.to||e.target)===n.id).map(e=>({other:(e.from||e.source)===n.id?(e.to||e.target):(e.from||e.source),kind:e.kind||e.relationship||'',dir:(e.from||e.source)===n.id?'→':'←'}));
-    const nc=DATA.node_contents&&DATA.node_contents[n.id];
-    detail.innerHTML=`<span class="eyebrow">${esc(n.category||n.kind||'')} / selected</span>
-      <h4 style="margin:8px 0 6px">${esc(n.label||n.id)}</h4>
-      <div class="path">${esc(n.path||'')}</div>
-      <p>${esc(n.role||n.description||'')}</p>
-      ${connEdges.length?`<div class="conn-block"><span class="eyebrow">Connections · ${connEdges.length}</span><ul>${connEdges.map(e=>`<li><span class="ek">${esc(e.dir)} ${esc(e.kind)}</span><span class="mono" style="color:var(--text)">${esc(e.other)}</span></li>`).join('')}</ul></div>`:''}
-      ${nc&&nc.kind==='file'?`<div class="conn-block"><span class="eyebrow">File · ${nc.size} chars</span><div class="file-body" style="margin-top:8px;max-height:200px;font-size:11px">${esc((nc.text||'').slice(0,600))}${nc.size>600?'…':''}</div></div>`:''}`;
-  }
-  // Legend
-  const cats=[...new Set(nodes.map(n=>n.category||n.kind).filter(Boolean))];
-  const lg=document.getElementById('graph-legend-bottom');
-  if(lg)lg.innerHTML=cats.slice(0,8).map(c=>`<span><span class="lg-dot" style="background:${KIND_COLOR[c]||catColors[c]||'#888'}"></span>${c}</span>`).join('');
-  render();updateDetail(nodes[0]);
+  // 그래프는 generate-graph-viz.py 산출물(dagre 레이아웃)을 iframe 으로 임베드.
+  // 탭 첫 진입 시 lazy-load — 같은 폴더의 methodology-graph-viz.html.
+  const f=document.getElementById('graph-frame');
+  if(f&&!f.getAttribute('src')) f.setAttribute('src','methodology-graph-viz.html');
 }
 
 // ── Guide / Whitepaper ────────────────────────────────────────
