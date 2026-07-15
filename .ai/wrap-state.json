@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "5a2547cd8cbae53dc02531621ca965d95ad06f88",
-  "last_validated_at": "2026-07-15T08:30:00Z",
+  "last_validated_commit": "e3a05fb87757b2f7c17c0658c6361e2ba53f4918",
+  "last_validated_at": "2026-07-15T08:48:33Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "444d8f6a20c4be9baa540c7e69349e16f4c878e8d41d749980a17eaf25b166a7"
+      "sha256": "c44a204411d08c5dab6deb0dccd1b8b301c494eed3d550097f349af788b7bcf2"
     },
     "TODO.md": {
-      "sha256": "3e3dc30ea503f0d7fba85235cc36e43dcf0bf5b19a2b7e2a4fdb701470a577f3"
+      "sha256": "d0c0cf964f881a2d44d8797d53b9a35113b235f8f08214219c6f257f10a6e1c5"
     },
     ".ai/checkpoint.md": {
-      "sha256": "589e158af8816aceea15108792a497872beb01d780a22db8719094bd79e2269e"
+      "sha256": "e2ac4a3074cd3d85eae6682dcebc6b34898126232eb0902c797661b4768218bc"
     }
   },
   "observations": {
@@ -119,6 +119,7 @@
       "50_resources/ai_observations/2026-07-15_sync-ai-icons-residual.md",
       "50_resources/ai_observations/2026-07-15_sync-all-helper.md",
       "50_resources/ai_observations/2026-07-15_sync-all-propagate.md",
+      "50_resources/ai_observations/2026-07-15_sync-cafe24.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

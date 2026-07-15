@@ -15,6 +15,9 @@
 
 ## Done
 
+### cafe24 sync — 전 다운스트림 배포 종료
+- **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-cafe24). 사용자 "준비완료"(WIP landing) → clean 재확인 → METH-106 절차(main 체크아웃→sync→push→피처브랜치 복원, add -A로 루트 shared 포함). 커스텀 guide 6개 보존. **관리 10곳 전부 방법론 payload 해시 동일** 검증. 버전스탬프 차이는 라이브파일 전용 커밋(#103·#104) 탓 cosmetic. branch-first.
+
 ### sync-all 보류분 처리 (ai-icons·cafe24)
 - **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-ai-icons-residual). ai-icons: WIP(tier2_ai_text.py=프로젝트 코드) 보존한 채 방법론만 sync·push(add -A→WIP reset로 안전 스테이징). main==origin 5a2547c. cafe24: 피처브랜치+skin184 활성 WIP 91건 → 사용자 결정으로 그 세션 위임(미처리). 관리 10곳 중 9 최신·1 보류. branch-first.
 
@@ -23,9 +26,6 @@
 
 ### METH-112 · 대시보드 슬림화
 - **notes**: 2026-07-15. Class A. PR base=main 대기(feat/dashboard-slim). "대시보드 난잡, 필요한 것만" → planning 리서치 스냅샷(`40_dev/snapshots/dashboard-slim-research-2026-07-15.md`) 먼저, 사용자 결정(모니터링·공유/3탭/파일뷰어 유지/스택 헤더축약) 후 구현. 5탭→3탭(상태/문서/관계그래프). 컷: 통합뷰(중복)·dev서버·spawn·커맨드팔레트·스택bento·가이드백서·node_contents(죽은데이터). generate-dashboard.py 1981→1587줄. 브라우저 3탭 검증·오류0. `tests/test_graph_viz.py` 슬림 단언 7/7. branch-first.
-
-### METH-111 · 지식그래프 대시보드 통합
-- **notes**: 2026-07-15. Class A. PR base=main 대기(feat/dashboard-graph-embed). "아티팩트 말고 대시보드에 통합". 대시보드 '관계 그래프' 탭(기존 자체 d3 force 시뮬)을 우리 dagre graph-viz iframe 임베드로 교체(탭 첫 진입 lazy-load, sibling `methodology-graph-viz.html`). 죽은 d3 CDN·force 140줄·graph CSS 제거→단일 렌더러. `.graph-frame` 82vh. `tests/test_graph_viz.py` 대시보드 임베드 테스트 추가 7/7 + 브라우저 검증(탭→iframe 42/53 로드). branch-first.
 
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
