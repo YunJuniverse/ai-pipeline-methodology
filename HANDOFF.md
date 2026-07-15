@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: METH-107 sync-all 헬퍼 (feat/sync-all-helper, PR 대기). 관리 다운스트림(현 10곳: +lifeManager·icons-marketing·insta-toon 신규 init) 전체 일괄 sync 명령. --apply 안전 가드로 dirty·비-main skip. 테스트 9개.
+- **Working on**: METH-108 generate-graph-viz.py (feat/graph-viz-generator, PR 대기). methodology-graph.json(정본 42/53)을 문서역할 지식그래프 HTML로 자동 렌더 — 하드코딩 아티팩트(v3.1 30/41) 드리프트 해결. 테스트 8개. 사용자 아티팩트(e3d2f0cc)도 이 생성기 출력으로 갱신.
 - **Current mode**: fullstack
 - **Next TODO**: 079~105 점검·정비 + 부팅/브리프 개선(101~105) 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·업무기술서 SOP 박제, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -41,8 +41,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-15: **METH-108 지식그래프 시각화 생성기 (Class A, PR 대기)** — `60_tools/generate-graph-viz.py`: 정본 `methodology-graph.json`(42노드/53엣지/v3.2-2026-07)을 문서역할 지식그래프 HTML로 자동 렌더. 사용자가 공유한 아티팩트가 하드코딩 스냅샷(v3.1·30노드/41엣지)이라 그래프 변경마다 드리프트하던 걸 data-driven 생성기로 해결(sync-all과 같은 결). 노드 좌표=category열/guides는 tier 분할로 결정적 배치, 엣지 primary(실선)/보조(점선) 분류, 라이프사이클 파이프라인+노드 클릭 상세패널 상호작용은 원 아티팩트 로직 포팅. 기본 출력=Artifact 게시용 body-content(`--standalone`로 완전문서). `tests/test_graph_viz.py` 8개(열배치·중복없음·좌표유일·루프판정·치환완료) 8/8 + 브라우저 DOM 검증(42/53·클릭 동작·오류0). 사용자 아티팩트(e3d2f0cc) 이 출력으로 갱신.
 - 2026-07-15: **METH-107 sync-all 일괄 sync 헬퍼 (Class A, PR 대기)** — `methodology sync-all`: root(기본 방법론 상위 `~/`) 아래 `.methodology-version` 보유 프로젝트 자동 발견 → 사전 스캔 표(project·version·branch·dirty·vs-upstream) → 각 프로젝트 `cmd_sync` 위임(main-only) → 요약. **--apply 안전 가드**: dirty repo·비-main 브랜치는 skip(오늘 METH-106 교훈 박제 — 진행 중 작업/피처브랜치 오염 방지), `--include-dirty`·`--allow-nonmain`로 override. commit/push는 각 repo 개별(add -A 혼입 회피). `tests/test_sync_all.py` 9개(발견·가드·behind 판정, 의존성 없는 자체 러너). 실측: 10곳 발견·표·dry-run 정상. **주의**: methodology.py가 shared라 이 헬퍼는 다음 sync 때 다운스트림에 전파됨.
 - 2026-07-15: **다운스트림 sync 보류분 처리 + 신규 3곳 init (Class A)** — 관리 7곳 현행 점검(status "behind"는 upstream tip이 METH-106 sync 기록 문서라서였고, 실측 5곳 이미 현행/2곳 ai-icons·talmo-com 미반영→sync·push 완료). 이후 신규 fullstack repo 3곳 init·비공개 origin 생성: lifeManager·icons-marketing·insta-toon. → 관리 다운스트림 10곳.
 - 2026-07-10: **METH-106 다운스트림 sync 5곳 (Class A, PR #95 머지)** — 092~105 전파. icons-invest(main)·cafe24·gamblescan·icons·tshome(feature 브랜치→main 체크아웃 후 sync·원 브랜치 복원). 각 29파일 shared+managed 머지, 커스텀 guide --prune 없이 보존, main 직접 push. 혼입 1건(icons-invest add -A, 정당·유실 없음). 교훈: sync 커밋 타깃 스테이징.
 - 2026-07-10: **METH-105 브리프 자동 분류·정리 체계 (Class A, PR #94 머지)** — 브리프 던지면 AI가 유형 판별해 폴더 배치. 유형 폴더 신설(research/reference/ideas) + `_README §자동 분류` 규칙표 + CLAUDE/AGENTS §2 규칙 + boot 유형별 그룹 노출. MANIFEST init_paths 반영.
-- 2026-07-10: **METH-104 SOP 트리거에 "인식 신호" 항목 추가 (Class A, PR #93 머지)** — 반복작업 매칭이 LLM 의미추론이라, SOP 트리거에 "어떤 요청/말이 이 작업을 의미하는가"(인식 신호) 앵커 명시로 매칭 신뢰도↑. `SOP_template.md`·`_README §standing` 반영.
