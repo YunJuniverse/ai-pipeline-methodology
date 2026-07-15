@@ -2,9 +2,9 @@
 """generate-graph-viz — methodology-graph.json 을 문서 역할 지식그래프 HTML 로 렌더.
 
 정본 `60_tools/methodology-graph.json` 을 읽어 라이프사이클 파이프라인 + 노드/엣지
-지식그래프를 self-contained HTML 로 뽑는다. 하드코딩 아티팩트가 그래프 변경마다
-드리프트하던 문제(v3.1 30/41 고정)를 없애기 위해, 노드 좌표를 category=열 /
-guides=tier 분할로 결정적으로 배치한다.
+지식그래프를 self-contained HTML 로 뽑는다. 레이아웃은 벤더링한 **dagre**(계층 DAG
+레이아웃)를 인라인해 브라우저에서 계산한다 — 손 배치 격자의 엣지 교차(스파게티)를
+없애고, 노드 순서·엣지 라우팅을 교차 최소화로 자동 배치한다.
 
   python3 60_tools/generate-graph-viz.py [--out PATH] [--standalone]
 
@@ -15,18 +15,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 GRAPH_JSON = ROOT / "60_tools" / "methodology-graph.json"
+VENDOR_DAGRE = ROOT / "60_tools" / "vendor" / "dagre.min.js"
 DEFAULT_OUT = ROOT / "_start" / ".cache" / "methodology-graph-viz.html"
 
-# 레이아웃 상수 (JS 렌더러와 일치)
-NODE_W, NODE_H = 150, 44
-COL_PITCH, ROW_PITCH = 210, 58
-X0, Y0 = 40, 44
-
 # 생산·서열·라우팅 흐름 = 실선(primary). 나머지(부팅·참조·템플릿 등) = 점선.
+# primary 는 dagre 랭킹에서 가중치를 높여 흐름 축을 곧게 편다.
 PRIMARY_KINDS = {
     "produces", "routes-to", "sequences", "sequenced-by", "drives",
     "expands-to", "phased-by", "gate-catalog-applied-by",
@@ -39,46 +37,22 @@ def load_graph(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def build_columns(nodes: list[dict], cat_order: list[str]) -> list[list[dict]]:
-    """category=열 배치. guides 는 노드가 많아 tier 별 하위 열로 분할."""
-    cols: list[list[dict]] = []
-    for cat in cat_order:
-        cat_nodes = [n for n in nodes if n["category"] == cat]
-        if not cat_nodes:
-            continue
-        if cat == "guides":
-            for tier in sorted({n["tier"] for n in cat_nodes}):
-                col = sorted((n for n in cat_nodes if n["tier"] == tier),
-                             key=lambda n: n["id"])
-                cols.append(col)
-        else:
-            cols.append(sorted(cat_nodes, key=lambda n: (n["tier"], n["id"])))
-    return cols
+def dagre_source() -> str:
+    """벤더링한 dagre 번들. 아티팩트에서 404 나지 않게 sourceMappingURL 주석 제거."""
+    src = VENDOR_DAGRE.read_text(encoding="utf-8")
+    return re.sub(r"\n//# sourceMappingURL=.*$", "", src).rstrip()
 
 
-def layout(columns: list[list[dict]]) -> dict[str, tuple[int, int]]:
-    """열/행 → (x, y). 각 열은 최장 열 기준 세로 중앙 정렬."""
-    max_rows = max((len(c) for c in columns), default=1)
-    pos: dict[str, tuple[int, int]] = {}
-    for ci, col in enumerate(columns):
-        x = X0 + ci * COL_PITCH
-        top = Y0 + (max_rows - len(col)) * ROW_PITCH // 2
-        for ri, node in enumerate(col):
-            pos[node["id"]] = (x, top + ri * ROW_PITCH)
-    return pos
+def js_nodes(nodes: list[dict]) -> list[dict]:
+    """레이아웃은 dagre 가 하므로 좌표 없이 식별·표시 정보만 넘긴다."""
+    return [{"id": n["id"], "lb": n["label"], "cat": n["category"],
+             "path": n["path"], "role": n["role"]} for n in nodes]
 
 
-def js_nodes(nodes: list[dict], pos: dict[str, tuple[int, int]]) -> list[dict]:
-    out = []
-    for n in nodes:
-        x, y = pos[n["id"]]
-        out.append({"id": n["id"], "lb": n["label"], "cat": n["category"],
-                    "x": x, "y": y, "path": n["path"], "role": n["role"]})
-    return out
-
-
-def js_edges(edges: list[dict]) -> list[list[str]]:
-    return [[e["from"], e["to"], e["kind"], e.get("label", "")] for e in edges]
+def js_edges(edges: list[dict]) -> list[dict]:
+    return [{"f": e["from"], "t": e["to"], "k": e["kind"],
+             "lb": e.get("label", ""), "prim": e["kind"] in PRIMARY_KINDS}
+            for e in edges]
 
 
 def js_cat(categories: list[dict]) -> dict:
@@ -94,7 +68,6 @@ def js_life(lifecycle: dict) -> list[dict]:
     out = []
     for i, s in enumerate(stages):
         nxt = s.get("next")
-        # next 가 바로 다음이 아니라 앞 단계를 가리키면 순환(루프) 단계.
         loops = bool(nxt) and (i + 1 >= len(stages) or nxt != ids[i + 1])
         gate = s.get("human_gate")
         out.append({"id": s["id"], "lb": s["label"],
@@ -104,19 +77,15 @@ def js_life(lifecycle: dict) -> list[dict]:
 
 
 def render(graph: dict) -> str:
-    nodes, edges = graph["nodes"], graph["edges"]
-    cat_order = [c["id"] for c in graph["categories"]]
-    pos = layout(build_columns(nodes, cat_order))
     data = {
         "CAT": js_cat(graph["categories"]),
-        "NODES": js_nodes(nodes, pos),
-        "EDGES": js_edges(edges),
+        "NODES": js_nodes(graph["nodes"]),
+        "EDGES": js_edges(graph["edges"]),
         "LIFE": js_life(graph.get("lifecycle", {})),
-        "PRIMARY": sorted(PRIMARY_KINDS),
         "VERSION": graph.get("version", "?"),
-        "NCOUNT": len(nodes), "ECOUNT": len(edges),
+        "NCOUNT": len(graph["nodes"]), "ECOUNT": len(graph["edges"]),
     }
-    body = _TEMPLATE
+    body = _TEMPLATE.replace("/*__DAGRE__*/", dagre_source())
     for key, val in data.items():
         body = body.replace(f"/*__{key}__*/", json.dumps(val, ensure_ascii=False))
     return body
@@ -143,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
     print(f"[ok] {out}  (nodes={len(graph['nodes'])}, edges={len(graph['edges'])}, "
-          f"version={graph.get('version')})")
+          f"version={graph.get('version')}, layout=dagre)")
     return 0
 
 
@@ -152,48 +121,48 @@ _TEMPLATE = r"""<title>방법론 문서 파이프라인 · 지식그래프</titl
 <style>
   *{box-sizing:border-box;}
   :root{
-    --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#FAFBFC;
-    --ink:#1B2230; --muted:#5C6577; --faint:#8A94A6; --line:#E4E8EF; --line-strong:#CBD2DE;
-    --accent:#0F9D6B; --accent-soft:#E4F3EC; --edge:#9AA4B4; --edge-strong:#4B5768;
-    --meta-bg:#E9ECF2; --meta-bd:#7E8CA6; --meta-tx:#2A3550;
-    --guides-bg:#DCEFE7; --guides-bd:#2A9D78; --guides-tx:#0B5A44;
-    --planning-bg:#F5E4DA; --planning-bd:#C76A44; --planning-tx:#7C2D12;
-    --dev-bg:#F4E8D1; --dev-bd:#BD8B29; --dev-tx:#6E3B10;
-    --resources-bg:#E3EAF8; --resources-bd:#4E79C8; --resources-tx:#1E3E86;
+    --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#F7F9FC;
+    --ink:#1A2130; --muted:#586173; --faint:#8B94A6; --line:#E3E8F0; --line-strong:#C9D1DE;
+    --accent:#0E9F6E; --accent-soft:#E3F3EC; --edge:#AEB7C6; --edge-strong:#54607A;
+    --meta-bg:#EAEDF3; --meta-bd:#7C8AA6; --meta-tx:#2A3450;
+    --guides-bg:#DBEFE6; --guides-bd:#2A9D78; --guides-tx:#0A5942;
+    --planning-bg:#F6E4D9; --planning-bd:#C76A42; --planning-tx:#7A2C11;
+    --dev-bg:#F4E7CE; --dev-bd:#BA8824; --dev-tx:#6B390E;
+    --resources-bg:#E1E9F8; --resources-bd:#4C77C8; --resources-tx:#1C3C86;
     --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
     --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
   }
   @media (prefers-color-scheme:dark){
     :root{
-      --bg:#0F1218; --surface:#171B22; --surface-2:#1C212A;
-      --ink:#E7EBF2; --muted:#9AA4B4; --faint:#707A8B; --line:#282F3A; --line-strong:#3A424F;
-      --accent:#34C79A; --accent-soft:#12332A; --edge:#59647A; --edge-strong:#93A0B4;
-      --meta-bg:#262D3A; --meta-bd:#64748B; --meta-tx:#C6D0DE;
-      --guides-bg:#123329; --guides-bd:#2E9E78; --guides-tx:#7CE6BE;
-      --planning-bg:#3A2417; --planning-bd:#C2603A; --planning-tx:#EFB79B;
-      --dev-bg:#372E13; --dev-bd:#B5851F; --dev-tx:#EAC983;
-      --resources-bg:#182740; --resources-bd:#5A82CE; --resources-tx:#A9C3EF;
+      --bg:#0E1117; --surface:#161B22; --surface-2:#1B212B;
+      --ink:#E8ECF3; --muted:#9BA5B6; --faint:#6E7889; --line:#262D39; --line-strong:#39424F;
+      --accent:#35C89B; --accent-soft:#123329; --edge:#4C5768; --edge-strong:#8F9DB2;
+      --meta-bg:#252D3A; --meta-bd:#63728C; --meta-tx:#C4CEDD;
+      --guides-bg:#123228; --guides-bd:#2E9E78; --guides-tx:#79E6BC;
+      --planning-bg:#39240F; --planning-bd:#C05F38; --planning-tx:#F0B79A;
+      --dev-bg:#362D11; --dev-bd:#B4841D; --dev-tx:#EBC981;
+      --resources-bg:#17263F; --resources-bd:#5981CE; --resources-tx:#A7C2EF;
     }
   }
   :root[data-theme="light"]{
-    --bg:#F5F6F8; --surface:#FFFFFF; --surface-2:#FAFBFC;
-    --ink:#1B2230; --muted:#5C6577; --faint:#8A94A6; --line:#E4E8EF; --line-strong:#CBD2DE;
-    --accent:#0F9D6B; --accent-soft:#E4F3EC; --edge:#9AA4B4; --edge-strong:#4B5768;
-    --meta-bg:#E9ECF2; --meta-bd:#7E8CA6; --meta-tx:#2A3550;
-    --guides-bg:#DCEFE7; --guides-bd:#2A9D78; --guides-tx:#0B5A44;
-    --planning-bg:#F5E4DA; --planning-bd:#C76A44; --planning-tx:#7C2D12;
-    --dev-bg:#F4E8D1; --dev-bd:#BD8B29; --dev-tx:#6E3B10;
-    --resources-bg:#E3EAF8; --resources-bd:#4E79C8; --resources-tx:#1E3E86;
+    --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#F7F9FC;
+    --ink:#1A2130; --muted:#586173; --faint:#8B94A6; --line:#E3E8F0; --line-strong:#C9D1DE;
+    --accent:#0E9F6E; --accent-soft:#E3F3EC; --edge:#AEB7C6; --edge-strong:#54607A;
+    --meta-bg:#EAEDF3; --meta-bd:#7C8AA6; --meta-tx:#2A3450;
+    --guides-bg:#DBEFE6; --guides-bd:#2A9D78; --guides-tx:#0A5942;
+    --planning-bg:#F6E4D9; --planning-bd:#C76A42; --planning-tx:#7A2C11;
+    --dev-bg:#F4E7CE; --dev-bd:#BA8824; --dev-tx:#6B390E;
+    --resources-bg:#E1E9F8; --resources-bd:#4C77C8; --resources-tx:#1C3C86;
   }
   :root[data-theme="dark"]{
-    --bg:#0F1218; --surface:#171B22; --surface-2:#1C212A;
-    --ink:#E7EBF2; --muted:#9AA4B4; --faint:#707A8B; --line:#282F3A; --line-strong:#3A424F;
-    --accent:#34C79A; --accent-soft:#12332A; --edge:#59647A; --edge-strong:#93A0B4;
-    --meta-bg:#262D3A; --meta-bd:#64748B; --meta-tx:#C6D0DE;
-    --guides-bg:#123329; --guides-bd:#2E9E78; --guides-tx:#7CE6BE;
-    --planning-bg:#3A2417; --planning-bd:#C2603A; --planning-tx:#EFB79B;
-    --dev-bg:#372E13; --dev-bd:#B5851F; --dev-tx:#EAC983;
-    --resources-bg:#182740; --resources-bd:#5A82CE; --resources-tx:#A9C3EF;
+    --bg:#0E1117; --surface:#161B22; --surface-2:#1B212B;
+    --ink:#E8ECF3; --muted:#9BA5B6; --faint:#6E7889; --line:#262D39; --line-strong:#39424F;
+    --accent:#35C89B; --accent-soft:#123329; --edge:#4C5768; --edge-strong:#8F9DB2;
+    --meta-bg:#252D3A; --meta-bd:#63728C; --meta-tx:#C4CEDD;
+    --guides-bg:#123228; --guides-bd:#2E9E78; --guides-tx:#79E6BC;
+    --planning-bg:#39240F; --planning-bd:#C05F38; --planning-tx:#F0B79A;
+    --dev-bg:#362D11; --dev-bd:#B4841D; --dev-tx:#EBC981;
+    --resources-bg:#17263F; --resources-bd:#5981CE; --resources-tx:#A7C2EF;
   }
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 64px;}
@@ -230,15 +199,15 @@ _TEMPLATE = r"""<title>방법론 문서 파이프라인 · 지식그래프</titl
   .loopnote{margin-top:10px;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;}
   .loopnote b{color:var(--accent);font-weight:600;font-family:var(--mono);font-size:12px;}
   .loopnote svg{width:16px;height:16px;display:block;}
-  .graph-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;}
+  .graph-scroll{overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;max-height:78vh;}
   svg.graph{display:block;}
   .gnode{cursor:pointer;}
-  .gnode rect{stroke-width:1.5;transition:opacity .18s,filter .18s;}
+  .gnode rect{stroke-width:1.5;transition:opacity .16s;}
   .gnode text{font-family:var(--font);font-size:11.5px;font-weight:500;pointer-events:none;}
-  .gnode .path{font-family:var(--mono);font-size:9px;font-weight:400;opacity:.72;}
-  .gedge{fill:none;transition:opacity .18s;}
-  .dim{opacity:.12;}
-  .dim-e{opacity:.05;}
+  .gnode .path{font-family:var(--mono);font-size:8.5px;font-weight:400;opacity:.7;}
+  .gedge{fill:none;transition:opacity .16s;}
+  .dim{opacity:.1;}
+  .dim-e{opacity:.04;}
   .hint{font-size:12.5px;color:var(--faint);margin:10px 2px 0;font-family:var(--mono);}
   .detail{margin-top:16px;padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;min-height:120px;}
   .detail .ph{color:var(--faint);font-size:14px;}
@@ -263,7 +232,7 @@ _TEMPLATE = r"""<title>방법론 문서 파이프라인 · 지식그래프</titl
   <header class="top">
     <p class="eyebrow">Methodology · Document Pipeline</p>
     <h1>산출물이 나오기까지 — 문서 파이프라인 & 역할 지식그래프</h1>
-    <p class="lede">레포가 스스로 인코딩한 <code style="font-family:var(--mono);font-size:13px">60_tools/methodology-graph.json</code> 을 정본으로 자동 렌더 — <b id="counts"></b>. 입력 브리프에서 개발 산출물·환류까지, 각 문서가 어떤 역할로 어떻게 연결되는지.</p>
+    <p class="lede">레포가 스스로 인코딩한 <code style="font-family:var(--mono);font-size:13px">60_tools/methodology-graph.json</code> 을 정본으로 자동 렌더 — <b id="counts"></b>. 레이아웃은 dagre 계층 배치로 교차를 최소화한다.</p>
   </header>
 
   <h2><span class="n">A</span> 라이프사이클 파이프라인</h2>
@@ -283,27 +252,28 @@ _TEMPLATE = r"""<title>방법론 문서 파이프라인 · 지식그래프</titl
     <span class="lg"><span class="ln dash"></span>보조·참조</span>
   </div>
   <div class="graph-scroll"><svg class="graph" id="graph" role="img" aria-label="방법론 문서 역할 지식그래프"></svg></div>
-  <p class="hint">← 가로 스크롤 · 노드 클릭 → 상세 · 배경 클릭 → 초기화</p>
+  <p class="hint">← 스크롤 · 노드 클릭 → 상세 · 배경 클릭 → 초기화</p>
 
   <div class="detail" id="detail"><span class="ph">노드를 클릭하면 그 문서의 역할과 들어오고 나가는 연결을 보여줍니다.</span></div>
 
-  <p class="foot">출처: <code>60_tools/methodology-graph.json</code> (<span id="ver"></span>) — <code>60_tools/generate-graph-viz.py</code> 가 자동 렌더. 노드 좌표는 category=열 / guides=tier 분할로 결정적 배치.</p>
+  <p class="foot">출처: <code>60_tools/methodology-graph.json</code> (<span id="ver"></span>) — <code>60_tools/generate-graph-viz.py</code> 가 자동 렌더. 레이아웃 = dagre(계층 DAG). 인터랙션 = 노드 클릭 상세.</p>
 </div>
 
+<script>/*__DAGRE__*/</script>
 <script>
 const CAT=/*__CAT__*/;
 const NODES=/*__NODES__*/;
-const PRIMARY=new Set(/*__PRIMARY__*/);
 const EDGES=/*__EDGES__*/;
 const LIFE=/*__LIFE__*/;
 const VERSION=/*__VERSION__*/, NCOUNT=/*__NCOUNT__*/, ECOUNT=/*__ECOUNT__*/;
-const NW=150,NH=44;
+const NW=158,NH=46;
 const byId=Object.fromEntries(NODES.map(n=>[n.id,n]));
 document.getElementById('counts').textContent=NCOUNT+' 노드 · '+ECOUNT+' 엣지 · '+VERSION;
 document.getElementById('ver').textContent=VERSION;
 
+// ---- lifecycle pipeline ----
 const lock='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>';
-const loop='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 0-14.3-4.6M4 4v3.5h3.5"/><path d="M4 12.5a8 8 0 0 0 14.3 4.6M20 20v-3.5h-3.5"/></svg>';
+const loopIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 0-14.3-4.6M4 4v3.5h3.5"/><path d="M4 12.5a8 8 0 0 0 14.3 4.6M20 20v-3.5h-3.5"/></svg>';
 const flow=document.getElementById('flow');
 LIFE.forEach(s=>{
   const d=document.createElement('div');
@@ -315,98 +285,113 @@ LIFE.forEach(s=>{
 });
 const looper=LIFE.find(s=>s.loop);
 if(looper){
-  document.getElementById('loopnote').innerHTML='<span style="color:var(--accent);display:inline-flex;width:16px;height:16px">'+loop+'</span>'+
+  document.getElementById('loopnote').innerHTML='<span style="color:var(--accent);display:inline-flex;width:16px;height:16px">'+loopIcon+'</span>'+
     '<span><b>'+looper.id+' → 개발</b> 로 순환 — 환류가 다음 배치를 다시 개발 단계로 되돌린다.</span>';
 }
 
-const NS='http://www.w3.org/2000/svg';
-const svg=document.getElementById('graph');
-const maxX=Math.max.apply(null,NODES.map(n=>n.x+NW))+40;
-const maxY=Math.max.apply(null,NODES.map(n=>n.y+NH))+30;
-svg.setAttribute('width',maxX); svg.setAttribute('height',maxY);
-svg.style.minWidth=Math.min(maxX,1180)+'px'; svg.style.width=maxX+'px'; svg.style.height=maxY+'px';
+// ---- dagre layout ----
 const cs=getComputedStyle(document.documentElement);
 function v(t){return cs.getPropertyValue(t).trim();}
-function conn(a,b){
-  const ax=a.x+NW/2, ay=a.y+NH/2, bx=b.x+NW/2, by=b.y+NH/2;
-  const dx=bx-ax, dy=by-ay; let px,py;
-  if(Math.abs(dx)>=Math.abs(dy)){ px=a.x+(dx>0?NW:0); py=ay+dy*((NW/2)/Math.max(Math.abs(dx),1)); }
-  else{ py=a.y+(dy>0?NH:0); px=ax+dx*((NH/2)/Math.max(Math.abs(dy),1)); }
-  return [px,py];
-}
+const g=new dagre.graphlib.Graph({multigraph:true});
+g.setGraph({rankdir:'LR',nodesep:22,ranksep:64,edgesep:14,marginx:18,marginy:18});
+g.setDefaultEdgeLabel(()=>({}));
+NODES.forEach(n=>g.setNode(n.id,{width:NW,height:NH}));
+EDGES.forEach((e,i)=>{
+  if(byId[e.f]&&byId[e.t]) g.setEdge(e.f,e.t,{weight:e.prim?4:1,minlen:1,data:e},'e'+i);
+});
+dagre.layout(g);
+const gInfo=g.graph();
+
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('graph');
+const W=Math.ceil(gInfo.width)+36, H=Math.ceil(gInfo.height)+36;
+svg.setAttribute('width',W); svg.setAttribute('height',H);
+svg.setAttribute('viewBox','0 0 '+W+' '+H);
+
 const defs=document.createElementNS(NS,'defs');
-defs.innerHTML='<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker>';
+defs.innerHTML='<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker>';
 svg.appendChild(defs);
 const eLayer=document.createElementNS(NS,'g');
 const nLayer=document.createElementNS(NS,'g');
 svg.appendChild(eLayer); svg.appendChild(nLayer);
 
+function smoothPath(pts){
+  if(pts.length<2) return '';
+  let d='M'+pts[0].x.toFixed(1)+' '+pts[0].y.toFixed(1);
+  for(let i=1;i<pts.length-1;i++){
+    const xc=(pts[i].x+pts[i+1].x)/2, yc=(pts[i].y+pts[i+1].y)/2;
+    d+=' Q'+pts[i].x.toFixed(1)+' '+pts[i].y.toFixed(1)+' '+xc.toFixed(1)+' '+yc.toFixed(1);
+  }
+  const last=pts[pts.length-1];
+  d+=' L'+last.x.toFixed(1)+' '+last.y.toFixed(1);
+  return d;
+}
 const edgeEls=[];
-EDGES.forEach(([f,t,k,lb])=>{
-  const a=byId[f], b=byId[t]; if(!a||!b) return;
-  const [x1,y1]=conn(a,b), [x2,y2]=conn(b,a);
-  const prim=PRIMARY.has(k);
+g.edges().forEach(eo=>{
+  const ed=g.edge(eo); const e=ed.data;
   const path=document.createElementNS(NS,'path');
-  const c1x=x1+(x2-x1)*0.42, c2x=x1+(x2-x1)*0.58;
-  path.setAttribute('d',`M${x1} ${y1} C ${c1x} ${y1}, ${c2x} ${y2}, ${x2} ${y2}`);
+  path.setAttribute('d',smoothPath(ed.points));
   path.setAttribute('class','gedge');
-  path.setAttribute('stroke', prim?v('--edge-strong'):v('--edge'));
-  path.setAttribute('stroke-width', prim?'1.7':'1.2');
-  if(!prim) path.setAttribute('stroke-dasharray','4 4');
-  path.setAttribute('opacity', prim?'0.62':'0.4');
+  path.setAttribute('stroke', e.prim?v('--edge-strong'):v('--edge'));
+  path.setAttribute('stroke-width', e.prim?'1.7':'1.2');
+  if(!e.prim) path.setAttribute('stroke-dasharray','4 4');
+  path.setAttribute('opacity', e.prim?'0.6':'0.4');
   path.setAttribute('marker-end','url(#ah)');
   eLayer.appendChild(path);
-  edgeEls.push({el:path,f,t,k,lb,prim});
+  edgeEls.push({el:path,f:e.f,t:e.t,prim:e.prim});
 });
 
 function truncate(s,n){return s.length>n?s.slice(0,n-1)+'…':s;}
 const nodeEls={};
-NODES.forEach(n=>{
-  const g=document.createElementNS(NS,'g');
-  g.setAttribute('class','gnode');
-  g.setAttribute('transform',`translate(${n.x},${n.y})`);
+g.nodes().forEach(id=>{
+  const n=byId[id]; if(!n) return;
+  const nd=g.node(id);
+  const x=nd.x-NW/2, y=nd.y-NH/2;
+  const grp=document.createElementNS(NS,'g');
+  grp.setAttribute('class','gnode');
+  grp.setAttribute('transform','translate('+x.toFixed(1)+','+y.toFixed(1)+')');
   const c=CAT[n.cat];
   const rect=document.createElementNS(NS,'rect');
   rect.setAttribute('width',NW);rect.setAttribute('height',NH);rect.setAttribute('rx','8');
   rect.setAttribute('fill',v(c.bg));rect.setAttribute('stroke',v(c.bd));rect.setAttribute('stroke-width','1.5');
   const t1=document.createElementNS(NS,'text');
-  t1.setAttribute('x',NW/2);t1.setAttribute('y',19);t1.setAttribute('text-anchor','middle');
-  t1.setAttribute('fill',v(c.tx));t1.setAttribute('class','lbl');t1.textContent=truncate(n.lb,15);
+  t1.setAttribute('x',NW/2);t1.setAttribute('y',20);t1.setAttribute('text-anchor','middle');
+  t1.setAttribute('fill',v(c.tx));t1.setAttribute('class','lbl');t1.textContent=truncate(n.lb,16);
   const t2=document.createElementNS(NS,'text');
-  t2.setAttribute('x',NW/2);t2.setAttribute('y',33);t2.setAttribute('text-anchor','middle');
-  t2.setAttribute('fill',v(c.tx));t2.setAttribute('class','path');t2.textContent=truncate(n.path,26);
-  g.appendChild(rect);g.appendChild(t1);g.appendChild(t2);
-  g.addEventListener('click',e=>{e.stopPropagation();select(n.id);});
-  nLayer.appendChild(g);
-  nodeEls[n.id]=g;
+  t2.setAttribute('x',NW/2);t2.setAttribute('y',34);t2.setAttribute('text-anchor','middle');
+  t2.setAttribute('fill',v(c.tx));t2.setAttribute('class','path');t2.textContent=truncate(n.path,28);
+  grp.appendChild(rect);grp.appendChild(t1);grp.appendChild(t2);
+  grp.addEventListener('click',ev=>{ev.stopPropagation();select(id);});
+  nLayer.appendChild(grp);
+  nodeEls[id]=grp;
 });
 
 function select(id){
   const nb=new Set([id]);
   edgeEls.forEach(e=>{if(e.f===id||e.t===id){nb.add(e.f);nb.add(e.t);}});
-  NODES.forEach(n=>nodeEls[n.id].classList.toggle('dim',!nb.has(n.id)));
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.toggle('dim',!nb.has(k)));
   edgeEls.forEach(e=>{
     const on=(e.f===id||e.t===id);
     e.el.classList.toggle('dim-e',!on);
-    e.el.setAttribute('opacity', on?'0.95':(e.prim?'0.62':'0.4'));
+    e.el.setAttribute('opacity', on?'0.95':(e.prim?'0.6':'0.4'));
     e.el.setAttribute('stroke-width', on?(e.prim?'2.4':'2'):(e.prim?'1.7':'1.2'));
   });
   renderDetail(id);
 }
 function reset(){
-  NODES.forEach(n=>nodeEls[n.id].classList.remove('dim'));
-  edgeEls.forEach(e=>{e.el.classList.remove('dim-e');e.el.setAttribute('opacity',e.prim?'0.62':'0.4');e.el.setAttribute('stroke-width',e.prim?'1.7':'1.2');});
+  Object.keys(nodeEls).forEach(k=>nodeEls[k].classList.remove('dim'));
+  edgeEls.forEach(e=>{e.el.classList.remove('dim-e');e.el.setAttribute('opacity',e.prim?'0.6':'0.4');e.el.setAttribute('stroke-width',e.prim?'1.7':'1.2');});
   document.getElementById('detail').innerHTML='<span class="ph">노드를 클릭하면 그 문서의 역할과 들어오고 나가는 연결을 보여줍니다.</span>';
 }
 svg.addEventListener('click',reset);
 
 function renderDetail(id){
   const n=byId[id], c=CAT[n.cat];
-  const outs=EDGES.filter(e=>e[0]===id).map(e=>({to:byId[e[1]],k:e[2],lb:e[3]}));
-  const ins=EDGES.filter(e=>e[1]===id).map(e=>({fr:byId[e[0]],k:e[2],lb:e[3]}));
-  const li=(node,k,lb)=>'<li><span class="k">'+k+(lb?' · '+lb:'')+'</span><b>'+(node?node.lb:'?')+'</b></li>';
-  const outHtml=outs.length?outs.map(o=>li(o.to,o.k,o.lb)).join(''):'<li class="none">없음 — 최종/말단 산출물</li>';
-  const inHtml=ins.length?ins.map(o=>li(o.fr,o.k,o.lb)).join(''):'<li class="none">없음 — 사이클의 입력</li>';
+  const outs=EDGES.filter(e=>e.f===id).map(e=>({node:byId[e.t],k:e.k,lb:e.lb}));
+  const ins=EDGES.filter(e=>e.t===id).map(e=>({node:byId[e.f],k:e.k,lb:e.lb}));
+  const li=o=>'<li><span class="k">'+o.k+(o.lb?' · '+o.lb:'')+'</span><b>'+(o.node?o.node.lb:'?')+'</b></li>';
+  const outHtml=outs.length?outs.map(li).join(''):'<li class="none">없음 — 최종/말단 산출물</li>';
+  const inHtml=ins.length?ins.map(li).join(''):'<li class="none">없음 — 사이클의 입력</li>';
   document.getElementById('detail').innerHTML=
     '<div class="d-head"><span class="d-cat" style="color:'+v(c.tx)+';border-color:'+v(c.bd)+';background:'+v(c.bg)+'">'+c.label+'</span>'+
     '<span class="d-title">'+n.lb+'</span></div>'+
@@ -416,10 +401,10 @@ function renderDetail(id){
     '<div class="d-col"><h4>나가는 연결 (output) →</h4><ul>'+outHtml+'</ul></div></div>';
 }
 const mo=new MutationObserver(()=>{
-  NODES.forEach(n=>{const c=CAT[n.cat],g=nodeEls[n.id];
-    g.querySelector('rect').setAttribute('fill',v(c.bg));
-    g.querySelector('rect').setAttribute('stroke',v(c.bd));
-    g.querySelectorAll('text').forEach(t=>t.setAttribute('fill',v(c.tx)));});
+  Object.keys(nodeEls).forEach(id=>{const c=CAT[byId[id].cat],grp=nodeEls[id];
+    grp.querySelector('rect').setAttribute('fill',v(c.bg));
+    grp.querySelector('rect').setAttribute('stroke',v(c.bd));
+    grp.querySelectorAll('text').forEach(t=>t.setAttribute('fill',v(c.tx)));});
   edgeEls.forEach(e=>e.el.setAttribute('stroke',e.prim?v('--edge-strong'):v('--edge')));
 });
 mo.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
