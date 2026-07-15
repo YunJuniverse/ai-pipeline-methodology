@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-15 (METH-109 graph-viz를 dashboard/boot에 통합)
+# Checkpoint — 2026-07-15 (METH-110 graph-viz dagre 레이아웃)
 
-> ✅ cmd_dashboard가 대시보드 빌드 직후 graph-viz를 동반 빌드. boot 경유로 매 세션 자동 최신화. feat/graph-viz-autobuild, PR 대기.
+> ✅ 지식그래프 레이아웃을 손 배치 격자 → dagre 계층 DAG로 교체(교차↓). feat/graph-viz-dagre, PR 대기. 아티팩트 갱신.
 
 ---
 
@@ -10,25 +10,28 @@
 
 ## 작성자
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `feat/graph-viz-autobuild` (updated main 기준, branch-first)
+- Worktree: branch `feat/graph-viz-dagre` (updated main 기준, branch-first)
 
 ## 부팅 계약
 1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
 ## 방금 한 것 (이번 세션)
-METH-108(graph-viz 생성기) 후속 — 사용자 요청으로 **dashboard/boot에 통합**해 자동 최신화.
-- **통합 지점**: `cmd_boot` → `cmd_dashboard`(기존 호출) → `generate-dashboard.py`. 여기 `cmd_dashboard`의 대시보드 빌드 subprocess **직후**에 `_build_graph_viz(build_root, out_path.parent)` 추가.
-- **`_build_graph_viz`**: `<build_root>/60_tools/generate-graph-viz.py`(없으면 METHODOLOGY_ROOT fallback)를 `--standalone --out <cache>/methodology-graph-viz.html`로 subprocess 실행. 생성기 미존재(미sync 다운스트림)·실패해도 대시보드 빌드 **안 막음**(warn만, 부수 산출물). 성공 시 `ok("graph-viz built: ...")`.
-- 결과: boot·`dashboard` 양쪽이 매번 graph-viz를 정본 JSON에서 재생성 → 수동 실행 불필요.
-- **테스트**: `tests/test_graph_viz.py`에 통합 테스트 1개 추가(`_build_graph_viz`가 실제 파일 생성·`<svg` 포함) → **9/9**. sync-all 9/9 회귀 없음.
-- **실측**: `dashboard --no-serve` → "graph-viz built" + 파일 생성, 주입 상수 NCOUNT=42·ECOUNT=53·VERSION=v3.2-2026-07 확인.
+사용자 "그래프가 좀 지저분" + "쓸 수 있는 스킬·커넥터·플러그인 조사해서 디벨롭".
+- **진단**: 손 배치 격자(category=열)라 42노드/53엣지에서 엣지 교차(스파게티)가 근본 원인 — 색 아니라 **레이아웃 알고리즘** 문제.
+- **수단 조사**: dataviz 스킬(✅ 시각 정돈)·Mermaid 네이티브 렌더(✅ 자동 레이아웃)·그래프 레이아웃 lib 인라인(✅ CSP가 인라인 JS 허용)·frontend-design/web-design-guidelines(보조)·Figma/Canva(인증·부적합). → 사용자가 **dagre 인라인** 선택.
+- **구현**: `npm pack @dagrejs/dagre`로 `dagre.min.js`(40KB) 확보 → `60_tools/vendor/`에 벤더링(MIT LEGAL 동봉). 생성기 재작성:
+  - 파이썬은 좌표 안 만들고 **노드/엣지 데이터만 주입**(`js_nodes`에서 x/y 제거). dagre 번들을 `<script>`로 인라인(`dagre_source()`가 sourceMappingURL 주석 제거).
+  - 브라우저에서 `new dagre.graphlib.Graph()` → rankdir=LR, primary 엣지 weight=4(흐름축 곧게) → `dagre.layout()` → 노드 좌표·엣지 `points`로 SVG 렌더(엣지는 smoothPath 곡선).
+  - **클릭→상세·라이프사이클·테마 recolor·dim 하이라이트 전부 유지**. dataviz 반영(recessive 엣지·라벨 2차인코딩·다크 설계 팔레트 소폭 정돈).
+- **검증**: `tests/test_graph_viz.py` 6개(데이터 주입·번들 인라인·sourceMappingURL 제거·치환·통합) 6/6. 브라우저 DOM: dagre 정의됨·42노드 9개 rank(x 18~1794)·53엣지 다중점 곡선·클릭 시 상세("CLAUDE.md")+38노드 dim·콘솔 오류0. 스크린샷 육안: 곡선 라우팅·팬아웃 깔끔.
+- **아티팩트**(e3d2f0cc) dagre 출력으로 갱신(같은 URL).
 
 ## 다음 사람에게
-1. **METH-109 PR(base=main) 머지** — feat/graph-viz-autobuild.
-2. 머지 후 다음 sync 때 이 통합(methodology.py)이 다운스트림 10곳에 전파 → 각 repo boot도 자동 graph-viz 생성.
-3. (선택) graph-viz를 서빙 URL로 노출하고 싶으면 dashboard 서버가 cache 디렉터리를 서빙하므로 `…/methodology-graph-viz.html` 경로로 접근 가능(현재는 파일만 생성).
+1. **METH-110 PR(base=main) 머지** — feat/graph-viz-dagre. 벤더 `60_tools/vendor/dagre.min.js`(+LEGAL) 신규 포함.
+2. 머지 후 다음 sync 때 벤더 dagre + 새 생성기가 다운스트림 10곳 전파(60_tools shared).
+3. (선택) dagre `ranksep`/`nodesep` 튜닝으로 밀도 조정 가능. 현재 rankdir=LR, ranksep=64.
 
 ## 환경 메모
-- 브랜치: `feat/graph-viz-autobuild` (updated main). branch-first.
-- 오늘 세션 = 4번째 PR(다운스트림 처리 → sync-all #97 → graph-viz #98 → autobuild).
+- 브랜치: `feat/graph-viz-dagre` (updated main). branch-first.
+- 오늘 세션 = 다운스트림 처리 → sync-all #97 → graph-viz #98 → autobuild #99 → dagre(대기).
 - 누적 상태(오픈이슈·PR)는 **HANDOFF 참조**.
