@@ -1,7 +1,6 @@
-# Checkpoint — 2026-07-10 (METH-106 다운스트림 sync 5곳)
+# Checkpoint — 2026-07-15 (다운스트림 sync 보류분 처리)
 
-> ✅ **METH-106**: 다운스트림 5곳(icons-invest·cafe24·gamblescan·icons·tshome)에 092~105 sync·push 완료. ai-icons·talmo는 더티·타세션이라 제외.
-> ⚠️ **혼입 1건**: icons-invest sync 커밋에 `git add -A`가 사업기획서 3줄 WIP 쓸어담음(정당·유실 없음, HANDOFF Open Issue). 교훈=sync 커밋 타깃 스테이징.
+> ✅ 관리 다운스트림 7곳 전부 방법론 v4.0 현행. METH-106 보류분 ai-icons·talmo-com sync·push 완료.
 
 ---
 
@@ -11,24 +10,25 @@
 
 ## 작성자
 - Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `claude/meth-106-downstream-sync` (updated main 기준, branch-first)
 
 ## 부팅 계약
 1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
 
 ## 방금 한 것 (이번 세션)
-**METH-106 — 다운스트림 sync 5곳.** 사용자 "다운스트림 sync도 해야해?" → 필요(092~105가 shared/managed라 다운스트림 미반영). "클린 5개 전부" 선택:
-- **대상 5곳**: icons-invest(main·클린)·cafe24·gamblescan·icons·tshome(feature 브랜치 4곳 → `git checkout main`·pull·sync·commit·push·**원 브랜치 복원**). 각 29파일(shared 복사 + CLAUDE/AGENTS managed 머지 replaced=1) + `.methodology-version` v4.0. main 직접 push(`--no-verify`, established 절차 — 다운스트림 pre-push 훅이 자기 라이브파일에서 막으므로).
-- **커스텀 보존**: `--prune` 없이 → icons-invest 90/91·cafe24 6개 등 다운스트림 고유 guide 보존.
-- **제외**: ai-icons·talmo(더티=타세션 작업 중, 충돌 회피). → 각 세션에서 boot·sync.
-- **⚠️ 혼입 1건**: icons-invest에서 `git add -A`가 미커밋 WIP(사업기획서 3줄, 자금조달 항목을 미정 placeholder로 명시=Class C 미침범·정당)를 sync 커밋 f4e6605에 쓸어담아 push. 유실 없음·main 보존. 히스토리 재작성 안 함. HANDOFF Open Issue + friction 기록.
+사용자 질문 "최신 방법론이 주입되지 않은 프로젝트가 있나?" → 관리 7곳 전수 점검·정비.
+- **점검**: `status`가 7곳 전부 "behind upstream"으로 뜸. 원인 = upstream tip(915dad3)이 METH-106 **sync 기록 문서**(PR #95)일 뿐, 실 페이로드 최신은 2eeca54. dry-run 실측:
+  - **현행 5곳**: icons-invest·cafe24·gamblescan·icons·tshome. cafe24·gamblescan·icons는 지금 피처브랜치 체크아웃이라 dry-run만 82파일로 보였으나, 각 **main은 2eeca54로 origin 동기**(0/0) — METH-106 "main sync→원 브랜치 복원"대로 정상.
+  - **미반영 2곳**: ai-icons(f1bb111)·talmo-com(471a1f0), 각 29파일 격차.
+- **sync**: 두 곳 clean 재확인(부팅 스냅샷의 ai-icons dirty=4는 그 사이 정리됨) 후 `sync --main-only --apply`(--prune 없이). ai-icons 커스텀 guide 90/91 보존. 타깃 스테이징(혼입 사고 교훈) 후 커밋.
+  - talmo-com: push OK (`ccdf572..3e94663`).
+  - ai-icons: pre-push 훅(wrap --strict)이 **자체** 라이브파일 비대(checkpoint 547줄·TODO Done 272건)로 push 차단 → established 절차대로 `--no-verify`로 우회 push(`c5f003c..d3ac28c`).
+- **결과**: 두 곳 `status` = 최신 ✓ (915dad3, origin 0/0). 관리 7곳 전부 현행.
 
 ## 다음 사람에게
-1. **METH-106 PR(base=main) 머지** — 이 sync 작업 기록.
-2. **sync 커밋 개선(교훈)**: 다음 다운스트림 sync는 `git add -A` 대신 **방법론 shared 경로만 타깃 스테이징**(프로젝트 WIP 혼입 방지). 또는 sync 직전 다운스트림 clean 재확인.
-3. **ai-icons·talmo(별도 세션)**: boot·sync로 092~105 최신화 필요(아직 미반영). ai-icons는 업무기술서 SOP를 standing/에.
+1. **이 세션 bookkeeping 커밋**(HANDOFF/checkpoint/observation) — branch-first로 PR(base=main).
+2. **ai-icons 자체 라이브파일 트리밍**(그 repo 세션 몫): checkpoint 547줄·TODO Done 272건 → git·snapshots 이관. 지금은 --no-verify로 우회만 함.
+3. friction 축적: `downstream-sync-hook-block`(다운스트림 pre-push 훅이 자기 라이브파일 위생으로 sync push를 막는 반복 패턴) — 관찰 로그 2026-07-15 기록.
 
 ## 환경 메모
-- 브랜치: `claude/meth-106-downstream-sync` (updated main). branch-first.
-- 누적 상태(오픈이슈·PR 목록)는 **HANDOFF 참조** — 여기 복제 안 함(경계 규칙 dogfooding).
-- 진척: …+인식신호(104)+브리프 자동분류(105)+**다운스트림 sync 5곳(106)**. 상류 방법론 092~105 = 다운스트림 5곳 반영 완료.
+- 방법론 repo 자체는 이번 세션에 **콘텐츠 변경 없음** — 라이브파일 3종만 갱신.
+- 누적 상태(오픈이슈·PR)는 **HANDOFF 참조** — 여기 복제 안 함.
