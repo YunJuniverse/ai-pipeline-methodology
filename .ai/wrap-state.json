@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "915dad3d37c86b4034843cada349f2729a4fff48",
-  "last_validated_at": "2026-07-15T03:02:22Z",
+  "last_validated_commit": "2b1ba329c629ee24db4cbdc2ac78c432820754f6",
+  "last_validated_at": "2026-07-15T04:24:02Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "64e0f073886e15a96880f40168877bb26e7207f1330706631df723c9968f6cf7"
+      "sha256": "4b419a5437bf8cbb3f600f61dd813c3f32859a54a4eff487696b557f23394f6a"
     },
     "TODO.md": {
-      "sha256": "753a734db1dd14f2b9c4d989bf2f6b9dfe83905504abfb2f5ae3b49b422f170a"
+      "sha256": "e5681b8c757f733197cca5bd88df92cf284e8f37fd50c79d0d4b999d79ba6562"
     },
     ".ai/checkpoint.md": {
-      "sha256": "02d9206ce72de8151caa3c7cbec9492ee41b80d8176e17da36fef58637d23b84"
+      "sha256": "d1e2a637909ac1aea667803194d63ac79c4d212716ecaf8ba76cb49b0d33201f"
     }
   },
   "observations": {
@@ -111,6 +111,7 @@
       "50_resources/ai_observations/2026-07-10_meth-105-brief-auto-filing.md",
       "50_resources/ai_observations/2026-07-10_meth-106-downstream-sync.md",
       "50_resources/ai_observations/2026-07-15_ai-icons-talmo-sync.md",
+      "50_resources/ai_observations/2026-07-15_sync-all-helper.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

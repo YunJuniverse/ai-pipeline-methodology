@@ -10,6 +10,10 @@ Commands
       현재 폴더(.methodology-version 보유)를 업스트림과 동기화한다.
       --apply 없이 호출하면 변경 미리보기만 출력 (드라이런).
 
+  methodology sync-all [--apply] [--root <dir>]
+      root(기본: 방법론 상위) 아래 관리 다운스트림을 전부 발견해 일괄 sync.
+      --apply 시 dirty·비-main 브랜치는 안전상 skip (--include-dirty/--allow-nonmain 로 강제).
+
   methodology status
       적용된 버전과 업스트림 버전을 비교한다.
 
@@ -1386,6 +1390,149 @@ def _git_sibling_worktrees(target: Path) -> list[Path]:
             if wt != target.resolve() and (wt / VERSION_FILE_NAME).exists():
                 paths.append(wt)
     return paths
+
+
+# ─── 명령: sync-all (관리 다운스트림 일괄) ───────────────────────────────────
+
+DEFAULT_BRANCHES = {"main", "master"}
+
+
+def _git_current_branch(path: Path) -> str | None:
+    """path 의 현재 브랜치. git repo 가 아니면 None."""
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(path), "rev-parse", "--abbrev-ref", "HEAD"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+        return out or None
+    except Exception:
+        return None
+
+
+def _git_dirty_count(path: Path) -> int:
+    """미커밋 변경 개수. git repo 가 아니거나 실패 시 0."""
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(path), "status", "--porcelain"],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+        return len(out.splitlines()) if out else 0
+    except Exception:
+        return 0
+
+
+def _discover_downstreams(root: Path) -> list[Path]:
+    """root 바로 아래에서 .methodology-version 을 가진 프로젝트 폴더 수집.
+
+    방법론 원본(METHODOLOGY_ROOT) 자신은 제외한다. 이름순 정렬.
+    """
+    found: list[Path] = []
+    try:
+        children = sorted(root.iterdir())
+    except OSError:
+        return found
+    for child in children:
+        if not child.is_dir() or child.resolve() == METHODOLOGY_ROOT:
+            continue
+        if (child / VERSION_FILE_NAME).exists():
+            found.append(child)
+    return found
+
+
+def _downstream_state(path: Path) -> dict:
+    """한 다운스트림의 sync 판단에 필요한 상태 스냅샷."""
+    vinfo = load_version_file(path) or {}
+    return {
+        "path": path,
+        "version": vinfo.get("methodology_version", "?"),
+        "applied_commit": vinfo.get("upstream_commit") or "unknown",
+        "branch": _git_current_branch(path),
+        "dirty": _git_dirty_count(path),
+    }
+
+
+def _is_behind(state: dict, up_commit: str) -> bool:
+    """적용 버전/커밋이 업스트림에 뒤처졌는지."""
+    if state["version"] != METHODOLOGY_VERSION:
+        return True
+    applied = state["applied_commit"]
+    return applied != "unknown" and up_commit != "unknown" and applied != up_commit
+
+
+def _sync_all_skip_reason(state: dict, args: argparse.Namespace) -> str | None:
+    """--apply 시 이 다운스트림을 건너뛸 이유. 없으면 None.
+
+    오늘의 교훈 2개를 가드로 박제:
+      1. dirty → 진행 중 작업 위에 sync churn 을 쌓지 않는다.
+      2. 비-main 브랜치 → 피처 브랜치에 방법론을 흩뿌리는 함정(METH-106) 방지.
+    """
+    if state["branch"] is None:
+        return "git repo 아님 — 안전상 skip"
+    if state["dirty"] and not args.include_dirty:
+        return f"미커밋 {state['dirty']}건 — 진행 중 작업 보호 (--include-dirty 로 강제)"
+    if state["branch"] not in DEFAULT_BRANCHES and not args.allow_nonmain:
+        return (f"기본 브랜치 아님 (현재 {state['branch']}) — "
+                f"main 체크아웃 후 sync (--allow-nonmain 로 강제)")
+    return None
+
+
+def _print_downstream_table(states: list[dict], up_commit: str) -> None:
+    """사전 스캔 표 — 버전·브랜치·dirty·업스트림 대비."""
+    print()
+    print(f"  {'project':22s} {'version':7s} {'branch':26s} {'dirty':>5s}  vs-upstream")
+    print(f"  {'-'*22} {'-'*7} {'-'*26} {'-'*5}  {'-'*11}")
+    for s in states:
+        state = "behind" if _is_behind(s, up_commit) else "최신 ✓"
+        print(f"  {s['path'].name:22.22s} {s['version']:7s} "
+              f"{(s['branch'] or '?'):26.26s} {s['dirty']:>5d}  {state}")
+    print()
+
+
+def cmd_sync_all(args: argparse.Namespace) -> int:
+    root = Path(args.root).resolve() if args.root else METHODOLOGY_ROOT.parent
+    apply = args.apply
+    projects = _discover_downstreams(root)
+    if not projects:
+        warn(f"다운스트림 없음 — {root} 아래 {VERSION_FILE_NAME} 보유 폴더가 없습니다.")
+        return 0
+
+    up_commit = upstream_commit()
+    info(f"sync-all — root: {root}  ({len(projects)}개)  "
+         f"{'APPLY' if apply else 'DRY-RUN'}")
+    states = [_downstream_state(p) for p in projects]
+    _print_downstream_table(states, up_commit)
+
+    processed, skipped = [], []
+    for s in states:
+        name = s["path"].name
+        if apply:
+            reason = _sync_all_skip_reason(s, args)
+            if reason:
+                warn(f"skip  {name}: {reason}")
+                skipped.append((name, reason))
+                continue
+        info(f"──── {name} ────")
+        sub = argparse.Namespace(
+            apply=apply, target=args.target, path=str(s["path"]),
+            include_worktrees=False, main_only=True,
+            force_worktree_migration=False, prune=args.prune,
+        )
+        rc = cmd_sync(sub)
+        (processed if rc == 0 else skipped).append(
+            name if rc == 0 else (name, f"sync 실패 rc={rc}"))
+
+    print()
+    ok(f"sync-all 완료 — 대상 {len(projects)}, 처리 {len(processed)}, skip {len(skipped)}")
+    for item in skipped:
+        name, reason = item if isinstance(item, tuple) else (item, "?")
+        warn(f"  skip {name}: {reason}")
+    if not apply:
+        info("실제 적용: methodology sync-all --apply "
+             "(각 repo commit/push 는 개별 수행 — git add -A 금지, 타깃 스테이징)")
+    else:
+        info("파일 적용됨 — 각 다운스트림 리뷰 후 개별 commit/push "
+             "(git add -A 금지, 방법론 경로만 타깃 스테이징)")
+    return 0
 
 
 # ─── 명령: status ───────────────────────────────────────────────────────────
@@ -2814,6 +2961,35 @@ def main(argv: list[str] | None = None) -> int:
         "삭제 대상은 적용 전 목록으로 표시됨.",
     )
     ps.set_defaults(func=cmd_sync)
+
+    psa = sub.add_parser(
+        "sync-all",
+        help="관리 다운스트림 전체 일괄 sync (발견→표→dry-run/적용→요약)",
+    )
+    psa.add_argument(
+        "--root",
+        help=f"탐색 루트 (기본: 방법론 상위 = {METHODOLOGY_ROOT.parent})",
+    )
+    psa.add_argument("--apply", action="store_true", help="실제 적용 (없으면 dry-run)")
+    psa.add_argument("--target", help="목표 버전 (기본: 최신)")
+    psa.add_argument(
+        "--prune",
+        action="store_true",
+        help="상류에 없는 다운스트림 고유 파일 삭제 (기본: 보존)",
+    )
+    psa.add_argument(
+        "--include-dirty",
+        dest="include_dirty",
+        action="store_true",
+        help="--apply 시 미커밋 있는 repo 도 sync (기본: skip)",
+    )
+    psa.add_argument(
+        "--allow-nonmain",
+        dest="allow_nonmain",
+        action="store_true",
+        help="--apply 시 기본 브랜치(main/master) 아니어도 sync (기본: skip)",
+    )
+    psa.set_defaults(func=cmd_sync_all)
 
     pst = sub.add_parser("status", help="버전 비교")
     pst.add_argument("--path", help="대상 폴더 (기본: 현재)")
