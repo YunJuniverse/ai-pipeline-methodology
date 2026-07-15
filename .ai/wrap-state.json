@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "2eeca54e6afe25d5a26e778bf936865ac1daeee8",
-  "last_validated_at": "2026-07-10T03:11:01Z",
+  "last_validated_commit": "915dad3d37c86b4034843cada349f2729a4fff48",
+  "last_validated_at": "2026-07-15T03:02:22Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "eef43b4549ce675700e9d01a3b2c3080da227fca567530109662aa8d3c9f702f"
+      "sha256": "64e0f073886e15a96880f40168877bb26e7207f1330706631df723c9968f6cf7"
     },
     "TODO.md": {
-      "sha256": "71f580ff84e4b6c5183bd430b26fadeae1e6c234c0c22cffb5b290b316b50fa7"
+      "sha256": "753a734db1dd14f2b9c4d989bf2f6b9dfe83905504abfb2f5ae3b49b422f170a"
     },
     ".ai/checkpoint.md": {
-      "sha256": "72d548cc9a348dc74ca501a956bf8230b9748240ed888f0ab3564a73c419e9cf"
+      "sha256": "02d9206ce72de8151caa3c7cbec9492ee41b80d8176e17da36fef58637d23b84"
     }
   },
   "observations": {
@@ -110,6 +110,7 @@
       "50_resources/ai_observations/2026-07-10_meth-104-sop-recognition-cues.md",
       "50_resources/ai_observations/2026-07-10_meth-105-brief-auto-filing.md",
       "50_resources/ai_observations/2026-07-10_meth-106-downstream-sync.md",
+      "50_resources/ai_observations/2026-07-15_ai-icons-talmo-sync.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
