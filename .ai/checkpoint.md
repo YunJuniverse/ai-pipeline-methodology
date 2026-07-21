@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-15 (cafe24 sync — 전 다운스트림 배포 종료)
+# Checkpoint — 2026-07-22 (grooman 11번째 관리 다운스트림 등록)
 
-> ✅ cafe24 sync 완료. 관리 다운스트림 10곳 전부 방법론 payload 내용 일치. chore/sync-cafe24, PR 대기.
+> ✅ grooman에 방법론 v4.0 적용(별도 세션 작업) → 소스 HANDOFF를 10→11곳으로 정합화. branch `chore/register-grooman-downstream`, PR 대기.
 
 ---
 
@@ -9,24 +9,22 @@
 > 형식 정의: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
-- Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin-25.5
-- Worktree: branch `chore/sync-cafe24` (updated main=e3a05fb 기준, branch-first)
-
-## 부팅 계약
-1. `.ai/context.json` → 2. `must_read` 순서 → 3. 이 파일 인계 → 4. "다음 사람에게" 첫 항목.
+- Agent: claude-opus-4-8 · Tool: claude-code-cli · Host: darwin
+- Worktree: branch `chore/register-grooman-downstream` (base=main 1843dea, branch-first)
 
 ## 방금 한 것 (이번 세션)
-사용자 "카페24 준비완료"(그 세션이 skin184 WIP landing).
-- **cafe24 sync**: clean 재확인(dirty 0, main==origin) → METH-106 절차: 원 브랜치 `fix/dev-fixes-260625` 저장 → `git checkout main` → pull → `sync --main-only --apply` → clean이라 `add -A`로 루트 shared 포함 스테이징 → commit + `--no-verify` push(3df5537..719ca68) → **원 브랜치 복원**. 커스텀 guide 6개 보존. main→e3a05fb.
-- **전 다운스트림 최종 검증**: 10곳의 `60_tools/methodology.py`·`generate-dashboard.py`를 upstream과 **해시 비교 → 전부 동일**. 즉 payload 내용 100% 일치.
-- **version 스탬프 cosmetic 차이**: 8곳 88b9382·ai-icons 5a2547c·cafe24 e3a05fb — `.methodology-version.upstream_commit`이 sync 시점 HEAD를 기록해서일 뿐, #103·#104가 라이브파일 전용 커밋이라 실제 shared 파일은 88b9382 이후 불변. `status`는 이들을 "behind"로 표시하나 내용은 최신.
+사용자 요청: "hayden 폴더 아래 방법론 적용 프로젝트 찾아라" → "grooman에도 적용" → 후속으로 grooman 내부 작업 → "소스 기록 정합화".
+- **다운스트림 탐색**: `/Users/hayden` 아래 GitHub repo 15개 스캔. 관리 다운스트림 10곳 전부 v4.0·payload 해시 일치 확인(원본 대조). Chaesik2s·grooman은 방법론 밖이었음.
+- **grooman 적용**(grooman repo에서 수행, 별도 인스턴스): 기존 Next.js14+Supabase 앱이라 `init`이 non-empty dir 거부 → 임시 staging `init --type fullstack` 후 grooman으로 복사. 구 809줄 자율빌드 CLAUDE.md는 grooman `00_briefs/reference/`로 보존, `.gitignore` 병합, 빈 `src/` 제외. → 관리 다운스트림 **10→11곳**.
+- **grooman 내부 후속**(grooman 자체 HANDOFF/TODO/ADR이 정본): 체크리스트 트리아지(56항목 중 ~53 이미 구현→GRM-001만 승격), retro-ADR 3건(0001 크롤·0002 봇시딩·0003 RLS), GRM-010(봇 teardown 수단: `profiles.is_bot`·teardown 스크립트·릴리스 게이트 SOP). grooman PR#1, 로컬 `next build`+`tsc --noEmit` 통과.
+- **소스 정합화(이 branch)**: 이 repo HANDOFF의 Working-on·Recent Changes를 "grooman 11번째 등록"으로 갱신. checkpoint 덮어씀.
 
 ## 다음 사람에게
-1. **이 bookkeeping PR(base=main) 머지** — chore/sync-cafe24.
-2. **전 다운스트림 배포 사이클 종료** — 10곳 전부 최신 방법론(graph-viz·dagre·대시보드 통합·슬림화).
-3. (선택·저우선) version 스탬프 cosmetic 차이가 신경 쓰이면, 다음 실질 shared 변경 sync 때 자연 정렬됨. 지금 강제 재sync는 스탬프만 바꿈(불필요).
+1. **이 bookkeeping PR(base=main) 머지** — chore/register-grooman-downstream.
+2. grooman이 이제 `.methodology-version` 보유 → `sync-all`이 자동 발견. 다음 방법론 shared 변경 시 grooman도 대상.
+3. grooman 쪽 오픈 작업(별도 세션): PR#1 머지, GRM-001 Lighthouse 감사, grooman에 앱 빌드/타입체크 CI 부재(방법론 CI만 존재) → 추가 검토.
 
 ## 환경 메모
-- 브랜치: `chore/sync-cafe24` (updated main). branch-first.
-- **dirty repo sync 패턴 확립**: WIP=방법론무관 소수면 targeted(add -A→WIP reset), 대량 활성 WIP는 그 세션이 landing 후 → clean이면 METH-106 dance.
+- 브랜치: `chore/register-grooman-downstream` (base=main). branch-first.
+- **기존 앱 retrofit 패턴 확립**: `init`은 non-empty 거부 → 임시 staging init 후 복사 + 충돌파일(CLAUDE.md·.gitignore) 수동 보존/병합. (grooman friction 로그 참조)
 - 누적 상태(오픈이슈·PR)는 **HANDOFF 참조**.
