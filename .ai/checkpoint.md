@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-23 (invest-ops 12번째 관리 다운스트림 등록)
+# Checkpoint — 2026-07-23 (METH-114 boot HANDOFF 파서·스캐폴드 템플릿 정합)
 
-> ✅ invest-ops 신규 부트스트랩(planning-only) + 딜 분석 SOP·deal-memo·ADR-0001. branch `chore/bootstrap-invest-ops`, PR 대기.
+> ✅ boot "Working on" 파서 볼드·비볼드 양쪽 허용 + 스캐폴드 템플릿 볼드화 + 회귀 테스트 5종. branch `fix/boot-handoff-working-on-parser`, PR 대기.
 
 ---
 
@@ -10,28 +10,21 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Worktree: branch `chore/bootstrap-invest-ops` (base=main 77b5d59, branch-first)
+- Worktree: `kind-visvesvaraya-8ac299`, branch `fix/boot-handoff-working-on-parser` (base=main f4ce460, branch-first)
 
 ## 방금 한 것 (이번 세션)
-사용자 컨텍스트: 민법상 투자조합 대표 취임 — 딜 분석·딜 구조 파악 + 추후 HTS 자동매매. 상담 후 "invest-ops로 부트스트랩 진행해줘".
-- **설계 상담**: 2-repo 분리안 권고(① invest-ops=딜 분석·조합 운영 문서 ② invest-trading=자동매매, 착수 시 별도 생성). 플랫폼은 Claude Code 유지. macOS 제약(키움 OpenAPI+ Windows 전용 → KIS REST 계열). 도구 메모리에 저장(investment-partnership-context).
-- **invest-ops 부트스트랩**(`/Users/hayden/invest-ops`, 로컬 main 2커밋 e9e8997·33242f2):
-  - `init --type planning-only` → CLAUDE.md §1(Mode: planning, private) 채움.
-  - `00_briefs/standing/SOP_deal-analysis.md` — 딜 인입→구조 분석→deal-memo 절차 박제.
-  - `50_resources/templates/deal-memo.md` — 다운스트림 고유 템플릿(캡테이블·워터폴·RAT·Class C 경계).
-  - `40_dev/adr/ADR-0001-repo-scope-and-class-c.md` — repo 분리 + Class C 확장(출자 실행·조합원 커뮤니케이션·외부 공유·실계좌 주문·법률 검토 게이트).
-  - TODO 시드: INV-001(첫 딜로 파이프라인 검증, Ready)·INV-002(브로커 API 리서치)·INV-003(조합 운영 문서 체계, Class C). observe+wrap 4/4 ✓.
-- **소스 정합화(이 branch)**: HANDOFF Working-on·Recent Changes 11→12곳, Open Issues 2건 추가(아래), TODO Done, checkpoint 덮어씀.
+- **문제**: `60_tools/methodology.py` boot의 HANDOFF 파서(구 2671행)는 `- **Working on**:`(볼드)만 매칭하는데, `init`이 복사하는 `50_resources/templates/HANDOFF.md`는 `- Working on:`(비볼드)로 스캐폴드 → 새 다운스트림 boot가 "Working on: (미기재)" 표시. invest-ops 부트스트랩 friction에서 발견된 HANDOFF Open Issue.
+- **수정 3건**:
+  1. 파서를 `_handoff_working_on(txt)` 헬퍼로 추출(cmd_boot 직전) — 정규식이 볼드·비볼드 양쪽 허용, 빈 값·미존재는 None. 주의: 콜론 주변 공백을 `\s*`로 쓰면 개행을 넘어 다음 줄까지 매칭하는 함정 → `[ \t]*`로 제한.
+  2. 템플릿 Current Focus 4개 라인(Working on/Current mode/Next TODO/Blockers)을 실사용 형식(볼드)으로 정합.
+  3. `tests/test_boot_handoff.py` 신규 5종 — 볼드/비볼드(레거시 스캐폴드)/빈값/미존재 + 템플릿↔파서 형식 회귀 가드(다시 어긋나면 즉시 실패).
+- **검증**: 신규 5/5 + 기존 `tests/test_sync_all.py` 9/9 통과, `methodology.py boot` 스모크 정상.
+- **전파 판단**: `60_tools/methodology.py`·`50_resources/templates` 둘 다 MANIFEST shared_paths → 다음 `sync-all --apply`에서 전 다운스트림(12곳) 자동 전파, 별도 조치 불필요. 기존 다운스트림의 *라이브* HANDOFF.md는 init 산출물이라 sync 대상 아님(비볼드로 남아도 이제 파서가 읽음 — 템플릿만 아니라 파서도 고친 이유).
 
 ## 다음 사람에게 (구체적 첫 행동)
-1. 이 branch PR 머지 확인 (base=main 단일 PR).
-2. invest-ops GitHub 원격 생성은 **대표 승인 대기** — 승인 나면 private repo 생성 후 push, 이후 invest-ops는 branch-first.
-3. 첫 딜 자료가 오면 invest-ops 세션에서 INV-001 진행(SOP_deal-analysis 먼저 읽기).
+1. 이 branch PR(base=main 단일 PR) 머지 확인.
+2. 머지 후 다음 sync-all 사이클에 자연 포함 — 즉시 전파가 필요하면 `methodology sync-all --apply`.
+3. 잔여(이 작업과 무관): grooman 이 머신 sync-all 미발견(타 호스트 추정) — grooman 세션에서 경로/호스트 확인 (HANDOFF Open Issue).
 
-## 막혔던 지점 / 발견한 것
-- **스캐폴드↔파서 불일치**: init이 만드는 HANDOFF `- Working on:`(볼드 없음)을 boot 파서(`- **Working on**:`)가 못 읽어 "(미기재)" 표시. invest-ops는 볼드로 수정, 상류 수정은 태스크 칩 발행 + Open Issue.
-- **grooman 미발견**: 이 머신 `/Users/hayden` 스캔에 grooman 없음(sync-all 11개=구 10+invest-ops). 등록 세션은 타 호스트(codex, darwin-26.4.1) 추정 → Open Issue, grooman 세션에서 확인 필요.
-
-## 환경 메모
-- sync-all(이 머신): 12곳 중 11 발견, invest-ops 최신 ✓, 나머지 "behind"는 라이브파일 전용 커밋 탓 cosmetic.
-- invest-ops 대시보드 포트 8778 (방법론 8765).
+## 막힌 것
+- 없음.

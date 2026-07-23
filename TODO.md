@@ -25,6 +25,9 @@
 
 ## Done
 
+### METH-114 · boot HANDOFF 파서·스캐폴드 템플릿 정합
+- **notes**: 2026-07-23. Class A. boot의 "Working on" 파서(볼드만 기대) ↔ init 스캐폴드 템플릿(비볼드 생성) 불일치로 새 다운스트림 boot가 "(미기재)" 표시(invest-ops friction에서 발견). 파서를 `_handoff_working_on` 헬퍼로 추출해 볼드·비볼드 양쪽 허용, 템플릿은 실사용 형식(볼드)으로 정합, `tests/test_boot_handoff.py` 5종(템플릿↔파서 회귀 가드 포함). methodology.py·templates 둘 다 shared_paths → 다음 sync-all에서 전 다운스트림 자동 전파. branch-first(fix/boot-handoff-working-on-parser).
+
 ### invest-ops 부트스트랩·12번째 다운스트림 등록
 - **notes**: 2026-07-23. Class A. 민법상 투자조합 운영 repo 신규 생성 — `init --type planning-only`, Mode: planning, private. 딜 분석 standing SOP + deal-memo 고유 템플릿 + ADR-0001(invest-trading repo 분리·투자 도메인 Class C 확장: 출자 실행/조합원 커뮤니케이션/외부 공유/실계좌 주문). INV-001~003 시드, 로컬 main 2커밋(원격은 대표 승인 대기). sync-all 발견 ✓. 마찰: 스캐폴드 HANDOFF "Working on" 볼드 형식이 boot 파서와 불일치 → Open Issue + 태스크 칩. grooman이 이 머신 스캔에 없음 → Open Issue. branch-first(chore/bootstrap-invest-ops).
 
@@ -33,12 +36,6 @@
 
 ### cafe24 sync — 전 다운스트림 배포 종료
 - **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-cafe24). 사용자 "준비완료"(WIP landing) → clean 재확인 → METH-106 절차(main 체크아웃→sync→push→피처브랜치 복원, add -A로 루트 shared 포함). 커스텀 guide 6개 보존. **관리 10곳 전부 방법론 payload 해시 동일** 검증. 버전스탬프 차이는 라이브파일 전용 커밋(#103·#104) 탓 cosmetic. branch-first.
-
-### sync-all 보류분 처리 (ai-icons·cafe24)
-- **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-ai-icons-residual). ai-icons: WIP(tier2_ai_text.py=프로젝트 코드) 보존한 채 방법론만 sync·push(add -A→WIP reset로 안전 스테이징). main==origin 5a2547c. cafe24: 피처브랜치+skin184 활성 WIP 91건 → 사용자 결정으로 그 세션 위임(미처리). 관리 10곳 중 9 최신·1 보류. branch-first.
-
-### sync-all 다운스트림 전파 (88b9382)
-- **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-all-propagate). 방법론 최신(graph-viz·dagre·대시보드 통합·슬림화)을 다운스트림 일괄 전파. `sync-all --apply`(가드 skip dirty·비-main) → main-clean 4곳 처리; clean 피처브랜치 4곳(gamblescan·icons·lifeManager·tshome)은 main 체크아웃→sync→push→복원. 8/10 반영(main==origin 0/0). 보류 2: ai-icons·cafe24(dirty WIP). friction: 타깃 스테이징이 루트 shared(ONBOARDING.md) 누락→추가 커밋. branch-first.
 
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
