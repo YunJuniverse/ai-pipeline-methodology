@@ -25,6 +25,9 @@
 
 ## Done
 
+### invest-ops 부트스트랩·12번째 다운스트림 등록
+- **notes**: 2026-07-23. Class A. 민법상 투자조합 운영 repo 신규 생성 — `init --type planning-only`, Mode: planning, private. 딜 분석 standing SOP + deal-memo 고유 템플릿 + ADR-0001(invest-trading repo 분리·투자 도메인 Class C 확장: 출자 실행/조합원 커뮤니케이션/외부 공유/실계좌 주문). INV-001~003 시드, 로컬 main 2커밋(원격은 대표 승인 대기). sync-all 발견 ✓. 마찰: 스캐폴드 HANDOFF "Working on" 볼드 형식이 boot 파서와 불일치 → Open Issue + 태스크 칩. grooman이 이 머신 스캔에 없음 → Open Issue. branch-first(chore/bootstrap-invest-ops).
+
 ### grooman 방법론 적용·11번째 다운스트림 등록
 - **notes**: 2026-07-22. Class A. 기존 Next.js14+Supabase 앱에 v4.0 retrofit(별도 세션, grooman PR#1). `init` non-empty 거부 → staging init 후 복사, 구 CLAUDE.md 보존·`.gitignore` 병합. 관리 다운스트림 **10→11곳**(sync-all 자동 발견). 소스 HANDOFF/checkpoint 정합화(이 branch: chore/register-grooman-downstream). grooman 내부 작업(retro-ADR 3건·GRM-010)은 grooman 인스턴스가 정본. 마찰→METH-113 백로그. branch-first.
 
