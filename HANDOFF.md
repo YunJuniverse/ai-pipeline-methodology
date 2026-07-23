@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **invest-ops를 12번째 관리 다운스트림으로 등록** (2026-07-23) — 민법상 투자조합 운영 repo 신규 부트스트랩(planning-only). 관리 다운스트림 **11→12곳**. 직전: grooman 등록(07-22)·다운스트림 전파 완료(07-15).
+- **Working on**: **METH-114 boot HANDOFF 파서·스캐폴드 템플릿 정합** (2026-07-23) — 파서 볼드·비볼드 양쪽 허용 + 템플릿 볼드화 + 회귀 테스트. PR 대기. 직전: invest-ops 등록(07-23)·grooman 등록(07-22).
 - **Current mode**: fullstack
 - **Next TODO**: 079~105 점검·정비 + 부팅/브리프 개선(101~105) 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·업무기술서 SOP 박제, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -36,15 +36,15 @@
 | - | ~~`.claude/skills` 레거시 3종~~ | — | **Closed(METH-090)** — ai-planning·ai-relay·vibe-coding 삭제. 기능은 guide 01/08/19+prompts가 정본. 90_archive 히스토리는 보존 |
 | - | icons-invest sync 커밋(f4e6605)에 `30_planning/10_사업기획서.md` 3줄 WIP 혼입 | Low | METH-106 sync 시 `git add -A`가 미커밋 WIP 쓸어담음. 내용 정당(미정 placeholder·Class C 미침범)·main 보존·유실 없음. 히스토리 재작성 안 함. **교훈: sync 커밋은 타깃 스테이징**(observe friction 기록) |
 | - | **grooman이 이 머신 sync-all에서 미발견** — `/Users/hayden` 아래 `.methodology-version` 스캔에 없음(2026-07-23 확인). 등록 세션은 타 호스트(codex, darwin-26.4.1) 추정 | Low | grooman 작업 세션에서 실제 경로/호스트 확인 — 타 머신이면 sync-all 커버리지 한계로 HANDOFF에 명시, 이 머신이면 경로 복구 |
-| - | init 스캐폴드 HANDOFF의 `- Working on:`(볼드 없음)이 boot 파서 기대 `- **Working on**:`과 불일치 → 새 다운스트림 boot에서 "(미기재)" 표시 | Low | 템플릿 볼드화 또는 파서 양쪽 허용(invest-ops 부트스트랩 friction, 별도 태스크 칩 발행) |
+| - | ~~init 스캐폴드 HANDOFF `- Working on:` ↔ boot 파서 볼드 기대 불일치~~ | — | **Closed(METH-114)** — 파서 `_handoff_working_on` 헬퍼로 양쪽 허용 + 템플릿 볼드화 + 회귀 테스트(`tests/test_boot_handoff.py`). 둘 다 shared_paths라 다음 sync-all에서 전 다운스트림 자동 전파 |
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-23: **METH-114 boot 파서·템플릿 정합 (Class A)** — boot의 HANDOFF "Working on" 파서가 볼드만 기대·스캐폴드 템플릿은 비볼드 생성 → 새 다운스트림 "(미기재)" 표시(invest-ops friction). 파서 헬퍼화(양쪽 허용)+템플릿 볼드화+테스트 5종. 둘 다 shared_paths → 다음 sync-all 시 전파.
 - 2026-07-23: **invest-ops 부트스트랩·등록 (Class A)** — 민법상 투자조합 운영 repo 신규 생성(`init --type planning-only`). 딜 분석 standing SOP·deal-memo 고유 템플릿·ADR-0001(invest-trading 분리 + 출자실행/조합원커뮤니케이션/실계좌주문 Class C) 포함, INV-001~003 시드. sync-all 발견 검증(이 머신 11개 중 최신 ✓ — grooman 미발견은 Open Issue). 로컬 main 2커밋, 원격 미생성(대표 승인 대기). **관리 다운스트림 11→12곳**. ※ invest-ops 작업 상세는 그 repo가 정본.
 - 2026-07-22: **grooman 방법론 적용·등록 (Class A)** — 기존 앱(자율빌드 grooman)에 v4.0 retrofit. `init`이 비어있지 않은 dir 거부 → staging init 후 복사, 구 809줄 CLAUDE.md는 grooman `00_briefs/reference/`로 보존, `.gitignore` 병합. 이후 grooman 자체 인스턴스에서 retro-ADR 3건(크롤·봇시딩·RLS)·GRM-010(봇 teardown 수단+릴리스 게이트)까지 진행(PR [grooman#1](https://github.com/YunJuniverse/grooman/pull/1), 로컬 build·tsc 통과). **관리 다운스트림 10→11곳** — 이제 `sync-all`이 grooman 자동 발견. ※ grooman 작업 상세는 grooman HANDOFF/TODO가 정본, 여기선 다운스트림 등록만.
 - 2026-07-15: **cafe24 sync 완료 (Class A)** — 사용자 "WIP landing 완료" → clean 재확인(dirty 0)→METH-106 절차(main 체크아웃→sync→push→피처브랜치 복원). 커스텀 guide 6개 보존. **관리 10곳 전부 방법론 payload 내용 일치** 검증(해시 동일). → 전 다운스트림 배포 사이클 종료.
 - 2026-07-15: **sync-all 보류분 처리 (Class A)** — 8/10 이후 dirty 2곳 확인. **ai-icons**(main, WIP=30_planning tier2_ai_text.py=프로젝트 코드): `git add -A` 후 WIP만 `reset`로 언스테이징 → 루트 shared 포함·WIP 제외 안전 스테이징으로 방법론만 sync·push(5a2547c). **WIP 보존**(그 세션 미훼손). **cafe24**: 피처브랜치+skin184 진행중 WIP 91건(오늘자 관찰로그=활성 세션) → 사용자 결정으로 **그 세션 몫**(내가 커밋/stash 안 함). → 관리 10곳 중 **9 최신·1 보류(cafe24)**.
-- 2026-07-15: **sync-all 전파 (Class A)** — 방법론 최신(88b9382)을 다운스트림에 일괄 전파. `sync-all --apply`(가드: dirty·비-main skip) → main-clean 4곳 처리, clean 피처브랜치 4곳(gamblescan·icons·lifeManager·tshome)은 main 체크아웃→sync→push→원브랜치 복원(METH-106 절차). **8/10 반영**(모두 main==origin 0/0). 보류 2: ai-icons(dirty 1)·cafe24(dirty 91) — WIP라 각 세션 몫. **friction**: 타깃 스테이징이 루트 shared(ONBOARDING.md)를 빠뜨려 icons-invest 미커밋 1건 잔존→추가 커밋(교훈: clean repo면 sync 변경 전체 스테이징).

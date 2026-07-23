@@ -2613,6 +2613,18 @@ def cmd_wrap(args: argparse.Namespace) -> int:
         return 1 if args.strict else 0
 
 
+def _handoff_working_on(txt: str) -> str | None:
+    """HANDOFF.md 에서 'Working on' 값 추출.
+
+    본 저장소 관례는 `- **Working on**:` (볼드)이지만, init 스캐폴드 이력상
+    `- Working on:` (비볼드)로 시작한 다운스트림이 있어 양쪽 다 허용한다.
+    """
+    m = re.search(r"^-\s+(?:\*\*)?Working on(?:\*\*)?[ \t]*:[ \t]*(.+)$", txt, re.MULTILINE)
+    if not m:
+        return None
+    return m.group(1).strip() or None
+
+
 def cmd_boot(args: argparse.Namespace) -> int:
     """세션 시작 브리핑 — 부팅 계약(CLAUDE.md §2)을 한 번에 실행·점검.
 
@@ -2668,8 +2680,8 @@ def cmd_boot(args: argparse.Namespace) -> int:
     hp = target / "HANDOFF.md"
     if hp.exists():
         txt = read_text(hp)
-        m = re.search(r"^-\s+\*\*Working on\*\*:\s*(.+)$", txt, re.MULTILINE)
-        print(f"    Working on: {_clip(m.group(1), 500) if m else '(미기재)'}")
+        working = _handoff_working_on(txt)
+        print(f"    Working on: {_clip(working, 500) if working else '(미기재)'}")
         rc = re.search(r"^##\s+Recent Changes.*?\n(.*?)(?=^##\s|\Z)", txt, re.MULTILINE | re.DOTALL)
         first = re.search(r"^-\s+(.+)$", rc.group(1), re.MULTILINE) if rc else None
         if first:
