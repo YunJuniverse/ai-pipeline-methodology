@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "90d3a61ffdaadef00547f38ac6bc428e00992d57",
-  "last_validated_at": "2026-07-24T07:19:26Z",
+  "last_validated_commit": "bc0a967d33abb2e0a1eb87c9eaa8ec41e16dac70",
+  "last_validated_at": "2026-07-24T07:30:01Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "972c9cc439bed0da01ee4919f8c447a5a53eeadad818896f9522f32d39fddd82"
+      "sha256": "1a651aac3cadca9f885b29c3ea81b953df6e6f12c7d1726a27e412a7d27536ea"
     },
     "TODO.md": {
-      "sha256": "dfc53282001ad91df7a43a24a9d576a2eb8c29330425db0faf5e34a90757da99"
+      "sha256": "fd1f984996873d6473eaeb575d186a85ea3cca611b3ad93a313f06bba08997c3"
     },
     ".ai/checkpoint.md": {
-      "sha256": "1c41272809e6cff1bda2a26271d9600f0349a997b2c4399ee46ca2b4a7582276"
+      "sha256": "e0c24c52f7a64939d02cf783e1fccd4dffd03bdbc325ded0cbc2b2ce73f56a27"
     }
   },
   "observations": {
@@ -124,6 +124,7 @@
       "50_resources/ai_observations/2026-07-23_boot-handoff-parser-template-align.md",
       "50_resources/ai_observations/2026-07-23_bootstrap-invest-ops-downstream.md",
       "50_resources/ai_observations/2026-07-24_ship-push-verify.md",
+      "50_resources/ai_observations/2026-07-24_sync-all-meth-115.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

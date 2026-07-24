@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-115 ship push 반영 검증** (2026-07-24) — ai-icons push 유실 사고(ICONS-365) 환류: push 후 origin HEAD 대조 fail-closed. PR 대기. 직전: METH-114(07-23)·invest-ops 등록(07-23).
+- **Working on**: **METH-115 전파 완료** (2026-07-24) — ship push 검증 머지(#109) 후 sync-all로 9/11 다운스트림 전파·origin 검증. 잔여: icons(활성 세션)·invest-ops(dirty·원격 미생성). 직전: METH-115 패치(07-24)·METH-114(07-23).
 - **Current mode**: fullstack
 - **Next TODO**: 079~105 점검·정비 + 부팅/브리프 개선(101~105) 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·업무기술서 SOP 박제, talmo-com. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-24: **METH-115 sync-all 전파 (Class A)** — #109 머지 후 9/11 다운스트림에 methodology.py(push 검증)+템플릿 sync·개별 커밋·push, 전 repo origin HEAD 대조 확인. 비-main 4곳은 main 체크아웃→sync→복원(METH-106 절차). **skip 2**: icons(활성 세션 감지 — 브랜치·WIP stash로 무손실 복원 후 제외), invest-ops(dirty+원격 미생성). 둘은 각 repo 세션에서 다음 sync 시 반영.
 - 2026-07-24: **METH-115 ship push 반영 검증 (Class A)** — ai-icons에서 원격이 앞서간 상태의 push 거부를 ship이 exit code만 보고 "완료"로 오보(ICONS-365, 16커밋 유실·배포 정지). 다운스트림 패치(ICONS-366) 업스트림 이식: push 후 `ls-remote`로 origin HEAD ↔ 로컬 HEAD 대조, 불일치 시 fail+rebase 안내. shared_paths → 다음 sync-all 전파(ai-icons 기적용).
 - 2026-07-23: **METH-114 boot 파서·템플릿 정합 (Class A)** — boot의 HANDOFF "Working on" 파서가 볼드만 기대·스캐폴드 템플릿은 비볼드 생성 → 새 다운스트림 "(미기재)" 표시(invest-ops friction). 파서 헬퍼화(양쪽 허용)+템플릿 볼드화+테스트 5종. 둘 다 shared_paths → 다음 sync-all 시 전파.
 - 2026-07-23: **invest-ops 부트스트랩·등록 (Class A)** — 민법상 투자조합 운영 repo 신규 생성(`init --type planning-only`). 딜 분석 standing SOP·deal-memo 고유 템플릿·ADR-0001(invest-trading 분리 + 출자실행/조합원커뮤니케이션/실계좌주문 Class C) 포함, INV-001~003 시드. sync-all 발견 검증(이 머신 11개 중 최신 ✓ — grooman 미발견은 Open Issue). 로컬 main 2커밋, 원격 미생성(대표 승인 대기). **관리 다운스트림 11→12곳**. ※ invest-ops 작업 상세는 그 repo가 정본.
 - 2026-07-22: **grooman 방법론 적용·등록 (Class A)** — 기존 앱(자율빌드 grooman)에 v4.0 retrofit. `init`이 비어있지 않은 dir 거부 → staging init 후 복사, 구 809줄 CLAUDE.md는 grooman `00_briefs/reference/`로 보존, `.gitignore` 병합. 이후 grooman 자체 인스턴스에서 retro-ADR 3건(크롤·봇시딩·RLS)·GRM-010(봇 teardown 수단+릴리스 게이트)까지 진행(PR [grooman#1](https://github.com/YunJuniverse/grooman/pull/1), 로컬 build·tsc 통과). **관리 다운스트림 10→11곳** — 이제 `sync-all`이 grooman 자동 발견. ※ grooman 작업 상세는 grooman HANDOFF/TODO가 정본, 여기선 다운스트림 등록만.
-- 2026-07-15: **cafe24 sync 완료 (Class A)** — 사용자 "WIP landing 완료" → clean 재확인(dirty 0)→METH-106 절차(main 체크아웃→sync→push→피처브랜치 복원). 커스텀 guide 6개 보존. **관리 10곳 전부 방법론 payload 내용 일치** 검증(해시 동일). → 전 다운스트림 배포 사이클 종료.

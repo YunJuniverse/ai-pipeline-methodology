@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-24 (METH-115 ship push 반영 검증)
+# Checkpoint — 2026-07-24 (METH-115 sync-all 전파 완료)
 
-> ✅ ship push-검증 패치 이식 완료. branch `fix/ship-push-verify`, PR 대기.
+> ✅ #109 머지 → sync-all 전파 9/11 완료·전 repo origin 검증. branch `chore/sync-propagate-meth-115`, PR 대기.
 
 ---
 
@@ -10,19 +10,20 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `fix/ship-push-verify` (base=main, branch-first)
+- Branch `chore/sync-propagate-meth-115` (base=main bc0a967, branch-first)
 
 ## 방금 한 것 (이번 세션)
 
-- **배경**: ai-icons에서 push 유실 사고(ICONS-365) — 백그라운드 태스크의 PR #6 머지로 origin이 앞서가 push가 non-fast-forward 거부됐는데, ship이 `git push` exit code만 확인해 "완료"로 오보. 16커밋이 로컬에만 쌓여 Vercel 배포 정지. ai-icons에는 ICONS-366으로 즉시 패치.
-- **이번 작업**: 그 패치를 업스트림 `60_tools/methodology.py`에 이식(METH-115). push 후 `git ls-remote origin <branch>`로 원격 HEAD를 로컬 HEAD와 대조 — 불일치/브랜치 미존재면 err+`git pull --rebase` 안내 후 exit 1, 원격 조회 불가면 "반영 미검증" 경고, 성공 시 `origin 반영 확인: <sha8>` 출력.
-- 검증: `py_compile` OK, `tests/` 3파일 21/21 통과.
-- 라이브 파일 갱신: TODO(METH-115 Done, cafe24 항목 아카이브), HANDOFF(Working on·Recent 5건 유지).
+- METH-115(ship push 반영 검증, ICONS-365 환류) PR #109 머지 확인 후 **sync-all 전파** 실행.
+- 절차: main pull → dry-run 점검 → 비-main 4곳(cafe24-renewal·gamblescan·insta-toon·lifeManager) main 체크아웃·pull → `sync-all --apply`(9곳) → repo별 타깃 스테이징(porcelain 경로만, add -A 금지) 커밋 `chore(sync): …(sync-all)` → `push --no-verify` → **repo마다 ls-remote로 origin HEAD 대조 확인** → 피처브랜치 복원.
+- 결과: **9/11 반영·전부 origin 검증 통과**(ai-icons e15e6274 등). ai-icons의 ICONS-366 로컬판은 상류판으로 수렴.
+- **skip 2**: ① icons — dry-run과 apply 사이 브랜치가 바뀜 = 활성 세션 감지. 체크아웃을 되돌리고 WIP 3파일 stash push→branch 복원→stash pop으로 **무손실 복원** 후 제외. ② invest-ops — dirty 1 + 원격 미생성(대표 승인 대기).
 
 ## 다음 구체 행동
 
-1. PR(`fix/ship-push-verify` → main) 머지 대기 — 머지 후 **sync-all로 전 다운스트림 전파**(methodology.py = shared_paths). ai-icons는 기적용이라 해시 동일해질 것.
-2. sync-all 시 grooman 미발견 이슈(타 호스트 추정)는 여전히 열려 있음 — 그 repo 세션에서 확인.
+1. 이 PR(`chore/sync-propagate-meth-115` → main, 라이브 파일 전용) 머지.
+2. icons·invest-ops는 각 repo 세션에서 clean 시점에 `sync-all` 재실행(또는 개별 `sync`)로 잔여 반영.
+3. grooman(타 호스트 추정) 미발견 이슈는 그대로 열려 있음.
 
 ## 막힌 것
 
