@@ -1784,9 +1784,34 @@ def cmd_ship(args: argparse.Namespace) -> int:
         ["git", "-C", str(target), "push", "origin", branch], env=env
     )
     if rc != 0:
-        err(f"push 실패 (branch: {branch})")
+        err(f"push 실패 (branch: {branch}) — 원격이 앞서 있으면 "
+            f"`git pull --rebase origin {branch}` 후 재-ship.")
         return 1
-    ok(f"ship 완료. branch: {branch}")
+    # push 반영 검증 — rc 0 이어도 실제 origin 반영을 대조한다.
+    # (비-패스트포워드 거부·pre-push hook 차단·부분 push 를 git exit code 만으로
+    #  놓칠 수 있어, 원격 HEAD 를 직접 조회해 로컬 HEAD 와 일치하는지 확인.
+    #  2026-07-24 ai-icons push 유실 사고(ICONS-365) 재발 방지 — 다운스트림 ICONS-366 패치 이식.)
+    try:
+        local_head = subprocess.check_output(
+            ["git", "-C", str(target), "rev-parse", "HEAD"], text=True
+        ).strip()
+        ls = subprocess.check_output(
+            ["git", "-C", str(target), "ls-remote", "origin", branch],
+            text=True, stderr=subprocess.DEVNULL,
+        ).strip()
+        remote_head = ls.split()[0] if ls else None
+    except Exception as e:  # noqa: BLE001 — 원격 조회 실패는 검증 불가로 경고
+        warn(f"push 반영 검증 생략(원격 조회 오류: {e}) — `git rev-parse origin/{branch}` 로 수동 확인.")
+        ok(f"ship 완료. branch: {branch} (반영 미검증)")
+        return 0
+    if remote_head is None:
+        err(f"push 미반영 — origin 에 {branch} 가 없습니다. 수동 확인 필요.")
+        return 1
+    if remote_head != local_head:
+        err(f"push 미반영 — origin/{branch}({remote_head[:8]}) ≠ 로컬 HEAD({local_head[:8]}). "
+            f"원격이 앞서 있을 수 있음 → `git pull --rebase origin {branch}` 후 재-ship.")
+        return 1
+    ok(f"ship 완료. branch: {branch} (origin 반영 확인: {remote_head[:8]})")
     return 0
 
 

@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "f4ce4603c2cfa07286d71cf8dec613a8b0e91ca1",
-  "last_validated_at": "2026-07-23T02:26:42Z",
+  "last_validated_commit": "90d3a61ffdaadef00547f38ac6bc428e00992d57",
+  "last_validated_at": "2026-07-24T07:19:26Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "3f91d304cdd33a224ccc6f2e071a9ab2a2cac7411d4fefef3f2e2f7254735e87"
+      "sha256": "972c9cc439bed0da01ee4919f8c447a5a53eeadad818896f9522f32d39fddd82"
     },
     "TODO.md": {
-      "sha256": "76386765df8ad4c7cca516452888236a52c36268cddedc4790feaea804e40c84"
+      "sha256": "dfc53282001ad91df7a43a24a9d576a2eb8c29330425db0faf5e34a90757da99"
     },
     ".ai/checkpoint.md": {
-      "sha256": "c274ade9ab258775163596c07dbd0276931e59f4bb4a8bdbf8fac76f2f332e94"
+      "sha256": "1c41272809e6cff1bda2a26271d9600f0349a997b2c4399ee46ca2b4a7582276"
     }
   },
   "observations": {
@@ -123,6 +123,7 @@
       "50_resources/ai_observations/2026-07-21_grooman-registered-11th-downstream.md",
       "50_resources/ai_observations/2026-07-23_boot-handoff-parser-template-align.md",
       "50_resources/ai_observations/2026-07-23_bootstrap-invest-ops-downstream.md",
+      "50_resources/ai_observations/2026-07-24_ship-push-verify.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
