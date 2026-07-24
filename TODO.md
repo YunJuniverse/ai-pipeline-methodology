@@ -25,6 +25,9 @@
 
 ## Done
 
+### METH-115 · ship push 반영 검증 (origin HEAD 대조)
+- **notes**: 2026-07-24. Class A. ai-icons에서 push 유실 사고(ICONS-365) — 백그라운드 PR 머지로 원격이 앞서가 push가 non-fast-forward 거부됐는데 ship이 exit code만 보고 "완료" 보고, 16커밋이 로컬에만 쌓여 배포 정지. 다운스트림 패치(ICONS-366)를 업스트림에 이식: push 후 `git ls-remote origin <branch>`로 원격 HEAD를 로컬 HEAD와 대조 — 불일치/미존재면 fail(rebase 안내), 조회 불가면 "반영 미검증" 경고, 성공 시 반영 SHA 출력. methodology.py는 shared_paths → 다음 sync-all에서 전 다운스트림 전파(ai-icons는 기적용). 테스트 21/21. branch-first(fix/ship-push-verify).
+
 ### METH-114 · boot HANDOFF 파서·스캐폴드 템플릿 정합
 - **notes**: 2026-07-23. Class A. boot의 "Working on" 파서(볼드만 기대) ↔ init 스캐폴드 템플릿(비볼드 생성) 불일치로 새 다운스트림 boot가 "(미기재)" 표시(invest-ops friction에서 발견). 파서를 `_handoff_working_on` 헬퍼로 추출해 볼드·비볼드 양쪽 허용, 템플릿은 실사용 형식(볼드)으로 정합, `tests/test_boot_handoff.py` 5종(템플릿↔파서 회귀 가드 포함). methodology.py·templates 둘 다 shared_paths → 다음 sync-all에서 전 다운스트림 자동 전파. branch-first(fix/boot-handoff-working-on-parser).
 
@@ -33,9 +36,6 @@
 
 ### grooman 방법론 적용·11번째 다운스트림 등록
 - **notes**: 2026-07-22. Class A. 기존 Next.js14+Supabase 앱에 v4.0 retrofit(별도 세션, grooman PR#1). `init` non-empty 거부 → staging init 후 복사, 구 CLAUDE.md 보존·`.gitignore` 병합. 관리 다운스트림 **10→11곳**(sync-all 자동 발견). 소스 HANDOFF/checkpoint 정합화(이 branch: chore/register-grooman-downstream). grooman 내부 작업(retro-ADR 3건·GRM-010)은 grooman 인스턴스가 정본. 마찰→METH-113 백로그. branch-first.
-
-### cafe24 sync — 전 다운스트림 배포 종료
-- **notes**: 2026-07-15. Class A. PR base=main 대기(chore/sync-cafe24). 사용자 "준비완료"(WIP landing) → clean 재확인 → METH-106 절차(main 체크아웃→sync→push→피처브랜치 복원, add -A로 루트 shared 포함). 커스텀 guide 6개 보존. **관리 10곳 전부 방법론 payload 해시 동일** 검증. 버전스탬프 차이는 라이브파일 전용 커밋(#103·#104) 탓 cosmetic. branch-first.
 
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
