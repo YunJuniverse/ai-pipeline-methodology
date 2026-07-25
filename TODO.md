@@ -25,6 +25,12 @@
 
 ## Done
 
+### METH-116 · IR·사업기획 덱 제작 지침 신설 (지침 22 + 스켈레톤)
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI + Human
+- **notes**: 2026-07-25. `icons-invest` IR 덱 v1→v4 제작 회고를 방법론으로 환류. 원료: 리서치 3종(AI-PPT-방법론·PPT-시각디자인·2025~26 트렌드)·python-pptx 43장 빌드 시스템(디자인 토큰 상단 고정+헬퍼+차트 xlsx→PNG)·멀티에이전트 실사 패널(4렌즈 토론결과)·100여 관찰/마찰 로그. 산출: `20_guides/22_IR_사업기획_덱_제작_지침.md` — Deck-as-Code 5단계(P0 정본화·P1 아웃라인 게이트·P2 디자인 계약·P3 코드 주입·P4 렌더검증) + 디자인 계약(색3·타입6·강조예산제) + 검증 게이트 4종+실사 패널 + 정직성 규율(헤드라인 정직·내부 메타 어휘 차단·GMV/인식매출) + 함정 체크리스트. 스켈레톤 `50_resources/skeletons/ir-deck-build/`(contract.py·build.py·textbook.template.md·panel-prompt.md), 스크래치 실행 검증(2장 빌드·geometry check 통과). README §3.6 산출물 craft 카테고리 신설. 지침 20(디자인 토큰)의 덱 레이어 자매. 사용자 선택(AskUserQuestion): 정식 가이드+실행 플레이북. branch-first(docs/guide-22-ir-deck-methodology). 머지 후 sync-all로 다운스트림 전파.
+
 ### METH-115 · ship push 반영 검증 (origin HEAD 대조)
 - **notes**: 2026-07-24. Class A. ai-icons에서 push 유실 사고(ICONS-365) — 백그라운드 PR 머지로 원격이 앞서가 push가 non-fast-forward 거부됐는데 ship이 exit code만 보고 "완료" 보고, 16커밋이 로컬에만 쌓여 배포 정지. 다운스트림 패치(ICONS-366)를 업스트림에 이식: push 후 `git ls-remote origin <branch>`로 원격 HEAD를 로컬 HEAD와 대조 — 불일치/미존재면 fail(rebase 안내), 조회 불가면 "반영 미검증" 경고, 성공 시 반영 SHA 출력. 테스트 21/21. branch-first(fix/ship-push-verify). **전파(07-24) 종결 11/11**: #109 머지 후 sync-all — 전 다운스트림 반영·origin 검증(ai-icons는 상류판으로 수렴), 비-main 4곳 METH-106 절차. 잔여 icons(활성 세션→임시 worktree로 main만 조작, 도중 origin 전진 non-FF를 새 검증이 포착→rebase 재push)·invest-ops(원격 생성 확인 후 정상 sync)도 반영. grooman(타 호스트)만 커버리지 밖.
 
@@ -33,10 +39,6 @@
 
 ### invest-ops 부트스트랩·12번째 다운스트림 등록
 - **notes**: 2026-07-23. Class A. 민법상 투자조합 운영 repo 신규 생성 — `init --type planning-only`, Mode: planning, private. 딜 분석 standing SOP + deal-memo 고유 템플릿 + ADR-0001(invest-trading repo 분리·투자 도메인 Class C 확장: 출자 실행/조합원 커뮤니케이션/외부 공유/실계좌 주문). INV-001~003 시드, 로컬 main 2커밋(원격은 대표 승인 대기). sync-all 발견 ✓. 마찰: 스캐폴드 HANDOFF "Working on" 볼드 형식이 boot 파서와 불일치 → Open Issue + 태스크 칩. grooman이 이 머신 스캔에 없음 → Open Issue. branch-first(chore/bootstrap-invest-ops).
-
-### grooman 방법론 적용·11번째 다운스트림 등록
-- **notes**: 2026-07-22. Class A. 기존 Next.js14+Supabase 앱에 v4.0 retrofit(별도 세션, grooman PR#1). `init` non-empty 거부 → staging init 후 복사, 구 CLAUDE.md 보존·`.gitignore` 병합. 관리 다운스트림 **10→11곳**(sync-all 자동 발견). 소스 HANDOFF/checkpoint 정합화(이 branch: chore/register-grooman-downstream). grooman 내부 작업(retro-ADR 3건·GRM-010)은 grooman 인스턴스가 정본. 마찰→METH-113 백로그. branch-first.
-
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")

@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "418d4fa78c95d760e9fb707281ff47e698f605f2",
-  "last_validated_at": "2026-07-24T07:42:36Z",
+  "last_validated_commit": "d2359759c20bda51012da3de54eb843bd982f347",
+  "last_validated_at": "2026-07-25T12:25:29Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "716755dd5ada26265d67fc64bc3d907429e63f098022e29a52d1f9eb8a80d1f1"
+      "sha256": "7f61896d9aa29206453da276f6521a8a63279bbb6e3267d7aa11aa1b0e34b4b1"
     },
     "TODO.md": {
-      "sha256": "702547b047e4d9d8d4120bec22427475081082b2ebc74b58f53a0a4d1374d3cd"
+      "sha256": "5261c21789722007bc4c84e3d879ac4320b917da4fcc434c7fa7f9a301b98ec2"
     },
     ".ai/checkpoint.md": {
-      "sha256": "c8459760650f35ca0345e3daab306be3ac55826a96207497628a1d50c2380960"
+      "sha256": "93c4f71fe19db7479d86e10fdf107c0679c61516bffa2120b7d237418fcccbad"
     }
   },
   "observations": {
@@ -126,6 +126,7 @@
       "50_resources/ai_observations/2026-07-24_ship-push-verify.md",
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115-remainder.md",
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115.md",
+      "50_resources/ai_observations/2026-07-25_ir-deck-methodology-guide-22.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

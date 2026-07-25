@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-24 (METH-115 전파 종결 — 11/11)
+# Checkpoint — 2026-07-25 (METH-116 IR·사업기획 덱 제작 지침 신설)
 
-> ✅ 잔여 2곳(icons·invest-ops) 반영 완료 — 이 머신 관리 다운스트림 전부에 ship push 검증 배포·origin 대조 확인. branch `chore/sync-remainder-meth-115`, PR 대기.
+> ✅ 지침 22 신설 완료 — `icons-invest` IR 덱 v1→v4 제작 회고를 방법론으로 환류. Deck-as-Code 파이프라인 + 재사용 스켈레톤 `ir-deck-build`. branch `docs/guide-22-ir-deck-methodology`, PR 대기.
 
 ---
 
@@ -9,24 +9,26 @@
 > 형식 정의: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
-- Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/sync-remainder-meth-115` (base=main 418d4fa, branch-first)
+- Agent: claude-opus-4-8 · Tool: claude-code-desktop · Host: darwin 25.5.0
+- Branch `docs/guide-22-ir-deck-methodology` (base=main d235975, branch-first)
 
 ## 방금 한 것 (이번 세션)
 
-- **icons**: 활성 세션(피처브랜치 작업 중)을 건드리지 않으려 **임시 git worktree로 main만 체크아웃**해 sync·커밋·push. 첫 push가 non-FF 거부(그 사이 활성 세션이 origin/main에 머지) — **새 ls-remote 검증이 즉시 포착** → worktree 재생성·`pull --rebase`·재push, origin ea940a23 확인. 임시 worktree 제거.
-- **invest-ops**: 원격이 생성돼 있음을 확인(다른 세션이 origin 연결·main 전환) → 정상 sync·커밋·push, origin 2f8694b7 확인.
-- 최종: sync-all 표의 behind 표시는 #110(라이브파일 커밋) 탓 **버전스탬프 cosmetic** — ai-icons 대상 dry-run "총 0개 변경"으로 payload 동일 검증. **11/11 전파 종결.**
+- 사용자 요청: `icons-invest`의 대량 IR/사업기획 작업을 읽고 "IR·사업기획 PPT 제작 방법론"으로 디벨롭.
+- `icons-invest/40_dev/snapshots/IR/` 통독: 리서치 3종(AI-PPT-방법론·PPT-시각디자인·트렌드), python-pptx 빌드 시스템(43장 v4 — 디자인 토큰 상단 고정+헬퍼+차트 xlsx→PNG), 멀티에이전트 실사 패널(토론결과 4렌즈), 100여 관찰/마찰 로그.
+- 사용자 선택(AskUserQuestion): **이 repo 정식 가이드 + 실행 플레이북 깊이**.
+- 신설: `20_guides/22_IR_사업기획_덱_제작_지침.md` — Deck-as-Code 5단계(P0 정본화·P1 아웃라인 게이트·P2 디자인 계약·P3 코드 주입·P4 렌더검증)·디자인 계약(색3·타입6·강조예산)·검증 게이트 4종+실사 패널·정직성 규율·함정 체크리스트. 지침 20의 덱 레이어 자매.
+- 신설: 스켈레톤 `50_resources/skeletons/ir-deck-build/`(base: contract.py·build.py·textbook.template.md·panel-prompt.md·_data). 스크래치 실행 검증 — 2장 빌드·geometry check 통과(전면 배경 오탐 제외 수정)·soffice 미설치 시 우아하게 skip.
+- 인덱스 갱신: `20_guides/README.md` §3.6 산출물 craft 카테고리 신설·현황표·변경이력 v4.1.
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/sync-remainder-meth-115` → main, 라이브 파일 전용) 머지 → METH-115 사이클 완전 종료.
-2. grooman(타 호스트 추정)만 이 머신 sync-all 커버리지 밖 — 그 repo 세션에서 자체 sync 필요(Open Issue 유지).
+1. 이 PR(`docs/guide-22-ir-deck-methodology` → main) 머지 → METH-116 종료.
+2. 머지 후 sync-all로 다운스트림 전파(가이드 22·스켈레톤 = 상류 00-89 소유 shared). `icons-invest`에도 역으로 들어가 그 repo IR 작업이 방법론 정본을 참조.
+3. (선택) `icons-invest` IR 마찰이 반복 검증(N≥2)되면 Catalog 엔트리 C-NNN 승급 → 스켈레톤 bakes-in 합류.
 
 ## 막힌 것
-
 - 없음.
 
 ## 환경
-
-- macOS, python3 (pytest 없음 — tests는 자체 러너 `python3 tests/test_*.py`).
+- macOS, python3 + python-pptx 설치됨. soffice(LibreOffice) 미설치 — 렌더 검증은 그 환경에서. pytest 없음(자체 러너).
