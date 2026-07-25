@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "0e1a6aef1e322a18a9f1262f819c5444da8f1928",
-  "last_validated_at": "2026-08-20T06:50:33Z",
+  "last_validated_commit": "a57f9b5719e3a91b143f478c45d4043f07b1fc04",
+  "last_validated_at": "2026-08-22T13:15:14Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "627440aa181b20b91545a2b2f8acc955f9c6ec749db1bf88548060cc49bf6dc5"
+      "sha256": "84f2c21920cf33cc941fe4eca11070997d33c5b1584985866164cf661b06092b"
     },
     "TODO.md": {
-      "sha256": "692e60cde0e68444abb9eac4d76be51da1b3de0a53a9a05a7f7afb7b6d85fcf4"
+      "sha256": "38e4c45aceb8230bf25aa2a596c7c9755fa35deb8f2927c3f95e76484c006254"
     },
     ".ai/checkpoint.md": {
-      "sha256": "346f432701c805e30fa963227221e902c96b7b83b4d0f581bb77f94be6bce384"
+      "sha256": "1261cdf0fc17acbda9e66c2457fdd8bda32e2fe6e56382d814b3ad92c012b907"
     }
   },
   "observations": {
@@ -126,6 +126,7 @@
       "50_resources/ai_observations/2026-07-24_ship-push-verify.md",
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115-remainder.md",
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115.md",
+      "50_resources/ai_observations/2026-07-25_ir-deck-content-design-split.md",
       "50_resources/ai_observations/2026-07-25_ir-deck-methodology-guide-22.md",
       "50_resources/ai_observations/2026-07-28_meth-117-reverse-harvest-backlog.md",
       "50_resources/ai_observations/2026-07-29_ai-design-research.md",
