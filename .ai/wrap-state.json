@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "d2359759c20bda51012da3de54eb843bd982f347",
-  "last_validated_at": "2026-07-25T12:25:29Z",
+  "last_validated_commit": "d0bfde44314cfea46749efef7b48a9a03461234d",
+  "last_validated_at": "2026-07-28T08:44:13Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "7f61896d9aa29206453da276f6521a8a63279bbb6e3267d7aa11aa1b0e34b4b1"
+      "sha256": "393b8ef28eb68dbb34012037ac4780eea9a6d3e3ad7416a585321c23f5a00f0f"
     },
     "TODO.md": {
-      "sha256": "5261c21789722007bc4c84e3d879ac4320b917da4fcc434c7fa7f9a301b98ec2"
+      "sha256": "2e5c969e9ebb70bb15f8e9a0213aed4d92ecab4d77e77fdf459527f874da9283"
     },
     ".ai/checkpoint.md": {
-      "sha256": "93c4f71fe19db7479d86e10fdf107c0679c61516bffa2120b7d237418fcccbad"
+      "sha256": "db6456c012cad0302ba18752f9c4d8bce66a60e82b8dedb778744b53aea64dec"
     }
   },
   "observations": {
@@ -127,6 +127,7 @@
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115-remainder.md",
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115.md",
       "50_resources/ai_observations/2026-07-25_ir-deck-methodology-guide-22.md",
+      "50_resources/ai_observations/2026-07-28_meth-117-reverse-harvest-backlog.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

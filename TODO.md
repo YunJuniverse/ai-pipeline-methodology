@@ -17,7 +17,16 @@
   - [ ] 코드 폴더 관례 감지(예: `app/` 존재 시 빈 `src/` 생성 생략)
 - **notes**: grooman(11번째 다운스트림) 적용 시 임시 staging init 후 수동 복사·병합으로 우회한 마찰에서 도출. 관찰로그 `2026-07-21_grooman-methodology-bootstrap.md`(friction: init-nonempty-refusal) 참조. 기존 앱을 방법론으로 편입하는 수요가 재발하면 승급.
 
-## Ready
+### METH-117 · 다운스트림 관찰·마찰 역수거 (sync-all 역방향 + 교차-레포 thinktank)
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI + Human
+- **acceptance criteria**:
+  - [ ] 역수거 명령 신설 (예: `methodology.py collect` 또는 `sync-all --collect`) — 관리 다운스트림의 `50_resources/ai_observations/*.md`를 상류로 읽기-전용 수거(다운스트림 무변경), 출처 repo 태그 부여, `session_id` 기준 중복 방지
+  - [ ] `thinktank`가 수거분 포함 교차-레포 집계 — 동일 `where:` 마찰이 서로 다른 repo에서 각 1회여도 합산 N≥2면 `PROMOTE-CANDIDATE` 마킹, 리포트에 repo별 출처 표기
+  - [ ] 수거물 저장 위치·수명 규칙 정의(방법론 repo 내 별도 디렉터리, 원본은 다운스트림이 정본) + `catalog/_README.md` §3 파이프라인 문구에 교차-레포 집계 반영
+  - [ ] 자동 승급 없음 유지(백서 §8-2) — 수거·집계·마킹까지만, 승급은 사람 PR
+- **notes**: 순방향(방법론→다운스트림)은 sync-all로 자동화되어 있으나 역방향(작업 repo의 마찰→방법론)은 수동 — `observation_files()`가 로컬 repo만 읽어 다운스트림 thinktank는 자기 repo 안에서만 집계되고, 교차-레포 재발(repo A 1회+repo B 1회=사실상 N≥2)은 사람이 기억해야만 잡힘. 실사례: 지침 05(산출물 채널 분리)는 ai-icons 반복을 사용자가 인지해 격상한 케이스(guide 05 §유래)·지침 22도 icons-invest 회고의 수동 환류. grooman(타 호스트) 등 이 머신 스캔 밖 repo는 커버리지 한계를 명시. 2026-07-28 세션 문답(역방향 학습 루프 갭 분석)에서 도출.
 
 ## InProgress
 

@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-116 IR·사업기획 덱 제작 지침 신설** (2026-07-25) — `icons-invest` IR 덱 v1→v4 회고를 방법론으로 환류. 지침 22(Deck-as-Code 파이프라인·디자인 계약·실사 패널) + 스켈레톤 `ir-deck-build`. branch `docs/guide-22-ir-deck-methodology`, PR 대기. 직전: METH-115 전파 종결 11/11(07-24).
+- **Working on**: **METH-117 백로그 등록 — 다운스트림 관찰·마찰 역수거** (2026-07-28) — 역방향 학습 루프 갭(순방향 sync-all만 자동, thinktank는 로컬 repo 한정) 분석 → 역수거 명령+교차-레포 집계를 백로그화. branch `chore/backlog-meth-117-reverse-harvest`, PR 대기. 직전: METH-116 지침 22(07-25, PR 대기)·METH-115 전파 종결(07-24).
 - **Current mode**: fullstack
 - **Next TODO**: METH-116 PR 머지 → sync-all 전파(가이드 22·스켈레톤 = 상류 shared). 079~105 점검·정비 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-28: **METH-117 백로그 등록 — 다운스트림 관찰·마찰 역수거 (Class A)** — 세션 문답에서 역방향 학습 루프 갭 확인: 순방향(sync-all)만 자동, `observation_files()`는 로컬 한정이라 교차-레포 재발(repo A 1회+repo B 1회)은 사람 기억에 의존(실사례: 지침 05 ai-icons 격상·지침 22 icons-invest 환류 모두 수동). 역수거 명령+교차-레포 thinktank 집계+사람 게이트 유지(백서 §8-2)를 acceptance criteria로 TODO 백로그화. TODO만 변경.
 - 2026-07-25: **METH-116 IR·사업기획 덱 제작 지침 신설 (Class A)** — `icons-invest` IR 덱 v1→v4 제작 회고(리서치 3종·python-pptx 43장 빌드·멀티에이전트 실사 패널·100여 마찰 로그)를 방법론으로 환류. `20_guides/22_IR_사업기획_덱_제작_지침.md`(Deck-as-Code 5단계·디자인 계약 색3/타입6/강조예산·검증 게이트 4종+실사 패널·정직성 규율·함정 체크리스트) + 스켈레톤 `50_resources/skeletons/ir-deck-build/`(contract.py·build.py·textbook·panel-prompt, 스크래치 실행 검증). README §3.6 산출물 craft 신설. 지침 20의 덱 레이어 자매. branch-first(docs/guide-22-ir-deck-methodology).
 - 2026-07-24: **METH-115 sync-all 전파 종결 11/11 (Class A)** — #109 머지 후 전 다운스트림에 methodology.py(push 검증)+템플릿 sync·개별 커밋·push·origin HEAD 대조. 비-main 4곳 METH-106 절차. 잔여 2곳 후속 반영: icons는 활성 세션 무방해 **임시 worktree로 main만** 조작(도중 origin 전진=non-FF를 새 검증이 포착→rebase 재push), invest-ops는 원격 생성 확인 후 정상 sync. behind 표시는 라이브파일 커밋(#110) 탓 버전스탬프 cosmetic — payload 해시 동일.
 - 2026-07-24: **METH-115 ship push 반영 검증 (Class A)** — ai-icons에서 원격이 앞서간 상태의 push 거부를 ship이 exit code만 보고 "완료"로 오보(ICONS-365, 16커밋 유실·배포 정지). 다운스트림 패치(ICONS-366) 업스트림 이식: push 후 `ls-remote`로 origin HEAD ↔ 로컬 HEAD 대조, 불일치 시 fail+rebase 안내. shared_paths → 다음 sync-all 전파(ai-icons 기적용).
 - 2026-07-23: **METH-114 boot 파서·템플릿 정합 (Class A)** — boot의 HANDOFF "Working on" 파서가 볼드만 기대·스캐폴드 템플릿은 비볼드 생성 → 새 다운스트림 "(미기재)" 표시(invest-ops friction). 파서 헬퍼화(양쪽 허용)+템플릿 볼드화+테스트 5종. 둘 다 shared_paths → 다음 sync-all 시 전파.
-- 2026-07-23: **invest-ops 부트스트랩·등록 (Class A)** — 민법상 투자조합 운영 repo 신규 생성(`init --type planning-only`). 딜 분석 standing SOP·deal-memo 고유 템플릿·ADR-0001(invest-trading 분리 + 출자실행/조합원커뮤니케이션/실계좌주문 Class C) 포함, INV-001~003 시드. sync-all 발견 검증(이 머신 11개 중 최신 ✓ — grooman 미발견은 Open Issue). 로컬 main 2커밋, 원격 미생성(대표 승인 대기). **관리 다운스트림 11→12곳**. ※ invest-ops 작업 상세는 그 repo가 정본.
