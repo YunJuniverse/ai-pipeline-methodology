@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "744bead83404400ada9a9fdb41c9c4ccca54029e",
-  "last_validated_at": "2026-07-29T06:15:39Z",
+  "last_validated_commit": "787311e2ab93d5e75cfd4f2da7e9a9e10e8eb484",
+  "last_validated_at": "2026-07-29T06:24:24Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "873cfd3a2a82b2ee73ae9fa2bc022053eddd36a2d8422730b40a4734224b0d13"
+      "sha256": "77194249f0dc3e1338c9a2ee38880962cb8b146e84e5f466c37912d0dfc2e1ff"
     },
     "TODO.md": {
-      "sha256": "2bde848882c6a2925df404c370c28546abc422e8e7238716159919bb3dd0bb0e"
+      "sha256": "f604106202a0e942bd92f285413c4a61866e0e43a793e352b0aa1e164693d98e"
     },
     ".ai/checkpoint.md": {
-      "sha256": "2e4f94aa9f4d24799f971ac80dc9cb3e1bf810b05c1bd707fb92efcc15177ace"
+      "sha256": "73507c9c3235ae65baf338a75020083e317d4f062f6dcf42d02af0f32257550e"
     }
   },
   "observations": {
@@ -132,6 +132,7 @@
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
       "50_resources/ai_observations/2026-07-29_meth-118-backlog-todo-repair.md",
       "50_resources/ai_observations/2026-07-29_meth-119-triage-register.md",
+      "50_resources/ai_observations/2026-07-29_meth-120-121-guards-impl.md",
       "50_resources/ai_observations/2026-07-29_monthly-audit-2026-07.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-117.md",

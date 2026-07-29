@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-119 트리아지 종결)
+# Checkpoint — 2026-07-29 (METH-120+121 구현 — maincheck·observe 강제)
 
-> ✅ 트리아지 완료(전부 채택) — METH-120~128 분배 등록, RFC-003 초안, insta-toon 복구 PR, 캡슐 루프 첫 실전 왕복. branch `chore/meth-119-triage-register`, PR 대기.
+> ✅ 구현·테스트 완료 — P1(스택-PR)·P2(관찰로그 무신호) 구조적 차단. branch `feat/meth-120-121-guards`, PR 대기. 머지 후 sync-all 전파.
 
 ---
 
@@ -10,23 +10,22 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/meth-119-triage-register` (base=main 744bead, branch-first)
+- Branch `feat/meth-120-121-guards` (base=main 787311e, branch-first)
 
-## 방금 한 것 (트리아지 세션)
+## 방금 한 것
 
-- 사용자 판정(AskUserQuestion 4문): ① P1~P9·P11·지침22 갭 전부 채택 ② P10→RFC-003 작성 ③ 구현 착수는 P1+P2부터 ④ insta-toon 지금 복구.
-- **insta-toon 복구**: origin/main 기준 worktree→`fix/restore-stack-to-main`→origin/feat/provenance-log 머지(무충돌)→unittest 64/64→push→**insta-toon PR #7** (스택 3커밋: TOON-010·014·dotenv). 머지는 사람.
-- **캡슐 루프 첫 실전 왕복**: icons-invest에서 `capsule --slug guide-22-audit-gaps`(갭 15건 요지+refs) 생성→타깃 커밋·push(origin 검증)→상류 `collect --apply`→`meth_inbox/icons-invest__2026-07-29_guide-22-audit-gaps.md` 적재+원장 기록→트리아지 유효 판정→METH-128로 분배. 설계대로 전부 작동.
-- TODO: METH-119→Done(판정 기록), 신규 METH-120·121(Ready — 다음 구현)·122~128(Backlog). METH-118 notes에 121 통합 명시. METH-114 Done 이관.
-- `70_meta/rfc/RFC-003_live-file-parallel-conflict.md` 초안 — 문제(P10 근거 4개 repo)·대안 A~D·잠정 권고 B+C 혼합·결정 조건. **status: draft, 사람 결정 대기**.
+- **METH-120 `maincheck`**: `cmd_maincheck` — fetch(옵션)→`_git_remote_default_ref`(origin main/master)→다건 sha `merge-base --is-ancestor` 대조, 미도달 exit 1 + "스택-PR 금지·Done 처리 금지" 안내. usage 헤더·argparse 등록. CLAUDE.md·AGENTS.md §2에 "스택-PR 금지·Done 검증 (의무)" 불릿(컴팩션 불릿 위).
+- **METH-121 observe 강제**: `normalize_repeat_of`(REPEAT_OF_RE: session_id|kebab|C-NNN; "repeat_of:" 접두 반복 제거; yes/repeat류·자유 텍스트 ValueError) → parse_friction_item·validate_observation_file 양쪽 적용. 메타: ctx "unknown"을 미기입 취급 후 env 추정(ANTHROPIC_MODEL·CLAUDECODE·CODEX_SANDBOX)·host_os 상시 실측. domain 기본 "meta" 제거 — 미해석 시 exit 2. prompt_patterns 자동 상용구 제거(기본 []). `observation_quality_warnings`(unknown·domain=meta·상용구) — 생성·--validate 시 출력. 부수 수정: `parse_observation_frontmatter`가 repo 밖 절대경로에서 죽던 것 견고화.
+- 테스트: `tests/test_maincheck_observe.py` 11종 — repeat_of 정규화/거부 5종·다건 friction id·빈 prompt_patterns 검증·오염 파일 거부·품질 경고·**임시 git repo(bare remote+clone)로 maincheck exit 0/1 실검증**. 회귀: capsule 13·sync-all 9·boot 5 전부 통과. E2E: 이 repo에서 maincheck HEAD~1 도달 ✓·오염 friction 생성 거부 ✓.
+- **마찰(기록함)**: TODO 섹션 이동에서 `index("## InProgress")`가 6행 안내문에 오매칭 — **오늘 세 번째 같은 유형**(#117 손상과 동일 원인). 이번엔 write 전 assert가 잡아 git checkout 복구, `^## ` 행 앵커 정규식으로 재작업. "규칙이 아니라 강제"의 자기 실증 — observe friction에 repeat_of 체인 기록.
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/meth-119-triage-register` → main) 머지.
-2. **머지 후 METH-120+121 구현 착수**(같은 methodology.py라 한 브랜치 권장): 120 = main 도달 검사 CLI+CLAUDE/AGENTS 스택-PR 금지 불릿 / 121 = observe 메타 자동 채움·repeat_of enum·다건 friction·기본값 lint(METH-118 prompting 블록과 스키마 통합 설계). 구현 후 shared 변경이니 sync-all 전파.
-3. insta-toon PR #7 머지는 사람 — 머지 후 그 repo TODO Done 표기가 참이 됨.
-4. RFC-003은 2주 관찰(friction `where: "라이브 파일 병렬 충돌"` 통일 표기) 후 결정.
-5. 잔여 repo 과제(각 repo 세션): invest-ops 민감정보 합의+restricted · tshome I-006 · icons-marketing 원장 upsert · icons 배포 루틴.
+1. 이 PR(`feat/meth-120-121-guards` → main) 머지.
+2. **머지 후 sync-all 전파** — shared 변경: methodology.py·CLAUDE/AGENTS. 절차 동일(main 6곳 직접 + 비-main worktree, 훅 차단 2곳 --no-verify). 전파되면 전 repo에서 maincheck 사용 가능 + observe가 오염 기록을 거부.
+3. 전파 후 METH-120·121 → Done(maincheck로 자가 검증하고 이동 — dogfood).
+4. 다음 구현 후보: METH-122(라이브 파일 fail-closed + build 가드) 또는 METH-118+121 잔여(prompting 블록). 사람 지정 대기.
+5. 참고: 다운스트림 `.ai/context.json`의 stale last_session(예: 이 repo ctx가 gpt-5)이 자동 채움에 실릴 수 있음 — 세션 시작 시 ctx 갱신이 안 되는 repo는 --agent/--tool 명시가 정확.
 
 ## 막힌 것
 - 없음.

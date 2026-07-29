@@ -78,24 +78,24 @@
 
 ## Ready
 
+## InProgress
+
+
 ### METH-120 · P1 도구 — main 도달 검증 + 스택-PR 금지 명문화
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
-  - [ ] Done 전이·배포 게이트용 main 도달 검사(`git merge-base --is-ancestor <sha> origin/main`)를 CLI로 제공(wrap 또는 신규 명령), TODO Done 처리 규칙에 연결
-  - [ ] "스택-PR 금지 — 앞 PR 머지 후 main에서 새로 분기" 를 CLAUDE/AGENTS §2에 명문화(개인 메모리→전 repo 규칙 승급)
-- **notes**: 전수조사 P1 — 6개 repo 사고(insta-toon 13일 미도달·구버전 배포·main 직접 푸시 등). lifeManager 관찰로그가 규칙 문장 원형 보유. insta-toon 복구는 그 repo PR #7.
+  - [x] Done 전이·배포 게이트용 main 도달 검사(`git merge-base --is-ancestor <sha> origin/main`)를 CLI로 제공(wrap 또는 신규 명령), TODO Done 처리 규칙에 연결
+  - [x] "스택-PR 금지 — 앞 PR 머지 후 main에서 새로 분기" 를 CLAUDE/AGENTS §2에 명문화(개인 메모리→전 repo 규칙 승급)
+- **notes**: 전수조사 P1 — 6개 repo 사고. insta-toon 복구는 그 repo PR #7(머지 완료). **2026-07-29 구현 완료(PR 대기)**: `maincheck` 명령(fetch→origin main/master 대조·다건 sha·미도달 exit 1+안내), CLAUDE/AGENTS §2 스택-PR 금지·Done 검증 불릿.
 
 ### METH-121 · P2 도구 — observe CLI 스키마 강제 (METH-118 통합)
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
-  - [ ] 메타 자동 채움: host_os 상시 실측, agent/tool 환경 추정, domain은 컨텍스트/인자 강제(기본값 "meta" 금지)
-  - [ ] `repeat_of` enum 강제(null | 관찰 session_id) — "repeat_of:" 접두 오염·자연어 거부, validate 반영
-  - [ ] 다건 friction 실사용 가능 확인(현행 F-001 캡 원인 규명) + 기본값 그대로면 validate가 "미기입" 경고
-  - [ ] prompt_patterns 상용구 제거 — METH-118 prompting 블록과 통합 설계
-- **notes**: 전수조사 P2 — 전 repo 900+건 메타 상수·repeat_of 포맷 7종 붕괴·cafe24 0/112. thinktank·캡슐 루프 입력을 말리는 방법론 자체 결함이라 최우선.
-
-## InProgress
-
+  - [x] 메타 자동 채움: host_os 상시 실측, agent/tool 환경 추정, domain은 컨텍스트/인자 강제(기본값 "meta" 금지)
+  - [x] `repeat_of` enum 강제(null | 관찰 session_id) — "repeat_of:" 접두 오염·자연어 거부, validate 반영
+  - [x] 다건 friction 실사용 가능 확인(현행 F-001 캡 원인 규명) + 기본값 그대로면 validate가 "미기입" 경고
+  - [x] prompt_patterns 상용구 제거 — METH-118 prompting 블록과 통합 설계
+- **notes**: 전수조사 P2 — 전 repo 900+건 메타 상수·repeat_of 포맷 붕괴. **2026-07-29 구현 완료(PR 대기)**: `normalize_repeat_of`(접두 오염 정규화+enum 강제, 위반 시 생성·validate 거부), 메타 자동 채움(ctx unknown 무시·env 추정·host_os 실측), domain 기본값 meta 제거(미지정 시 exit 2), prompt_patterns 상용구 제거(기본 []), `observation_quality_warnings`(unknown·meta·상용구 경고). prompting 실측 블록은 METH-118 잔여. tests 11종.
 ## Blocked
 
 ## Done
