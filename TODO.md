@@ -17,25 +17,6 @@
   - [ ] 코드 폴더 관례 감지(예: `app/` 존재 시 빈 `src/` 생성 생략)
 - **notes**: grooman(11번째 다운스트림) 적용 시 임시 staging init 후 수동 복사·병합으로 우회한 마찰에서 도출. 관찰로그 `2026-07-21_grooman-methodology-bootstrap.md`(friction: init-nonempty-refusal) 참조. 기존 앱을 방법론으로 편입하는 수요가 재발하면 승급.
 
-### METH-125 · P7 — 스크래핑 페이스 SOP 상류 승급 + 외부 소스 폴백 사다리
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] gamblescan `SOP_scraping-pace.md`(페널티 누적·IP 교체 무효·배치 분할)를 상류 standing SOP로 승급
-  - [ ] 리서치 flow에 폴백 사다리(WebFetch→Firecrawl→브라우저→API 우선) + "폴백 사용 시 정밀도 한계 표기" 명문화
-- **notes**: 전수조사 P7(6곳).
-
-### METH-126 · P8 — CI-로컬 정합 (지침 19 보강 + 스캐폴드)
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] "CI가 쓰는 패키지 매니저로 검증" 규칙 + `packageManager` 핀·락파일 단일화 스캐폴드 기본 + lockfile sync 가드(gamblescan 자산 재사용) + "런북 작성=절차 실측" 패턴
-- **notes**: 전수조사 P8(3곳) — tshome 프로덕션 4일 정지가 대표 사고.
-
-### METH-127 · P11 — 지침 05 보강: 사실 주장 출처 규칙·샘플 마킹
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] 사실 주장(수치·정책·연혁)은 출처 등급 없이 라이브 금지 + 플레이스홀더/`[샘플]` 명시 마킹 + 제거 스크립트 패턴(icons-marketing 원형 승급)
-- **notes**: 전수조사 P11(4곳) — tshome AI 생성 콘텐츠 2개월 게시가 대표 사고.
-
 ### METH-128 · 지침 22 보강 — 전수조사 갭 15건 (캡슐 수거분)
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
@@ -57,6 +38,25 @@
 
 
 
+
+### METH-125 · P7 — 스크래핑 페이스 SOP 상류 승급 + 외부 소스 폴백 사다리
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] gamblescan `SOP_scraping-pace.md`(페널티 누적·IP 교체 무효·배치 분할)를 상류 standing SOP로 승급
+  - [x] 리서치 flow에 폴백 사다리(WebFetch→Firecrawl→브라우저→API 우선) + "폴백 사용 시 정밀도 한계 표기" 명문화
+- **notes**: 전수조사 P7(6곳). **2026-07-29 구현 완료(PR 대기)**: 상류 `00_briefs/standing/SOP_scraping-pace.md` 신설(shared_paths 등록 — 전 repo 배포: 페널티 누적·프로브≠회복·IP 교체 무효·페이스 절차·폴백 사다리·신규 소스 3축 평가·정밀도 한계 표기).
+
+### METH-126 · P8 — CI-로컬 정합 (지침 19 보강 + 스캐폴드)
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] "CI가 쓰는 패키지 매니저로 검증" 규칙 + `packageManager` 핀·락파일 단일화 스캐폴드 기본 + lockfile sync 가드(gamblescan 자산 재사용) + "런북 작성=절차 실측" 패턴
+- **notes**: 전수조사 P8(3곳) — tshome 프로덕션 4일 정지가 대표 사고. **2026-07-29 구현 완료(PR 대기)**: 지침 19 §11 CI-로컬 정합 신설(v2) — CI 매니저로 검증·packageManager 핀·락파일 단일화·lockfile 가드·런북=절차 실측.
+
+### METH-127 · P11 — 지침 05 보강: 사실 주장 출처 규칙·샘플 마킹
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] 사실 주장(수치·정책·연혁)은 출처 등급 없이 라이브 금지 + 플레이스홀더/`[샘플]` 명시 마킹 + 제거 스크립트 패턴(icons-marketing 원형 승급)
+- **notes**: 전수조사 P11(4곳) — tshome AI 생성 콘텐츠 2개월 게시가 대표 사고. **2026-07-29 구현 완료(PR 대기)**: 지침 05 §9 사실 주장·샘플 데이터 규칙 신설(v2) — 출처 없는 사실 주장 라이브 금지·[샘플] 마킹+제거 체크·근거 등급 표기·기존 잔존물 강등.
 ## Blocked
 
 ## Done
