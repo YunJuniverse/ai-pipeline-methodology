@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-120+121 전파 종결 — 11/11)
+# Checkpoint — 2026-07-29 (METH-122 구현 — 라이브 파일·빌드 가드)
 
-> ✅ 전 다운스트림이 maincheck·observe 강제 획득. Done 이동 완료(maincheck dogfood). branch `chore/sync-propagate-meth-120-121`, PR 대기.
+> ✅ 구현·테스트 완료 — P3(라이브 파일 규칙 미작동)·P6(dev-build 충돌) 구조적 차단. branch `feat/meth-122-livefile-build-guards`, PR 대기. 머지 후 sync-all 전파.
 
 ---
 
@@ -10,22 +10,23 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/sync-propagate-meth-120-121` (base=main, branch-first)
+- Branch `feat/meth-122-livefile-build-guards` (base=main, branch-first)
 
-## 방금 한 것 (#121 머지 후 전파)
+## 방금 한 것
 
-- dogfood: 구현 커밋(04535d0d)을 `maincheck`로 main 도달 검증 ✓ 후 Done 이동.
-- sync-all --apply: main+clean 5곳(ai-icons·icons-marketing·invest-ops·talmo-com·tshome) 직접 — 타깃 스테이징·push·ls-remote 대조. 훅 차단 2곳(ai-icons·invest-ops) merge-base 조상 확인 후 --no-verify(확립 절차).
-- **skip 6곳 전부 worktree 처리**: 비-main 3(cafe24·gamblescan·insta-toon) + **dirty 3(icons 15건·icons-invest 2건·lifeManager 2건 — 활성 세션/미커밋 보호, worktree는 origin/main만 조작하므로 무방해)**. 각 3파일(methodology.py·CLAUDE/AGENTS)+버전스탬프, 전부 origin 검증.
-- 결과: **11/11**. 전 repo에서 이제 ① maincheck로 Done·배포 전 main 도달 기계 검증 ② observe가 오염 repeat_of·domain 미지정·상용구를 거부/경고.
-- TODO: METH-120·121 → Done(전파 노트), Done ~4건 유지(115·116 git 이관).
+- **`rotate` 명령**: `_rotate_todo_done`(Done 최신 4건 유지, 초과분 아카이브 md)·`_rotate_recent_changes`(Recent 5건) 순수 함수 + `cmd_rotate`(dry-run 기본·--apply·--checkpoint=전체 사본 아카이브+상단 40줄 스텁). 아카이브는 `40_dev/snapshots/live-archive/YYYY-MM-DD_*.md` — 같은 날 재실행 시 append. **삭제 없음.**
+- **wrap 경성 한도**: `live_file_hard_violations`(규정 2배: HANDOFF 300·checkpoint 400·Done 20건) — --strict에서 fail로 계상 + "rotate --apply" 안내. 연성 경고(METH-101)는 유지. 기존 비대 다운스트림 ship은 --no-verify 관례가 있어 즉시 마비는 없음 — rotate가 정도.
+- **boot [4a] 신선도**: `staleness_warnings` — HANDOFF Working on 날짜·wrap-state last_validated_at이 최근 커밋 날짜보다 7일+ 뒤처지면 경고.
+- **build 가드**: ship build 단계에 `_dev_server_running`(pgrep "next dev") 감지 시 차단. `60_tools/build-guard.sh` 신설(shared_paths 등록 — sync로 전 repo 배포, BUILD_GUARD_FORCE=1 탈출구, 머신 전체 감지라 보수적임을 스크립트에 명시).
+- **규칙**: CLAUDE/AGENTS §2 "외부 게이트=Blocked 강제 (의무)" 불릿(+rotate·build-guard 안내).
+- 테스트: `tests/test_rotate_guards.py` 6종(회전 보존·noop·경성 임계 분류·비-git 안전) — 안내문 오매칭 계보 방지 어서션 포함. 회귀 44종(maincheck 11·capsule 13·sync 9·boot 5+신규 6) 통과. E2E: 이 repo rotate no-op·build-guard 통과/차단(시뮬 프로세스) 확인.
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/sync-propagate-meth-120-121` → main) 머지 — 기록만.
-2. **다음 구현 후보(사람 지정 대기)**: ① METH-122 라이브 파일 fail-closed+build 가드 ② METH-118+121 잔여(prompting 블록 — observe 스키마와 통합) ③ METH-123·124 지침 신설. 권고 순서: 122(도구 마무리) → 118 → 지침.
-3. 잔여 트리아지 산출: METH-125~128(Backlog), RFC-003(2주 관찰 후 결정), 잔여 repo 과제 4건(invest-ops 민감정보·tshome I-006·icons-marketing 원장·icons 배포 루틴).
-4. grooman(타 호스트): 이번 payload 포함해 그 머신 세션에서 sync 필요.
+1. 이 PR(`feat/meth-122-livefile-build-guards` → main) 머지 → sync-all 전파(payload: methodology.py·build-guard.sh(신규 shared)·CLAUDE/AGENTS) → METH-122 Done(maincheck 검증 후).
+2. 전파 후 실효 후보: 비대 repo(cafe24·gamblescan·ai-icons·icons·icons-invest)에서 각 repo 세션이 `rotate --apply --checkpoint` 실행하면 전수조사 P3 잔여가 즉시 해소됨 — 각 repo 과제로 전달.
+3. 다음 구현: METH-118+121 잔여(prompting 블록) 또는 지침 123·124 — 사람 지정 대기.
+4. RFC-003 2주 관찰 중 · grooman sync(타 호스트) · repo 과제 4건 잔여.
 
 ## 막힌 것
 - 없음.

@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "a5f2e38421ae0e29e6941434b708aec79a552c5b",
-  "last_validated_at": "2026-07-29T06:37:24Z",
+  "last_validated_commit": "c28be5a77060ab1b6789f77e1a7ff8d4980fe26b",
+  "last_validated_at": "2026-07-29T06:44:23Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "6dc5c73ef168cd146c79dce78374e3271128f4deb8c8a4987115b775e3195258"
+      "sha256": "ceb068d234aa22778fa651901af02db535633a53525d23acd7e8ec7e45fde3cb"
     },
     "TODO.md": {
-      "sha256": "75638b7d132f1f178e401059a7ffbc0b03c1c1071d786eaab90467845ccc146f"
+      "sha256": "7ff644de78360d84d96411eba02686246ae2c2ffa15314a825fef15842e6cf3c"
     },
     ".ai/checkpoint.md": {
-      "sha256": "e4ad32173c8dbe2cd1233f73fe4f01446625527963d476f3d4755087eb750ffc"
+      "sha256": "7738c524348895e17ab9e04c3f0a15220d8398b84d78d3e59ba98f119f32be12"
     }
   },
   "observations": {
@@ -133,6 +133,7 @@
       "50_resources/ai_observations/2026-07-29_meth-118-backlog-todo-repair.md",
       "50_resources/ai_observations/2026-07-29_meth-119-triage-register.md",
       "50_resources/ai_observations/2026-07-29_meth-120-121-guards-impl.md",
+      "50_resources/ai_observations/2026-07-29_meth-122-livefile-build-guards.md",
       "50_resources/ai_observations/2026-07-29_monthly-audit-2026-07.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-117.md",

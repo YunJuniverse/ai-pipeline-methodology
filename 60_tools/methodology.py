@@ -51,6 +51,11 @@ Commands
       커밋이 origin main에 실제 도달했는지 검증한다 (기본 HEAD).
       TODO Done 전이·배포 판정 전 필수 — 스택-PR 미도달 사고 방지 (METH-120).
 
+  methodology rotate [--apply] [--checkpoint]
+      비대해진 라이브 파일을 기계 회전한다 — TODO Done(4건 유지)·HANDOFF
+      Recent Changes(5건 유지) 초과분을 40_dev/snapshots/live-archive/ 로 이관.
+      wrap --strict 는 규정 2배 초과를 fail 시키며, rotate 가 탈출구다 (METH-122).
+
 Classification
 --------------
   shared          — sync가 항상 덮어쓴다 (20_guides/, 50_resources/, 그래프, 대시보드)
@@ -111,6 +116,7 @@ MANIFEST = {
         "60_tools/generate-dashboard.py",
         "60_tools/methodology.py",
         "60_tools/stack.json",
+        "60_tools/build-guard.sh",
         "10_foundation/WHITEPAPER.md",
         "10_foundation/HOW_TO_APPLY.md",
         "10_foundation/KICKOFF_PROMPT.md",
@@ -2282,6 +2288,12 @@ def cmd_ship(args: argparse.Namespace) -> int:
         except Exception:
             scripts = {}
         if "build" in scripts:
+            dev = _dev_server_running()
+            if dev:
+                err(f"dev 서버 실행 중 감지: {dev}")
+                err("dev 중 build 는 .next 를 파괴한다(전수조사 P6 — 7회 재발). "
+                    "dev 를 중지(preview_stop)하고 재시도하거나 --no-build 로 건너뛸 것.")
+                return 1
             rc = subprocess.call([manager, "run", "build"], cwd=str(target))
             if rc != 0:
                 err("빌드 실패 — push 중단.")
@@ -3016,6 +3028,197 @@ LIVE_FILE_LINE_LIMITS = {
     ".ai/checkpoint.md": 200,   # 백서 §2-2: ≤200줄
 }
 TODO_DONE_SOFT_CAP = 6          # 템플릿 규정: 최근 완료 ~4건만 유지
+# METH-122 (전수조사 P3): 경고만으로는 안 지켜졌다 — cafe24 checkpoint 345줄/342KB·
+# gamblescan TODO 761줄 실증. 규정의 2배(경성 한도) 초과 시 wrap --strict 가 fail —
+# `methodology rotate` 로 기계 회전하면 즉시 해소되므로 fail-closed 의 탈출구가 있다.
+LIVE_FILE_HARD_MULTIPLIER = 2
+TODO_DONE_HARD_CAP = 20
+ROTATE_KEEP_DONE = 4            # rotate 후 Done 유지 건수
+ROTATE_KEEP_RECENT = 5          # rotate 후 HANDOFF Recent Changes 유지 건수
+LIVE_ARCHIVE_DIR = Path("40_dev/snapshots/live-archive")
+STALE_DAYS = 7                  # 신선도 경고 임계 (HANDOFF 날짜·wrap 미실행 vs 최근 커밋)
+
+
+def _todo_done_count(text: str) -> int:
+    section = re.search(r"^##\s+Done\s*$(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
+    return len(re.findall(r"^###\s+", section.group(1), re.MULTILINE)) if section else 0
+
+
+def live_file_hard_violations(target: Path) -> list[str]:
+    """경성 한도(규정 2배·Done 20건) 위반 — wrap --strict 를 fail 시키는 수준 (METH-122)."""
+    violations: list[str] = []
+    for rel, limit in LIVE_FILE_LINE_LIMITS.items():
+        p = target / rel
+        if p.exists():
+            n = len(read_text(p).splitlines())
+            if n > limit * LIVE_FILE_HARD_MULTIPLIER:
+                violations.append(f"{rel}: {n}줄 — 경성 한도(≤{limit * LIVE_FILE_HARD_MULTIPLIER}줄) 초과")
+    todo_p = target / "TODO.md"
+    if todo_p.exists():
+        done = _todo_done_count(read_text(todo_p))
+        if done > TODO_DONE_HARD_CAP:
+            violations.append(f"TODO.md Done {done}건 — 경성 한도(≤{TODO_DONE_HARD_CAP}건) 초과")
+    return violations
+
+
+def _rotate_todo_done(text: str, keep: int = ROTATE_KEEP_DONE) -> tuple[str, str, int]:
+    """TODO Done 섹션에서 최신 keep건만 남기고 나머지를 아카이브 블록으로 분리.
+
+    반환: (새 TODO 텍스트, 아카이브 md, 이관 건수). Done 항목 순서는 최신-우선 관례를 따른다.
+    """
+    m = re.search(r"^##\s+Done\s*$\n(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
+    if not m:
+        return text, "", 0
+    body = m.group(1)
+    parts = re.split(r"(?=^###\s+)", body, flags=re.MULTILINE)
+    head = parts[0] if parts and not parts[0].startswith("### ") else ""
+    items = [p for p in parts if p.startswith("### ")]
+    if len(items) <= keep:
+        return text, "", 0
+    kept, moved = items[:keep], items[keep:]
+    # 항목 이후의 꼬리 주석(> ...)은 head/kept 에 안 섞이도록 마지막 항목에서 분리하지 않고 그대로 둔다
+    new_body = head + "".join(kept)
+    new_text = text[:m.start(1)] + new_body + text[m.end(1):]
+    archive = "".join(moved).rstrip() + "\n"
+    return new_text, archive, len(moved)
+
+
+def _rotate_recent_changes(text: str, keep: int = ROTATE_KEEP_RECENT) -> tuple[str, str, int]:
+    """HANDOFF Recent Changes 불릿을 최신 keep건만 유지, 초과분 아카이브 분리."""
+    m = re.search(r"^##\s+Recent Changes\s*$\n(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
+    if not m:
+        return text, "", 0
+    body = m.group(1)
+    lines = body.splitlines(keepends=True)
+    bullets: list[int] = [i for i, ln in enumerate(lines) if ln.startswith("- ")]
+    if len(bullets) <= keep:
+        return text, "", 0
+    cut = bullets[keep]
+    kept_lines, moved_lines = lines[:cut], lines[cut:]
+    new_text = text[:m.start(1)] + "".join(kept_lines) + text[m.end(1):]
+    archive = "".join(moved_lines).rstrip() + "\n"
+    return new_text, archive, len(bullets) - keep
+
+
+def cmd_rotate(args: argparse.Namespace) -> int:
+    """라이브 파일 기계 회전 — 초과분을 40_dev/snapshots/live-archive/ 로 이관 (METH-122).
+
+    삭제하지 않는다 — 아카이브로 옮기고 라이브에는 요지만 남긴다.
+    TODO Done(최신 4건 유지)·HANDOFF Recent Changes(5건 유지)·checkpoint(--checkpoint 시
+    전체 사본 아카이브 후 상단 요지만 유지). 기본 dry-run, --apply 로 실행.
+    """
+    target = Path(args.path or ".").resolve()
+    today = utc_date()
+    arch_dir = target / LIVE_ARCHIVE_DIR
+    actions: list[tuple[Path, str, Path, str]] = []  # (라이브 파일, 새 내용, 아카이브 파일, 아카이브 내용)
+
+    todo_p = target / "TODO.md"
+    if todo_p.exists():
+        new_text, archive, moved = _rotate_todo_done(read_text(todo_p))
+        if moved:
+            header = f"# TODO Done 아카이브 — {today} rotate ({moved}건)\n\n> 정본 이력은 git log·PR. 이 파일은 열람용 사본.\n\n"
+            actions.append((todo_p, new_text, arch_dir / f"{today}_todo-done.md", header + archive))
+            info(f"TODO.md: Done {moved}건 이관 예정 (최신 {ROTATE_KEEP_DONE}건 유지)")
+
+    ho_p = target / "HANDOFF.md"
+    if ho_p.exists():
+        new_text, archive, moved = _rotate_recent_changes(read_text(ho_p))
+        if moved:
+            header = f"# HANDOFF Recent Changes 아카이브 — {today} rotate ({moved}건)\n\n"
+            actions.append((ho_p, new_text, arch_dir / f"{today}_handoff-recent.md", header + archive))
+            info(f"HANDOFF.md: Recent Changes {moved}건 이관 예정 (최신 {ROTATE_KEEP_RECENT}건 유지)")
+
+    cp_p = target / ".ai" / "checkpoint.md"
+    if args.checkpoint and cp_p.exists():
+        cp_text = read_text(cp_p)
+        cp_lines = cp_text.splitlines(keepends=True)
+        limit = LIVE_FILE_LINE_LIMITS[".ai/checkpoint.md"]
+        if len(cp_lines) > limit:
+            keep_n = 40
+            stub = "".join(cp_lines[:keep_n]) + (
+                f"\n> (이하 {len(cp_lines) - keep_n}줄은 {LIVE_ARCHIVE_DIR}/{today}_checkpoint.md 로 "
+                "rotate 아카이브 — 다음 세션은 이 파일을 새로 덮어쓴다)\n")
+            actions.append((cp_p, stub, arch_dir / f"{today}_checkpoint.md", cp_text))
+            info(f"checkpoint: {len(cp_lines)}줄 → 상단 {keep_n}줄 + 전체 사본 아카이브 예정")
+
+    if not actions:
+        ok("회전 대상 없음 — 라이브 파일이 규정 이내이거나 초과분 없음.")
+        return 0
+    if not args.apply:
+        info("dry-run — 실제 이관은 --apply")
+        return 0
+    arch_dir.mkdir(parents=True, exist_ok=True)
+    for live, new_text, arch, arch_text in actions:
+        if arch.exists():
+            arch_text = read_text(arch).rstrip() + "\n\n---\n\n" + arch_text
+        write_text(arch, arch_text)
+        write_text(live, new_text)
+        ok(f"{live.relative_to(target)} → {arch.relative_to(target)}")
+    info("커밋은 ship 으로. wrap 은 회전된 콘텐츠 변경을 갱신으로 인정한다.")
+    return 0
+
+
+def _latest_commit_date(target: Path) -> str | None:
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "log", "-1", "--format=%cs"],
+            text=True, stderr=subprocess.DEVNULL).strip()
+        return out or None
+    except Exception:
+        return None
+
+
+def staleness_warnings(target: Path) -> list[str]:
+    """HANDOFF 날짜·wrap 미실행이 최근 커밋 대비 STALE_DAYS 이상 뒤처졌는지 (METH-122).
+
+    전수조사 실증: insta-toon HANDOFF 13일 stale·invest-ops wrap 5일 미실행 — 무경고였다.
+    """
+    warnings: list[str] = []
+    commit_date = _latest_commit_date(target)
+    if not commit_date:
+        return warnings
+    try:
+        commit_d = date.fromisoformat(commit_date)
+    except ValueError:
+        return warnings
+
+    ho = target / "HANDOFF.md"
+    if ho.exists():
+        m = re.search(r"Working on.*?\((\d{4}-\d{2}-\d{2})\)", read_text(ho))
+        if m:
+            try:
+                gap = (commit_d - date.fromisoformat(m.group(1))).days
+                if gap > STALE_DAYS:
+                    warnings.append(
+                        f"HANDOFF 신선도: Working on 날짜({m.group(1)})가 최근 커밋({commit_date})보다 "
+                        f"{gap}일 뒤처짐 — 실태와 어긋난 부팅 프라이머는 오독을 만든다")
+            except ValueError:
+                pass
+
+    state = load_wrap_state(target)
+    last = (state or {}).get("last_validated_at") or ""
+    if last:
+        try:
+            last_d = date.fromisoformat(last[:10])
+            gap = (commit_d - last_d).days
+            if gap > STALE_DAYS:
+                warnings.append(
+                    f"wrap 미실행 감지: 마지막 검증({last[:10]}) 이후 커밋({commit_date})까지 {gap}일 — "
+                    "세션 종료 규율이 끊겼다(라이브 파일 갱신 없이 커밋 진행 중)")
+        except ValueError:
+            pass
+    return warnings
+
+
+def _dev_server_running() -> str | None:
+    """실행 중인 next dev/dev 서버 프로세스 감지 — build 충돌 가드 (METH-122, P6 7회 재발)."""
+    try:
+        out = subprocess.run(["pgrep", "-fl", "next dev"], capture_output=True, text=True, timeout=10)
+        if out.returncode == 0 and out.stdout.strip():
+            return out.stdout.strip().splitlines()[0]
+    except Exception:
+        pass
+    return None
 
 
 def live_file_size_warnings(target: Path) -> list[str]:
@@ -3184,6 +3387,13 @@ def cmd_wrap(args: argparse.Namespace) -> int:
     for w in size_warns:
         warn(f"사이즈: {w}")
 
+    # ── 경성 한도 (METH-122) — 규정 2배 초과는 --strict fail (탈출구: rotate) ──
+    hard = live_file_hard_violations(target)
+    for v in hard:
+        err(f"사이즈(경성): {v} — `methodology rotate --apply` 로 회전 후 재시도")
+    if hard and args.strict:
+        missing += len(hard)
+
     print()
     if missing == 0:
         ok(
@@ -3300,6 +3510,10 @@ def cmd_boot(args: argparse.Namespace) -> int:
     else:
         print("    ✓ 규정 이내 (HANDOFF ≤150 · checkpoint ≤200 · TODO Done ~4)")
     print()
+
+    # [4a] 신선도 (METH-122 — HANDOFF 날짜·wrap 미실행 vs 최근 커밋)
+    for w in staleness_warnings(target):
+        warn(w)
 
     # [4b] 캡슐 outbox 가시성 (METH-117 — 수거 잊음 방지)
     own_capsules = capsule_files(target)
@@ -3779,6 +3993,16 @@ def main(argv: list[str] | None = None) -> int:
     pmk.add_argument("--path", help="대상 repo (기본: 현재 디렉터리)")
     pmk.add_argument("--no-fetch", dest="no_fetch", action="store_true", help="origin fetch 생략")
     pmk.set_defaults(func=cmd_maincheck)
+
+    prt = sub.add_parser(
+        "rotate",
+        help="라이브 파일 기계 회전 — TODO Done·HANDOFF Recent 초과분을 snapshots/live-archive 로 이관 (METH-122)",
+    )
+    prt.add_argument("--path", help="대상 폴더 (기본: 현재)")
+    prt.add_argument("--apply", action="store_true", help="실제 이관 (없으면 dry-run)")
+    prt.add_argument("--checkpoint", action="store_true",
+                     help="checkpoint 도 회전(전체 사본 아카이브 + 상단 요지 유지)")
+    prt.set_defaults(func=cmd_rotate)
 
     args = p.parse_args(argv)
     return args.func(args)

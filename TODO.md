@@ -29,14 +29,6 @@
   - [ ] **교차-repo 통합은 v1 제외 명시**: 리포트는 repo 로컬. 통합 리포트는 collect 인프라 확장 후속(사용자 단위 데이터라 통합 가치 큼 — 재논의 트리거를 notes에 기록)
 - **notes**: 2026-07-29 사용자 요청 — "전문용어를 몰라 지시가 길어지거나 핑퐁이 늘어나는 걸 스스로 교정할 데이터·리포트가 필요. 즉시 피드백보다 **언제나 남겨질 기록으로 뒷단에서 알아서 판단한 뒤 리포트 자동 업데이트**"(상시 기록이 확정 방향). 마찰 루프와 동형의 코칭 루프(L1 기록→집계→사람 교정). 발판: observe `prompt_patterns`(intent·success·rounds)가 이미 있으나 형식적 사용 — 이걸 확장. 정직한 한계 합의: 토큰 실측은 세션 내 불가(프록시로 시작), 원문 저장은 발췌로 제한. 사용자 선호는 도구 메모리(`prompting-feedback-preference`)에 별도 저장(즉시 피드백은 언제든 가능). **METH-121(observe 스키마 강제)과 통합 구현 예정(METH-119 트리아지).**
 
-### METH-122 · P3+P6 도구 — 라이브 파일 fail-closed·자동 회전 + build 가드
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] wrap 사이즈 경고를 자동 아카이브 회전 또는 fail-closed로 승급(cafe24 342KB·gamblescan 761줄 재발 방지) + HANDOFF 신선도(갱신일 vs 최근 커밋) 검사 + wrap 미실행 N일 감지
-  - [ ] 외부 게이트(대표·결제·자격증명) 대기 항목 = TODO Blocked 강제 이동 규칙 문서화(4개 repo에서 Blocked 미사용 실증)
-  - [ ] dev 서버 감지 시 build 차단 가드 스크립트를 스캐폴드 포함(ai-icons 7회 반복 — 규칙 아닌 강제)
-- **notes**: 전수조사 P3(7곳)+P6(4곳).
-
 ### METH-123 · 지침 23 신설 — 검증 규범 (무음 실패·빈 상태·검증불가 등록부)
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
@@ -82,6 +74,14 @@
 
 
 
+
+### METH-122 · P3+P6 도구 — 라이브 파일 fail-closed·자동 회전 + build 가드
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] wrap 사이즈 경고를 자동 아카이브 회전 또는 fail-closed로 승급(cafe24 342KB·gamblescan 761줄 재발 방지) + HANDOFF 신선도(갱신일 vs 최근 커밋) 검사 + wrap 미실행 N일 감지
+  - [x] 외부 게이트(대표·결제·자격증명) 대기 항목 = TODO Blocked 강제 이동 규칙 문서화(4개 repo에서 Blocked 미사용 실증)
+  - [x] dev 서버 감지 시 build 차단 가드 스크립트를 스캐폴드 포함(ai-icons 7회 반복 — 규칙 아닌 강제)
+- **notes**: 전수조사 P3(7곳)+P6(4곳). **2026-07-29 구현 완료(PR 대기)**: `rotate` 명령(TODO Done 4건·HANDOFF Recent 5건 유지, 초과분 `40_dev/snapshots/live-archive/` 이관 — 삭제 아님, --checkpoint 는 전체 사본+상단 요지), wrap --strict 경성 한도(규정 2배·Done 20건) fail+rotate 안내, boot 신선도 경고(HANDOFF 날짜·wrap 미실행 vs 최근 커밋 7일), ship build 단계 dev 서버 감지 차단 + `60_tools/build-guard.sh`(shared, BUILD_GUARD_FORCE 탈출구), CLAUDE/AGENTS §2 외부 게이트=Blocked 강제 규칙. tests 6종.
 ## Blocked
 
 ## Done
