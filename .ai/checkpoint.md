@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-128 구현 — 트리아지 마지막 항목)
+# Checkpoint — 2026-07-29 (트리아지 12/12 전량 종결)
 
-> ✅ 캡슐 첫 수거분을 지침 22 v2·지침 08 §7로 반영 — **캡슐 루프 풀 사이클 완결**. branch `docs/meth-128-guide-22-capsule`, PR 대기. 머지·전파 시 트리아지 12/12 전량 종결.
+> ✅ METH-128 전파 11/11 — 2026-07 전수조사 트리아지 채택분 전량 완결. 캡슐 루프 풀 사이클 실증. branch `chore/sync-propagate-meth-128`, PR 대기.
 
 ---
 
@@ -10,23 +10,25 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `docs/meth-128-guide-22-capsule` (base=main, branch-first)
+- Branch `chore/sync-propagate-meth-128` (base=main, branch-first)
 
-## 방금 한 것
+## 방금 한 것 (#131 머지 후 전파 — 오늘 8번째 전파)
 
-- **지침 22 v2** — 캡슐(`icons-invest__2026-07-29_guide-22-audit-gaps`) 15건 분배 반영:
-  - 불변규율 3→5개: ④ 텍스트본 *파일*=유일 소스(대화본 빌드 금지·충돌 시 파일 우선·빌드 직전 재확인) ⑤ 안정 슬라이드 ID(순번은 렌더 시 계산 — 재번호 연쇄 8회+ 계보)
-  - P0 게이트: 흡수 대상 원자료 전수 목록 확정(빌드 후 역방향 흡수 방지) / P3 게이트: 패치마다 리드백 필수(무증상 실패)
-  - §4.2 패널 결함 해소 루프: 치명 결함 TODO 승격 + 다음 패널이 해소 여부 명시 판정(1차 치명 5건 중 2건만 해소된 실측)
-  - §7 함정 체크 8종 추가: 무증상 빌드 실패·차트 글리프·검산 전 셰이프·인덱스 하드코딩 금지·에셋 문맥 소실·이미지 소싱 2단·대용량 백그라운드
-- **지침 08 §7 신설(교차)** — 장시간 에이전트 스톨 감지: mtime/size 정체 판정 → TaskStop 후 동기 재실행, 지침 07 no-progress를 백그라운드에도 적용(48분 단일 최대 friction 계보). 격상 이력 §8로 재번호.
-- 반영 완료 캡슐 `_inbox`에서 삭제(git rm) — **원장은 유지**라 재수거 안 됨(inbox README 규칙대로).
+- maincheck(0bdc3830 ✓) → sync-all 11/11(main 6 직접·worktree 5) — 지침 22 v2·08 §7 전 repo 반영. **발신 repo(icons-invest)에도 회귀 = 캡슐 루프 풀 사이클 실증.**
+- TODO: METH-128 → Done. **`rotate --apply` 첫 실전 dogfood** — Done 2건을 `40_dev/snapshots/live-archive/2026-07-29_todo-done.md`로 기계 이관.
+
+## 2026-07-29 하루 결산 (정본 요약)
+
+- **역방향 루프**: 설계 문답·시각화 → 캡슐 outbox 확정 → 구현·전파 → 당일 풀 사이클 실증 (METH-117)
+- **전수조사**: 11 repo 병렬 에이전트, 관찰 1,006·마찰 302건·90h+, 패턴 P1~P12 (스냅샷 정본)
+- **트리아지 12/12 종결**: 도구 4(maincheck·observe 강제·rotate/가드·capsule) + 지침 4(23 검증·24 착수·22 v2·05/19 v2) + SOP 1(스크래핑) + 사용자 요청 1(프롬프팅 코칭) + 복구 1(insta-toon) + 조사 1. PR #113~#131(19개), 전파 8회 전부 11/11 origin 검증.
+- **미해결로 남긴 것(정직)**: METH-113(retrofit, Backlog) · RFC-003(라이브 파일 병렬 충돌 — 2주 관찰, 8/12경 재론) · repo 과제 5건(비대 5곳 rotate·invest-ops 민감정보+restricted·tshome I-006·icons-marketing 원장 upsert·icons 배포 루틴) · grooman(타 호스트 — 이 머신 전파 커버리지 밖) · pre-push 훅 sync 면제(오늘 5회+ --no-verify — thinktank 승급 후보 성숙).
 
 ## 다음 구체 행동
 
-1. 이 PR(`docs/meth-128-guide-22-capsule` → main) 머지 → sync-all 전파(지침 22·08 shared) → METH-128 Done → **트리아지 12/12 전량 종결 보고**.
-2. 이후 방법론 백로그: METH-113(retrofit)만 잔류. 별도 트랙: RFC-003 관찰(8/12경)·repo 과제 5건·grooman sync.
-3. 다음 달 루프 운용: 다운스트림 캡슐 발신 축적 → boot 미수거 경고 시 collect → Catalog Review에서 트리아지 — 이번에 실증된 사이클 그대로.
+1. 이 PR(`chore/sync-propagate-meth-128` → main) 머지 — 기록만, 오늘 마지막.
+2. 다음 세션 운용: boot → (미수거 캡슐·프롬프팅 헤드라인·신선도 경고 확인) → 통상 작업. 월간 전수조사는 8월 말 재실행 후보(이번 스냅샷과 대비해 가드 실효 측정).
+3. 백로그: METH-113 재개는 기존 앱 편입 수요 재발 시.
 
 ## 막힌 것
 - 없음.
