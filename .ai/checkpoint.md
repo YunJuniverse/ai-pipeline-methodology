@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-129 종결 — AI 디자인 방법론 가동)
+# Checkpoint — 2026-07-29 (지침 20 v3 — 기본 실수 3층 방어)
 
-> ✅ 전파 11/11 — 12개 repo 전부에서 AI 디자인 규범(지침 25~27·20 v2·22 v3) 적용. branch `chore/sync-propagate-meth-129`, PR 대기.
+> ✅ 사용자 반복 실수(다크 대비·간격 붙음) 환류 — 지침 20 v3 + METH-130(UI repo 실설치) 등록. #135는 cherry-pick 통합 후 close. branch `docs/guide-20-v3-defense`, PR 대기.
 
 ---
 
@@ -10,25 +10,20 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/sync-propagate-meth-129` (base=main, branch-first)
+- Branch `docs/guide-20-v3-defense` (base=main c93dcfa + #135 기록 cherry-pick, branch-first)
 
-## 방금 한 것 (#134 머지 후 전파)
+## 방금 한 것
 
-- maincheck(79b60c3f ✓) → sync-all: main 5곳 직접(훅 2곳 --no-verify)·비-main/dirty 6곳 worktree — **11/11 origin 대조**. payload: 20_guides(25·26·27 신설, 20 v2·22 v3, README v4.3)·버전스탬프.
-- TODO: METH-129 → Done. rotate 실행(Done 초과분 live-archive 이관 — 2회째 정상 가동).
-- **AI 디자인 방법론 사이클 당일 완결**: 리서치(4 에이전트) → 스냅샷 → 사용자 확정("5개 전부") → 작성 → 전파. METH-117 캡슐 루프와 같은 하루 리듬.
-
-## 현재 상태 (콜드스타트용)
-
-- **방법론 지침 27종 체계**: 00~09(운영)·10~18(기획)·19~24(개발·검증·착수)·25~27(AI 디자인) + 22(덱). 전 다운스트림 동기.
-- **가동 중인 루프**: 캡슐(발신→collect→트리아지→반영), 프롬프팅 코칭(wrap 상시 기록→리포트 자동), friction→thinktank, maincheck·rotate·build 가드.
-- **잔여 트랙**: 스켈레톤 ai-asset-pipeline(첫 이미지/영상 실작업 시 함께) · RFC-003 관찰(8/12경) · repo 과제 5건(비대 rotate·invest-ops restricted·tshome I-006·icons-marketing 원장·icons 배포 루틴) · grooman sync(타 호스트) · AI 디자인 도구 지형 분기 재검증(10월) · 월간 전수조사 2회차(8월 말).
-- 방법론 백로그: METH-113(retrofit)만.
+- **#135 처리**: OPEN 상태에서 새 작업이 라이브 파일을 겹치게 되어 — 스택-PR 금지 규칙에 따라 #135의 기록 커밋(b2f05c70)을 이 브랜치에 cherry-pick하고 #135는 사유 코멘트와 함께 close. 단일 main 직행 PR로 통합(내용 유실 없음).
+- **지침 20 v3**: 사용자 지적 반복 실수 2종의 구조적 방어 —
+  - §4 가드레일 표에 **절대색 직접 사용 fail 행**(`text-black`·`text-white`·`bg-black`·`bg-white` — 다크모드 미반전의 근원).
+  - §9.5 신설 "기본 실수 3층 방어": 1층 구조(시맨틱 토큰=자동 반전·`<Section>/<Stack>` 프리미티브 내장 간격, "기본 패딩 0+개별 부여" 구조 금지 — tshome 실사고 계보) / 2층 기계(axe 대비 PR 차단·opacity 누적 병행·인접 bounding box 간격 린트·양모드 스크린샷·computed 확인) / 3층 friction 기록.
+- **METH-130 등록**(Backlog): UI repo 6곳(tshome·talmo·lifeManager·icons-marketing·gamblescan·icons) 실설치 — axe 게이트·간격 스크립트·절대색 차단 확장·프리미티브 점검 + 더미 위반 실효 증명. 규칙 전파(sync)와 별개로 게이트 설치는 repo별 작업.
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/sync-propagate-meth-129` → main) 머지 — 기록만.
-2. 다음 작업은 사용자 지시 대기 — 후보: 실제 AI 이미지/영상 첫 작업(스켈레톤 동반) / repo 과제 처리 / 통상 업무 복귀.
+1. 이 PR(`docs/guide-20-v3-defense` → main) 머지 → sync-all 전파(지침 20 shared) → 이후 각 UI repo 세션에서 METH-130 항목 참조해 설치.
+2. 잔여 트랙: 스켈레톤 ai-asset-pipeline(첫 실작업 시) · RFC-003 관찰 · repo 과제(METH-130 포함 6곳+기존 5건) · grooman sync · 월간 전수조사 2회차(8월 말).
 
 ## 막힌 것
 - 없음.
