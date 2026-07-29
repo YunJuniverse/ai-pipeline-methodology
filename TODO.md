@@ -17,20 +17,6 @@
   - [ ] 코드 폴더 관례 감지(예: `app/` 존재 시 빈 `src/` 생성 생략)
 - **notes**: grooman(11번째 다운스트림) 적용 시 임시 staging init 후 수동 복사·병합으로 우회한 마찰에서 도출. 관찰로그 `2026-07-21_grooman-methodology-bootstrap.md`(friction: init-nonempty-refusal) 참조. 기존 앱을 방법론으로 편입하는 수요가 재발하면 승급.
 
-### METH-123 · 지침 23 신설 — 검증 규범 (무음 실패·빈 상태·검증불가 등록부)
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] P4: 0건 처리=실패 sanity assert · 검사 못 함≠깨끗함(대상 0개 exit 1) · 금지형 가드 negative case 주입 증명 · 빌드 통과≠산출물 정상(리드백/grep)
-  - [ ] P9: 비어있지 않은 데이터로·최대 표시 크기로·존재가 아닌 내용/가시성 어서션으로 검증
-  - [ ] P12: 검증불가 등록부(무엇을·왜·대체 검증·확인 요청 대상) + 드래그/업로드 UI 비-포인터 대안 규칙
-- **notes**: 전수조사 P4(6곳)+P9(5곳)+P12(4곳) 통합 지침.
-
-### METH-124 · 지침 24 신설 — 착수 게이트 (정본·전제·해석 확인)
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] 과거 사실 기록물은 "무엇이 정본인가" 사용자 확인 선행 / 조사 스냅샷 진단은 착수 시점 코드로 재확인 / 시안·요청 해석 계약(정확 구현 vs 참고) 첫 질문 / 사용자가 그은 경계는 거절 전 원문 검증
-- **notes**: 전수조사 P5(5곳) — 최고 단일 비용군(ai-icons 195분·gamblescan 90분·80분).
-
 ### METH-125 · P7 — 스크래핑 페이스 SOP 상류 승급 + 외부 소스 폴백 사다리
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
@@ -68,6 +54,20 @@
 
 
 
+
+### METH-123 · 지침 23 신설 — 검증 규범 (무음 실패·빈 상태·검증불가 등록부)
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] P4: 0건 처리=실패 sanity assert · 검사 못 함≠깨끗함(대상 0개 exit 1) · 금지형 가드 negative case 주입 증명 · 빌드 통과≠산출물 정상(리드백/grep)
+  - [x] P9: 비어있지 않은 데이터로·최대 표시 크기로·존재가 아닌 내용/가시성 어서션으로 검증
+  - [x] P12: 검증불가 등록부(무엇을·왜·대체 검증·확인 요청 대상) + 드래그/업로드 UI 비-포인터 대안 규칙
+- **notes**: 전수조사 P4(6곳)+P9(5곳)+P12(4곳) 통합 지침. **2026-07-29 구현 완료(PR 대기)**: `20_guides/23_검증_규범.md` 신설 — 무음 실패 4규칙·내용 기준 검증 3기준·검증불가 등록부(4필드+우회 사다리). README §3.6·이력 v4.2.
+
+### METH-124 · 지침 24 신설 — 착수 게이트 (정본·전제·해석 확인)
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] 과거 사실 기록물은 "무엇이 정본인가" 사용자 확인 선행 / 조사 스냅샷 진단은 착수 시점 코드로 재확인 / 시안·요청 해석 계약(정확 구현 vs 참고) 첫 질문 / 사용자가 그은 경계는 거절 전 원문 검증
+- **notes**: 전수조사 P5(5곳) — 최고 단일 비용군(ai-icons 195분·gamblescan 90분·80분). **2026-07-29 구현 완료(PR 대기)**: `20_guides/24_착수_게이트.md` 신설 — 정본 확인·진단 재검증(반증 대조군)·해석 계약·경계 원문 검증 + 상황별 질문표.
 ## Blocked
 
 ## Done
