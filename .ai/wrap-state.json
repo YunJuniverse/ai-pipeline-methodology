@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "ef80afaceb0ea13e0bfd9dc94f6875c4102ea03e",
-  "last_validated_at": "2026-07-29T08:22:51Z",
+  "last_validated_commit": "20bcab33c18c7ccb657315987cfa85f996ce285b",
+  "last_validated_at": "2026-07-29T08:53:52Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "b84953ebf8d56aa519c3a4118743c43a02cfcb857b0e0cdbb44a3f2ee008a880"
+      "sha256": "0e6647ef895973f36bb6c68a252035bff26fd68611f8e3e8b7a539c74cdecc9e"
     },
     "TODO.md": {
-      "sha256": "9a95d75778374e7bc286eb48c578396b8a21267d96dba08043084e947df1eaed"
+      "sha256": "66dccc36c99c023971a262aec09841d6aba0f3742f14b511c893f7b9146e55a3"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d6d7260296ebe2d66d6813256735a214e02027866bd8b46fd280aaffe3ff26eb"
+      "sha256": "5d1cdf296bc43db237c2c4a07b7840c197406dbde83253ac637f587716989e97"
     }
   },
   "observations": {
@@ -129,6 +129,7 @@
       "50_resources/ai_observations/2026-07-25_ir-deck-methodology-guide-22.md",
       "50_resources/ai_observations/2026-07-28_meth-117-reverse-harvest-backlog.md",
       "50_resources/ai_observations/2026-07-29_ai-design-research.md",
+      "50_resources/ai_observations/2026-07-29_guide-20-v3-defense.md",
       "50_resources/ai_observations/2026-07-29_guides-23-24-verification-kickoff.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
@@ -149,6 +150,7 @@
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-122.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-125-127.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-128-final.md",
+      "50_resources/ai_observations/2026-07-29_sync-propagate-meth-129.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-129 작성 — AI 디자인 방법론 5종)
+# Checkpoint — 2026-07-29 (지침 20 v3 — 기본 실수 3층 방어)
 
-> ✅ 사용자 확정("5개 전부") → 지침 25·26·27 신설 + 20 v2·22 v3 보강 완료. branch `docs/meth-129-ai-design-guides`, PR 대기. 머지 후 sync-all 전파.
+> ✅ 사용자 반복 실수(다크 대비·간격 붙음) 환류 — 지침 20 v3 + METH-130(UI repo 실설치) 등록. #135는 cherry-pick 통합 후 close. branch `docs/guide-20-v3-defense`, PR 대기.
 
 ---
 
@@ -10,22 +10,20 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `docs/meth-129-ai-design-guides` (base=main, branch-first)
+- Branch `docs/guide-20-v3-defense` (base=main c93dcfa + #135 기록 cherry-pick, branch-first)
 
 ## 방금 한 것
 
-- **지침 25 · AI 디자인 공통 규범(신설)**: 리서치 §0의 9원칙 승급 — ①모델 추상화(벤더 소멸 3건) ②캐논 우선 ③provenance=저작권 증빙(문체부 안내서·Thaler) ④2단 생성+선별 KPI(3회 상한) ⑤사람 게이트 3위치 표 ⑥2층 검증(지침 23 인스턴스) ⑦텍스트·로고 생성 금지 ⑧slop 금지 목록 ⑨법무 게이트(AI기본법 표시·무료 티어 금지·유사 IP 폐기·소송 중 모델 유예·플랫폼 정책).
-- **지침 26 · 이미지·캐릭터(신설)**: 역할 매트릭스(GPT Image 2·NB Pro·FLUX LoRA·Ideogram·Firefly 면책·Midjourney 유예), 일관성 사다리(정본 시트 동결→레퍼런스 주입→LoRA ~$8), 파이프라인(인페인팅 우선·클린 베이스 후 업스케일), 검수 2단+인쇄 크기, 에셋 명명·approved 분리·provenance.
-- **지침 27 · 영상(신설)**: 7단 파이프라인(스크립트 사람 먼저·샷 4~8초 분해), 샷 스펙 YAML 스키마(model은 역할 참조), 프롬프트 5부 구조·레퍼런스 캐논·First/Last Frame, 비용 공식+시도계수, QA 체크 8항.
-- **지침 20 v2**: §9 신설 — DESIGN.md 의무(미학 방향+레퍼런스+금지 기본값+토큰 참조), 3안 픽 게이트(픽 후 전면 재생성 금지), 시스템 정렬(Tailwind v4 @theme·DTCG·shadcn registry·MCP 조회), 품질 게이트(axe 차단·시각 회귀·AI 티 테스트 4축 중 3축).
-- **지침 22 v3**: §7b 신설 — 결정론 레이아웃 린트 4종(build 체크 fail-closed)·패널 taxonomy 주입·Vega-Lite 차트 계층(VLM 수치 검증 금지)·리플렉션 루프(예산 상한)·경계 2종(HTML 경유 금지·상용 API 소재까지).
-- README v4.3(카탈로그 3행 추가·이력). TODO METH-129 → InProgress(AC 체크).
+- **#135 처리**: OPEN 상태에서 새 작업이 라이브 파일을 겹치게 되어 — 스택-PR 금지 규칙에 따라 #135의 기록 커밋(b2f05c70)을 이 브랜치에 cherry-pick하고 #135는 사유 코멘트와 함께 close. 단일 main 직행 PR로 통합(내용 유실 없음).
+- **지침 20 v3**: 사용자 지적 반복 실수 2종의 구조적 방어 —
+  - §4 가드레일 표에 **절대색 직접 사용 fail 행**(`text-black`·`text-white`·`bg-black`·`bg-white` — 다크모드 미반전의 근원).
+  - §9.5 신설 "기본 실수 3층 방어": 1층 구조(시맨틱 토큰=자동 반전·`<Section>/<Stack>` 프리미티브 내장 간격, "기본 패딩 0+개별 부여" 구조 금지 — tshome 실사고 계보) / 2층 기계(axe 대비 PR 차단·opacity 누적 병행·인접 bounding box 간격 린트·양모드 스크린샷·computed 확인) / 3층 friction 기록.
+- **METH-130 등록**(Backlog): UI repo 6곳(tshome·talmo·lifeManager·icons-marketing·gamblescan·icons) 실설치 — axe 게이트·간격 스크립트·절대색 차단 확장·프리미티브 점검 + 더미 위반 실효 증명. 규칙 전파(sync)와 별개로 게이트 설치는 repo별 작업.
 
 ## 다음 구체 행동
 
-1. 이 PR(`docs/meth-129-ai-design-guides` → main) 머지 → sync-all 전파(20_guides shared) → METH-129 Done(maincheck 후) — 전파되면 12개 repo 전부에서 AI 디자인 작업이 이 규범을 따름.
-2. 후속 후보(백로그 미등록): 스켈레톤 `ai-asset-pipeline`(canon/·approved/·provenance 레저·샷 스펙 템플릿) — 실제 이미지/영상 작업 첫 착수 시 함께 만드는 게 효율적.
-3. 별도 트랙: RFC-003 관찰 · repo 과제 5건 · grooman sync · 도구 지형 분기 재검증(10월경).
+1. 이 PR(`docs/guide-20-v3-defense` → main) 머지 → sync-all 전파(지침 20 shared) → 이후 각 UI repo 세션에서 METH-130 항목 참조해 설치.
+2. 잔여 트랙: 스켈레톤 ai-asset-pipeline(첫 실작업 시) · RFC-003 관찰 · repo 과제(METH-130 포함 6곳+기존 5건) · grooman sync · 월간 전수조사 2회차(8월 말).
 
 ## 막힌 것
 - 없음.
