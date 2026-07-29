@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-116 전파 종결 — 11/11)
+# Checkpoint — 2026-07-29 (METH-117 구현 — 캡슐 outbox 역방향 루프)
 
-> ✅ 지침 22 sync-all 전파 완료 — 전 다운스트림 11곳 origin main 반영·ls-remote 대조. branch `chore/sync-propagate-meth-116`, PR 대기.
+> ✅ 구현·테스트 완료 — capsule/collect 명령+가시성+안전 가드+문서, tests 13종·E2E 스모크 통과. branch `feat/meth-117-capsule-outbox`, PR 대기.
 
 ---
 
@@ -10,25 +10,29 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/sync-propagate-meth-116` (base=main 34464ea, branch-first)
+- Branch `feat/meth-117-capsule-outbox` (base=main 57cfb7d, branch-first)
 
-## 방금 한 것 (이번 세션 후반, #114 머지 후)
+## 방금 한 것 (이번 세션 — 사용자 Ready 승격·착수 지시)
 
-- `sync-all --apply`: main+clean 6곳(ai-icons·icons-invest·icons-marketing·invest-ops·talmo-com·tshome) 파일 적용 → 각 repo 타깃 스테이징(`20_guides`·`.methodology-version`) 커밋·push·ls-remote 대조.
-  - ai-icons·invest-ops push 차단 = **pre-push wrap --strict 훅**(sync 커밋엔 세션 라이브파일 갱신이 없어 fail) → 2026-07-15 확립 절차대로 `--no-verify` FF push(원격이 로컬 조상임을 merge-base로 확인 후). **재발 마찰 — friction 기록(repeat_of: 2026-07-15_ai-icons-talmo-sync), 승급 후보 원료.**
-- 비-main 5곳(cafe24-renewal·gamblescan·icons·insta-toon·lifeManager): 활성 세션 무방해 원칙 — `worktree add --detach origin/main` 임시 worktree에 `sync --apply --path` → 커밋 → `push origin HEAD:main` → ls-remote 대조 → worktree remove.
-  - gamblescan은 main이 이전 전파도 밀려 있어 지침 07·CLAUDE/AGENTS 동반 캐치업(5파일).
-- 재스캔: 11/11 origin 반영. behind 표시 5곳은 로컬 체크아웃(피처 브랜치) 기준 cosmetic — payload는 origin main에 있음.
-- 참고: 스켈레톤 `ir-deck-build`는 `shared_paths`가 아니라 init 경로(`50_resources/skeletons`는 init 1회) → sync 비전파가 **설계 정상**. 다운스트림은 필요 시 상류에서 온디맨드 복사. METH-116 checkpoint의 "스켈레톤=shared" 서술은 부정확했음.
+- `60_tools/methodology.py`:
+  - 상수: `OUTBOX_DIR`(50_resources/meth_outbox)·`INBOX_DIR`(meth_inbox)·`CAPSULE_TYPES` 4종·본문 120줄 가드.
+  - `cmd_capsule`: 1제안=1캡슐=1파일 생성(id=`<repo>__<date>_<slug>`)·`--validate`·`--dry-run`·restricted 정책(.methodology-version `capsule_policy`) 거부+`--allow-restricted`.
+  - `cmd_collect`: 다운스트림 발견(sync-all 재사용)→로컬+origin(fetch·ls-tree·show) 병합→원장(`_inbox/_ledger.json`) 중복 skip→`_inbox/<repo>__<file>` 적재. 기본 dry-run·`--apply`. 커버리지 리포트(원격 없음/fetch 실패/repo 아님). 다운스트림 무변경.
+  - 가시성: boot [4b](자기 outbox 잔량 + 상류(70_meta 보유)면 전 다운스트림 미수거 총계)·sync-all 표 outbox 컬럼+총계 경고.
+  - 안전: `_detect_sensitive`가 outbox .md 변경분의 *내용* 시크릿 패턴(_CAPSULE_SECRET_RES) 검사. MANIFEST: shared에 `meth_outbox/_README.md`만, init_paths에 outbox 디렉터리, init_path_excludes로 캡슐 본체 격리. _inbox는 어디에도 미전파(상류 전용).
+  - thinktank: `_thinktank_capsule_section` — _inbox target별 집계, `CROSS-REPO`/`DUP-TARGET` 마킹.
+- 문서: `50_resources/meth_outbox/_README.md`(원칙·트리거 표·CLI·민감정보·수거 이후), `50_resources/meth_inbox/_README.md`(원장·트리아지 유효/이미 반영/만료), catalog `_README.md` §3 캡슐 트랙, CLAUDE.md·AGENTS.md §2 캡슐 규칙 불릿(명시 요청=의무).
+- 테스트: `tests/test_capsule_collect.py` 13종(roundtrip·검증 거부 4종·원장 dedupe·폴백 id·파일 필터·정책·시크릿 스캔). 기존 sync-all 9·boot 5 회귀 통과. E2E 스모크: 임시 repo 캡슐 생성→restricted 거부→collect dry-run/apply→재수거 0건→thinktank 섹션·sync-all 컬럼·boot 확인. 테스트 산출물 정리 완료(_inbox엔 _README만).
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/sync-propagate-meth-116` → main) 머지 — 전파 기록, Class A.
-2. METH-117(캡슐 outbox) 구현 착수는 Backlog→Ready 승격 시.
-3. (관찰) pre-push wrap 훅 vs 상류 sync push 충돌이 2회째 — thinktank 돌리면 승급 후보로 잡힐 것. 해법 후보: 훅이 sync 커밋(방법론 경로만 변경)을 인지해 wrap 검사 면제.
+1. 이 PR(`feat/meth-117-capsule-outbox` → main) 머지 → METH-117 Done 이동.
+2. **머지 후 sync-all 전파** — shared 변경: methodology.py·meth_outbox/_README·catalog _README·CLAUDE/AGENTS. 절차는 07-29 전파와 동일(main 직접 + 비-main worktree, ai-icons·invest-ops는 --no-verify).
+3. 후속 백로그 후보(안 만듦): methodology-graph.json에 outbox/collect 노드 추가(대시보드 그래프 정합, METH-099 계보).
+4. invest-ops에 `capsule_policy: restricted` 실제 부여는 그 repo 세션에서 결정(ADR-0001 Class C 근거).
 
 ## 막힌 것
-- 없음. grooman(타 호스트)만 전파 커버리지 밖 — 그 머신 세션에서 sync 필요.
+- 없음.
 
 ## 환경
-- macOS, python3. 대시보드 http://localhost:8765 서빙 중.
+- macOS, python3. 대시보드 http://localhost:8765. pytest 없음(자체 러너).

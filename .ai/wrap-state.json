@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "34464eae675bffe8fa4672cdf2ec908a0732271e",
-  "last_validated_at": "2026-07-29T00:51:40Z",
+  "last_validated_commit": "57cfb7d81df5e7bcec650980cdd852ca14bb0391",
+  "last_validated_at": "2026-07-29T02:26:28Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "8bbbe853b4c5f52a6079f6cc064623a0b11484e8ec14914747f8e285fd5fc0a0"
+      "sha256": "4ee3324a89ace4f9f1b3cbfcac0853d39b19d4d3ab47b9dc77cabfce951ce90c"
     },
     "TODO.md": {
-      "sha256": "1237d4fb71c7babf2948f51abed37aba118ffee57296b80c513a86739cb4ccc5"
+      "sha256": "6f01a80510b756063b30f2819d9681ece066ca9ccb59363ba411c38eb542d728"
     },
     ".ai/checkpoint.md": {
-      "sha256": "cbb1a5037dc1e6a0249069f2bceb49b3e1c81e3aa5a79bafb77f8d5d2f7f3af5"
+      "sha256": "b69fdbc24edec4d10037b147bdc7443ee71d0df0e99a941107323b1b945b5ed3"
     }
   },
   "observations": {
@@ -129,6 +129,7 @@
       "50_resources/ai_observations/2026-07-25_ir-deck-methodology-guide-22.md",
       "50_resources/ai_observations/2026-07-28_meth-117-reverse-harvest-backlog.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
+      "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
