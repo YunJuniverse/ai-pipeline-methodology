@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "1e6f1cd11dc2a46d093cb7cc790a8d9c0386f2e0",
-  "last_validated_at": "2026-07-29T05:25:08Z",
+  "last_validated_commit": "0b58f2c49525b6939e5b1697c426d329fda43128",
+  "last_validated_at": "2026-07-29T06:01:34Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "0dc24e1269e7b302269f67e3a8dbece1f53a13feb38d9e99b60301ad168a95d9"
+      "sha256": "602ac461582b53ed6269675e1441ca592b496d35252fe16ae203b95430fa91de"
     },
     "TODO.md": {
-      "sha256": "c0173e2158f0237c7dae1f78d8d7c000cc15fb677e0b8c1d1cc359455ef2a8d8"
+      "sha256": "c6f6ae0b5faf96b6f8fc4b3d13bb6196e3041bace130a2d348b6fec1f58b9f9a"
     },
     ".ai/checkpoint.md": {
-      "sha256": "c9c84d07b4f49bd6f46e751d3f12327380f39ea6b8a5e7ec693e16491c7f5e89"
+      "sha256": "f90ac86bbfbcfbb33f1bfa456af3181755f41e84fcb1962f9aff667babe7ad7b"
     }
   },
   "observations": {
@@ -131,6 +131,7 @@
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
       "50_resources/ai_observations/2026-07-29_meth-118-backlog-todo-repair.md",
+      "50_resources/ai_observations/2026-07-29_monthly-audit-2026-07.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-117.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",

@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (METH-118 백로그 등록 + TODO 손상 복구)
+# Checkpoint — 2026-07-29 (2026-07 전 레포 월간 전수조사)
 
-> ✅ METH-118(프롬프팅 코칭 루프) Backlog 등록 + #117에 혼입됐던 TODO.md 손상 정본 복구. branch `chore/backlog-meth-118-prompt-coaching`, PR 대기.
+> ✅ 11개 repo 병렬 전수조사 완료 — 교차 반복 패턴 12종 스냅샷 박제, 트리아지 METH-119 등록. branch `docs/monthly-audit-2026-07`, PR 대기.
 
 ---
 
@@ -10,18 +10,22 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/backlog-meth-118-prompt-coaching` (base=main 1e6f1cd, branch-first)
+- Branch `docs/monthly-audit-2026-07` (base=main 0b58f2c, branch-first)
 
 ## 방금 한 것 (이번 세션 마지막 구간)
 
-- **METH-118 등록**: 사용자 요청(프롬프팅 자가 교정 데이터·리포트) → 설계 방향 확정: 온디맨드가 아닌 **상시 자동 기록**(wrap 의무 — observe `prompting:` 블록: 총 라운드·교환별 intent/rounds/모호 지시 발췌+교정안/용어/상황 태그/재지시 패턴) + **prompt-report 자동 갱신**(wrap 파이프라인이 재생성, boot 헤드라인 표시). 한계 합의: 토큰 실측은 세션 내 불가 → v1 프록시(라운드·재지시 수), PostHog `llma-cc-setup` 연동은 옵션 게이트. 원문 전체 저장 금지(발췌만). 교차-repo 통합 v1 제외(collect 확장 후속). 사용자 선호는 도구 메모리(`prompting-feedback-preference`) 저장.
-- **TODO.md 손상 복구**: #117 커밋에 혼입 — 직전 세션의 섹션 이동 파이썬 스크립트가 `text.index("## Blocked")`로 검색해 6행 안내문 속 문자열(`` `## Blocked`, `## Done`) ``)에 오매칭 → METH-117 위 전체가 중복되고 Done의 METH-117 헤딩·필드가 유실. 정본 재작성으로 복구(칸반 5헤더 정합 검증·중복 0). 라이브 파일이라 다운스트림 무영향. **교훈(friction 기록): 라이브 파일 섹션 조작은 문자열 index() 금지 — `^## ` 행 시작 앵커 정규식으로.**
+- 사용자 지시: "모든 repo 순회, 최근 한 달 기록 전수조사(병목·반복·결과물 문제·인사이트)". 캡슐 루프 이전 미환류분의 소급 수거.
+- 병렬 Explore 에이전트 11기(repo당 1기, 읽기 전용) — 각 repo의 관찰로그 friction 전량·HANDOFF·checkpoint·TODO·git log·스냅샷 조사. grooman(타 호스트)만 불가.
+- 교차 집계 → `40_dev/snapshots/2026-07-29_전레포-월간-전수조사-마찰-인사이트.md` (정본): 총괄 통계, 승급 후보 P1~P12, 방법론 도구 결함 §2, 지침 후보 §3, repo별 요지 §4, 즉시 주의 §5, 방법 한계 §6.
+- 핵심: P1 스택-PR 사고 6곳(insta-toon은 main에 코드 없는 채 Done 허위) · P2 observe CLI 스키마 결함 전 repo(메타 상수·repeat_of 포맷 붕괴·F-001 캡·cafe24 friction 0/112) · P3 라이브 파일 규칙 미작동 7곳 · P6 dev-build 충돌 7회 반복("규칙 아닌 강제 필요" 실증) · P10 라이브 파일 3종 동시 갱신이 병렬 PR을 100% 충돌시킴(방법론 구조 비판 — RFC감).
+- METH-119(트리아지) Ready 등록 — 승급은 사람 게이트.
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/backlog-meth-118-prompt-coaching` → main) 머지 — TODO(복구+118)·라이브 파일만, Class A.
-2. METH-118 착수는 Backlog→Ready 승격 시. 진입점: `cmd_observe`/`render_observation`(prompt_patterns 확장)·`cmd_wrap`(리포트 재생성 훅)·`cmd_boot`(헤드라인).
-3. 기존 후속 후보 유지: graph.json outbox/collect 노드·invest-ops restricted 부여·pre-push 훅 sync 면제(3회 재발)·grooman sync(타 호스트).
+1. 이 PR(`docs/monthly-audit-2026-07` → main) 머지.
+2. **METH-119 트리아지**(사람+AI, Catalog Review 합류): 스냅샷 §1 P1~P12 채택/보류/기각 → §2 도구 백로그·§3 지침·_pending·RFC 분배. observe CLI 강제(P2)는 METH-118과 통합 구현 검토.
+3. §5 즉시 주의는 각 repo 세션 과제: ① insta-toon 스택-PR 미도달 복구(최우선 — main에 lettering/provenance/config 부재) ② invest-ops 민감정보 저장 범위 합의+restricted ③ tshome I-006 잔여 ④ icons-marketing 원장 upsert ⑤ icons 배포 루틴.
+4. 원자료(에이전트 11기 상세 보고)는 이 세션 트랜스크립트에만 존재 — 스냅샷이 보존본. 필요 시 재조사가 정본.
 
 ## 막힌 것
 - 없음.
