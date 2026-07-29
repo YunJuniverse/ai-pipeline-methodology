@@ -66,6 +66,15 @@
 
 
 
+
+
+## Blocked
+
+## Done
+
+
+
+
 ### METH-118 · 프롬프팅 코칭 루프 — 상시 자동 기록 + 자동 갱신 리포트
 - **mode**: fullstack
 - **change-class**: A
@@ -76,13 +85,7 @@
   - [x] **`prompt-report` 명령 + 자동 갱신**: 살아있는 리포트 파일 재생성 — 반복 모호 패턴 통계(빈도순)·배울 용어 사전·상황별 프롬프트 플레이북·라운드 수 추이·토큰 적정성(v1 프록시=라운드·재지시 수). **wrap 파이프라인이 기록 후 자동 재생성** → 세션 종료마다 최신. boot가 리포트 헤드라인 1줄 표시
   - [x] **토큰 실측(옵션 게이트)**: v1은 프록시. PostHog LLM Analytics(`llma-cc-setup`) 연동 시 리포트가 실측 토큰을 읽는 확장 포인트만 설계(구현은 후속)
   - [x] **교차-repo 통합은 v1 제외 명시**: 리포트는 repo 로컬. 통합 리포트는 collect 인프라 확장 후속(사용자 단위 데이터라 통합 가치 큼 — 재논의 트리거를 notes에 기록)
-- **notes**: 2026-07-29 사용자 요청 — "전문용어를 몰라 지시가 길어지거나 핑퐁이 늘어나는 걸 스스로 교정할 데이터·리포트가 필요. 즉시 피드백보다 **언제나 남겨질 기록으로 뒷단에서 알아서 판단한 뒤 리포트 자동 업데이트**"(상시 기록이 확정 방향). 마찰 루프와 동형의 코칭 루프(L1 기록→집계→사람 교정). 발판: observe `prompt_patterns`(intent·success·rounds)가 이미 있으나 형식적 사용 — 이걸 확장. 정직한 한계 합의: 토큰 실측은 세션 내 불가(프록시로 시작), 원문 저장은 발췌로 제한. 사용자 선호는 도구 메모리(`prompting-feedback-preference`)에 별도 저장(즉시 피드백은 언제든 가능). **METH-121(observe 스키마 강제)과 통합 구현 예정(METH-119 트리아지).** **2026-07-29 구현 완료(PR 대기, METH-121 잔여분 통합)**: observe `--rounds-total`(상시 의무)·`--prompting "intent|rounds|모호발췌(≤200자 가드)|교정안|용어|상황태그"`(교환별), prompting 프론트매터 블록 렌더/파서, `prompt-report` 명령 + **wrap 자동 재생성**(`50_resources/prompting-report.md`: 요지·라운드 추이·모호→교정 목록·용어 사전·상황 플레이북·토큰 프록시+PostHog 확장 포인트) + boot 헤드라인. 판단 시점(wrap 세션 AI)·v1 스코프(교차-repo 제외) 리포트 헤더 명시. ship sensitive가 관찰로그 내용도 스캔. CLAUDE/AGENTS wrap 규칙에 상시 기록 의무 추가. tests 7종.
-## Blocked
-
-## Done
-
-
-
+- **notes**: 2026-07-29 사용자 요청 — "전문용어를 몰라 지시가 길어지거나 핑퐁이 늘어나는 걸 스스로 교정할 데이터·리포트가 필요. 즉시 피드백보다 **언제나 남겨질 기록으로 뒷단에서 알아서 판단한 뒤 리포트 자동 업데이트**"(상시 기록이 확정 방향). 마찰 루프와 동형의 코칭 루프(L1 기록→집계→사람 교정). 발판: observe `prompt_patterns`(intent·success·rounds)가 이미 있으나 형식적 사용 — 이걸 확장. 정직한 한계 합의: 토큰 실측은 세션 내 불가(프록시로 시작), 원문 저장은 발췌로 제한. 사용자 선호는 도구 메모리(`prompting-feedback-preference`)에 별도 저장(즉시 피드백은 언제든 가능). **METH-121(observe 스키마 강제)과 통합 구현 예정(METH-119 트리아지).** **2026-07-29 구현 완료(PR 대기, METH-121 잔여분 통합)**: observe `--rounds-total`(상시 의무)·`--prompting "intent|rounds|모호발췌(≤200자 가드)|교정안|용어|상황태그"`(교환별), prompting 프론트매터 블록 렌더/파서, `prompt-report` 명령 + **wrap 자동 재생성**(`50_resources/prompting-report.md`: 요지·라운드 추이·모호→교정 목록·용어 사전·상황 플레이북·토큰 프록시+PostHog 확장 포인트) + boot 헤드라인. 판단 시점(wrap 세션 AI)·v1 스코프(교차-repo 제외) 리포트 헤더 명시. ship sensitive가 관찰로그 내용도 스캔. CLAUDE/AGENTS wrap 규칙에 상시 기록 의무 추가. tests 7종. **머지(#125)·전파(07-29) 종결 11/11** — 전 repo에서 프롬프팅 상시 기록·리포트 자동 갱신 가동. maincheck 검증(69de6d95 ✓) 후 Done. 첫 실데이터·리포트는 방법론 repo에 생성됨(`50_resources/prompting-report.md`).
 ### METH-122 · P3+P6 도구 — 라이브 파일 fail-closed·자동 회전 + build 가드
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
@@ -90,21 +93,6 @@
   - [x] 외부 게이트(대표·결제·자격증명) 대기 항목 = TODO Blocked 강제 이동 규칙 문서화(4개 repo에서 Blocked 미사용 실증)
   - [x] dev 서버 감지 시 build 차단 가드 스크립트를 스캐폴드 포함(ai-icons 7회 반복 — 규칙 아닌 강제)
 - **notes**: 전수조사 P3(7곳)+P6(4곳). **2026-07-29 구현 완료(PR 대기)**: `rotate` 명령(TODO Done 4건·HANDOFF Recent 5건 유지, 초과분 `40_dev/snapshots/live-archive/` 이관 — 삭제 아님, --checkpoint 는 전체 사본+상단 요지), wrap --strict 경성 한도(규정 2배·Done 20건) fail+rotate 안내, boot 신선도 경고(HANDOFF 날짜·wrap 미실행 vs 최근 커밋 7일), ship build 단계 dev 서버 감지 차단 + `60_tools/build-guard.sh`(shared, BUILD_GUARD_FORCE 탈출구), CLAUDE/AGENTS §2 외부 게이트=Blocked 강제 규칙. tests 6종. **머지(#123)·전파(07-29) 종결 11/11** — 전 repo가 rotate·경성 한도·신선도 경고·build 가드 획득. maincheck 자가 검증(fddc085d ✓) 후 Done. 비대 repo 5곳 rotate 실행은 각 repo 세션 과제.
-### METH-120 · P1 도구 — main 도달 검증 + 스택-PR 금지 명문화
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [x] Done 전이·배포 게이트용 main 도달 검사(`git merge-base --is-ancestor <sha> origin/main`)를 CLI로 제공(wrap 또는 신규 명령), TODO Done 처리 규칙에 연결
-  - [x] "스택-PR 금지 — 앞 PR 머지 후 main에서 새로 분기" 를 CLAUDE/AGENTS §2에 명문화(개인 메모리→전 repo 규칙 승급)
-- **notes**: 전수조사 P1 — 6개 repo 사고. insta-toon 복구는 그 repo PR #7(머지 완료). **2026-07-29 구현 완료(PR 대기)**: `maincheck` 명령(fetch→origin main/master 대조·다건 sha·미도달 exit 1+안내), CLAUDE/AGENTS §2 스택-PR 금지·Done 검증 불릿. **머지(#121)·전파(07-29) 종결 11/11** — dirty 3곳(icons·icons-invest·lifeManager)도 worktree로 origin/main만 반영. Done 이동은 maincheck 자가 검증(04535d0d 도달 ✓) 후 — dogfood.
-
-### METH-121 · P2 도구 — observe CLI 스키마 강제 (METH-118 통합)
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [x] 메타 자동 채움: host_os 상시 실측, agent/tool 환경 추정, domain은 컨텍스트/인자 강제(기본값 "meta" 금지)
-  - [x] `repeat_of` enum 강제(null | 관찰 session_id) — "repeat_of:" 접두 오염·자연어 거부, validate 반영
-  - [x] 다건 friction 실사용 가능 확인(현행 F-001 캡 원인 규명) + 기본값 그대로면 validate가 "미기입" 경고
-  - [x] prompt_patterns 상용구 제거 — METH-118 prompting 블록과 통합 설계
-- **notes**: 전수조사 P2 — 전 repo 900+건 메타 상수·repeat_of 포맷 붕괴. **2026-07-29 구현 완료(PR 대기)**: `normalize_repeat_of`(접두 오염 정규화+enum 강제, 위반 시 생성·validate 거부), 메타 자동 채움(ctx unknown 무시·env 추정·host_os 실측), domain 기본값 meta 제거(미지정 시 exit 2), prompt_patterns 상용구 제거(기본 []), `observation_quality_warnings`(unknown·meta·상용구 경고). prompting 실측 블록은 METH-118 잔여. tests 11종.
 ### METH-117 · 역방향 루프 — 캡슐 outbox + 수동 일괄 수거
 - **mode**: fullstack
 - **change-class**: A
