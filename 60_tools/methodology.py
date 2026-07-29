@@ -47,6 +47,10 @@ Commands
       (상류 전용) 다운스트림 outbox 캡슐을 일괄 수거해 _inbox에 적재한다.
       수동 트리거·다운스트림 무변경·수거 상태는 상류 원장(_ledger.json).
 
+  methodology maincheck [<sha> ...]
+      커밋이 origin main에 실제 도달했는지 검증한다 (기본 HEAD).
+      TODO Done 전이·배포 판정 전 필수 — 스택-PR 미도달 사고 방지 (METH-120).
+
 Classification
 --------------
   shared          — sync가 항상 덮어쓴다 (20_guides/, 50_resources/, 그래프, 대시보드)
@@ -355,6 +359,29 @@ def yaml_scalar(value: str | None) -> str:
     return f'"{escaped}"'
 
 
+# repeat_of 허용 형식: null | 관찰 session_id(YYYY-MM-DD_slug) | 마찰 앵커 슬러그 | C-NNN
+# (METH-121 — 자유 텍스트·"repeat_of:" 접두 오염을 차단해야 thinktank ≥2 집계가 기계적으로 가능)
+REPEAT_OF_RE = re.compile(r"^(?:\d{4}-\d{2}-\d{2}_)?[a-z0-9]+(?:-[a-z0-9]+)*$|^C-\d{3}$")
+
+
+def normalize_repeat_of(raw: str) -> str | None:
+    """repeat_of 값 정규화 — 접두 오염 제거 후 형식 검증. 위반 시 ValueError."""
+    value = raw.strip().strip('"')
+    while value.startswith("repeat_of:"):
+        value = value[len("repeat_of:"):].strip()
+    if value in {"", "null", "none", "no", "-"}:
+        return None
+    if value in {"yes", "repeat", "true"}:
+        raise ValueError(
+            "repeat_of에는 '반복이다'가 아니라 *무엇의* 반복인지를 적습니다 — "
+            "이전 관찰 session_id(YYYY-MM-DD_slug) 또는 마찰 앵커 슬러그(kebab-case)")
+    if not REPEAT_OF_RE.match(value):
+        raise ValueError(
+            f"repeat_of 형식 위반: '{value}' — null 또는 session_id/kebab-슬러그/C-NNN만 허용"
+            " (자유 서술은 resolution에)")
+    return value
+
+
 def parse_friction_item(raw: str, index: int) -> dict:
     parts = raw.split("|")
     if len(parts) != 4:
@@ -364,13 +391,12 @@ def parse_friction_item(raw: str, index: int) -> dict:
         cost_minutes = int(cost)
     except ValueError as exc:
         raise ValueError("friction cost_minutes는 정수여야 합니다") from exc
-    repeat_value = None if repeat_of in {"", "null", "none", "-"} else repeat_of
     return {
         "id": f"F-{index:03d}",
         "where": where,
         "cost_minutes": cost_minutes,
         "resolution": resolution,
-        "repeat_of": repeat_value,
+        "repeat_of": normalize_repeat_of(repeat_of),
     }
 
 
@@ -466,6 +492,12 @@ def validate_observation_file(path: Path) -> list[str]:
     task_match = re.search(r"^task_type:\s*([^\s]+)\s*$", frontmatter, flags=re.MULTILINE)
     if task_match and task_match.group(1) not in OBSERVATION_TASK_TYPES:
         errors.append(f"task_type은 {', '.join(sorted(OBSERVATION_TASK_TYPES))} 중 하나여야 합니다")
+    # METH-121: repeat_of 형식 강제 — 오염되면 thinktank 반복 집계가 기계적으로 불가
+    for m in re.finditer(r"^\s+repeat_of:\s*(.+?)\s*$", frontmatter, flags=re.MULTILINE):
+        try:
+            normalize_repeat_of(m.group(1))
+        except ValueError as exc:
+            errors.append(str(exc))
     if re.search(r"^\s*-\s*\[?None\]?\s*$", frontmatter, flags=re.MULTILINE):
         errors.append("빈 배열은 [None] 대신 []로 기록해야 합니다")
     # 본문(body) 검증:
@@ -478,6 +510,19 @@ def validate_observation_file(path: Path) -> list[str]:
     return errors
 
 
+def observation_quality_warnings(path: Path) -> list[str]:
+    """미기입·상용구 경고 (METH-121) — 차단하지 않되 신호 부재를 드러낸다."""
+    warnings: list[str] = []
+    text = read_text(path)
+    if re.search(r'^\s+(agent|tool):\s*"?unknown"?\s*$', text, flags=re.MULTILINE):
+        warnings.append("authored_by가 unknown — --agent/--tool 로 명시하면 L3 귀속 분석 가능")
+    if re.search(r'^domain:\s*meta\s*$', text, flags=re.MULTILINE):
+        warnings.append("domain=meta — 방법론 repo 자신이 아니면 실제 도메인(fullstack 등)을 지정")
+    if 'intent: "l1 observation capture"' in text:
+        warnings.append("prompt_patterns가 상용구 — 실측 아니면 비워두는 편이 정직(METH-118 예정)")
+    return warnings
+
+
 def parse_observation_frontmatter(path: Path) -> dict[str, Any]:
     text = read_text(path)
     if not text.startswith("---\n"):
@@ -486,7 +531,11 @@ def parse_observation_frontmatter(path: Path) -> dict[str, Any]:
         _, frontmatter, _body = text.split("---", 2)
     except ValueError:
         return {}
-    out: dict[str, Any] = {"path": str(path.relative_to(METHODOLOGY_ROOT))}
+    try:
+        rel = str(path.relative_to(METHODOLOGY_ROOT))
+    except ValueError:
+        rel = path.name
+    out: dict[str, Any] = {"path": rel}
     current = None
     for raw in frontmatter.splitlines():
         line = raw.rstrip()
@@ -515,6 +564,8 @@ def cmd_observe(args: argparse.Namespace) -> int:
                 err(item)
             return 1
         ok(f"observation valid: {path}")
+        for w in observation_quality_warnings(path):
+            warn(w)
         return 0
 
     if not args.slug or not args.summary:
@@ -528,12 +579,31 @@ def cmd_observe(args: argparse.Namespace) -> int:
         return 2
 
     ctx = load_ai_context(METHODOLOGY_ROOT)
-    agent = args.agent or ctx.get("last_session", {}).get("agent", {}).get("model") or "unknown"
-    tool = args.tool or ctx.get("last_session", {}).get("agent", {}).get("tool") or "unknown"
-    host_os = args.host_os or ctx.get("last_session", {}).get("host_os") or host_os_label()
-    domain = args.domain or ctx.get("project", {}).get("domain") or "meta"
+
+    def _ctx_value(*keys: str) -> str | None:
+        node: Any = ctx
+        for key in keys:
+            node = node.get(key, {}) if isinstance(node, dict) else {}
+        return None if not isinstance(node, str) or node in {"", "unknown"} else node
+
+    # METH-121: 메타 자동 채움 — "unknown" 상수가 900+건 쌓인 결함의 근본 수정.
+    # ctx의 "unknown"은 미기입으로 취급하고, 환경에서 실측·추정한다.
+    agent = args.agent or _ctx_value("last_session", "agent", "model") \
+        or os.environ.get("ANTHROPIC_MODEL") or os.environ.get("CLAUDE_MODEL") or "unknown"
+    tool = args.tool or _ctx_value("last_session", "agent", "tool") \
+        or ("claude-code" if os.environ.get("CLAUDECODE") else None) \
+        or ("codex" if os.environ.get("CODEX_SANDBOX") else None) or "unknown"
+    host_os = args.host_os or _ctx_value("last_session", "host_os") or host_os_label()
+    # METH-121: domain 기본값 "meta" 금지 — 전 repo 로그가 meta 상수로 분류 무력화됐던 결함.
+    domain = args.domain or _ctx_value("project", "domain")
+    if not domain:
+        err("--domain 이 필요합니다 (.ai/context.json project.domain 미설정) — "
+            "예: fullstack, webapp, planning, meta(방법론 repo 자신일 때만)")
+        return 2
     stack_used = args.stack or ["python3", f"methodology@{METHODOLOGY_VERSION}"]
-    intents = args.intent or ["l1 observation capture"]
+    # METH-121: prompt_patterns 상용구 자동 주입 제거 — 실측 없으면 빈 배열이 정직하다.
+    # (프롬프팅 실측 블록은 METH-118에서 설계)
+    intents = args.intent or []
     rounds = args.rounds or [1 for _ in intents]
     if len(rounds) != len(intents):
         err("--rounds 개수는 --intent 개수와 같아야 합니다")
@@ -578,6 +648,8 @@ def cmd_observe(args: argparse.Namespace) -> int:
             err(item)
         return 1
     ok(f"observation created: {output.relative_to(METHODOLOGY_ROOT)}")
+    for w in observation_quality_warnings(output):
+        warn(w)
     return 0
 
 
@@ -1245,6 +1317,52 @@ def cmd_collect(args: argparse.Namespace) -> int:
     if apply and total_new:
         info(f"적재: {INBOX_DIR}/ — 트리아지(유효/이미 반영/만료)·분배는 사람. "
              "커밋은 ship 으로.")
+    return 0
+
+
+def cmd_maincheck(args: argparse.Namespace) -> int:
+    """커밋의 기본 브랜치(main) 도달 검증 — METH-120 (전수조사 P1).
+
+    스택-PR이 중간 브랜치로 머지되면 "PR 머지됨"이어도 main에는 코드가 없다
+    (6개 repo 실사고: insta-toon 13일 미도달·구버전 배포 등). TODO Done 전이·배포
+    판정 전에 이 명령으로 실제 도달을 확인한다. exit 0=전부 도달, 1=미도달 존재.
+    """
+    target = Path(args.path or ".").resolve()
+    if not args.no_fetch:
+        try:
+            subprocess.run(["git", "-C", str(target), "fetch", "-q", "origin"],
+                           check=True, capture_output=True, timeout=60)
+        except Exception:
+            warn("origin fetch 실패 — 로컬에 캐시된 원격 참조 기준으로 검사(신선도 주의)")
+    ref = _git_remote_default_ref(target)
+    if ref is None:
+        err("origin main/master 참조를 찾을 수 없음 — 원격 미설정이거나 fetch 필요")
+        return 1
+    shas = args.sha or ["HEAD"]
+    failed = 0
+    for s in shas:
+        try:
+            resolved = subprocess.check_output(
+                ["git", "-C", str(target), "rev-parse", "--verify", "--quiet", s],
+                text=True, stderr=subprocess.DEVNULL).strip()
+        except subprocess.CalledProcessError:
+            err(f"  {s}: 해석 불가한 커밋/참조")
+            failed += 1
+            continue
+        reached = subprocess.run(
+            ["git", "-C", str(target), "merge-base", "--is-ancestor", resolved, ref],
+            capture_output=True).returncode == 0
+        if reached:
+            ok(f"  {s} ({resolved[:8]}) → {ref} 도달 ✓")
+        else:
+            err(f"  {s} ({resolved[:8]}) → {ref} 미도달 ✗")
+            failed += 1
+    if failed:
+        err(f"maincheck 실패 — {failed}건 미도달. PR이 main으로 머지됐는지 `gh pr view`로 확인.")
+        err("스택-PR 금지 — 앞 PR 머지 후 main에서 새로 분기(CLAUDE.md §2). "
+            "미도달 상태로 TODO Done 처리 금지.")
+        return 1
+    ok(f"maincheck 통과 — {len(shas)}건 전부 {ref} 도달.")
     return 0
 
 
@@ -3652,6 +3770,15 @@ def main(argv: list[str] | None = None) -> int:
     pcl.add_argument("--no-fetch", dest="no_fetch", action="store_true",
                      help="origin fetch 생략 — 로컬 작업트리만 스캔")
     pcl.set_defaults(func=cmd_collect)
+
+    pmk = sub.add_parser(
+        "maincheck",
+        help="커밋의 main 도달 검증 — Done 전이·배포 판정 전 필수 (스택-PR 미도달 사고 방지, METH-120)",
+    )
+    pmk.add_argument("sha", nargs="*", help="검사할 커밋/참조 (기본: HEAD, 여러 개 가능)")
+    pmk.add_argument("--path", help="대상 repo (기본: 현재 디렉터리)")
+    pmk.add_argument("--no-fetch", dest="no_fetch", action="store_true", help="origin fetch 생략")
+    pmk.set_defaults(func=cmd_maincheck)
 
     args = p.parse_args(argv)
     return args.func(args)
