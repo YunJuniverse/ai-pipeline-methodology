@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-117 설계 확정 — 캡슐 outbox + 수동 일괄 수거** (2026-07-29) — 초안(상류 pull 스캔)을 사용자와 시각화·리스크 검토 거쳐 캡슐 outbox 안으로 교체, AC에 완화책 5종 반영. branch `chore/meth-117-capsule-outbox-design`, PR 대기. 구현 착수는 Backlog→Ready 승격 시. 직전: METH-117 백로그 등록(07-28, #113 머지)·METH-116 지침 22(07-25, #112 머지 — sync-all 전파 잔여).
+- **Working on**: **METH-116 전파 종결 — 11/11** (2026-07-29) — #114(METH-117 설계) 머지 후 지침 22 sync-all 전파 완료: main 6곳 직접·비-main 5곳 임시 worktree, 전부 origin ls-remote 검증. branch `chore/sync-propagate-meth-116`, PR 대기. 직전: METH-117 설계 확정(07-29, #114 머지)·METH-116 지침 22(#112 머지).
 - **Current mode**: fullstack
 - **Next TODO**: METH-116 PR 머지 → sync-all 전파(가이드 22·스켈레톤 = 상류 shared). 079~105 점검·정비 사이클 종료. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍. **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-29: **METH-116 sync-all 전파 종결 11/11 (Class A)** — 지침 22(IR·사업기획 덱)+README를 전 다운스트림 origin main에 반영·ls-remote 대조. main+clean 6곳 직접 커밋, 비-main 5곳 임시 worktree로 origin/main만 조작(활성 세션 무방해). ai-icons·invest-ops pre-push wrap 훅 차단 → 확립 절차 --no-verify(재발 마찰 friction 기록 — 승급 후보 원료). gamblescan 밀린 지침 07·CLAUDE/AGENTS 동반 캐치업. 스켈레톤은 init 경로라 sync 비전파(설계 정상). behind 표시 5곳은 로컬 피처브랜치 기준 cosmetic. grooman(타 호스트) 커버리지 밖.
 - 2026-07-29: **METH-117 설계 확정 — 캡슐 outbox 안 (Class A)** — 루프 시각화로 사용자와 설계 조정: 상류 pull 스캔 초안 → **다운스트림 outbox에 1제안=1캡슐 적재, 상류가 수동 트리거 `collect`로 일괄 수거** 안 채택(#113의 AC 전면 교체). 캡슐=포인터+요약(id·type·target·refs), git 동반 이동으로 타 호스트 조건부 커버. 리스크 6종 검토 — 수거 잊음(boot/sync-all 잔량 표시)·트리아지 병목(트리거 보수화+Catalog Review 합류)·sensitive(스캔 포함+발신 제한)·stale(유효/반영/만료 판정)·원격 전제(커버리지 밖 리포트) 완화책 AC 반영, 결과 피드백은 v1 제외. TODO만 변경.
 - 2026-07-28: **METH-117 백로그 등록 (Class A)** — 역방향 학습 루프 갭 확인(순방향 sync-all만 자동, `observation_files()` 로컬 한정, 지침 05·22 모두 수동 환류) → 역수거를 TODO 백로그화(#113).
 - 2026-07-25: **METH-116 IR·사업기획 덱 제작 지침 신설 (Class A)** — `icons-invest` IR 덱 v1→v4 제작 회고(리서치 3종·python-pptx 43장 빌드·멀티에이전트 실사 패널·100여 마찰 로그)를 방법론으로 환류. `20_guides/22_IR_사업기획_덱_제작_지침.md`(Deck-as-Code 5단계·디자인 계약 색3/타입6/강조예산·검증 게이트 4종+실사 패널·정직성 규율·함정 체크리스트) + 스켈레톤 `50_resources/skeletons/ir-deck-build/`(contract.py·build.py·textbook·panel-prompt, 스크래치 실행 검증). README §3.6 산출물 craft 신설. 지침 20의 덱 레이어 자매. branch-first(docs/guide-22-ir-deck-methodology).
 - 2026-07-24: **METH-115 sync-all 전파 종결 11/11 (Class A)** — #109 머지 후 전 다운스트림에 methodology.py(push 검증)+템플릿 sync·개별 커밋·push·origin HEAD 대조. 비-main 4곳 METH-106 절차. 잔여 2곳 후속 반영: icons는 활성 세션 무방해 **임시 worktree로 main만** 조작(도중 origin 전진=non-FF를 새 검증이 포착→rebase 재push), invest-ops는 원격 생성 확인 후 정상 sync. behind 표시는 라이브파일 커밋(#110) 탓 버전스탬프 cosmetic — payload 해시 동일.
-- 2026-07-24: **METH-115 ship push 반영 검증 (Class A)** — ai-icons에서 원격이 앞서간 상태의 push 거부를 ship이 exit code만 보고 "완료"로 오보(ICONS-365, 16커밋 유실·배포 정지). 다운스트림 패치(ICONS-366) 업스트림 이식: push 후 `ls-remote`로 origin HEAD ↔ 로컬 HEAD 대조, 불일치 시 fail+rebase 안내. shared_paths → 다음 sync-all 전파(ai-icons 기적용).
