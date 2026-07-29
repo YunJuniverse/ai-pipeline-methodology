@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "4cc047c6ffb0659df264086ab4f877d28191071c",
-  "last_validated_at": "2026-07-29T08:10:58Z",
+  "last_validated_commit": "ef80afaceb0ea13e0bfd9dc94f6875c4102ea03e",
+  "last_validated_at": "2026-07-29T08:22:51Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "bbb699d6ea62184c00477c047e21eb1f6d179072d80770b75d4abba61993315c"
+      "sha256": "b84953ebf8d56aa519c3a4118743c43a02cfcb857b0e0cdbb44a3f2ee008a880"
     },
     "TODO.md": {
-      "sha256": "cec829e0e26e033d38a3271484b71adc7e0d0660cb62f517102cbcc5ce7fd6b4"
+      "sha256": "9a95d75778374e7bc286eb48c578396b8a21267d96dba08043084e947df1eaed"
     },
     ".ai/checkpoint.md": {
-      "sha256": "80c7003036c90795e3ed7512f373f4d6d90a57de2fc33492570509ec2b8e2266"
+      "sha256": "d6d7260296ebe2d66d6813256735a214e02027866bd8b46fd280aaffe3ff26eb"
     }
   },
   "observations": {
@@ -139,6 +139,7 @@
       "50_resources/ai_observations/2026-07-29_meth-122-livefile-build-guards.md",
       "50_resources/ai_observations/2026-07-29_meth-125-127-sop-ci-facts.md",
       "50_resources/ai_observations/2026-07-29_meth-128-guide-22-capsule.md",
+      "50_resources/ai_observations/2026-07-29_meth-129-ai-design-guides.md",
       "50_resources/ai_observations/2026-07-29_monthly-audit-2026-07.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-guides-23-24.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
