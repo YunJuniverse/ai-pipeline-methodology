@@ -107,6 +107,7 @@ MANIFEST = {
     "shared_paths": [
         "00_briefs/_README.md",
         "00_briefs/standing/SOP_template.md",
+        "00_briefs/standing/SOP_scraping-pace.md",  # METH-125: 전 repo 공통 수집 페이스 SOP
         "20_guides",
         "50_resources/templates",
         "50_resources/prompts",

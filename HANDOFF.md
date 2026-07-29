@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **지침 23·24 종결 — 전파 11/11** (2026-07-29) — 전 repo가 검증 규범·착수 게이트 지침 획득. branch `chore/sync-propagate-guides-23-24`, PR 대기. 잔여 트리아지: METH-125(스크래핑 SOP)·126(CI 정합)·127(출처 규칙)·128(지침 22 보강). 직전: 지침 23·24 신설(#127 머지).
+- **Working on**: **METH-125+126+127 구현 완료** (2026-07-29) — 스크래핑 페이스 SOP(상류 standing·shared 등록)·지침 19 §11 CI-로컬 정합·지침 05 §9 사실 주장 규칙. branch `docs/meth-125-127-sop-ci-facts`, PR 대기. 머지 후 sync-all 전파 → 잔여는 METH-128(지침 22 보강)뿐. 직전: 지침 23·24 종결(#127·#128 머지).
 - **Current mode**: fullstack
 - **Next TODO**: 후속 후보(백로그 미등록): graph.json에 outbox/collect 노드·invest-ops `capsule_policy: restricted` 부여(그 repo 세션·ADR-0001 근거)·pre-push 훅 vs sync push 충돌 3회 재발 → thinktank 승급 후보. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-29: **METH-125+126+127 구현 (Class A)** — ① 스크래핑 페이스 SOP 상류 승급(`00_briefs/standing/SOP_scraping-pace.md`, shared_paths 등록 — 페널티 누적 실측·프로브≠회복·IP 교체 무효·폴백 사다리·신규 소스 3축 평가) ② 지침 19 v2 §11 CI-로컬 정합(CI 매니저 검증·packageManager 핀·lockfile 가드·런북=실측) ③ 지침 05 v2 §9 사실 주장·샘플 규칙(출처 없는 주장 라이브 금지·[샘플] 마킹·근거 등급). 전수조사 P7·P8·P11 승급.
 - 2026-07-29: **지침 23·24 전파 종결 11/11 (Class A)** — #127 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. METH-123·124 Done(maincheck ✓). 트리아지 채택 12건 중 **10건 종결**(118~124) — 잔여 METH-125~128 + RFC-003 관찰.
 - 2026-07-29: **지침 23·24 신설 (Class A, METH-123·124)** — 전수조사 잔여 P 패턴 승급: **23 검증 규범**(무음 실패 4규칙 — 0건=실패·검사불능≠깨끗함·가드 negative case·리드백 / 내용 기준 검증 3기준 / 검증불가 등록부+우회 사다리+비-포인터 대안), **24 착수 게이트**(정본 사용자 확인·조사 진단 코드 재검증·반증 대조군·해석 계약·사용자 경계 원문 검증 + 상황별 질문표). 각 규칙에 실사고 계보 명기. README §3.6·이력 v4.2.
 - 2026-07-29: **METH-118 구현 — 프롬프팅 코칭 루프 (Class A)** — 사용자 요청분("두루뭉술 지시를 스스로 교정할 데이터·리포트"). observe `--rounds-total`(상시 의무)·`--prompting`(교환별: intent·rounds·모호발췌≤200자·교정안·용어·상황태그) → **wrap이 `50_resources/prompting-report.md` 자동 재생성**(요지·라운드 추이·모호→교정·용어 사전·상황 플레이북·토큰 프록시+PostHog 확장 포인트) → boot 헤드라인 표시. 판단은 wrap 시 세션 AI(맥락 있는 유일 시점)·원문 저장 금지·교차-repo v1 제외 명시. ship sensitive가 관찰로그 내용 스캔. tests 7종.
-- 2026-07-29: **METH-122 구현 — 라이브 파일·빌드 가드 (Class A)** — ① `rotate`: TODO Done(4건)·HANDOFF Recent(5건) 초과분을 `40_dev/snapshots/live-archive/`로 기계 이관(삭제 아님·dry-run 기본), --checkpoint는 전체 사본+상단 40줄 유지 ② wrap --strict가 경성 한도(규정 2배·Done 20건) 초과를 fail — rotate가 탈출구(cafe24 342KB·gamblescan 761줄 재발 방지) ③ boot 신선도 경고: HANDOFF 날짜·wrap 미실행이 최근 커밋 대비 7일+ 뒤처지면 표시(insta-toon 13일 stale 무경고 재발 방지) ④ ship build 전 dev 서버 감지 차단 + `build-guard.sh`(shared, ai-icons 7회 재발 강제 차단) ⑤ CLAUDE/AGENTS 외부 게이트=Blocked 강제 규칙. tests/test_rotate_guards.py 6종+회귀 통과.
 - 2026-07-29: **METH-120+121 전파 종결 11/11 (Class A)** — #121 머지 후 sync-all: main+clean 5곳 직접, 비-main 3곳+dirty 3곳(icons·icons-invest·lifeManager — 활성 세션 무방해)은 임시 worktree로 origin/main만 반영, 전부 ls-remote 대조. 전 repo가 `maincheck`(Done 전이·배포 게이트)와 observe 스키마 강제(repeat_of enum·메타 자동 채움·domain 필수)를 획득 — 전수조사 P1·P2 결함이 전 다운스트림에서 구조적으로 차단됨. Done 이동은 maincheck 자가 검증(04535d0d ✓, dogfood). 훅 차단 2곳(ai-icons·invest-ops) --no-verify 확립 절차.

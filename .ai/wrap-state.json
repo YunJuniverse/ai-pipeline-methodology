@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "a79ef4f88f5396413d58b711519ca0000c44d481",
-  "last_validated_at": "2026-07-29T07:22:29Z",
+  "last_validated_commit": "f05ddd51292e6491ddc94db9a9ea3fe0614c4dca",
+  "last_validated_at": "2026-07-29T07:29:45Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "7a552a49dcfde483b86832376e4ac17362e875f50f397b07b3ef19dd4975de34"
+      "sha256": "ec746d178914f941b57038f9c7c9cff377c5f38123c0391c938e07f76b98f025"
     },
     "TODO.md": {
-      "sha256": "1f2029b14d81b159059479acc8d5b2290d11f24dd3ef61b92f51352ae9d5bfb3"
+      "sha256": "5000d2db92583ace004c9c9cbe148960e1dfa8682f9c999b68dc340f2daaa02a"
     },
     ".ai/checkpoint.md": {
-      "sha256": "8a1f2b08176e2d7f98b71b822a994af6502f1df14c2faf3535f6838895531c94"
+      "sha256": "3f153c03ca1a263b842ecd4eca6698309cb423048a37a7a8936876450382825e"
     }
   },
   "observations": {
@@ -136,6 +136,7 @@
       "50_resources/ai_observations/2026-07-29_meth-119-triage-register.md",
       "50_resources/ai_observations/2026-07-29_meth-120-121-guards-impl.md",
       "50_resources/ai_observations/2026-07-29_meth-122-livefile-build-guards.md",
+      "50_resources/ai_observations/2026-07-29_meth-125-127-sop-ci-facts.md",
       "50_resources/ai_observations/2026-07-29_monthly-audit-2026-07.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-guides-23-24.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
