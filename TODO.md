@@ -17,18 +17,6 @@
   - [ ] 코드 폴더 관례 감지(예: `app/` 존재 시 빈 `src/` 생성 생략)
 - **notes**: grooman(11번째 다운스트림) 적용 시 임시 staging init 후 수동 복사·병합으로 우회한 마찰에서 도출. 관찰로그 `2026-07-21_grooman-methodology-bootstrap.md`(friction: init-nonempty-refusal) 참조. 기존 앱을 방법론으로 편입하는 수요가 재발하면 승급.
 
-### METH-118 · 프롬프팅 코칭 루프 — 상시 자동 기록 + 자동 갱신 리포트
-- **mode**: fullstack
-- **change-class**: A
-- **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] **상시 기록(자동·의무)**: wrap 의무에 프롬프팅 관찰 추가 — observe 스키마 `prompting:` 블록 확장(세션 총 라운드 수 + 교환별: intent·rounds·두루뭉술 지시 *발췌*+교정안 쌍·몰라서 비용 든 용어·상황 태그 예 `webpage-design-choice`·재지시 패턴). 피드백 가치 없는 세션은 minimal(rounds만) — CLI가 형식 강제. **원문 전체 저장 금지**(발췌만 — 볼륨·sensitive 반경), sensitive 스캔 대상
-  - [ ] **판단 시점 정의**: 질적 판단(교정안·용어·상황 태그)은 wrap 시 그 세션 AI가 생성(맥락이 있는 유일한 시점) — 뒷단 배치 아님을 문서에 명시. 결정적 집계는 CLI만
-  - [ ] **`prompt-report` 명령 + 자동 갱신**: 살아있는 리포트 파일 재생성 — 반복 모호 패턴 통계(빈도순)·배울 용어 사전·상황별 프롬프트 플레이북·라운드 수 추이·토큰 적정성(v1 프록시=라운드·재지시 수). **wrap 파이프라인이 기록 후 자동 재생성** → 세션 종료마다 최신. boot가 리포트 헤드라인 1줄 표시
-  - [ ] **토큰 실측(옵션 게이트)**: v1은 프록시. PostHog LLM Analytics(`llma-cc-setup`) 연동 시 리포트가 실측 토큰을 읽는 확장 포인트만 설계(구현은 후속)
-  - [ ] **교차-repo 통합은 v1 제외 명시**: 리포트는 repo 로컬. 통합 리포트는 collect 인프라 확장 후속(사용자 단위 데이터라 통합 가치 큼 — 재논의 트리거를 notes에 기록)
-- **notes**: 2026-07-29 사용자 요청 — "전문용어를 몰라 지시가 길어지거나 핑퐁이 늘어나는 걸 스스로 교정할 데이터·리포트가 필요. 즉시 피드백보다 **언제나 남겨질 기록으로 뒷단에서 알아서 판단한 뒤 리포트 자동 업데이트**"(상시 기록이 확정 방향). 마찰 루프와 동형의 코칭 루프(L1 기록→집계→사람 교정). 발판: observe `prompt_patterns`(intent·success·rounds)가 이미 있으나 형식적 사용 — 이걸 확장. 정직한 한계 합의: 토큰 실측은 세션 내 불가(프록시로 시작), 원문 저장은 발췌로 제한. 사용자 선호는 도구 메모리(`prompting-feedback-preference`)에 별도 저장(즉시 피드백은 언제든 가능). **METH-121(observe 스키마 강제)과 통합 구현 예정(METH-119 트리아지).**
-
 ### METH-123 · 지침 23 신설 — 검증 규범 (무음 실패·빈 상태·검증불가 등록부)
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
@@ -77,6 +65,18 @@
 
 
 
+
+### METH-118 · 프롬프팅 코칭 루프 — 상시 자동 기록 + 자동 갱신 리포트
+- **mode**: fullstack
+- **change-class**: A
+- **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] **상시 기록(자동·의무)**: wrap 의무에 프롬프팅 관찰 추가 — observe 스키마 `prompting:` 블록 확장(세션 총 라운드 수 + 교환별: intent·rounds·두루뭉술 지시 *발췌*+교정안 쌍·몰라서 비용 든 용어·상황 태그 예 `webpage-design-choice`·재지시 패턴). 피드백 가치 없는 세션은 minimal(rounds만) — CLI가 형식 강제. **원문 전체 저장 금지**(발췌만 — 볼륨·sensitive 반경), sensitive 스캔 대상
+  - [x] **판단 시점 정의**: 질적 판단(교정안·용어·상황 태그)은 wrap 시 그 세션 AI가 생성(맥락이 있는 유일한 시점) — 뒷단 배치 아님을 문서에 명시. 결정적 집계는 CLI만
+  - [x] **`prompt-report` 명령 + 자동 갱신**: 살아있는 리포트 파일 재생성 — 반복 모호 패턴 통계(빈도순)·배울 용어 사전·상황별 프롬프트 플레이북·라운드 수 추이·토큰 적정성(v1 프록시=라운드·재지시 수). **wrap 파이프라인이 기록 후 자동 재생성** → 세션 종료마다 최신. boot가 리포트 헤드라인 1줄 표시
+  - [x] **토큰 실측(옵션 게이트)**: v1은 프록시. PostHog LLM Analytics(`llma-cc-setup`) 연동 시 리포트가 실측 토큰을 읽는 확장 포인트만 설계(구현은 후속)
+  - [x] **교차-repo 통합은 v1 제외 명시**: 리포트는 repo 로컬. 통합 리포트는 collect 인프라 확장 후속(사용자 단위 데이터라 통합 가치 큼 — 재논의 트리거를 notes에 기록)
+- **notes**: 2026-07-29 사용자 요청 — "전문용어를 몰라 지시가 길어지거나 핑퐁이 늘어나는 걸 스스로 교정할 데이터·리포트가 필요. 즉시 피드백보다 **언제나 남겨질 기록으로 뒷단에서 알아서 판단한 뒤 리포트 자동 업데이트**"(상시 기록이 확정 방향). 마찰 루프와 동형의 코칭 루프(L1 기록→집계→사람 교정). 발판: observe `prompt_patterns`(intent·success·rounds)가 이미 있으나 형식적 사용 — 이걸 확장. 정직한 한계 합의: 토큰 실측은 세션 내 불가(프록시로 시작), 원문 저장은 발췌로 제한. 사용자 선호는 도구 메모리(`prompting-feedback-preference`)에 별도 저장(즉시 피드백은 언제든 가능). **METH-121(observe 스키마 강제)과 통합 구현 예정(METH-119 트리아지).** **2026-07-29 구현 완료(PR 대기, METH-121 잔여분 통합)**: observe `--rounds-total`(상시 의무)·`--prompting "intent|rounds|모호발췌(≤200자 가드)|교정안|용어|상황태그"`(교환별), prompting 프론트매터 블록 렌더/파서, `prompt-report` 명령 + **wrap 자동 재생성**(`50_resources/prompting-report.md`: 요지·라운드 추이·모호→교정 목록·용어 사전·상황 플레이북·토큰 프록시+PostHog 확장 포인트) + boot 헤드라인. 판단 시점(wrap 세션 AI)·v1 스코프(교차-repo 제외) 리포트 헤더 명시. ship sensitive가 관찰로그 내용도 스캔. CLAUDE/AGENTS wrap 규칙에 상시 기록 의무 추가. tests 7종.
 ## Blocked
 
 ## Done

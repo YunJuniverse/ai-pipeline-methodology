@@ -56,6 +56,10 @@ Commands
       Recent Changes(5건 유지) 초과분을 40_dev/snapshots/live-archive/ 로 이관.
       wrap --strict 는 규정 2배 초과를 fail 시키며, rotate 가 탈출구다 (METH-122).
 
+  methodology prompt-report
+      프롬프팅 코칭 리포트를 재생성한다 (METH-118). wrap 이 자동 호출하므로
+      보통은 직접 부를 일이 없다 — 산출: 50_resources/prompting-report.md.
+
 Classification
 --------------
   shared          — sync가 항상 덮어쓴다 (20_guides/, 50_resources/, 그래프, 대시보드)
@@ -203,6 +207,10 @@ INSIGHTS_DIR = Path("40_dev/snapshots/insights")
 OBSERVATION_TASK_TYPES = {"bootstrap", "feature", "bugfix", "refactor", "research", "docs"}
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 OBSERVATION_FILE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}_[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
+
+# METH-118 프롬프팅 코칭 루프 — 상시 기록(wrap)·자동 갱신 리포트
+PROMPTING_VAGUE_MAX = 200  # 발췌 상한 — 원문 전체 저장 금지(볼륨·sensitive 반경)
+PROMPT_REPORT_PATH = Path("50_resources/prompting-report.md")
 
 # METH-117 역방향 루프 — 캡슐 outbox(다운스트림 발신) / _inbox(상류 수거함)
 OUTBOX_DIR = Path("50_resources/meth_outbox")
@@ -388,6 +396,36 @@ def normalize_repeat_of(raw: str) -> str | None:
     return value
 
 
+def parse_prompting_item(raw: str) -> dict:
+    """--prompting 'intent|rounds|모호발췌|교정안|용어(콤마)|상황태그' 파싱 (METH-118).
+
+    모호발췌·교정안·용어·상황태그는 빈칸 허용. 발췌는 200자 상한(원문 덤프 금지).
+    """
+    parts = raw.split("|")
+    if len(parts) != 6:
+        raise ValueError("--prompting 형식은 'intent|rounds|모호발췌|교정안|용어(콤마)|상황태그' 입니다")
+    intent, rounds, vague, correction, terms, situation = [p.strip() for p in parts]
+    if not intent:
+        raise ValueError("prompting intent는 비울 수 없습니다")
+    try:
+        rounds_n = int(rounds)
+    except ValueError as exc:
+        raise ValueError("prompting rounds는 정수여야 합니다") from exc
+    if len(vague) > PROMPTING_VAGUE_MAX:
+        raise ValueError(
+            f"모호 지시 발췌가 {len(vague)}자 — {PROMPTING_VAGUE_MAX}자 상한(원문 전체 저장 금지, 핵심 구절만)")
+    if situation and not SLUG_RE.match(situation):
+        raise ValueError("상황태그는 kebab-case (예: webpage-design-choice)")
+    return {
+        "intent": intent,
+        "rounds": rounds_n,
+        "vague": vague or None,
+        "correction": correction or None,
+        "terms": [t.strip() for t in terms.split(",") if t.strip()],
+        "situation": situation or None,
+    }
+
+
 def parse_friction_item(raw: str, index: int) -> dict:
     parts = raw.split("|")
     if len(parts) != 4:
@@ -447,6 +485,28 @@ def render_observation(payload: dict) -> str:
             ])
     else:
         lines.append("prompt_patterns: []")
+
+    # METH-118 프롬프팅 코칭 블록 — 판단(교정안·용어·상황)은 wrap 시 그 세션 AI가 생성
+    prompting = payload.get("prompting") or {}
+    if prompting.get("rounds_total") is not None or prompting.get("exchanges"):
+        lines.append("prompting:")
+        if prompting.get("rounds_total") is not None:
+            lines.append(f"  rounds_total: {prompting['rounds_total']}")
+        exchanges = prompting.get("exchanges") or []
+        if exchanges:
+            lines.append("  exchanges:")
+            for ex in exchanges:
+                lines.append(f"    - intent: {yaml_scalar(ex['intent'])}")
+                lines.append(f"      rounds: {ex['rounds']}")
+                if ex.get("vague"):
+                    lines.append(f"      vague: {yaml_scalar(ex['vague'])}")
+                if ex.get("correction"):
+                    lines.append(f"      correction: {yaml_scalar(ex['correction'])}")
+                if ex.get("terms"):
+                    lines.append("      terms:")
+                    lines.extend(f"        - {yaml_scalar(t)}" for t in ex["terms"])
+                if ex.get("situation"):
+                    lines.append(f"      situation: {ex['situation']}")
 
     lines.extend([
         "---",
@@ -526,6 +586,9 @@ def observation_quality_warnings(path: Path) -> list[str]:
         warnings.append("domain=meta — 방법론 repo 자신이 아니면 실제 도메인(fullstack 등)을 지정")
     if 'intent: "l1 observation capture"' in text:
         warnings.append("prompt_patterns가 상용구 — 실측 아니면 비워두는 편이 정직(METH-118 예정)")
+    if "\nprompting:" not in text:
+        warnings.append("prompting 미기록 — 세션 라운드 수(--rounds-total)는 상시 기록 의무(METH-118), "
+                        "교정 가치 있으면 --prompting 'intent|rounds|모호발췌|교정안|용어|상황태그'")
     return warnings
 
 
@@ -621,6 +684,13 @@ def cmd_observe(args: argparse.Namespace) -> int:
         err(str(exc))
         return 2
 
+    try:
+        exchanges = [parse_prompting_item(raw) for raw in (args.prompting or [])]
+    except ValueError as exc:
+        err(str(exc))
+        return 2
+    prompting = {"rounds_total": args.rounds_total, "exchanges": exchanges}
+
     date_part = args.date or utc_date()
     session_id = f"{date_part}_{args.slug}"
     output = _observation_dir(METHODOLOGY_ROOT) / f"{session_id}.md"
@@ -640,6 +710,7 @@ def cmd_observe(args: argparse.Namespace) -> int:
         "friction": friction,
         "prompt_patterns": intents,
         "rounds": rounds,
+        "prompting": prompting,
         "summary": args.summary,
         "created_at": utc_stamp(),
     }
@@ -976,6 +1047,154 @@ def _thinktank_capsule_section() -> list[str]:
     lines.append("")
     lines.append("> 트리아지 판정(유효/이미 반영/만료)·분배는 사람 — `50_resources/meth_inbox/_README.md`.")
     return lines
+
+
+# ─── METH-118 프롬프팅 코칭 — 집계·리포트 ───────────────────────────────────
+# 판단 시점 정의: 질적 판단(모호 발췌·교정안·용어·상황 태그)은 wrap 시 *그 세션의 AI*가
+# 생성한다 — 대화 맥락이 있는 유일한 시점이기 때문. 뒷단 배치가 아니다.
+# 이 모듈은 그 기록의 *결정적 집계*만 담당한다. 리포트는 wrap 이 자동 재생성한다.
+
+
+def parse_prompting_block(text: str) -> dict | None:
+    """관찰 파일에서 prompting 블록 파싱 — render_observation 이 쓰는 형식 전제."""
+    m = re.search(r"^prompting:\s*$\n(.*?)(?=^[a-z_]+:|^---)", text, re.MULTILINE | re.DOTALL)
+    if not m:
+        return None
+    block = m.group(1)
+    out: dict = {"rounds_total": None, "exchanges": []}
+    rt = re.search(r"^\s{2}rounds_total:\s*(\d+)", block, re.MULTILINE)
+    if rt:
+        out["rounds_total"] = int(rt.group(1))
+    for ex_raw in re.split(r"(?=^\s{4}- intent:)", block, flags=re.MULTILINE):
+        im = re.search(r"^\s{4}- intent:\s*\"?(.*?)\"?\s*$", ex_raw, re.MULTILINE)
+        if not im:
+            continue
+        ex = {"intent": im.group(1), "rounds": 1, "vague": None, "correction": None,
+              "terms": [], "situation": None}
+        for key in ("rounds", "vague", "correction", "situation"):
+            km = re.search(rf"^\s{{6}}{key}:\s*\"?(.*?)\"?\s*$", ex_raw, re.MULTILINE)
+            if km:
+                ex[key] = int(km.group(1)) if key == "rounds" else km.group(1)
+        ex["terms"] = re.findall(r"^\s{8}-\s*\"?(.*?)\"?\s*$", ex_raw, re.MULTILINE)
+        out["exchanges"].append(ex)
+    return out
+
+
+def collect_prompting_entries(target: Path) -> list[dict]:
+    entries: list[dict] = []
+    for rel in list_observation_files(target):
+        p = target / rel
+        text = read_text(p)
+        block = parse_prompting_block(text)
+        if not block:
+            continue
+        dm = re.match(r"(\d{4}-\d{2}-\d{2})_", p.name)
+        entries.append({"session_id": p.stem, "date": dm.group(1) if dm else "?", **block})
+    return sorted(entries, key=lambda e: e["date"])
+
+
+def build_prompt_report(entries: list[dict], generated_at: str) -> str:
+    """프롬프팅 코칭 리포트 생성 — 살아있는 파일(wrap 이 재생성). 결정적 집계만."""
+    sessions = len(entries)
+    totals = [e["rounds_total"] for e in entries if e.get("rounds_total") is not None]
+    exchanges = [ex for e in entries for ex in e["exchanges"]]
+    corrections = [ex for ex in exchanges if ex.get("vague") or ex.get("correction")]
+    terms: dict[str, int] = {}
+    for ex in exchanges:
+        for t in ex.get("terms") or []:
+            terms[t] = terms.get(t, 0) + 1
+    situations: dict[str, list[dict]] = {}
+    for ex in exchanges:
+        if ex.get("situation"):
+            situations.setdefault(ex["situation"], []).append(ex)
+    redo = [ex for ex in exchanges if (ex.get("rounds") or 1) >= 3]
+    avg = f"{sum(totals) / len(totals):.1f}" if totals else "-"
+
+    lines = [
+        "# 프롬프팅 코칭 리포트",
+        "",
+        f"> 생성: {generated_at} — **wrap 이 자동 재생성하는 살아있는 파일**(직접 편집 금지).",
+        "> 판단(발췌·교정안·용어·상황)은 각 세션 AI가 wrap 시 기록, 여기서는 결정적 집계만.",
+        "> v1 스코프: 토큰은 프록시(라운드·재지시 수), 교차-repo 통합 제외(repo 로컬).",
+        "",
+        f"> 요지: 기록 세션 {sessions}건 · 평균 라운드 {avg} · 교정 사례 {len(corrections)}건 · 용어 {len(terms)}개 · 재지시(3라운드+) {len(redo)}건",
+        "",
+        "## 라운드 추이 (세션별)",
+        "",
+    ]
+    by_date: dict[str, list[int]] = {}
+    for e in entries:
+        if e.get("rounds_total") is not None:
+            by_date.setdefault(e["date"], []).append(e["rounds_total"])
+    if by_date:
+        lines.append("| 날짜 | 세션 | 평균 라운드 |")
+        lines.append("|---|---:|---:|")
+        for d in sorted(by_date)[-14:]:
+            vals = by_date[d]
+            lines.append(f"| {d} | {len(vals)} | {sum(vals) / len(vals):.1f} |")
+    else:
+        lines.append("(rounds_total 기록 없음 — wrap 시 `--rounds-total` 로 기록)")
+    lines += ["", "## 모호 지시 → 교정안 (최근순)", ""]
+    if corrections:
+        for ex in corrections[-20:][::-1]:
+            lines.append(f"- **{ex['intent']}** ({ex.get('rounds', '?')}라운드"
+                         + (f", `{ex['situation']}`" if ex.get("situation") else "") + ")")
+            if ex.get("vague"):
+                lines.append(f"  - 모호: “{ex['vague']}”")
+            if ex.get("correction"):
+                lines.append(f"  - 교정: {ex['correction']}")
+    else:
+        lines.append("(아직 없음)")
+    lines += ["", "## 배우면 좋은 용어 사전", ""]
+    if terms:
+        for t, c in sorted(terms.items(), key=lambda kv: (-kv[1], kv[0])):
+            lines.append(f"- **{t}** — {c}회 등장")
+    else:
+        lines.append("(아직 없음)")
+    lines += ["", "## 상황별 플레이북", ""]
+    if situations:
+        for tag, exs in sorted(situations.items(), key=lambda kv: -len(kv[1])):
+            lines.append(f"### `{tag}` ({len(exs)}회)")
+            for ex in exs[-5:]:
+                if ex.get("correction"):
+                    lines.append(f"- {ex['correction']}")
+            lines.append("")
+    else:
+        lines.append("(아직 없음)")
+    lines += [
+        "## 토큰 적정성 (v1 프록시)",
+        "",
+        f"- 총 라운드 {sum(totals) if totals else 0} · 세션 평균 {avg} · 재지시(3라운드+) {len(redo)}건",
+        "- 프록시 한계: 세션 내 AI는 토큰 실측 불가 — 라운드·재지시 수가 대리 지표.",
+        "- 확장 포인트: PostHog LLM Analytics(`llma-cc-setup`) 연동 시 이 섹션이 실측 토큰을 읽도록 교체(METH-118 AC ④).",
+        "",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _regenerate_prompt_report(target: Path) -> bool:
+    """prompting 기록이 있으면 리포트 재생성. 갱신 여부 반환 — wrap 파이프라인용."""
+    entries = collect_prompting_entries(target)
+    if not entries:
+        return False
+    content = build_prompt_report(entries, utc_stamp())
+    out = target / PROMPT_REPORT_PATH
+    if out.exists() and read_text(out) == content:
+        return False
+    write_text(out, content)
+    return True
+
+
+def cmd_prompt_report(args: argparse.Namespace) -> int:
+    target = Path(args.path or ".").resolve()
+    entries = collect_prompting_entries(target)
+    if not entries:
+        warn("prompting 기록이 없음 — wrap 시 observe --rounds-total/--prompting 으로 기록하면 쌓인다.")
+        return 0
+    content = build_prompt_report(entries, utc_stamp())
+    write_text(target / PROMPT_REPORT_PATH, content)
+    ok(f"prompting report: {PROMPT_REPORT_PATH} (세션 {len(entries)}건 집계)")
+    return 0
 
 
 # ─── METH-117 역방향 루프 — 캡슐 outbox / collect ───────────────────────────
@@ -2196,9 +2415,12 @@ def _detect_sensitive(target: Path) -> list[str]:
                 hits.append(path)
                 break
         else:
-            if low.startswith(str(OUTBOX_DIR).lower() + "/") and low.endswith(".md") \
-                    and _capsule_content_hits(target, path):
-                hits.append(f"{path} (캡슐 내용에 시크릿 의심 패턴)")
+            content_scanned = (
+                low.startswith(str(OUTBOX_DIR).lower() + "/")
+                or low.startswith(str(OBSERVATION_DIR).lower() + "/")  # METH-118: 발췌 포함 가능
+            )
+            if content_scanned and low.endswith(".md") and _capsule_content_hits(target, path):
+                hits.append(f"{path} (내용에 시크릿 의심 패턴)")
     return hits
 
 
@@ -3387,6 +3609,13 @@ def cmd_wrap(args: argparse.Namespace) -> int:
     for w in size_warns:
         warn(f"사이즈: {w}")
 
+    # ── 프롬프팅 리포트 자동 갱신 (METH-118) — 기록이 있으면 wrap 마다 최신화 ──
+    try:
+        if _regenerate_prompt_report(target):
+            info(f"prompting report 갱신: {PROMPT_REPORT_PATH}")
+    except Exception as exc:  # 리포트 실패가 wrap 을 막으면 안 됨
+        warn(f"prompting report 갱신 실패(무시): {exc}")
+
     # ── 경성 한도 (METH-122) — 규정 2배 초과는 --strict fail (탈출구: rotate) ──
     hard = live_file_hard_violations(target)
     for v in hard:
@@ -3514,6 +3743,13 @@ def cmd_boot(args: argparse.Namespace) -> int:
     # [4a] 신선도 (METH-122 — HANDOFF 날짜·wrap 미실행 vs 최근 커밋)
     for w in staleness_warnings(target):
         warn(w)
+
+    # [4a-2] 프롬프팅 코칭 헤드라인 (METH-118)
+    pr = target / PROMPT_REPORT_PATH
+    if pr.exists():
+        hm = re.search(r"^> 요지: (.+)$", read_text(pr), re.MULTILINE)
+        if hm:
+            print(f"    프롬프팅: {hm.group(1)} → {PROMPT_REPORT_PATH}")
 
     # [4b] 캡슐 outbox 가시성 (METH-117 — 수거 잊음 방지)
     own_capsules = capsule_files(target)
@@ -3920,6 +4156,10 @@ def main(argv: list[str] | None = None) -> int:
     po.add_argument("--intent", action="append", help="프롬프트 intent. 여러 번 지정 가능")
     po.add_argument("--rounds", action="append", type=int, help="각 intent의 turn 수. --intent와 같은 개수")
     po.add_argument("--friction", action="append", help="'where|cost_minutes|resolution|repeat_of' 형식. 여러 번 지정 가능")
+    po.add_argument("--rounds-total", dest="rounds_total", type=int,
+                    help="세션 총 핑퐁 라운드 수 — 상시 기록 의무 (METH-118)")
+    po.add_argument("--prompting", action="append",
+                    help="'intent|rounds|모호발췌|교정안|용어(콤마)|상황태그' — 교정 가치 있는 교환별 기록, 여러 번 가능")
     po.add_argument("--date", help="UTC 날짜 YYYY-MM-DD (기본: 오늘 UTC)")
     po.add_argument("--force", action="store_true", help="동일 파일이 있으면 덮어쓰기")
     po.add_argument("--dry-run", action="store_true", help="파일을 쓰지 않고 출력")
@@ -4003,6 +4243,13 @@ def main(argv: list[str] | None = None) -> int:
     prt.add_argument("--checkpoint", action="store_true",
                      help="checkpoint 도 회전(전체 사본 아카이브 + 상단 요지 유지)")
     prt.set_defaults(func=cmd_rotate)
+
+    ppr = sub.add_parser(
+        "prompt-report",
+        help="프롬프팅 코칭 리포트 재생성 (METH-118) — wrap 이 자동 호출, 수동 재생성용",
+    )
+    ppr.add_argument("--path", help="대상 폴더 (기본: 현재)")
+    ppr.set_defaults(func=cmd_prompt_report)
 
     args = p.parse_args(argv)
     return args.func(args)
