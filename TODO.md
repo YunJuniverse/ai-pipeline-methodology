@@ -17,6 +17,15 @@
   - [ ] 코드 폴더 관례 감지(예: `app/` 존재 시 빈 `src/` 생성 생략)
 - **notes**: grooman(11번째 다운스트림) 적용 시 임시 staging init 후 수동 복사·병합으로 우회한 마찰에서 도출. 관찰로그 `2026-07-21_grooman-methodology-bootstrap.md`(friction: init-nonempty-refusal) 참조. 기존 앱을 방법론으로 편입하는 수요가 재발하면 승급.
 
+### METH-129 · AI 디자인 방법론 제정 — 리서치 완료, 구성안 확정 대기
+- **mode**: planning → fullstack
+- **change-class**: A (지침 신설·보강)
+- **owner**: Human(구성안 확정) + AI(작성)
+- **acceptance criteria**:
+  - [ ] 구성안 확정(사람): 스냅샷 §6 — 지침 25(AI 디자인 공통 규범)·26(이미지·캐릭터 에셋)·27(영상) 신설 + 지침 20 v2·22 v3 보강 + 스켈레톤 `ai-asset-pipeline` — 채택/조정
+  - [ ] 확정분 작성 → 전파 (기존 PR 사이클)
+- **notes**: 2026-07-29 사용자 지시로 4개 도메인(영상·이미지·PPT·웹디자인) 병렬 웹리서치(에이전트 4기·1차 출처 확인). 정본: `40_dev/snapshots/2026-07-29_AI디자인-방법론-리서치.md` — 교차 공통 원칙 9종(§0)·도메인 요지·기존 자산 접속 지도(§5)·구성안(§6). 핵심 발견: 벤더 소멸 3건(Sora·Tome·Galileo — 모델 추상화 필수), Deck-as-Code 학계 검증(AutoPresent·Design-First), AI기본법 표시 의무(2026-01 시행), Midjourney 소송 리스크, LoRA 승급 사다리, DTCG 안정판+shadcn registry(12 repo 단일 배포 가능). 지형 변화 빠름 — 분기 재검증 권장.
+
 ## Ready
 
 ## InProgress
