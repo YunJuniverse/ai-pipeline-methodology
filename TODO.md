@@ -55,19 +55,8 @@
 
 
 
-### METH-123 · 지침 23 신설 — 검증 규범 (무음 실패·빈 상태·검증불가 등록부)
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [x] P4: 0건 처리=실패 sanity assert · 검사 못 함≠깨끗함(대상 0개 exit 1) · 금지형 가드 negative case 주입 증명 · 빌드 통과≠산출물 정상(리드백/grep)
-  - [x] P9: 비어있지 않은 데이터로·최대 표시 크기로·존재가 아닌 내용/가시성 어서션으로 검증
-  - [x] P12: 검증불가 등록부(무엇을·왜·대체 검증·확인 요청 대상) + 드래그/업로드 UI 비-포인터 대안 규칙
-- **notes**: 전수조사 P4(6곳)+P9(5곳)+P12(4곳) 통합 지침. **2026-07-29 구현 완료(PR 대기)**: `20_guides/23_검증_규범.md` 신설 — 무음 실패 4규칙·내용 기준 검증 3기준·검증불가 등록부(4필드+우회 사다리). README §3.6·이력 v4.2.
 
-### METH-124 · 지침 24 신설 — 착수 게이트 (정본·전제·해석 확인)
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [x] 과거 사실 기록물은 "무엇이 정본인가" 사용자 확인 선행 / 조사 스냅샷 진단은 착수 시점 코드로 재확인 / 시안·요청 해석 계약(정확 구현 vs 참고) 첫 질문 / 사용자가 그은 경계는 거절 전 원문 검증
-- **notes**: 전수조사 P5(5곳) — 최고 단일 비용군(ai-icons 195분·gamblescan 90분·80분). **2026-07-29 구현 완료(PR 대기)**: `20_guides/24_착수_게이트.md` 신설 — 정본 확인·진단 재검증(반증 대조군)·해석 계약·경계 원문 검증 + 상황별 질문표.
+
 ## Blocked
 
 ## Done
@@ -75,6 +64,20 @@
 
 
 
+
+### METH-123 · 지침 23 신설 — 검증 규범 (무음 실패·빈 상태·검증불가 등록부)
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] P4: 0건 처리=실패 sanity assert · 검사 못 함≠깨끗함(대상 0개 exit 1) · 금지형 가드 negative case 주입 증명 · 빌드 통과≠산출물 정상(리드백/grep)
+  - [x] P9: 비어있지 않은 데이터로·최대 표시 크기로·존재가 아닌 내용/가시성 어서션으로 검증
+  - [x] P12: 검증불가 등록부(무엇을·왜·대체 검증·확인 요청 대상) + 드래그/업로드 UI 비-포인터 대안 규칙
+- **notes**: 전수조사 P4(6곳)+P9(5곳)+P12(4곳) 통합 지침. **2026-07-29 구현 완료(PR 대기)**: `20_guides/23_검증_규범.md` 신설 — 무음 실패 4규칙·내용 기준 검증 3기준·검증불가 등록부(4필드+우회 사다리). README §3.6·이력 v4.2. **머지(#127)·전파(07-29) 종결 11/11**(maincheck 01f11071 ✓).
+
+### METH-124 · 지침 24 신설 — 착수 게이트 (정본·전제·해석 확인)
+- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
+- **acceptance criteria**:
+  - [x] 과거 사실 기록물은 "무엇이 정본인가" 사용자 확인 선행 / 조사 스냅샷 진단은 착수 시점 코드로 재확인 / 시안·요청 해석 계약(정확 구현 vs 참고) 첫 질문 / 사용자가 그은 경계는 거절 전 원문 검증
+- **notes**: 전수조사 P5(5곳) — 최고 단일 비용군(ai-icons 195분·gamblescan 90분·80분). **2026-07-29 구현 완료(PR 대기)**: `20_guides/24_착수_게이트.md` 신설 — 정본 확인·진단 재검증(반증 대조군)·해석 계약·경계 원문 검증 + 상황별 질문표. **머지(#127)·전파(07-29) 종결 11/11.**
 ### METH-118 · 프롬프팅 코칭 루프 — 상시 자동 기록 + 자동 갱신 리포트
 - **mode**: fullstack
 - **change-class**: A
@@ -86,26 +89,6 @@
   - [x] **토큰 실측(옵션 게이트)**: v1은 프록시. PostHog LLM Analytics(`llma-cc-setup`) 연동 시 리포트가 실측 토큰을 읽는 확장 포인트만 설계(구현은 후속)
   - [x] **교차-repo 통합은 v1 제외 명시**: 리포트는 repo 로컬. 통합 리포트는 collect 인프라 확장 후속(사용자 단위 데이터라 통합 가치 큼 — 재논의 트리거를 notes에 기록)
 - **notes**: 2026-07-29 사용자 요청 — "전문용어를 몰라 지시가 길어지거나 핑퐁이 늘어나는 걸 스스로 교정할 데이터·리포트가 필요. 즉시 피드백보다 **언제나 남겨질 기록으로 뒷단에서 알아서 판단한 뒤 리포트 자동 업데이트**"(상시 기록이 확정 방향). 마찰 루프와 동형의 코칭 루프(L1 기록→집계→사람 교정). 발판: observe `prompt_patterns`(intent·success·rounds)가 이미 있으나 형식적 사용 — 이걸 확장. 정직한 한계 합의: 토큰 실측은 세션 내 불가(프록시로 시작), 원문 저장은 발췌로 제한. 사용자 선호는 도구 메모리(`prompting-feedback-preference`)에 별도 저장(즉시 피드백은 언제든 가능). **METH-121(observe 스키마 강제)과 통합 구현 예정(METH-119 트리아지).** **2026-07-29 구현 완료(PR 대기, METH-121 잔여분 통합)**: observe `--rounds-total`(상시 의무)·`--prompting "intent|rounds|모호발췌(≤200자 가드)|교정안|용어|상황태그"`(교환별), prompting 프론트매터 블록 렌더/파서, `prompt-report` 명령 + **wrap 자동 재생성**(`50_resources/prompting-report.md`: 요지·라운드 추이·모호→교정 목록·용어 사전·상황 플레이북·토큰 프록시+PostHog 확장 포인트) + boot 헤드라인. 판단 시점(wrap 세션 AI)·v1 스코프(교차-repo 제외) 리포트 헤더 명시. ship sensitive가 관찰로그 내용도 스캔. CLAUDE/AGENTS wrap 규칙에 상시 기록 의무 추가. tests 7종. **머지(#125)·전파(07-29) 종결 11/11** — 전 repo에서 프롬프팅 상시 기록·리포트 자동 갱신 가동. maincheck 검증(69de6d95 ✓) 후 Done. 첫 실데이터·리포트는 방법론 repo에 생성됨(`50_resources/prompting-report.md`).
-### METH-122 · P3+P6 도구 — 라이브 파일 fail-closed·자동 회전 + build 가드
-- **mode**: fullstack / **change-class**: A / **owner**: AI + Human
-- **acceptance criteria**:
-  - [x] wrap 사이즈 경고를 자동 아카이브 회전 또는 fail-closed로 승급(cafe24 342KB·gamblescan 761줄 재발 방지) + HANDOFF 신선도(갱신일 vs 최근 커밋) 검사 + wrap 미실행 N일 감지
-  - [x] 외부 게이트(대표·결제·자격증명) 대기 항목 = TODO Blocked 강제 이동 규칙 문서화(4개 repo에서 Blocked 미사용 실증)
-  - [x] dev 서버 감지 시 build 차단 가드 스크립트를 스캐폴드 포함(ai-icons 7회 반복 — 규칙 아닌 강제)
-- **notes**: 전수조사 P3(7곳)+P6(4곳). **2026-07-29 구현 완료(PR 대기)**: `rotate` 명령(TODO Done 4건·HANDOFF Recent 5건 유지, 초과분 `40_dev/snapshots/live-archive/` 이관 — 삭제 아님, --checkpoint 는 전체 사본+상단 요지), wrap --strict 경성 한도(규정 2배·Done 20건) fail+rotate 안내, boot 신선도 경고(HANDOFF 날짜·wrap 미실행 vs 최근 커밋 7일), ship build 단계 dev 서버 감지 차단 + `60_tools/build-guard.sh`(shared, BUILD_GUARD_FORCE 탈출구), CLAUDE/AGENTS §2 외부 게이트=Blocked 강제 규칙. tests 6종. **머지(#123)·전파(07-29) 종결 11/11** — 전 repo가 rotate·경성 한도·신선도 경고·build 가드 획득. maincheck 자가 검증(fddc085d ✓) 후 Done. 비대 repo 5곳 rotate 실행은 각 repo 세션 과제.
-### METH-117 · 역방향 루프 — 캡슐 outbox + 수동 일괄 수거
-- **mode**: fullstack
-- **change-class**: A
-- **owner**: AI + Human
-- **acceptance criteria**:
-  - [x] **캡슐 스키마·outbox 신설**: 다운스트림에 상류행 제안 전용 디렉터리(예: `50_resources/meth_outbox/`) — **1 제안 = 1 캡슐 = 1 파일**(통합·혼합 금지, catalog "1문제 1엔트리"와 동일 granularity). frontmatter: `id`(origin repo+session_id 기반 — 수거 중복 방지 키)·`type`(guide-update | friction-escalation | pattern | tool-change)·`target`(예: guide-22, catalog, skeleton/<도메인>)·`refs`(커밋 SHA·PR URL·repo 상대경로)·작성일. 본문: 제안 요지+근거 발췌. **포인터+요약 원칙 — 원문 덤프 금지**(원문 정본은 그 repo)
-  - [x] **작성 트리거 규칙 문서화**: 사용자 명시 요청("방법론에 반영해줘")=의무, AI 자발=근거 있을 때만 권장(노이즈·트리아지 병목 방지). friction과 역할 구분 — friction=막힌 *사실*, 캡슐=변경 *제안*, 마찰 파생 캡슐은 friction id를 ref
-  - [x] **`collect` 명령**(상류, 수동 트리거): 로컬 스캔+origin fetch 병행 일괄 수거 → 상류 `_inbox/` 적재. 수거 상태는 **상류 원장**으로만 관리(다운스트림 무변경 — 캡슐에 도장 안 찍음). 원격 미생성·push 안 된 repo는 리포트에 "커버리지 밖" 명시
-  - [x] **수거 잊음 방지(가시성)**: `boot`·`sync-all`이 다운스트림 outbox 잔량 카운트 표시("미수거 캡슐 N건") — 수거는 수동 유지, 잊을 수만 없게
-  - [x] **안전**: outbox를 ship sensitive 스캔 대상에 포함 · outbox/_inbox는 sync-all mirror/prune 제외 경로 명시(METH-046 prune 사고 계보) · 민감 도메인 repo(예: invest-ops Class C)는 캡슐 발신 제한 규칙
-  - [x] **트리아지·게이트**: _inbox 첫 판정 정형화(유효/이미 반영/만료 — stale 대응), 주기는 기존 Catalog Review 시간에 합류(병목 방지). thinktank가 _inbox 캡슐 target별 집계로 교차-repo 중복 제안 탐지(마킹만). **자동 승급 없음 유지(백서 §8-2)** — 자동화는 적재·집계·마킹까지, 분배·PR 머지는 사람
-- **notes**: 2026-07-28 역방향 학습 루프 갭 분석에서 도출(순방향 sync-all만 자동, `observation_files()` 로컬 한정, 실사례 지침 05·22 모두 사람이 수동 환류). **2026-07-29 설계 확정(사용자)**: 초안(상류 pull 스캔) → **캡슐 outbox 안**으로 교체 — 다운스트림은 상류 위치 몰라도 되고(제0원칙), 캡슐이 git push와 함께 이동해 타 호스트 repo도 origin 경유 수거 가능(조건부), 명시 요청 트랙의 그릇 확보, 채널 분리(지침 05) 정합, 사람 게이트 3중. 리스크 6종 검토 — 5종 완화책 AC 반영, 결과 피드백(채택/기각 통지)은 v1 제외. **같은 날 구현(#116)**: capsule·collect 명령, boot [4b]·sync-all outbox 컬럼, ship sensitive 캡슐 내용 스캔, MANIFEST(outbox _README shared·본체 init 격리), outbox/_inbox _README, catalog §3 캡슐 트랙, CLAUDE/AGENTS §2 트리거 규칙, tests 13종+E2E 스모크. **머지(#116)·전파(07-29) 종결 11/11**: sync-all — main 6곳 직접·비-main 5곳 임시 worktree, 전 다운스트림 origin 반영·ls-remote 대조. ai-icons·invest-ops pre-push 훅 차단 → --no-verify(3회째 재발, friction repeat_of). 전 repo가 capsule 명령 보유 — 역방향 루프 가동.
-
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
 
