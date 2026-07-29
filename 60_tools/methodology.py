@@ -37,6 +37,15 @@ Commands
 
   methodology thinktank
       L1 관찰 로그 기반 주간 인사이트 리포트를 생성한다.
+      (_inbox 수거 캡슐이 있으면 target별 교차-repo 집계 섹션 추가)
+
+  methodology capsule --slug <s> --target <t> --summary <text> [options]
+      상류행 제안 캡슐을 outbox에 생성한다 — 1제안=1캡슐=1파일 (METH-117).
+      사용자 명시 요청("방법론에 반영해줘")=의무, AI 자발=근거 있을 때만.
+
+  methodology collect [--apply] [--root <dir>] [--no-fetch]
+      (상류 전용) 다운스트림 outbox 캡슐을 일괄 수거해 _inbox에 적재한다.
+      수동 트리거·다운스트림 무변경·수거 상태는 상류 원장(_ledger.json).
 
 Classification
 --------------
@@ -91,6 +100,9 @@ MANIFEST = {
         "50_resources/catalog/_README.md",
         "50_resources/skeletons/_README.md",
         "50_resources/ai_observations/_README.md",
+        # METH-117: outbox 는 _README 만 shared — 캡슐 본체는 다운스트림 소유(절대 미러/prune 안 됨).
+        # _inbox(상류 수거함)는 상류 전용 — shared/init 어디에도 넣지 않는다.
+        "50_resources/meth_outbox/_README.md",
         "60_tools/methodology-graph.json",
         "60_tools/generate-dashboard.py",
         "60_tools/methodology.py",
@@ -123,6 +135,7 @@ MANIFEST = {
         "50_resources/catalog/archived",
         "50_resources/skeletons",
         "50_resources/ai_observations",
+        "50_resources/meth_outbox",
     ],
     # init_paths 복사에서 제외할 패턴 (repo-relative path, re.match)
     # — 본 저장소가 자기 자신에 방법론을 적용해 쌓은 *실 운영 기록*
@@ -136,6 +149,7 @@ MANIFEST = {
         r"^50_resources/ai_observations/(?!_README\.md$)",  # _README 제외 모든 실 관찰 로그
         r"^50_resources/skeletons/meta/",                    # 방법론 자신의 meta 도메인 스켈레톤
         r"^50_resources/catalog/_pending/P-\d{3}_",          # 방법론 자신의 pending lesson
+        r"^50_resources/meth_outbox/(?!_README\.md$)",      # 캡슐 본체는 각 repo 소유 — 새 프로젝트로 안 샘
     ],
     # init이 src→dst 매핑으로 복사하는 단일 파일들 (PROJECT_NAME 치환 가능)
     "init_files": [
@@ -179,6 +193,13 @@ INSIGHTS_DIR = Path("40_dev/snapshots/insights")
 OBSERVATION_TASK_TYPES = {"bootstrap", "feature", "bugfix", "refactor", "research", "docs"}
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 OBSERVATION_FILE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}_[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
+
+# METH-117 역방향 루프 — 캡슐 outbox(다운스트림 발신) / _inbox(상류 수거함)
+OUTBOX_DIR = Path("50_resources/meth_outbox")
+INBOX_DIR = Path("50_resources/meth_inbox")
+CAPSULE_TYPES = {"guide-update", "friction-escalation", "pattern", "tool-change"}
+CAPSULE_FILE_RE = OBSERVATION_FILE_RE  # 동일 명명: YYYY-MM-DD_<slug>.md
+CAPSULE_BODY_MAX_LINES = 120  # 포인터+요약 원칙 — 원문 덤프 차단
 
 
 # ─── 유틸 ───────────────────────────────────────────────────────────────────
@@ -841,9 +862,404 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
     for obs in observations:
         lines.append(f"- `{obs.get('session_id', 'unknown')}` — domain `{obs.get('domain', '?')}`, task `{obs.get('task_type', '?')}`")
     write_text(out, "\n".join(lines) + "\n")
+
+    capsule_lines = _thinktank_capsule_section()
+    if capsule_lines:
+        with out.open("a", encoding="utf-8") as fh:
+            fh.write("\n".join(capsule_lines) + "\n")
+
     ok(f"thinktank report: {out.relative_to(METHODOLOGY_ROOT)}")
     info("수동 승급이 정식 — 승급 후보(≥2회)는 사람이 검토·PR로 승급(백서 §8-2).")
     return 0
+
+
+def _thinktank_capsule_section() -> list[str]:
+    """_inbox 수거 캡슐의 target별 집계 — 교차-repo 중복 제안 마킹(METH-117).
+
+    마킹까지만 한다. 분배·승급은 사람(백서 §8-2).
+    """
+    inbox = METHODOLOGY_ROOT / INBOX_DIR
+    if not inbox.is_dir():
+        return []
+    capsules = sorted(p for p in inbox.glob("*.md") if not p.name.startswith("_"))
+    if not capsules:
+        return []
+    by_target: dict[str, list[dict]] = {}
+    for p in capsules:
+        meta = parse_capsule_frontmatter(read_text(p))
+        target = str(meta.get("target") or "?")
+        by_target.setdefault(target, []).append(
+            {"repo": str(meta.get("origin_repo") or "?"), "file": p.name})
+    lines = ["", "## Collected Capsules (_inbox)", ""]
+    for target, items in sorted(by_target.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+        repos = sorted({i["repo"] for i in items})
+        marker = "CROSS-REPO" if len(repos) >= 2 else ("DUP-TARGET" if len(items) >= 2 else "single")
+        lines.append(f"- `{marker}` x{len(items)}: target `{target}` — repo {', '.join(repos)}")
+    lines.append("")
+    lines.append("> 트리아지 판정(유효/이미 반영/만료)·분배는 사람 — `50_resources/meth_inbox/_README.md`.")
+    return lines
+
+
+# ─── METH-117 역방향 루프 — 캡슐 outbox / collect ───────────────────────────
+# 다운스트림이 방법론 업데이트 *제안*을 1제안=1캡슐=1파일로 outbox에 적재하고,
+# 상류가 수동 트리거 `collect`로 일괄 수거한다. 수거 상태는 상류 원장(_ledger.json)
+# 으로만 관리 — 다운스트림 캡슐은 절대 변경하지 않는다(읽기 전용).
+# 자동화는 적재·수거·집계·마킹까지. 분배·PR 머지는 사람(백서 §8-2).
+
+
+def _repo_name(target: Path) -> str:
+    return target.resolve().name
+
+
+def _capsule_policy(target: Path) -> str:
+    """캡슐 발신 정책 — .methodology-version 의 capsule_policy 키.
+
+    "restricted": 민감 도메인 repo(예: Class C 확장 repo) — 캡슐 발신 차단.
+    기본 "open".
+    """
+    vinfo = load_version_file(target) or {}
+    return str(vinfo.get("capsule_policy") or "open")
+
+
+def capsule_files(base: Path) -> list[Path]:
+    d = base / OUTBOX_DIR
+    if not d.is_dir():
+        return []
+    return sorted(p for p in d.glob("*.md")
+                  if not p.name.startswith("_") and CAPSULE_FILE_RE.match(p.name))
+
+
+def parse_capsule_frontmatter(text: str) -> dict[str, Any]:
+    """캡슐 frontmatter 파싱 — 관찰 로그와 동일한 단순 YAML 서브셋."""
+    if not text.startswith("---\n"):
+        return {}
+    try:
+        _, frontmatter, _body = text.split("---", 2)
+    except ValueError:
+        return {}
+    out: dict[str, Any] = {}
+    current = None
+    for raw in frontmatter.splitlines():
+        line = raw.rstrip()
+        if not line.strip():
+            continue
+        top = re.match(r"^([a-z_]+):\s*(.*)$", line)
+        if top:
+            current = top.group(1)
+            value = top.group(2).strip()
+            out[current] = value.strip('"') if value else []
+            continue
+        item = re.match(r"^\s+-\s+(.+)$", line)
+        if item and current and isinstance(out.get(current), list):
+            out[current].append(item.group(1).strip().strip('"'))
+    return out
+
+
+def render_capsule(payload: dict) -> str:
+    lines = [
+        "---",
+        f"id: {payload['id']}",
+        f"origin_repo: {payload['origin_repo']}",
+        f"type: {payload['type']}",
+        f"target: {yaml_scalar(payload['target'])}",
+        "refs:",
+    ]
+    if payload["refs"]:
+        for ref in payload["refs"]:
+            lines.append(f"  - {yaml_scalar(ref)}")
+    else:
+        lines[-1] = "refs: []"
+    lines.extend([
+        f"friction_ref: {payload.get('friction_ref') or 'null'}",
+        f"created: {payload['created']}",
+        "---",
+        "",
+        "## 제안",
+        payload["summary"],
+        "",
+        "## 근거",
+    ])
+    evidence = payload.get("evidence") or []
+    if evidence:
+        lines.extend(f"- {e}" for e in evidence)
+    else:
+        lines.append("- (refs 참조 — 원문 정본은 이 repo)")
+    lines.append("")
+    return "\n".join(lines) + "\n"
+
+
+def validate_capsule_text(text: str, filename: str, repo: str) -> list[str]:
+    """캡슐 형식 검증. filename 은 'YYYY-MM-DD_<slug>.md'."""
+    errors: list[str] = []
+    meta = parse_capsule_frontmatter(text)
+    if not meta:
+        return ["frontmatter 없음 — capsule CLI로 생성해야 합니다"]
+    for field in ("id", "origin_repo", "type", "target", "created"):
+        if not meta.get(field):
+            errors.append(f"필수 필드 누락: {field}")
+    if meta.get("type") and meta["type"] not in CAPSULE_TYPES:
+        errors.append(f"type은 {', '.join(sorted(CAPSULE_TYPES))} 중 하나여야 합니다")
+    stem = filename[:-3] if filename.endswith(".md") else filename
+    expected_id = f"{repo}__{stem}"
+    if meta.get("id") and repo and meta["id"] != expected_id:
+        errors.append(f"id는 '<origin_repo>__<파일명 stem>' ({expected_id}) 이어야 합니다")
+    try:
+        body = text.split("---", 2)[2]
+    except IndexError:
+        body = ""
+    if not body.strip():
+        errors.append("본문이 비어있습니다 — 제안 요지 필요")
+    if len(body.splitlines()) > CAPSULE_BODY_MAX_LINES:
+        errors.append(
+            f"본문 {len(body.splitlines())}줄 > {CAPSULE_BODY_MAX_LINES}줄 — "
+            "포인터+요약 원칙 위반(원문 덤프 금지). refs로 가리키고 요지만 남기세요")
+    return errors
+
+
+def cmd_capsule(args: argparse.Namespace) -> int:
+    """상류행 제안 캡슐 생성 — 1 제안 = 1 캡슐 = 1 파일.
+
+    트리거 규칙(outbox _README): 사용자 명시 요청("방법론에 반영해줘")=의무,
+    AI 자발=근거 있을 때만 권장. friction=막힌 사실 / 캡슐=변경 제안.
+    """
+    repo = _repo_name(METHODOLOGY_ROOT)
+
+    if args.validate:
+        path = Path(args.validate)
+        errors = validate_capsule_text(read_text(path), path.name, repo)
+        if errors:
+            for item in errors:
+                err(item)
+            return 1
+        ok(f"capsule valid: {path}")
+        return 0
+
+    if not args.slug or not args.summary or not args.target:
+        err("capsule 생성에는 --slug, --target, --summary 가 필요합니다")
+        return 2
+    if not SLUG_RE.match(args.slug):
+        err("--slug 는 영문 소문자/숫자/kebab-case 여야 합니다")
+        return 2
+    if args.type not in CAPSULE_TYPES:
+        err(f"--type 은 {', '.join(sorted(CAPSULE_TYPES))} 중 하나여야 합니다")
+        return 2
+
+    policy = _capsule_policy(METHODOLOGY_ROOT)
+    if policy == "restricted" and not args.allow_restricted:
+        err("이 repo는 캡슐 발신 제한(capsule_policy: restricted) — 민감 도메인.")
+        err("사람 승인 후 --allow-restricted 로 재호출하되, 민감 내용은 refs로만 가리킬 것.")
+        return 1
+
+    date_part = args.date or utc_date()
+    stem = f"{date_part}_{args.slug}"
+    output = METHODOLOGY_ROOT / OUTBOX_DIR / f"{stem}.md"
+    if output.exists() and not args.force:
+        err(f"이미 존재합니다: {output.relative_to(METHODOLOGY_ROOT)} (--force 로 덮어쓰기)")
+        return 1
+
+    payload = {
+        "id": f"{repo}__{stem}",
+        "origin_repo": repo,
+        "type": args.type,
+        "target": args.target,
+        "refs": args.ref or [],
+        "friction_ref": args.friction_ref,
+        "created": utc_stamp(),
+        "summary": args.summary,
+        "evidence": args.evidence or [],
+    }
+    content = render_capsule(payload)
+    errors = validate_capsule_text(content, output.name, repo)
+    if errors:
+        for item in errors:
+            err(item)
+        return 1
+    if args.dry_run:
+        print(content)
+        return 0
+    write_text(output, content)
+    ok(f"capsule created: {output.relative_to(METHODOLOGY_ROOT)}")
+    info("수거는 상류에서 `methodology collect` — 이 파일은 커밋·push까지 해야 origin 경유 수거가 됩니다.")
+    return 0
+
+
+def _ledger_path() -> Path:
+    return METHODOLOGY_ROOT / INBOX_DIR / "_ledger.json"
+
+
+def load_ledger() -> dict:
+    p = _ledger_path()
+    if not p.exists():
+        return {"collected": {}}
+    try:
+        data = json.loads(read_text(p))
+        if isinstance(data, dict) and isinstance(data.get("collected"), dict):
+            return data
+    except json.JSONDecodeError:
+        pass
+    return {"collected": {}}
+
+
+def save_ledger(ledger: dict) -> None:
+    p = _ledger_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
+    write_text(p, json.dumps(ledger, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+
+
+def _git_remote_default_ref(path: Path) -> str | None:
+    """origin/main 또는 origin/master — 없으면 None."""
+    for branch in ("main", "master"):
+        try:
+            subprocess.check_output(
+                ["git", "-C", str(path), "rev-parse", "--verify", "--quiet", f"origin/{branch}"],
+                stderr=subprocess.DEVNULL,
+            )
+            return f"origin/{branch}"
+        except subprocess.CalledProcessError:
+            continue
+        except Exception:
+            return None
+    return None
+
+
+def _origin_capsules(path: Path, fetch: bool) -> tuple[dict[str, str], str | None]:
+    """origin 기본 브랜치 트리의 outbox 캡슐 {파일명: 내용}. 실패 시 사유 반환."""
+    try:
+        remotes = subprocess.check_output(
+            ["git", "-C", str(path), "remote"], text=True, stderr=subprocess.DEVNULL
+        ).split()
+    except Exception:
+        return {}, "git repo 아님"
+    if not remotes:
+        return {}, "원격 없음 — 로컬 스캔만"
+    if fetch:
+        try:
+            subprocess.run(
+                ["git", "-C", str(path), "fetch", "-q", "origin"],
+                check=True, capture_output=True, timeout=60,
+            )
+        except Exception:
+            return {}, "origin fetch 실패 — 로컬 스캔만"
+    ref = _git_remote_default_ref(path)
+    if ref is None:
+        return {}, "origin main/master 없음 — 로컬 스캔만"
+    try:
+        listed = subprocess.check_output(
+            ["git", "-C", str(path), "ls-tree", "-r", "--name-only", ref, "--", str(OUTBOX_DIR)],
+            text=True, stderr=subprocess.DEVNULL,
+        ).splitlines()
+    except subprocess.CalledProcessError:
+        return {}, None
+    out: dict[str, str] = {}
+    for rel in listed:
+        name = rel.rsplit("/", 1)[-1]
+        if name.startswith("_") or not CAPSULE_FILE_RE.match(name):
+            continue
+        try:
+            out[name] = subprocess.check_output(
+                ["git", "-C", str(path), "show", f"{ref}:{rel}"],
+                text=True, stderr=subprocess.DEVNULL,
+            )
+        except subprocess.CalledProcessError:
+            continue
+    return out, None
+
+
+def _collect_plan(capsules: dict[str, str], repo: str, ledger: dict) -> tuple[list[tuple[str, str, str]], int]:
+    """수거 계획 — (파일명, id, 내용) 신규 목록과 중복 skip 수.
+
+    id 는 frontmatter 우선, 없으면 repo__stem 폴백. 원장에 있으면 skip.
+    """
+    new_items: list[tuple[str, str, str]] = []
+    dup = 0
+    for name in sorted(capsules):
+        text = capsules[name]
+        meta = parse_capsule_frontmatter(text)
+        cid = str(meta.get("id") or f"{repo}__{name[:-3]}")
+        if cid in ledger.get("collected", {}):
+            dup += 1
+            continue
+        new_items.append((name, cid, text))
+    return new_items, dup
+
+
+def cmd_collect(args: argparse.Namespace) -> int:
+    """다운스트림 outbox 캡슐 일괄 수거 — 수동 트리거(상류 전용).
+
+    다운스트림 무변경(읽기 전용). 수거 상태는 상류 원장(_ledger.json)으로만.
+    기본 dry-run — --apply 로 실제 적재.
+    """
+    root = Path(args.root).resolve() if args.root else METHODOLOGY_ROOT.parent
+    projects = _discover_downstreams(root)
+    if not projects:
+        warn(f"다운스트림 없음 — {root} 아래 {VERSION_FILE_NAME} 보유 폴더가 없습니다.")
+        return 0
+    apply = args.apply
+    fetch = not args.no_fetch
+    ledger = load_ledger()
+    inbox = METHODOLOGY_ROOT / INBOX_DIR
+
+    info(f"collect — root: {root}  ({len(projects)}개)  "
+         f"{'APPLY' if apply else 'DRY-RUN'}  {'fetch' if fetch else 'no-fetch(로컬만)'}")
+    print()
+    print(f"  {'project':22s} {'capsules':>8s} {'new':>4s} {'dup':>4s}  note")
+    print(f"  {'-'*22} {'-'*8} {'-'*4} {'-'*4}  {'-'*24}")
+
+    total_new = 0
+    coverage_out: list[str] = []
+    for p in projects:
+        name = p.name
+        if _capsule_policy(p) == "restricted":
+            print(f"  {name:22.22s} {'-':>8s} {'-':>4s} {'-':>4s}  발신 제한(restricted) — skip")
+            continue
+        local = {f.name: read_text(f) for f in capsule_files(p)}
+        origin, note = _origin_capsules(p, fetch)
+        merged = dict(origin)
+        merged.update(local)  # 작업트리 우선
+        new_items, dup = _collect_plan(merged, name, ledger)
+        if note:
+            coverage_out.append(f"{name}: {note}")
+        print(f"  {name:22.22s} {len(merged):>8d} {len(new_items):>4d} {dup:>4d}  {note or ''}")
+        if not apply:
+            total_new += len(new_items)
+            continue
+        for fname, cid, text in new_items:
+            dest = inbox / f"{name}__{fname}"
+            errors = validate_capsule_text(text, fname, name)
+            if errors:
+                warn(f"  형식 오류 — 적재하되 트리아지에서 확인: {name}/{fname} ({errors[0]})")
+            inbox.mkdir(parents=True, exist_ok=True)
+            write_text(dest, text)
+            ledger["collected"][cid] = {
+                "repo": name, "file": fname, "collected_at": utc_stamp(),
+            }
+            total_new += 1
+
+    print()
+    if apply and total_new:
+        save_ledger(ledger)
+    if coverage_out:
+        for line in coverage_out:
+            warn(f"커버리지: {line}")
+    ok(f"collect 완료 — 신규 {total_new}건" + ("" if apply else " (dry-run — --apply 로 적재)"))
+    if apply and total_new:
+        info(f"적재: {INBOX_DIR}/ — 트리아지(유효/이미 반영/만료)·분배는 사람. "
+             "커밋은 ship 으로.")
+    return 0
+
+
+def _pending_capsule_counts(root: Path) -> tuple[int, int]:
+    """다운스트림 outbox의 미수거(원장 기준) 캡슐 총계 — (건수, repo 수). 로컬 스캔만."""
+    ledger = load_ledger()
+    total = 0
+    repos = 0
+    for p in _discover_downstreams(root):
+        merged = {f.name: read_text(f) for f in capsule_files(p)}
+        new_items, _dup = _collect_plan(merged, p.name, ledger)
+        if new_items:
+            total += len(new_items)
+            repos += 1
+    return total, repos
 
 
 # ─── 마이그레이션 ───────────────────────────────────────────────────────────
@@ -1448,6 +1864,7 @@ def _downstream_state(path: Path) -> dict:
         "applied_commit": vinfo.get("upstream_commit") or "unknown",
         "branch": _git_current_branch(path),
         "dirty": _git_dirty_count(path),
+        "outbox": len(capsule_files(path)),
     }
 
 
@@ -1477,14 +1894,17 @@ def _sync_all_skip_reason(state: dict, args: argparse.Namespace) -> str | None:
 
 
 def _print_downstream_table(states: list[dict], up_commit: str) -> None:
-    """사전 스캔 표 — 버전·브랜치·dirty·업스트림 대비."""
+    """사전 스캔 표 — 버전·브랜치·dirty·outbox 캡슐·업스트림 대비."""
     print()
-    print(f"  {'project':22s} {'version':7s} {'branch':26s} {'dirty':>5s}  vs-upstream")
-    print(f"  {'-'*22} {'-'*7} {'-'*26} {'-'*5}  {'-'*11}")
+    print(f"  {'project':22s} {'version':7s} {'branch':26s} {'dirty':>5s} {'outbox':>6s}  vs-upstream")
+    print(f"  {'-'*22} {'-'*7} {'-'*26} {'-'*5} {'-'*6}  {'-'*11}")
     for s in states:
         state = "behind" if _is_behind(s, up_commit) else "최신 ✓"
         print(f"  {s['path'].name:22.22s} {s['version']:7s} "
-              f"{(s['branch'] or '?'):26.26s} {s['dirty']:>5d}  {state}")
+              f"{(s['branch'] or '?'):26.26s} {s['dirty']:>5d} {s.get('outbox', 0):>6d}  {state}")
+    total_outbox = sum(s.get("outbox", 0) for s in states)
+    if total_outbox:
+        warn(f"outbox 캡슐 {total_outbox}건 발견 — 수거는 `methodology collect` (METH-117)")
     print()
 
 
@@ -1614,8 +2034,27 @@ def cmd_version(args: argparse.Namespace) -> int:
 _SENSITIVE_PATTERNS = [".env", "credential", "secret", ".pem", ".key", ".p12", ".pfx"]
 
 
+_CAPSULE_SECRET_RES = [
+    re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY"),
+    re.compile(r"(?i)\b(api[_-]?key|secret|token|passwd|password)\b\s*[:=]\s*['\"]?[A-Za-z0-9_\-/+]{16,}"),
+    re.compile(r"(?i)\baws_(access_key_id|secret_access_key)\b"),
+]
+
+
+def _capsule_content_hits(target: Path, path: str) -> bool:
+    """outbox 캡슐 *내용*의 시크릿 의심 패턴 검사 (METH-117 — 캡슐은 원격으로 이동하므로)."""
+    f = target / path
+    if not f.is_file():
+        return False
+    try:
+        text = read_text(f)
+    except (OSError, UnicodeDecodeError):
+        return False
+    return any(r.search(text) for r in _CAPSULE_SECRET_RES)
+
+
 def _detect_sensitive(target: Path) -> list[str]:
-    """git status에서 sensitive 파일 패턴 탐지."""
+    """git status에서 sensitive 파일 패턴 탐지 (+ outbox 캡슐은 내용까지)."""
     try:
         out = subprocess.check_output(
             ["git", "-C", str(target), "status", "--porcelain"], text=True
@@ -1632,6 +2071,10 @@ def _detect_sensitive(target: Path) -> list[str]:
             if pat in low and not low.endswith(".sample") and not low.endswith(".example"):
                 hits.append(path)
                 break
+        else:
+            if low.startswith(str(OUTBOX_DIR).lower() + "/") and low.endswith(".md") \
+                    and _capsule_content_hits(target, path):
+                hits.append(f"{path} (캡슐 내용에 시크릿 의심 패턴)")
     return hits
 
 
@@ -2740,6 +3183,15 @@ def cmd_boot(args: argparse.Namespace) -> int:
         print("    ✓ 규정 이내 (HANDOFF ≤150 · checkpoint ≤200 · TODO Done ~4)")
     print()
 
+    # [4b] 캡슐 outbox 가시성 (METH-117 — 수거 잊음 방지)
+    own_capsules = capsule_files(target)
+    if own_capsules:
+        warn(f"outbox: 상류행 캡슐 {len(own_capsules)}건 — 커밋·push 필요, 수거는 상류 collect")
+    if (target / META_ROOT).is_dir():  # 상류(방법론 원본)에서만 다운스트림 스캔
+        pending, repos = _pending_capsule_counts(METHODOLOGY_ROOT.parent)
+        if pending:
+            warn(f"미수거 캡슐 {pending}건 / {repos}개 repo — `methodology collect` 실행 고려")
+
     # [5] dashboard
     print("\033[1m[5] 대시보드\033[0m")
     if not args.no_dashboard:
@@ -3168,6 +3620,38 @@ def main(argv: list[str] | None = None) -> int:
 
     pt = sub.add_parser("thinktank", help="L3 관찰 집계 — §7 지표 + 승급 후보 마킹 (수동 승급 정식, 회고 소스)")
     pt.set_defaults(func=cmd_thinktank)
+
+    pc = sub.add_parser(
+        "capsule",
+        help="상류행 제안 캡슐 생성 — 1제안=1캡슐=1파일, outbox 적재 (METH-117 역방향 루프)",
+    )
+    pc.add_argument("--slug", help="kebab-case 슬러그 (파일명·id에 사용)")
+    pc.add_argument("--type", default="guide-update",
+                    help=f"캡슐 유형: {', '.join(sorted(CAPSULE_TYPES))} (기본 guide-update)")
+    pc.add_argument("--target", help="반영 목표 (예: guide-22, catalog, skeleton/<도메인>)")
+    pc.add_argument("--summary", help="제안 요지 (50~300자 권장)")
+    pc.add_argument("--ref", action="append",
+                    help="근거 포인터 — 커밋 SHA·PR URL·repo 상대경로 (반복 가능). 원문 덤프 금지")
+    pc.add_argument("--evidence", action="append", help="근거 발췌 한 줄 (반복 가능, 선택)")
+    pc.add_argument("--friction-ref", dest="friction_ref",
+                    help="마찰 파생 캡슐이면 해당 관찰로그 session_id")
+    pc.add_argument("--date", help="날짜 강제 (기본: 오늘 UTC)")
+    pc.add_argument("--force", action="store_true", help="동일 파일 덮어쓰기")
+    pc.add_argument("--dry-run", dest="dry_run", action="store_true", help="파일 생성 없이 출력만")
+    pc.add_argument("--validate", help="기존 캡슐 파일 형식 검증")
+    pc.add_argument("--allow-restricted", dest="allow_restricted", action="store_true",
+                    help="발신 제한(restricted) repo에서 사람 승인 하에 강제 발신")
+    pc.set_defaults(func=cmd_capsule)
+
+    pcl = sub.add_parser(
+        "collect",
+        help="다운스트림 outbox 캡슐 일괄 수거 → _inbox 적재 (수동 트리거·상류 전용·다운스트림 무변경)",
+    )
+    pcl.add_argument("--root", help=f"탐색 루트 (기본: 방법론 상위 = {METHODOLOGY_ROOT.parent})")
+    pcl.add_argument("--apply", action="store_true", help="실제 적재 (없으면 dry-run)")
+    pcl.add_argument("--no-fetch", dest="no_fetch", action="store_true",
+                     help="origin fetch 생략 — 로컬 작업트리만 스캔")
+    pcl.set_defaults(func=cmd_collect)
 
     args = p.parse_args(argv)
     return args.func(args)
