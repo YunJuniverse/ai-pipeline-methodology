@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "57cfb7d81df5e7bcec650980cdd852ca14bb0391",
-  "last_validated_at": "2026-07-29T02:26:28Z",
+  "last_validated_commit": "bc72f13bec0b6b001da1bdcc4a0b4af2655f09b9",
+  "last_validated_at": "2026-07-29T04:50:57Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "4ee3324a89ace4f9f1b3cbfcac0853d39b19d4d3ab47b9dc77cabfce951ce90c"
+      "sha256": "cc8220fcebed10d2667c29cb6613b1ac05f47cc7ce5eb6aec210783cc56d8209"
     },
     "TODO.md": {
-      "sha256": "6f01a80510b756063b30f2819d9681ece066ca9ccb59363ba411c38eb542d728"
+      "sha256": "66a0d29bc0dbef356d28c0ac5d8b7e5edcb051d55e8b8320305f52325062f1c4"
     },
     ".ai/checkpoint.md": {
-      "sha256": "b69fdbc24edec4d10037b147bdc7443ee71d0df0e99a941107323b1b945b5ed3"
+      "sha256": "7870c54d2dc29180de6a07a6f3941fac12d729b24b6050453a384bb144937abe"
     }
   },
   "observations": {
@@ -131,6 +131,7 @@
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
+      "50_resources/ai_observations/2026-07-29_sync-propagate-meth-117.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

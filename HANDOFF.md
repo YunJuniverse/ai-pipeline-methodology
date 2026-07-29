@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-117 구현 완료 — 캡슐 outbox 역방향 루프** (2026-07-29) — capsule·collect 명령+가시성+안전 가드+문서+테스트 13종. branch `feat/meth-117-capsule-outbox`, PR 대기. 머지 후 sync-all 전파 필요(methodology.py·outbox _README·catalog _README·CLAUDE/AGENTS = shared). 직전: METH-116 전파 종결 11/11(#115 머지)·METH-117 설계 확정(#114 머지).
+- **Working on**: **METH-117 종결 — 캡슐 outbox 역방향 루프 가동** (2026-07-29) — #116 머지 후 sync-all 전파 11/11 완료(전 repo가 capsule/collect 획득). branch `chore/sync-propagate-meth-117`, PR 대기. 직전: METH-117 구현(#116 머지)·METH-116 전파 종결(#115 머지).
 - **Current mode**: fullstack
-- **Next TODO**: METH-117 PR 머지 → sync-all 전파(methodology.py 등 shared) → Done 이동. 후속 후보: graph.json에 outbox/collect 노드·invest-ops restricted 정책 부여(그 repo 세션). 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
+- **Next TODO**: 후속 후보(백로그 미등록): graph.json에 outbox/collect 노드·invest-ops `capsule_policy: restricted` 부여(그 repo 세션·ADR-0001 근거)·pre-push 훅 vs sync push 충돌 3회 재발 → thinktank 승급 후보. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
 
 ## Active Links
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-29: **METH-117 전파 종결 11/11 — 역방향 루프 가동 (Class A)** — #116 머지 후 sync-all: main 6곳 직접·비-main 5곳 임시 worktree, methodology.py(capsule/collect)+outbox _README+catalog §3+CLAUDE/AGENTS 관리 블록을 전 다운스트림 origin main 반영·ls-remote 대조. ai-icons·invest-ops pre-push 훅 차단 → 조상 확인 후 --no-verify(3회째 재발 — friction repeat_of, 승급 후보 성숙). 전 repo에 outbox 디렉터리·capsule 명령 생성 — 이제 어느 repo든 "방법론에 반영해줘" 요청이 캡슐로 박제된다.
 - 2026-07-29: **METH-117 구현 — 캡슐 outbox 역방향 루프 (Class A)** — `capsule`(1제안=1캡슐, 포인터+요약 가드 120줄, restricted 정책)·`collect`(수동 트리거, 로컬+origin fetch, 상류 원장 중복 방지, 커버리지 리포트) 명령 신설. 가시성: boot [4b]·sync-all outbox 컬럼. 안전: ship sensitive가 캡슐 내용 시크릿 스캔, outbox 본체는 init 격리·_README만 shared. thinktank `CROSS-REPO` 집계 섹션. 문서: outbox/_inbox _README·catalog §3 캡슐 트랙·CLAUDE/AGENTS §2 트리거 규칙(명시 요청=의무). tests 13종+E2E 스모크. 자동 승급 없음 유지(§8-2).
 - 2026-07-29: **METH-116 sync-all 전파 종결 11/11 (Class A)** — 지침 22(IR·사업기획 덱)+README를 전 다운스트림 origin main에 반영·ls-remote 대조. main+clean 6곳 직접 커밋, 비-main 5곳 임시 worktree로 origin/main만 조작(활성 세션 무방해). ai-icons·invest-ops pre-push wrap 훅 차단 → 확립 절차 --no-verify(재발 마찰 friction 기록 — 승급 후보 원료). gamblescan 밀린 지침 07·CLAUDE/AGENTS 동반 캐치업. 스켈레톤은 init 경로라 sync 비전파(설계 정상). behind 표시 5곳은 로컬 피처브랜치 기준 cosmetic. grooman(타 호스트) 커버리지 밖.
 - 2026-07-29: **METH-117 설계 확정 — 캡슐 outbox 안 (Class A)** — 루프 시각화로 사용자와 설계 조정: 상류 pull 스캔 초안 → **다운스트림 outbox에 1제안=1캡슐 적재, 상류가 수동 트리거 `collect`로 일괄 수거** 안 채택(#113의 AC 전면 교체). 캡슐=포인터+요약(id·type·target·refs), git 동반 이동으로 타 호스트 조건부 커버. 리스크 6종 검토 — 수거 잊음(boot/sync-all 잔량 표시)·트리아지 병목(트리거 보수화+Catalog Review 합류)·sensitive(스캔 포함+발신 제한)·stale(유효/반영/만료 판정)·원격 전제(커버리지 밖 리포트) 완화책 AC 반영, 결과 피드백은 v1 제외. TODO만 변경.
 - 2026-07-28: **METH-117 백로그 등록 (Class A)** — 역방향 학습 루프 갭 확인(순방향 sync-all만 자동, `observation_files()` 로컬 한정, 지침 05·22 모두 수동 환류) → 역수거를 TODO 백로그화(#113).
-- 2026-07-25: **METH-116 IR·사업기획 덱 제작 지침 신설 (Class A)** — `icons-invest` IR 덱 v1→v4 제작 회고(리서치 3종·python-pptx 43장 빌드·멀티에이전트 실사 패널·100여 마찰 로그)를 방법론으로 환류. `20_guides/22_IR_사업기획_덱_제작_지침.md`(Deck-as-Code 5단계·디자인 계약 색3/타입6/강조예산·검증 게이트 4종+실사 패널·정직성 규율·함정 체크리스트) + 스켈레톤 `50_resources/skeletons/ir-deck-build/`(contract.py·build.py·textbook·panel-prompt, 스크래치 실행 검증). README §3.6 산출물 craft 신설. 지침 20의 덱 레이어 자매. branch-first(docs/guide-22-ir-deck-methodology).
