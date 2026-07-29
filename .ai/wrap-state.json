@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "d0238d60369ffc8f25bd165fa8639a4b71a7145b",
-  "last_validated_at": "2026-07-29T06:49:17Z",
+  "last_validated_commit": "93eeb16f77e918fec3a3cdda4ca72bd0cd8b94f2",
+  "last_validated_at": "2026-07-29T06:55:54Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "993dac470bac5c74495a414804be689b422a36e616c13ba314ee11fd9395dc22"
+      "sha256": "0447c2320e037ea50786cefaa1bf95d962770f0f06ed18612379f067968d8e06"
     },
     "TODO.md": {
-      "sha256": "533d3d48175d8c25e7829da102af2675246192c262a6b8531c7d002ffac29125"
+      "sha256": "bd12f9b4e878129cd78a58c710db76696fa644b4114af33f66cd71edd812c617"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d2cad9ad2b974fcc50d7c1432443f8351d6d949bba93cdedd596bba5ae98b546"
+      "sha256": "90108b9fb5d92f81b6579419e8524681e399f5efef1fd34b130d1b6d3e584841"
     }
   },
   "observations": {
@@ -131,6 +131,7 @@
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
       "50_resources/ai_observations/2026-07-29_meth-118-backlog-todo-repair.md",
+      "50_resources/ai_observations/2026-07-29_meth-118-prompt-coaching-impl.md",
       "50_resources/ai_observations/2026-07-29_meth-119-triage-register.md",
       "50_resources/ai_observations/2026-07-29_meth-120-121-guards-impl.md",
       "50_resources/ai_observations/2026-07-29_meth-122-livefile-build-guards.md",
