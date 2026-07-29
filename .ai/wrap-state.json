@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "bc72f13bec0b6b001da1bdcc4a0b4af2655f09b9",
-  "last_validated_at": "2026-07-29T04:50:57Z",
+  "last_validated_commit": "1e6f1cd11dc2a46d093cb7cc790a8d9c0386f2e0",
+  "last_validated_at": "2026-07-29T05:25:08Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "cc8220fcebed10d2667c29cb6613b1ac05f47cc7ce5eb6aec210783cc56d8209"
+      "sha256": "0dc24e1269e7b302269f67e3a8dbece1f53a13feb38d9e99b60301ad168a95d9"
     },
     "TODO.md": {
-      "sha256": "66a0d29bc0dbef356d28c0ac5d8b7e5edcb051d55e8b8320305f52325062f1c4"
+      "sha256": "c0173e2158f0237c7dae1f78d8d7c000cc15fb677e0b8c1d1cc359455ef2a8d8"
     },
     ".ai/checkpoint.md": {
-      "sha256": "7870c54d2dc29180de6a07a6f3941fac12d729b24b6050453a384bb144937abe"
+      "sha256": "c9c84d07b4f49bd6f46e751d3f12327380f39ea6b8a5e7ec693e16491c7f5e89"
     }
   },
   "observations": {
@@ -130,6 +130,7 @@
       "50_resources/ai_observations/2026-07-28_meth-117-reverse-harvest-backlog.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",
+      "50_resources/ai_observations/2026-07-29_meth-118-backlog-todo-repair.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-116.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-117.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
