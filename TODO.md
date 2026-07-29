@@ -75,18 +75,21 @@
 
 
 
+
+
+## Blocked
+
+## Done
+
+
+
 ### METH-122 · P3+P6 도구 — 라이브 파일 fail-closed·자동 회전 + build 가드
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
   - [x] wrap 사이즈 경고를 자동 아카이브 회전 또는 fail-closed로 승급(cafe24 342KB·gamblescan 761줄 재발 방지) + HANDOFF 신선도(갱신일 vs 최근 커밋) 검사 + wrap 미실행 N일 감지
   - [x] 외부 게이트(대표·결제·자격증명) 대기 항목 = TODO Blocked 강제 이동 규칙 문서화(4개 repo에서 Blocked 미사용 실증)
   - [x] dev 서버 감지 시 build 차단 가드 스크립트를 스캐폴드 포함(ai-icons 7회 반복 — 규칙 아닌 강제)
-- **notes**: 전수조사 P3(7곳)+P6(4곳). **2026-07-29 구현 완료(PR 대기)**: `rotate` 명령(TODO Done 4건·HANDOFF Recent 5건 유지, 초과분 `40_dev/snapshots/live-archive/` 이관 — 삭제 아님, --checkpoint 는 전체 사본+상단 요지), wrap --strict 경성 한도(규정 2배·Done 20건) fail+rotate 안내, boot 신선도 경고(HANDOFF 날짜·wrap 미실행 vs 최근 커밋 7일), ship build 단계 dev 서버 감지 차단 + `60_tools/build-guard.sh`(shared, BUILD_GUARD_FORCE 탈출구), CLAUDE/AGENTS §2 외부 게이트=Blocked 강제 규칙. tests 6종.
-## Blocked
-
-## Done
-
-
+- **notes**: 전수조사 P3(7곳)+P6(4곳). **2026-07-29 구현 완료(PR 대기)**: `rotate` 명령(TODO Done 4건·HANDOFF Recent 5건 유지, 초과분 `40_dev/snapshots/live-archive/` 이관 — 삭제 아님, --checkpoint 는 전체 사본+상단 요지), wrap --strict 경성 한도(규정 2배·Done 20건) fail+rotate 안내, boot 신선도 경고(HANDOFF 날짜·wrap 미실행 vs 최근 커밋 7일), ship build 단계 dev 서버 감지 차단 + `60_tools/build-guard.sh`(shared, BUILD_GUARD_FORCE 탈출구), CLAUDE/AGENTS §2 외부 게이트=Blocked 강제 규칙. tests 6종. **머지(#123)·전파(07-29) 종결 11/11** — 전 repo가 rotate·경성 한도·신선도 경고·build 가드 획득. maincheck 자가 검증(fddc085d ✓) 후 Done. 비대 repo 5곳 rotate 실행은 각 repo 세션 과제.
 ### METH-120 · P1 도구 — main 도달 검증 + 스택-PR 금지 명문화
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
@@ -102,9 +105,6 @@
   - [x] 다건 friction 실사용 가능 확인(현행 F-001 캡 원인 규명) + 기본값 그대로면 validate가 "미기입" 경고
   - [x] prompt_patterns 상용구 제거 — METH-118 prompting 블록과 통합 설계
 - **notes**: 전수조사 P2 — 전 repo 900+건 메타 상수·repeat_of 포맷 붕괴. **2026-07-29 구현 완료(PR 대기)**: `normalize_repeat_of`(접두 오염 정규화+enum 강제, 위반 시 생성·validate 거부), 메타 자동 채움(ctx unknown 무시·env 추정·host_os 실측), domain 기본값 meta 제거(미지정 시 exit 2), prompt_patterns 상용구 제거(기본 []), `observation_quality_warnings`(unknown·meta·상용구 경고). prompting 실측 블록은 METH-118 잔여. tests 11종.
-### METH-119 · 2026-07 전수조사 발견 트리아지
-- **notes**: 2026-07-29. Class A, planning. 사용자와 트리아지 완료 — **P1~P9·P11·지침22 갭 전부 채택**, P10(라이브 파일 병렬 충돌)은 **RFC-003 초안**으로(`70_meta/rfc/RFC-003_live-file-parallel-conflict.md`, 결정 대기), 즉시 주의 5건 중 insta-toon 스택-PR 미도달은 즉시 복구(insta-toon PR #7 — 머지 무충돌·테스트 64/64). 분배: METH-120(P1)·121(P2, METH-118 통합)·122(P3+P6)·123(지침23)·124(지침24)·125(P7)·126(P8)·127(P11)·128(지침22 갭). 구현 착수 순서: 120·121 먼저(Ready). 지침 22 갭은 icons-invest 캡슐 발신→collect 수거로 **캡슐 루프 첫 실전 왕복 검증**. 잔여 repo 과제 4건(invest-ops 민감정보·tshome I-006·icons-marketing 원장·icons 배포 루틴)은 각 repo 세션 몫. 근거 스냅샷: `40_dev/snapshots/2026-07-29_전레포-월간-전수조사-마찰-인사이트.md`.
-
 ### METH-117 · 역방향 루프 — 캡슐 outbox + 수동 일괄 수거
 - **mode**: fullstack
 - **change-class**: A
