@@ -81,12 +81,18 @@
 ## InProgress
 
 
+
+## Blocked
+
+## Done
+
+
 ### METH-120 · P1 도구 — main 도달 검증 + 스택-PR 금지 명문화
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
 - **acceptance criteria**:
   - [x] Done 전이·배포 게이트용 main 도달 검사(`git merge-base --is-ancestor <sha> origin/main`)를 CLI로 제공(wrap 또는 신규 명령), TODO Done 처리 규칙에 연결
   - [x] "스택-PR 금지 — 앞 PR 머지 후 main에서 새로 분기" 를 CLAUDE/AGENTS §2에 명문화(개인 메모리→전 repo 규칙 승급)
-- **notes**: 전수조사 P1 — 6개 repo 사고. insta-toon 복구는 그 repo PR #7(머지 완료). **2026-07-29 구현 완료(PR 대기)**: `maincheck` 명령(fetch→origin main/master 대조·다건 sha·미도달 exit 1+안내), CLAUDE/AGENTS §2 스택-PR 금지·Done 검증 불릿.
+- **notes**: 전수조사 P1 — 6개 repo 사고. insta-toon 복구는 그 repo PR #7(머지 완료). **2026-07-29 구현 완료(PR 대기)**: `maincheck` 명령(fetch→origin main/master 대조·다건 sha·미도달 exit 1+안내), CLAUDE/AGENTS §2 스택-PR 금지·Done 검증 불릿. **머지(#121)·전파(07-29) 종결 11/11** — dirty 3곳(icons·icons-invest·lifeManager)도 worktree로 origin/main만 반영. Done 이동은 maincheck 자가 검증(04535d0d 도달 ✓) 후 — dogfood.
 
 ### METH-121 · P2 도구 — observe CLI 스키마 강제 (METH-118 통합)
 - **mode**: fullstack / **change-class**: A / **owner**: AI + Human
@@ -96,10 +102,6 @@
   - [x] 다건 friction 실사용 가능 확인(현행 F-001 캡 원인 규명) + 기본값 그대로면 validate가 "미기입" 경고
   - [x] prompt_patterns 상용구 제거 — METH-118 prompting 블록과 통합 설계
 - **notes**: 전수조사 P2 — 전 repo 900+건 메타 상수·repeat_of 포맷 붕괴. **2026-07-29 구현 완료(PR 대기)**: `normalize_repeat_of`(접두 오염 정규화+enum 강제, 위반 시 생성·validate 거부), 메타 자동 채움(ctx unknown 무시·env 추정·host_os 실측), domain 기본값 meta 제거(미지정 시 exit 2), prompt_patterns 상용구 제거(기본 []), `observation_quality_warnings`(unknown·meta·상용구 경고). prompting 실측 블록은 METH-118 잔여. tests 11종.
-## Blocked
-
-## Done
-
 ### METH-119 · 2026-07 전수조사 발견 트리아지
 - **notes**: 2026-07-29. Class A, planning. 사용자와 트리아지 완료 — **P1~P9·P11·지침22 갭 전부 채택**, P10(라이브 파일 병렬 충돌)은 **RFC-003 초안**으로(`70_meta/rfc/RFC-003_live-file-parallel-conflict.md`, 결정 대기), 즉시 주의 5건 중 insta-toon 스택-PR 미도달은 즉시 복구(insta-toon PR #7 — 머지 무충돌·테스트 64/64). 분배: METH-120(P1)·121(P2, METH-118 통합)·122(P3+P6)·123(지침23)·124(지침24)·125(P7)·126(P8)·127(P11)·128(지침22 갭). 구현 착수 순서: 120·121 먼저(Ready). 지침 22 갭은 icons-invest 캡슐 발신→collect 수거로 **캡슐 루프 첫 실전 왕복 검증**. 잔여 repo 과제 4건(invest-ops 민감정보·tshome I-006·icons-marketing 원장·icons 배포 루틴)은 각 repo 세션 몫. 근거 스냅샷: `40_dev/snapshots/2026-07-29_전레포-월간-전수조사-마찰-인사이트.md`.
 
@@ -115,15 +117,6 @@
   - [x] **안전**: outbox를 ship sensitive 스캔 대상에 포함 · outbox/_inbox는 sync-all mirror/prune 제외 경로 명시(METH-046 prune 사고 계보) · 민감 도메인 repo(예: invest-ops Class C)는 캡슐 발신 제한 규칙
   - [x] **트리아지·게이트**: _inbox 첫 판정 정형화(유효/이미 반영/만료 — stale 대응), 주기는 기존 Catalog Review 시간에 합류(병목 방지). thinktank가 _inbox 캡슐 target별 집계로 교차-repo 중복 제안 탐지(마킹만). **자동 승급 없음 유지(백서 §8-2)** — 자동화는 적재·집계·마킹까지, 분배·PR 머지는 사람
 - **notes**: 2026-07-28 역방향 학습 루프 갭 분석에서 도출(순방향 sync-all만 자동, `observation_files()` 로컬 한정, 실사례 지침 05·22 모두 사람이 수동 환류). **2026-07-29 설계 확정(사용자)**: 초안(상류 pull 스캔) → **캡슐 outbox 안**으로 교체 — 다운스트림은 상류 위치 몰라도 되고(제0원칙), 캡슐이 git push와 함께 이동해 타 호스트 repo도 origin 경유 수거 가능(조건부), 명시 요청 트랙의 그릇 확보, 채널 분리(지침 05) 정합, 사람 게이트 3중. 리스크 6종 검토 — 5종 완화책 AC 반영, 결과 피드백(채택/기각 통지)은 v1 제외. **같은 날 구현(#116)**: capsule·collect 명령, boot [4b]·sync-all outbox 컬럼, ship sensitive 캡슐 내용 스캔, MANIFEST(outbox _README shared·본체 init 격리), outbox/_inbox _README, catalog §3 캡슐 트랙, CLAUDE/AGENTS §2 트리거 규칙, tests 13종+E2E 스모크. **머지(#116)·전파(07-29) 종결 11/11**: sync-all — main 6곳 직접·비-main 5곳 임시 worktree, 전 다운스트림 origin 반영·ls-remote 대조. ai-icons·invest-ops pre-push 훅 차단 → --no-verify(3회째 재발, friction repeat_of). 전 repo가 capsule 명령 보유 — 역방향 루프 가동.
-
-### METH-116 · IR·사업기획 덱 제작 지침 신설 (지침 22 + 스켈레톤)
-- **mode**: fullstack
-- **change-class**: A
-- **owner**: AI + Human
-- **notes**: 2026-07-25. `icons-invest` IR 덱 v1→v4 제작 회고를 방법론으로 환류. 원료: 리서치 3종(AI-PPT-방법론·PPT-시각디자인·2025~26 트렌드)·python-pptx 43장 빌드 시스템(디자인 토큰 상단 고정+헬퍼+차트 xlsx→PNG)·멀티에이전트 실사 패널(4렌즈 토론결과)·100여 관찰/마찰 로그. 산출: `20_guides/22_IR_사업기획_덱_제작_지침.md` — Deck-as-Code 5단계(P0 정본화·P1 아웃라인 게이트·P2 디자인 계약·P3 코드 주입·P4 렌더검증) + 디자인 계약(색3·타입6·강조예산제) + 검증 게이트 4종+실사 패널 + 정직성 규율(헤드라인 정직·내부 메타 어휘 차단·GMV/인식매출) + 함정 체크리스트. 스켈레톤 `50_resources/skeletons/ir-deck-build/`(contract.py·build.py·textbook.template.md·panel-prompt.md), 스크래치 실행 검증(2장 빌드·geometry check 통과). README §3.6 산출물 craft 카테고리 신설. 지침 20(디자인 토큰)의 덱 레이어 자매. 사용자 선택(AskUserQuestion): 정식 가이드+실행 플레이북. branch-first(docs/guide-22-ir-deck-methodology). **전파(07-29) 종결 11/11**: #112 머지 후 sync-all — main+clean 6곳 직접, 비-main 5곳 임시 worktree로 origin/main만 조작, 전부 타깃 스테이징 커밋·push·ls-remote 대조. ai-icons·invest-ops는 pre-push wrap 훅 차단 → established 절차 --no-verify(재발 마찰, friction 기록). gamblescan은 밀린 지침 07·CLAUDE/AGENTS도 동반 따라잡음. 스켈레톤 ir-deck-build는 설계상 init 경로라 sync 비전파(정상 — shared는 _README만). grooman(타 호스트)만 커버리지 밖.
-
-### METH-115 · ship push 반영 검증 (origin HEAD 대조)
-- **notes**: 2026-07-24. Class A. ai-icons에서 push 유실 사고(ICONS-365) — 백그라운드 PR 머지로 원격이 앞서가 push가 non-fast-forward 거부됐는데 ship이 exit code만 보고 "완료" 보고, 16커밋이 로컬에만 쌓여 배포 정지. 다운스트림 패치(ICONS-366)를 업스트림에 이식: push 후 `git ls-remote origin <branch>`로 원격 HEAD를 로컬 HEAD와 대조 — 불일치/미존재면 fail(rebase 안내), 조회 불가면 "반영 미검증" 경고, 성공 시 반영 SHA 출력. 테스트 21/21. branch-first(fix/ship-push-verify). **전파(07-24) 종결 11/11**: #109 머지 후 sync-all — 전 다운스트림 반영·origin 검증(ai-icons는 상류판으로 수렴), 비-main 4곳 METH-106 절차. 잔여 icons(활성 세션→임시 worktree로 main만 조작, 도중 origin 전진 non-FF를 새 검증이 포착→rebase 재push)·invest-ops(원격 생성 확인 후 정상 sync)도 반영. grooman(타 호스트)만 커버리지 밖.
 
 > 최근 완료 ~4건만 유지. 이전 완료 항목은 `git log --grep="METH-"` 및 `40_dev/snapshots/` 참조.
 > (CLAUDE.md §파일 역할: "Full completion archives — move historical detail to git, PRs, or dated snapshots — not here.")
