@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "eef5a9fee2c5a4ac78e17cb6751d386567effea8",
-  "last_validated_at": "2026-07-29T07:55:54Z",
+  "last_validated_commit": "4cc047c6ffb0659df264086ab4f877d28191071c",
+  "last_validated_at": "2026-07-29T08:10:58Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "ba5e4c1ee19f67ef339cc31c91f06e06c6d86cf680ec4cb4369d94b9b48da1b8"
+      "sha256": "bbb699d6ea62184c00477c047e21eb1f6d179072d80770b75d4abba61993315c"
     },
     "TODO.md": {
-      "sha256": "aefc9aa372caa17e9afbe78240d1c7965baa65bd847a3c84141fda87c6cdd261"
+      "sha256": "cec829e0e26e033d38a3271484b71adc7e0d0660cb62f517102cbcc5ce7fd6b4"
     },
     ".ai/checkpoint.md": {
-      "sha256": "73ca4076be001f1eb46b10b963f6df9fa1334bf94befff407b2292ae5b79fb3c"
+      "sha256": "80c7003036c90795e3ed7512f373f4d6d90a57de2fc33492570509ec2b8e2266"
     }
   },
   "observations": {
@@ -128,6 +128,7 @@
       "50_resources/ai_observations/2026-07-24_sync-all-meth-115.md",
       "50_resources/ai_observations/2026-07-25_ir-deck-methodology-guide-22.md",
       "50_resources/ai_observations/2026-07-28_meth-117-reverse-harvest-backlog.md",
+      "50_resources/ai_observations/2026-07-29_ai-design-research.md",
       "50_resources/ai_observations/2026-07-29_guides-23-24-verification-kickoff.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-design.md",
       "50_resources/ai_observations/2026-07-29_meth-117-capsule-outbox-impl.md",

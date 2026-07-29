@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **트리아지 12/12 전량 종결** (2026-07-29) — METH-128 전파 11/11로 2026-07 전수조사 채택분 전량 완결. 방법론 백로그 잔류: METH-113(retrofit)뿐. branch `chore/sync-propagate-meth-128`, PR 대기. 별도 트랙: RFC-003 관찰(8/12경)·repo 과제 5건·grooman sync. 직전: METH-128 구현(#131 머지).
+- **Working on**: **AI 디자인 방법론 리서치 완료** (2026-07-29) — 영상·이미지·PPT·웹디자인 4도메인 병렬 웹리서치, 교차 공통 원칙 9종·구성안(지침 25~27 신설+20 v2·22 v3 보강) 도출. 스냅샷 정본, METH-129 등록(구성안 확정 = 사람 게이트). branch `docs/research-ai-design-2026-07`, PR 대기. 직전: 트리아지 12/12 종결(#132 머지).
 - **Current mode**: fullstack
 - **Next TODO**: 후속 후보(백로그 미등록): graph.json에 outbox/collect 노드·invest-ops `capsule_policy: restricted` 부여(그 repo 세션·ADR-0001 근거)·pre-push 훅 vs sync push 충돌 3회 재발 → thinktank 승급 후보. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-29: **AI 디자인 방법론 리서치 (Class A, planning)** — 웹리서치 에이전트 4기 병렬(1차 출처 확인): 영상(Kling·Veo 양강, Sora 소멸 — 모델 추상화 교훈)·이미지(레퍼런스→LoRA 사다리·Midjourney 소송·Firefly 유일 면책·AI기본법 표시 의무)·PPT(Deck-as-Code 학계 검증·결정론 레이아웃 린트·Vega-Lite 차트 계층)·웹(slop 마커 규명·DESIGN.md+금지목록+3안 픽·DTCG/shadcn registry). 교차 공통 원칙 9종 + 구성안(지침 25~27 신설, 20 v2·22 v3 보강, 스켈레톤 ai-asset-pipeline). 정본: `40_dev/snapshots/2026-07-29_AI디자인-방법론-리서치.md`. METH-129(확정 대기).
 - 2026-07-29: **METH-128 전파 종결 — 트리아지 12/12 전량 완결 (Class A)** — #131 머지 후 sync-all 11/11: 지침 22 v2·08 §7이 전 repo 반영, 발신 repo(icons-invest)에도 회귀 — **캡슐 루프 풀 사이클 실증**(발신→수거→트리아지→반영→전파). 오늘 하루: 역방향 루프 설계·구현·가동 + 전수조사(마찰 302건/90h+) + 채택 12건 전량 구현·전파(도구 4·지침 4·SOP 1·사용자 요청 1·복구 1·조사 1). Done 섹션은 rotate로 회전(live-archive 이관 — rotate 첫 실전 dogfood).
 - 2026-07-29: **METH-128 구현 — 지침 22 v2·지침 08 §7 (Class A)** — **캡슐 루프 풀 사이클 완결**: icons-invest 발신 캡슐(갭 15건) → collect 수거 → 트리아지 유효 → 지침 반영. 지침 22: 불변규율 4·5 신설(파일=유일 소스·안정 슬라이드 ID), P0/P3 게이트 보강(흡수 전수 확정·리드백 필수), 패널 결함 해소 루프(TODO 승격+다음 패널 명시 판정 — 1차 치명 5건 중 2건만 해소된 실측 계보), 함정 체크 8종. 지침 08 §7 장시간 에이전트 스톨 감지(mtime/size·TaskStop 후 동기 재실행). 반영 캡슐 _inbox 정리(원장 유지).
 - 2026-07-29: **METH-125~127 전파 종결 11/11 (Class A)** — #129 머지 후 sync-all: main 6곳 직접·비-main/dirty 5곳 worktree, 전부 origin 대조. SOP_scraping-pace가 전 repo standing에 배포(boot 노출), 지침 05/19 v2 반영. 트리아지 채택 12건 중 **11건 종결** — 잔여 METH-128(지침 22 보강)뿐.
 - 2026-07-29: **METH-125+126+127 구현 (Class A)** — ① 스크래핑 페이스 SOP 상류 승급(`00_briefs/standing/SOP_scraping-pace.md`, shared_paths 등록 — 페널티 누적 실측·프로브≠회복·IP 교체 무효·폴백 사다리·신규 소스 3축 평가) ② 지침 19 v2 §11 CI-로컬 정합(CI 매니저 검증·packageManager 핀·lockfile 가드·런북=실측) ③ 지침 05 v2 §9 사실 주장·샘플 규칙(출처 없는 주장 라이브 금지·[샘플] 마킹·근거 등급). 전수조사 P7·P8·P11 승급.
-- 2026-07-29: **지침 23·24 전파 종결 11/11 (Class A)** — #127 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. METH-123·124 Done(maincheck ✓). 트리아지 채택 12건 중 **10건 종결**(118~124) — 잔여 METH-125~128 + RFC-003 관찰.
