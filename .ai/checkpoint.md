@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (2026-07 전 레포 월간 전수조사)
+# Checkpoint — 2026-07-29 (METH-119 트리아지 종결)
 
-> ✅ 11개 repo 병렬 전수조사 완료 — 교차 반복 패턴 12종 스냅샷 박제, 트리아지 METH-119 등록. branch `docs/monthly-audit-2026-07`, PR 대기.
+> ✅ 트리아지 완료(전부 채택) — METH-120~128 분배 등록, RFC-003 초안, insta-toon 복구 PR, 캡슐 루프 첫 실전 왕복. branch `chore/meth-119-triage-register`, PR 대기.
 
 ---
 
@@ -10,22 +10,23 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `docs/monthly-audit-2026-07` (base=main 0b58f2c, branch-first)
+- Branch `chore/meth-119-triage-register` (base=main 744bead, branch-first)
 
-## 방금 한 것 (이번 세션 마지막 구간)
+## 방금 한 것 (트리아지 세션)
 
-- 사용자 지시: "모든 repo 순회, 최근 한 달 기록 전수조사(병목·반복·결과물 문제·인사이트)". 캡슐 루프 이전 미환류분의 소급 수거.
-- 병렬 Explore 에이전트 11기(repo당 1기, 읽기 전용) — 각 repo의 관찰로그 friction 전량·HANDOFF·checkpoint·TODO·git log·스냅샷 조사. grooman(타 호스트)만 불가.
-- 교차 집계 → `40_dev/snapshots/2026-07-29_전레포-월간-전수조사-마찰-인사이트.md` (정본): 총괄 통계, 승급 후보 P1~P12, 방법론 도구 결함 §2, 지침 후보 §3, repo별 요지 §4, 즉시 주의 §5, 방법 한계 §6.
-- 핵심: P1 스택-PR 사고 6곳(insta-toon은 main에 코드 없는 채 Done 허위) · P2 observe CLI 스키마 결함 전 repo(메타 상수·repeat_of 포맷 붕괴·F-001 캡·cafe24 friction 0/112) · P3 라이브 파일 규칙 미작동 7곳 · P6 dev-build 충돌 7회 반복("규칙 아닌 강제 필요" 실증) · P10 라이브 파일 3종 동시 갱신이 병렬 PR을 100% 충돌시킴(방법론 구조 비판 — RFC감).
-- METH-119(트리아지) Ready 등록 — 승급은 사람 게이트.
+- 사용자 판정(AskUserQuestion 4문): ① P1~P9·P11·지침22 갭 전부 채택 ② P10→RFC-003 작성 ③ 구현 착수는 P1+P2부터 ④ insta-toon 지금 복구.
+- **insta-toon 복구**: origin/main 기준 worktree→`fix/restore-stack-to-main`→origin/feat/provenance-log 머지(무충돌)→unittest 64/64→push→**insta-toon PR #7** (스택 3커밋: TOON-010·014·dotenv). 머지는 사람.
+- **캡슐 루프 첫 실전 왕복**: icons-invest에서 `capsule --slug guide-22-audit-gaps`(갭 15건 요지+refs) 생성→타깃 커밋·push(origin 검증)→상류 `collect --apply`→`meth_inbox/icons-invest__2026-07-29_guide-22-audit-gaps.md` 적재+원장 기록→트리아지 유효 판정→METH-128로 분배. 설계대로 전부 작동.
+- TODO: METH-119→Done(판정 기록), 신규 METH-120·121(Ready — 다음 구현)·122~128(Backlog). METH-118 notes에 121 통합 명시. METH-114 Done 이관.
+- `70_meta/rfc/RFC-003_live-file-parallel-conflict.md` 초안 — 문제(P10 근거 4개 repo)·대안 A~D·잠정 권고 B+C 혼합·결정 조건. **status: draft, 사람 결정 대기**.
 
 ## 다음 구체 행동
 
-1. 이 PR(`docs/monthly-audit-2026-07` → main) 머지.
-2. **METH-119 트리아지**(사람+AI, Catalog Review 합류): 스냅샷 §1 P1~P12 채택/보류/기각 → §2 도구 백로그·§3 지침·_pending·RFC 분배. observe CLI 강제(P2)는 METH-118과 통합 구현 검토.
-3. §5 즉시 주의는 각 repo 세션 과제: ① insta-toon 스택-PR 미도달 복구(최우선 — main에 lettering/provenance/config 부재) ② invest-ops 민감정보 저장 범위 합의+restricted ③ tshome I-006 잔여 ④ icons-marketing 원장 upsert ⑤ icons 배포 루틴.
-4. 원자료(에이전트 11기 상세 보고)는 이 세션 트랜스크립트에만 존재 — 스냅샷이 보존본. 필요 시 재조사가 정본.
+1. 이 PR(`chore/meth-119-triage-register` → main) 머지.
+2. **머지 후 METH-120+121 구현 착수**(같은 methodology.py라 한 브랜치 권장): 120 = main 도달 검사 CLI+CLAUDE/AGENTS 스택-PR 금지 불릿 / 121 = observe 메타 자동 채움·repeat_of enum·다건 friction·기본값 lint(METH-118 prompting 블록과 스키마 통합 설계). 구현 후 shared 변경이니 sync-all 전파.
+3. insta-toon PR #7 머지는 사람 — 머지 후 그 repo TODO Done 표기가 참이 됨.
+4. RFC-003은 2주 관찰(friction `where: "라이브 파일 병렬 충돌"` 통일 표기) 후 결정.
+5. 잔여 repo 과제(각 repo 세션): invest-ops 민감정보 합의+restricted · tshome I-006 · icons-marketing 원장 upsert · icons 배포 루틴.
 
 ## 막힌 것
 - 없음.
