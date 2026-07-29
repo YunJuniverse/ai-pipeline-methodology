@@ -1,6 +1,6 @@
-# Checkpoint — 2026-07-29 (지침 20 v3 — 기본 실수 3층 방어)
+# Checkpoint — 2026-07-29 (지침 20 v3 전파 종결 — 11/11)
 
-> ✅ 사용자 반복 실수(다크 대비·간격 붙음) 환류 — 지침 20 v3 + METH-130(UI repo 실설치) 등록. #135는 cherry-pick 통합 후 close. branch `docs/guide-20-v3-defense`, PR 대기.
+> ✅ 절대색 차단·3층 방어 규칙이 전 repo 반영. UI 게이트 실설치는 METH-130(repo별). branch `chore/sync-propagate-guide-20-v3`, PR 대기.
 
 ---
 
@@ -10,20 +10,23 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `docs/guide-20-v3-defense` (base=main c93dcfa + #135 기록 cherry-pick, branch-first)
+- Branch `chore/sync-propagate-guide-20-v3` (base=main, branch-first)
 
-## 방금 한 것
+## 방금 한 것 (#136 머지 후 전파)
 
-- **#135 처리**: OPEN 상태에서 새 작업이 라이브 파일을 겹치게 되어 — 스택-PR 금지 규칙에 따라 #135의 기록 커밋(b2f05c70)을 이 브랜치에 cherry-pick하고 #135는 사유 코멘트와 함께 close. 단일 main 직행 PR로 통합(내용 유실 없음).
-- **지침 20 v3**: 사용자 지적 반복 실수 2종의 구조적 방어 —
-  - §4 가드레일 표에 **절대색 직접 사용 fail 행**(`text-black`·`text-white`·`bg-black`·`bg-white` — 다크모드 미반전의 근원).
-  - §9.5 신설 "기본 실수 3층 방어": 1층 구조(시맨틱 토큰=자동 반전·`<Section>/<Stack>` 프리미티브 내장 간격, "기본 패딩 0+개별 부여" 구조 금지 — tshome 실사고 계보) / 2층 기계(axe 대비 PR 차단·opacity 누적 병행·인접 bounding box 간격 린트·양모드 스크린샷·computed 확인) / 3층 friction 기록.
-- **METH-130 등록**(Backlog): UI repo 6곳(tshome·talmo·lifeManager·icons-marketing·gamblescan·icons) 실설치 — axe 게이트·간격 스크립트·절대색 차단 확장·프리미티브 점검 + 더미 위반 실효 증명. 규칙 전파(sync)와 별개로 게이트 설치는 repo별 작업.
+- maincheck(9b6b1fbe ✓) → sync-all: main 5곳 직접(훅 2곳 --no-verify)·비-main/dirty 6곳 worktree — **11/11 origin 대조**. payload: 지침 20 v3·버전스탬프.
+- 이제 전 repo의 AI가 UI 작업 시 절대색(`text-black` 등) 금지·프리미티브 내장 간격·양모드 검증 규칙을 로드한다. **repo별 게이트 실설치(axe·간격 린트·가드레일 스크립트 확장)는 METH-130** — 각 UI repo 세션 착수 시 처리.
+
+## 현재 열린 트랙 (콜드스타트용)
+
+- **METH-130**(Backlog): UI repo 6곳 방어층 설치 — tshome·talmo·lifeManager·icons-marketing·gamblescan·icons. 설치 시 더미 위반 실효 증명 필수.
+- **METH-113**(Backlog): retrofit. **스켈레톤 ai-asset-pipeline**: 첫 이미지/영상 실작업 시.
+- RFC-003 관찰(8/12경 재론) · repo 과제 기존 5건(비대 rotate·invest-ops restricted·tshome I-006·icons-marketing 원장·icons 배포 루틴) · grooman sync(타 호스트) · AI 디자인 도구 지형 재검증(10월) · 월간 전수조사 2회차(8월 말).
 
 ## 다음 구체 행동
 
-1. 이 PR(`docs/guide-20-v3-defense` → main) 머지 → sync-all 전파(지침 20 shared) → 이후 각 UI repo 세션에서 METH-130 항목 참조해 설치.
-2. 잔여 트랙: 스켈레톤 ai-asset-pipeline(첫 실작업 시) · RFC-003 관찰 · repo 과제(METH-130 포함 6곳+기존 5건) · grooman sync · 월간 전수조사 2회차(8월 말).
+1. 이 PR(`chore/sync-propagate-guide-20-v3` → main) 머지 — 기록만.
+2. 이후 사용자 지시 대기.
 
 ## 막힌 것
 - 없음.

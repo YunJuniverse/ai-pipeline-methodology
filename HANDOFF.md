@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **지침 20 v3 — 기본 실수 3층 방어** (2026-07-29) — 사용자 반복 실수(다크 대비·간격 붙음) 환류: §4 절대색 차단(fail)·§9.5 3층 방어(토큰 강제·프리미티브 내장 간격·axe/간격 린트·양모드). METH-130(UI repo 6곳 실설치) 등록. #135 기록 커밋은 cherry-pick 통합(스택-PR 회피, #135 close). branch `docs/guide-20-v3-defense`, PR 대기.
+- **Working on**: **지침 20 v3 전파 종결 — 11/11** (2026-07-29) — 전 repo에 절대색 차단·3층 방어 규칙 반영. UI repo 6곳 게이트 실설치는 METH-130(각 repo 세션 몫). branch `chore/sync-propagate-guide-20-v3`, PR 대기. 직전: 지침 20 v3(#136 머지, #135 통합).
 - **Current mode**: fullstack
 - **Next TODO**: 후속 후보(백로그 미등록): graph.json에 outbox/collect 노드·invest-ops `capsule_policy: restricted` 부여(그 repo 세션·ADR-0001 근거)·pre-push 훅 vs sync push 충돌 3회 재발 → thinktank 승급 후보. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
 - **Blockers**: none
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-07-29: **지침 20 v3 전파 종결 11/11 (Class A)** — #136 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. 절대색 차단·프리미티브 내장 간격·기계 게이트 규칙이 전 repo 반영 — 실설치는 METH-130.
 - 2026-07-29: **지침 20 v3 — 기본 실수 3층 방어 (Class A)** — 사용자 반복 실수 환류(다크 배경+검은 텍스트 / 패딩 누락 붙음): §4 가드레일에 절대색(`text-black` 등) 차단 추가, §9.5 신설 — 1층 구조(시맨틱 토큰 자동 반전·프리미티브 내장 간격, 기본 패딩 0 구조 금지) 2층 기계(axe 대비 차단·bounding box 간격 린트·양모드 스크린샷·computed 확인) 3층 friction 기록. METH-130(UI repo 6곳 실설치 과제) 등록. #135는 cherry-pick 통합 후 close(스택-PR 금지 준수).
 - 2026-07-29: **METH-129 전파 종결 11/11 — AI 디자인 방법론 가동 (Class A)** — #134 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. 지침 25(공통 규범)·26(이미지)·27(영상)·20 v2·22 v3가 전 repo 반영 — 이제 어느 repo의 AI든 시각 산출물 작업 전 이 규범을 로드한다. 리서치(오전)→구성안 확정(사용자)→작성→전파까지 당일 완결.
 - 2026-07-29: **METH-129 작성 — AI 디자인 방법론 5종 (Class A)** — 사용자 확정(5개 전부): **지침 25 AI 디자인 공통 규범**(9원칙 — 모델 추상화·캐논 우선·provenance=저작권 증빙·2단 생성·게이트 3위치·2층 검증·텍스트 오버레이·slop 금지·법무), **26 이미지·캐릭터**(역할 매트릭스·시트→레퍼런스→LoRA 사다리·검수 2단), **27 영상**(샷 스펙 YAML·5부 프롬프트·비용 공식·QA 8항), **20 v2**(§9 DESIGN.md 의무·금지 기본값·3안 픽·AI 티 테스트), **22 v3**(§7b 레이아웃 린트·taxonomy·Vega-Lite·HTML 경유 금지). README v4.3.
 - 2026-07-29: **AI 디자인 방법론 리서치 (Class A, planning)** — 웹리서치 에이전트 4기 병렬(1차 출처 확인): 영상(Kling·Veo 양강, Sora 소멸 — 모델 추상화 교훈)·이미지(레퍼런스→LoRA 사다리·Midjourney 소송·Firefly 유일 면책·AI기본법 표시 의무)·PPT(Deck-as-Code 학계 검증·결정론 레이아웃 린트·Vega-Lite 차트 계층)·웹(slop 마커 규명·DESIGN.md+금지목록+3안 픽·DTCG/shadcn registry). 교차 공통 원칙 9종 + 구성안(지침 25~27 신설, 20 v2·22 v3 보강, 스켈레톤 ai-asset-pipeline). 정본: `40_dev/snapshots/2026-07-29_AI디자인-방법론-리서치.md`. METH-129(확정 대기).
-- 2026-07-29: **METH-128 전파 종결 — 트리아지 12/12 전량 완결 (Class A)** — #131 머지 후 sync-all 11/11: 지침 22 v2·08 §7이 전 repo 반영, 발신 repo(icons-invest)에도 회귀 — **캡슐 루프 풀 사이클 실증**(발신→수거→트리아지→반영→전파). 오늘 하루: 역방향 루프 설계·구현·가동 + 전수조사(마찰 302건/90h+) + 채택 12건 전량 구현·전파(도구 4·지침 4·SOP 1·사용자 요청 1·복구 1·조사 1). Done 섹션은 rotate로 회전(live-archive 이관 — rotate 첫 실전 dogfood).
