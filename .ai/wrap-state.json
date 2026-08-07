@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "fa65f64f73c83036b308b12af8d12339401c4f19",
-  "last_validated_at": "2026-07-29T08:56:57Z",
+  "last_validated_commit": "0f899b995bd87e0ed5e8ee55f2f0a6353998d1a0",
+  "last_validated_at": "2026-08-07T03:16:13Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "07dd5cd38f764fbcd4f23f8596e4f0691afd5acaf30b0a86c58a80d599bd1063"
+      "sha256": "eaf865fd8e277cf4a21c2c212fce962401c9f63cd026e8d09188fb6d9b86f35d"
     },
     "TODO.md": {
-      "sha256": "cb696b3515612299c46684768efadcba3a1c45a70b596921146b0bd098a741b9"
+      "sha256": "e5369a9d54f829404c1e3be71a1bec98f7b1d455c49880fdb98d159d7eac76df"
     },
     ".ai/checkpoint.md": {
-      "sha256": "78bb6ec7a0fac18aff7b563bd8db620dd0e9aec4e5cc54d1a3c40882443842e3"
+      "sha256": "3b8e5360cb7f0e85d90af1a460e2b4dc6ffc085db33ecae0cc788a418d2876c0"
     }
   },
   "observations": {
@@ -152,6 +152,7 @@
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-125-127.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-128-final.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-129.md",
+      "50_resources/ai_observations/2026-08-07_capsule-collect-2026-08.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

@@ -1,9 +1,84 @@
 {
   "collected": {
+    "gamblescan__2026-07-31_orphaned-pr-branch-commits": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-07-31_orphaned-pr-branch-commits.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-07-31_ship-no-build-bypass-masked-break": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-07-31_ship-no-build-bypass-masked-break.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-07-31_verify-source-not-proxy": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-07-31_verify-source-not-proxy.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-08-07_guard-pass-verdict-is-weak": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-08-07_guard-pass-verdict-is-weak.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-08-07_measure-before-widening-a-guard": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-08-07_measure-before-widening-a-guard.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-08-07_port-request-measure-inputs-first": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-08-07_port-request-measure-inputs-first.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-08-07_single-source-primitive": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-08-07_single-source-primitive.md",
+      "repo": "gamblescan"
+    },
+    "gamblescan__2026-08-07_verify-source-not-proxy-recurrence": {
+      "collected_at": "2026-08-07T03:13:53Z",
+      "file": "2026-08-07_verify-source-not-proxy-recurrence.md",
+      "repo": "gamblescan"
+    },
     "icons-invest__2026-07-29_guide-22-audit-gaps": {
       "collected_at": "2026-07-29T06:12:28Z",
       "file": "2026-07-29_guide-22-audit-gaps.md",
       "repo": "icons-invest"
+    },
+    "invest-ops__2026-07-31_done-claim-guard-ship-boot": {
+      "collected_at": "2026-08-07T03:13:58Z",
+      "file": "2026-07-31_done-claim-guard-ship-boot.md",
+      "repo": "invest-ops"
+    },
+    "invest-ops__2026-07-31_land-command-post-merge": {
+      "collected_at": "2026-08-07T03:13:58Z",
+      "file": "2026-07-31_land-command-post-merge.md",
+      "repo": "invest-ops"
+    },
+    "invest-ops__2026-07-31_prepush-hook-blocks-ref-delete": {
+      "collected_at": "2026-08-07T03:13:58Z",
+      "file": "2026-07-31_prepush-hook-blocks-ref-delete.md",
+      "repo": "invest-ops"
+    },
+    "lifeManager__2026-08-07_fixture-real-edge-values": {
+      "collected_at": "2026-08-07T03:13:59Z",
+      "file": "2026-08-07_fixture-real-edge-values.md",
+      "repo": "lifeManager"
+    },
+    "lifeManager__2026-08-07_no-kill-foreign-process": {
+      "collected_at": "2026-08-07T03:13:59Z",
+      "file": "2026-08-07_no-kill-foreign-process.md",
+      "repo": "lifeManager"
+    },
+    "lifeManager__2026-08-07_perf-ab-sampling": {
+      "collected_at": "2026-08-07T03:13:59Z",
+      "file": "2026-08-07_perf-ab-sampling.md",
+      "repo": "lifeManager"
+    },
+    "lifeManager__2026-08-07_scoped-bulk-edit": {
+      "collected_at": "2026-08-07T03:13:59Z",
+      "file": "2026-08-07_scoped-bulk-edit.md",
+      "repo": "lifeManager"
     }
   }
 }

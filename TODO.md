@@ -51,6 +51,16 @@
 
 ## Blocked
 
+### METH-131 · 캡슐 트리아지 2026-08 — 15건 / 3 repo (_inbox 적재 완료)
+- **mode**: fullstack
+- **change-class**: A / **owner**: Human(트리아지 판정) + AI(반영)
+- **대기 사유(외부 게이트)**: 캡슐 판정(유효/이미 반영/만료)은 **사람만** 내린다 — 백서 §8-2 자동 승급 금지. 판정 전 반영 착수 불가.
+- **acceptance criteria**:
+  - [ ] 15건 각각 판정 → 유효분만 목적지 분배(지침 보강 PR / TODO 백로그 / `catalog/_pending` / 도구 변경)
+  - [ ] 판정 후 '이미 반영'·'만료'분은 `_inbox`에서 삭제(원장 유지 — 재수거 방지), 근거 한 줄을 커밋 메시지에
+  - [ ] 유효분 반영 PR은 main 직행 단일 PR·maincheck로 도달 확인
+- **notes**: 2026-08-07 `collect --apply` 수거(원장 1→16건). thinktank 교차 집계: **CROSS-REPO** guide-23 x4(gamblescan·lifeManager) · guide-07 x2 · guide-19 x2, **DUP-TARGET** catalog x2 — 우선 검토 신호. 도구 변경 3건(tool/ship·tool/land·tool/hooks, invest-ops)은 서로 의존하는 한 세트라 함께 판정. `tool/hooks`(pre-push가 브랜치 삭제 push 차단)는 thinktank 승급 후보 ≥2회와 동일 마찰. `catalog` 2건은 07-31 제안의 08-07 재발 캡슐(누적 5실사례)이라 중복이 아닌 승급 근거. 집계: `40_dev/snapshots/insights/2026-W32_thinktank.md`.
+
 ## Done
 
 
