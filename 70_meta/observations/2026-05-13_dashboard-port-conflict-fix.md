@@ -24,7 +24,7 @@ friction:
     where: "적용 프로젝트(talmocom)의 local methodology.py 가 *옛 버전*이라 새 fix 가 안 적용됨 — talmocom 에서 호출하면 옛 동작"
     cost_minutes: 1
     resolution: "본 저장소 commit → 적용 프로젝트에 sync --apply 전파 필요. 임시 우회: python3 <METHODOLOGY>/60_tools/methodology.py dashboard --path ~/talmocom --port 8765 (본 저장소 새 코드 사용). 근본: METH-015 류 전파 사이클."
-    repeat_of: "F-001 (2026-05-12_meth-015-propagation)"
+    repeat_of: 2026-05-12_meth-015-propagation
   - id: F-004
     where: "세션 resume 으로 자정 넘김 — 관찰 파일을 작업 시작일(2026-05-12)로 만들었는데 wrap 은 오늘(2026-05-13) 날짜만 봐서 ship 실패"
     cost_minutes: 2

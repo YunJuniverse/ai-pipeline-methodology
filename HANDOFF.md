@@ -4,10 +4,10 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **캡슐 수거 2026-08 — 15건/3 repo `_inbox` 적재**(2026-08-07) — gamblescan 8·lifeManager 4·invest-ops 3. thinktank 재집계로 CROSS-REPO 3묶음 마킹. 트리아지 판정은 사람(METH-131, Blocked). branch `chore/collect-capsules-20260807`, PR 대기. 직전: 지침 20 v3 전파 종결 11/11(#137 머지).
+- **Working on**: **METH-132 CI `validate` 복구**(2026-08-07) — observation lint `repeat_of` 형식 위반 6건 정규화. **CI는 #136·#137·#138 세 번 연속 main에서 red였음** — 자동 머지(METH-133) 착수 전 선결. branch `fix/ci-observation-lint-20260807`. 직전: 캡슐 수거 15건(#138 머지).
 - **Current mode**: fullstack
-- **Next TODO**: METH-131 트리아지(사용자 판정 후 유효분 반영). 후속 후보(백로그 미등록): graph.json에 outbox/collect 노드·invest-ops `capsule_policy: restricted` 부여(그 repo 세션·ADR-0001 근거). 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
-- **Blockers**: METH-131 — 캡슐 15건 트리아지 판정 대기(사람만 판정 가능, 백서 §8-2 자동 승급 금지). 판정 전 반영 착수 불가.
+- **Next TODO**: METH-133/134/135(자동 머지·실험 모드·자율주행) 설계 확정 대기 — 사용자 결정 2건(자동 머지 범위·실험 모드 경계) 후 착수. METH-131 캡슐 트리아지. 후속 후보(백로그 미등록): graph.json에 outbox/collect 노드·invest-ops `capsule_policy: restricted`. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
+- **Blockers**: METH-131 — 캡슐 15건 트리아지 판정 대기(사람만 판정 가능, 백서 §8-2 자동 승급 금지). METH-133~135 — 거버넌스 변경(휴먼 게이트 구조)이라 Class C 승인 대기.
 
 ## Active Links
 
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-08-07: **METH-132 CI `validate` 복구 (Class A)** — observation lint `repeat_of` 자유서술 6건(5월 레거시 5 + 07-24 1)을 허용 스키마로 정규화, 서술은 `resolution` 보존. **CI가 #136~#138 세 번 연속 main red였고 아무도 못 봄** — 자동 머지 설계(METH-133)의 전제를 먼저 복구. 교훈: 스키마를 좁힐 때 기존 자산 전수 재검증.
 - 2026-08-07: **캡슐 수거 2026-08 — 15건/3 repo (Class A)** — 12개 repo 스캔 후 `collect --apply`: gamblescan 8·lifeManager 4·invest-ops 3을 `_inbox` 적재, 원장 1→16건(icons-invest 1건은 기수거 skip). thinktank 재집계로 CROSS-REPO guide-23 x4·guide-07 x2·guide-19 x2, DUP-TARGET catalog x2 마킹. 트리아지 판정은 사람 — METH-131(Blocked).
 - 2026-07-29: **지침 20 v3 전파 종결 11/11 (Class A)** — #136 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. 절대색 차단·프리미티브 내장 간격·기계 게이트 규칙이 전 repo 반영 — 실설치는 METH-130.
 - 2026-07-29: **지침 20 v3 — 기본 실수 3층 방어 (Class A)** — 사용자 반복 실수 환류(다크 배경+검은 텍스트 / 패딩 누락 붙음): §4 가드레일에 절대색(`text-black` 등) 차단 추가, §9.5 신설 — 1층 구조(시맨틱 토큰 자동 반전·프리미티브 내장 간격, 기본 패딩 0 구조 금지) 2층 기계(axe 대비 차단·bounding box 간격 린트·양모드 스크린샷·computed 확인) 3층 friction 기록. METH-130(UI repo 6곳 실설치 과제) 등록. #135는 cherry-pick 통합 후 close(스택-PR 금지 준수).
 - 2026-07-29: **METH-129 전파 종결 11/11 — AI 디자인 방법론 가동 (Class A)** — #134 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. 지침 25(공통 규범)·26(이미지)·27(영상)·20 v2·22 v3가 전 repo 반영 — 이제 어느 repo의 AI든 시각 산출물 작업 전 이 규범을 로드한다. 리서치(오전)→구성안 확정(사용자)→작성→전파까지 당일 완결.
-- 2026-07-29: **METH-129 작성 — AI 디자인 방법론 5종 (Class A)** — 사용자 확정(5개 전부): **지침 25 AI 디자인 공통 규범**(9원칙 — 모델 추상화·캐논 우선·provenance=저작권 증빙·2단 생성·게이트 3위치·2층 검증·텍스트 오버레이·slop 금지·법무), **26 이미지·캐릭터**(역할 매트릭스·시트→레퍼런스→LoRA 사다리·검수 2단), **27 영상**(샷 스펙 YAML·5부 프롬프트·비용 공식·QA 8항), **20 v2**(§9 DESIGN.md 의무·금지 기본값·3안 픽·AI 티 테스트), **22 v3**(§7b 레이아웃 린트·taxonomy·Vega-Lite·HTML 경유 금지). README v4.3.
