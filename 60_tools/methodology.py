@@ -1592,6 +1592,211 @@ def cmd_maincheck(args: argparse.Namespace) -> int:
     return 0
 
 
+# ─── land — 머지 착지 (METH-133) ────────────────────────────────────────────
+
+# Class B/C 자동 트리거 경로·패턴 (CLAUDE.md §3). fail-closed:
+# 하나라도 걸리면 자동 머지를 *거부*하고 사람을 부른다.
+# 오탐(사람 호출)은 싸고, 미탐(무검토 머지)은 비싸다 — 비대칭을 그대로 반영.
+CLASS_BC_PATTERNS: list[tuple[str, str]] = [
+    # (설명, 정규식 — repo 상대경로에 대해 검사)
+    ("DB 마이그레이션·스키마", r"(^|/)(migrations?|prisma)/|\.sql$|schema\.(prisma|sql)$"),
+    ("인증·인가", r"(^|/)(auth|authz|authentication|authorization|session|middleware|permissions?|rbac|roles?)[./_-]"),
+    ("과금·결제·가격", r"(^|/)(billing|payment|pricing|checkout|invoice|subscription|plan)s?[./_-]"),
+    ("외부 API 계약", r"(^|/)(openapi|swagger)|\.proto$|(^|/)api[-_]?contract"),
+    ("백그라운드 작업·스케줄러·큐", r"(^|/)(cron|scheduler|queue|worker|job)s?[./_-]"),
+    ("CI·배포 파이프라인", r"^\.github/workflows/|(^|/)(Dockerfile|docker-compose|vercel\.json|fly\.toml)$"),
+    ("법무·정책·공개 메시지", r"(^|/)(legal|policy|privacy|terms|compliance)[./_-]"),
+]
+
+
+def _classify_change(target: Path, base_ref: str, head_ref: str = "HEAD") -> list[tuple[str, str]]:
+    """base..head 변경 경로에서 Class B/C 트리거를 찾는다.
+
+    반환: [(트리거 설명, 걸린 경로), ...] — 비어 있으면 Class A로 간주.
+    """
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "diff", "--name-only", f"{base_ref}...{head_ref}"],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return [("변경 경로 조회 실패 — 자동 판정 불가", "(unknown)")]
+    hits: list[tuple[str, str]] = []
+    for path in (p.strip() for p in out.splitlines() if p.strip()):
+        for label, pattern in CLASS_BC_PATTERNS:
+            if re.search(pattern, path, re.IGNORECASE):
+                hits.append((label, path))
+                break
+    return hits
+
+
+def _pr_for_branch(target: Path, branch: str) -> dict | None:
+    """현재 브랜치의 열린 PR 정보 — gh 없거나 PR 없으면 None."""
+    try:
+        out = subprocess.check_output(
+            ["gh", "pr", "view", branch, "--json",
+             "number,state,mergeable,baseRefName,title,url"],
+            cwd=str(target), text=True, stderr=subprocess.DEVNULL,
+        )
+        return json.loads(out)
+    except Exception:  # noqa: BLE001 — gh 미설치·PR 없음 모두 "판정 불가"
+        return None
+
+
+def _pr_checks_failing(target: Path, pr_number: int) -> list[str] | None:
+    """실패한 CI 체크 이름 목록. None = 체크 정보 조회 불가(판정 불가)."""
+    try:
+        out = subprocess.check_output(
+            ["gh", "pr", "checks", str(pr_number), "--json", "name,state"],
+            cwd=str(target), text=True, stderr=subprocess.DEVNULL,
+        )
+        rows = json.loads(out)
+    except Exception:  # noqa: BLE001
+        return None
+    bad = {"FAILURE", "ERROR", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED"}
+    return [r.get("name", "?") for r in rows if str(r.get("state", "")).upper() in bad]
+
+
+def _pr_checks_pending(target: Path, pr_number: int) -> list[str]:
+    """아직 끝나지 않은 체크 이름 목록."""
+    try:
+        out = subprocess.check_output(
+            ["gh", "pr", "checks", str(pr_number), "--json", "name,state"],
+            cwd=str(target), text=True, stderr=subprocess.DEVNULL,
+        )
+        rows = json.loads(out)
+    except Exception:  # noqa: BLE001
+        return []
+    pend = {"PENDING", "QUEUED", "IN_PROGRESS", "WAITING", "REQUESTED"}
+    return [r.get("name", "?") for r in rows if str(r.get("state", "")).upper() in pend]
+
+
+def cmd_land(args: argparse.Namespace) -> int:
+    """PR 머지 → main 도달 확인 → 브랜치 정리까지의 '착지' — METH-133.
+
+    ship 이 *떠나보냄*(commit·push)이라면 land 는 *착지*다. 수거 캡슐
+    invest-ops__2026-07-31_land-command-post-merge 의 설계를 채택했다.
+
+    단계:
+      1) 현재 브랜치의 PR 식별
+      2) Class 판정 — Class B/C 트리거 경로면 자동 머지 거부(사람 호출)
+      3) CI green 기계 확인 — 실패 0건, 진행 중 0건
+      4) gh pr merge --squash --delete-branch
+      5) 기본 브랜치 체크아웃 + pull
+      6) maincheck — main 도달 기계 확인
+    어느 단계든 판정 불가면 *진행하지 않는다*(fail-closed).
+    """
+    target = Path(args.path or ".").resolve()
+
+    branch = subprocess.check_output(
+        ["git", "-C", str(target), "branch", "--show-current"], text=True
+    ).strip()
+    if not branch:
+        err("DETACHED HEAD — land 불가.")
+        return 1
+
+    base_ref = _git_remote_default_ref(target)
+    if base_ref is None:
+        err("origin main/master 참조를 찾을 수 없음.")
+        return 1
+    default_branch = base_ref.rsplit("/", 1)[-1]
+    if branch == default_branch:
+        err(f"현재 브랜치가 기본 브랜치({default_branch}) — land 는 작업 브랜치에서 실행한다.")
+        return 1
+
+    # 1) PR 식별
+    info("land: 1/6 — PR 식별")
+    pr = _pr_for_branch(target, branch)
+    if pr is None:
+        err(f"브랜치 {branch} 의 PR 을 찾을 수 없음(gh 미설치이거나 PR 미생성).")
+        err("`gh pr create` 로 PR 을 먼저 연 뒤 재실행.")
+        return 1
+    pr_num = pr.get("number")
+    if str(pr.get("state", "")).upper() == "MERGED":
+        ok(f"  PR #{pr_num} 이미 머지됨 — 머지 단계 skip, 도달 확인만 진행")
+    else:
+        print(f"  PR #{pr_num} · base={pr.get('baseRefName')} · {pr.get('url')}")
+    if pr.get("baseRefName") and pr["baseRefName"] != default_branch:
+        err(f"PR base 가 {pr['baseRefName']} — 기본 브랜치({default_branch})가 아니다. "
+            "스택-PR 금지(METH-120): 중간 브랜치로 머지되면 main 미도달이 된다.")
+        return 1
+
+    # 2) Class 판정 — fail-closed
+    info("land: 2/6 — Class 판정 (Class B/C 자동 머지 금지)")
+    hits = _classify_change(target, base_ref)
+    if hits:
+        err(f"Class B/C 트리거 {len(hits)}건 — 자동 머지 거부. 사람 검토가 필요하다.")
+        seen: set[str] = set()
+        for label, path in hits:
+            if label not in seen:
+                err(f"  - {label}")
+                seen.add(label)
+            err(f"      {path}")
+        err("CLAUDE.md §3: 근거·영향 범위·롤백 계획·리스크를 PR 에 남기고 사람이 머지한다.")
+        return 2
+    print("  ✓ Class B/C 트리거 없음 — Class A")
+
+    if str(pr.get("state", "")).upper() != "MERGED":
+        # 3) CI green
+        info("land: 3/6 — CI green 확인")
+        if not args.no_ci_check:
+            pending = _pr_checks_pending(target, pr_num)
+            if pending:
+                err(f"진행 중인 체크 {len(pending)}건 — 완료 후 재실행: {', '.join(pending[:5])}")
+                return 1
+            failing = _pr_checks_failing(target, pr_num)
+            if failing is None:
+                err("CI 체크 정보를 읽을 수 없음 — 판정 불가라 머지하지 않는다. "
+                    "`gh pr checks` 로 수동 확인 후 --no-ci-check 로 재실행.")
+                return 1
+            if failing:
+                err(f"실패한 체크 {len(failing)}건 — 머지 거부: {', '.join(failing)}")
+                err("가드의 '통과'는 약해도 '거부'는 강하다 — 고치고 재실행.")
+                return 1
+            print("  ✓ 실패 체크 0건")
+        else:
+            warn("  --no-ci-check — CI 검증 생략(무검증 머지)")
+
+        # 4) 머지
+        info("land: 4/6 — merge")
+        if args.dry_run:
+            ok(f"  DRY-RUN — 여기서 `gh pr merge {pr_num} --squash --delete-branch` 를 실행한다.")
+            return 0
+        rc = subprocess.call(
+            ["gh", "pr", "merge", str(pr_num), "--squash", "--delete-branch"],
+            cwd=str(target),
+        )
+        if rc != 0:
+            err("머지 실패 — 충돌·권한·보호 규칙을 확인.")
+            return 1
+    else:
+        info("land: 3/6 — CI green 확인 — skip (이미 머지됨)")
+        info("land: 4/6 — merge — skip (이미 머지됨)")
+
+    # 5) 기본 브랜치 동기화
+    info(f"land: 5/6 — {default_branch} 동기화")
+    subprocess.call(["git", "-C", str(target), "checkout", "-q", default_branch])
+    rc = subprocess.call(["git", "-C", str(target), "pull", "--ff-only", "-q"])
+    if rc != 0:
+        warn("pull --ff-only 실패 — 로컬 기본 브랜치가 갈라져 있을 수 있음. 수동 확인.")
+
+    # 6) main 도달 기계 확인
+    info("land: 6/6 — maincheck (main 도달)")
+    head = subprocess.check_output(
+        ["git", "-C", str(target), "rev-parse", "HEAD"], text=True
+    ).strip()
+    rc = subprocess.call([sys.executable, str(Path(__file__).resolve()),
+                          "maincheck", head, "--path", str(target)])
+    if rc != 0:
+        err("main 도달 미확인 — TODO Done 전이 금지.")
+        return 1
+
+    ok(f"land 완료 — PR #{pr_num} 이 {default_branch} 에 도달({head[:8]}). "
+       "이제 TODO Done 전이가 기계적으로 정당하다.")
+    print("  다음: TODO Done 이동 → HANDOFF/checkpoint 갱신 → ship")
+    return 0
+
+
 def _pending_capsule_counts(root: Path) -> tuple[int, int]:
     """다운스트림 outbox의 미수거(원장 기준) 캡슐 총계 — (건수, repo 수). 로컬 스캔만."""
     ledger = load_ledger()
@@ -2608,6 +2813,15 @@ def cmd_ship(args: argparse.Namespace) -> int:
             f"원격이 앞서 있을 수 있음 → `git pull --rebase origin {branch}` 후 재-ship.")
         return 1
     ok(f"ship 완료. branch: {branch} (origin 반영 확인: {remote_head[:8]})")
+
+    # 8) (선택) land — 머지 착지까지 이어서
+    if getattr(args, "land", False):
+        info("ship: 8/8 — land (머지 착지)")
+        land_args = argparse.Namespace(
+            path=str(target), dry_run=False,
+            no_ci_check=getattr(args, "no_ci_check", False),
+        )
+        return cmd_land(land_args)
     return 0
 
 
@@ -4120,6 +4334,10 @@ def main(argv: list[str] | None = None) -> int:
     psh.add_argument("--no-commit", action="store_true", help="commit 단계 skip (검증만)")
     psh.add_argument("--no-push", action="store_true", help="push 단계 skip (commit까지만)")
     psh.add_argument("--allow-sensitive", action="store_true", help="sensitive 파일 의심 패턴 차단 우회")
+    psh.add_argument("--land", action="store_true",
+                     help="push 후 land 까지 이어서 — PR 머지+main 도달 확인 (Class A·CI green 일 때만)")
+    psh.add_argument("--no-ci-check", dest="no_ci_check", action="store_true",
+                     help="--land 시 CI green 검증 생략 (무검증 머지 — 기본 금지)")
     psh.set_defaults(func=cmd_ship)
 
     phk = sub.add_parser("hooks", help="git hook 자동 설치 (pre-push 검증)")
@@ -4234,6 +4452,17 @@ def main(argv: list[str] | None = None) -> int:
     pmk.add_argument("--path", help="대상 repo (기본: 현재 디렉터리)")
     pmk.add_argument("--no-fetch", dest="no_fetch", action="store_true", help="origin fetch 생략")
     pmk.set_defaults(func=cmd_maincheck)
+
+    pld = sub.add_parser(
+        "land",
+        help="머지 착지 — PR 머지+main 도달 확인+브랜치 정리 (Class A·CI green 일 때만, METH-133)",
+    )
+    pld.add_argument("--path", help="대상 repo (기본: 현재 디렉터리)")
+    pld.add_argument("--dry-run", dest="dry_run", action="store_true",
+                     help="머지 직전까지만 — Class 판정·CI 확인 결과만 보고")
+    pld.add_argument("--no-ci-check", dest="no_ci_check", action="store_true",
+                     help="CI green 검증 생략 (무검증 머지 — 기본 금지)")
+    pld.set_defaults(func=cmd_land)
 
     prt = sub.add_parser(
         "rotate",
