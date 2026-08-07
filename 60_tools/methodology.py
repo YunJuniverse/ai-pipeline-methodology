@@ -2630,6 +2630,52 @@ def _detect_sensitive(target: Path) -> list[str]:
     return hits
 
 
+def _todo_done_ids(text: str) -> set[str]:
+    """TODO.md 본문에서 `## Done` 섹션에 있는 항목 ID 집합."""
+    ids: set[str] = set()
+    in_done = False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            in_done = line.strip() == "## Done"
+            continue
+        if in_done and line.startswith("### "):
+            m = re.match(r"###\s+([A-Z][A-Z0-9]*-\d+)", line)
+            if m:
+                ids.add(m.group(1))
+    return ids
+
+
+def _warn_premature_done(target: Path) -> None:
+    """작업 브랜치에서 Done 신규 진입을 감지하면 경고 — 차단하지 않는다."""
+    todo = target / "TODO.md"
+    if not todo.exists():
+        return
+    try:
+        branch = subprocess.check_output(
+            ["git", "-C", str(target), "branch", "--show-current"], text=True).strip()
+        default_ref = _git_remote_default_ref(target)
+    except Exception:  # noqa: BLE001
+        return
+    if not branch or default_ref is None:
+        return
+    default_branch = default_ref.rsplit("/", 1)[-1]
+    if branch == default_branch:
+        return  # 기본 브랜치면 이미 도달한 상태
+    try:
+        before = subprocess.check_output(
+            ["git", "-C", str(target), "show", f"{default_ref}:TODO.md"],
+            text=True, stderr=subprocess.DEVNULL)
+    except Exception:  # noqa: BLE001
+        return
+    new_done = _todo_done_ids(read_text(todo)) - _todo_done_ids(before)
+    if not new_done:
+        return
+    warn(f"Done 신규 진입 {len(new_done)}건 — 아직 {default_branch} 미도달: "
+         f"{', '.join(sorted(new_done))}")
+    warn("  머지 전 Done 표기는 허위 기록이다(METH-120). push 후 "
+         "`methodology.py land` 로 착지시켜 maincheck 를 통과시킬 것.")
+
+
 def cmd_ship(args: argparse.Namespace) -> int:
     """작업 종료 흐름을 단일 명령으로 통합.
 
@@ -2716,9 +2762,9 @@ def cmd_ship(args: argparse.Namespace) -> int:
         except Exception:
             scripts = {}
         if "build" in scripts:
-            dev = _dev_server_running()
+            dev = _dev_server_running(target)
             if dev:
-                err(f"dev 서버 실행 중 감지: {dev}")
+                err(f"dev 서버 실행 중 감지 (이 프로젝트): {dev}")
                 err("dev 중 build 는 .next 를 파괴한다(전수조사 P6 — 7회 재발). "
                     "dev 를 중지(preview_stop)하고 재시도하거나 --no-build 로 건너뛸 것.")
                 return 1
@@ -2728,14 +2774,40 @@ def cmd_ship(args: argparse.Namespace) -> int:
                 return 1
         else:
             print("  (package.json scripts.build 없음 — skip)")
+    elif pkg.exists() and args.no_build:
+        # --no-build 우회 시 최소한의 타입 검증은 남긴다
+        # (캡슐 ship-no-build-bypass-masked-break: 우회가 상습화되면 빌드 파손이
+        #  로컬에서 전혀 안 잡히고 배포에서만 드러난다. playwright 미선언 타입에러
+        #  → Vercel 전 배포 Error 실사례.)
+        info("ship: 5/7 — build (--no-build) — skip")
+        warn("빌드 미검증 상태로 push 한다 — 파손이 배포에서만 드러날 수 있다.")
+        if (target / "tsconfig.json").exists():
+            info("  최소 검증: tsc --noEmit")
+            rc = subprocess.call([manager, "exec", "tsc", "--noEmit"], cwd=str(target))
+            if rc != 0:
+                err("타입 검사 실패 — push 중단. (--no-build 여도 타입은 본다)")
+                err("정말 건너뛰려면 원인을 고치거나 tsconfig 를 조정할 것.")
+                return 1
+            print("  ✓ 타입 검사 통과")
+        else:
+            warn("  tsconfig.json 없음 — 타입 검증도 불가. 배포 전 수동 확인 권장.")
     else:
-        info("ship: 5/7 — build (package.json 없음 또는 --no-build) — skip")
+        info("ship: 5/7 — build (package.json 없음) — skip")
 
     # 6) commit
     if args.no_commit:
         ok("ship: 6/7 — commit (--no-commit) — skip")
         ok("ship: 7/7 — push — skip (--no-commit)")
         return 0
+
+    # Done 주장 감지 — 캡슐 invest-ops__2026-07-31_done-claim-guard-ship-boot
+    # 트리거를 'push'가 아니라 'Done 주장'에 둔다. maincheck 를 push 게이트로 넣는
+    # 안은 반대 — branch-first repo 에서 push 시점 커밋은 정의상 main 미도달이라
+    # 100% fail 하고 상시 우회를 학습시킨다(캡슐이 직접 지적).
+    # 차단이 아니라 *경고* 인 이유도 같다: 머지 후 Done 만 별도 커밋하게 강제하면
+    # 그 마찰로 우회한다. METH-133 land 도입으로 정상 경로(ship→land→Done)는 이미
+    # 닫혔고, 여기서 잡는 것은 '머지 전에 Done 부터 찍는' 이탈 경로다.
+    _warn_premature_done(target)
 
     info("ship: 6/7 — commit")
     # commit 직전에 wrap-state.json 을 *현재 라이브 파일 상태* 로 재생성.
@@ -2863,6 +2935,34 @@ if [ -z "$METH" ]; then
 fi
 
 python3 "$METH" manifest-check
+
+# 참조만 바꾸는 push 면제 (캡슐 invest-ops__2026-07-31_prepush-hook-blocks-ref-delete):
+# 브랜치 삭제(local sha = zero)와 tag push 는 *콘텐츠를 올리지 않는다*. 그런데도
+# wrap --strict 가 '4/4 라이브 파일 미갱신'으로 막아, 무관한 참조 정리에조차
+# --no-verify 를 쓰게 만든다 → 우회 습관화로 가드 자체가 무력해진다.
+# stdin 형식: <local ref> <local sha> <remote ref> <remote sha>
+# 푸시되는 ref 가 *전부* 삭제이거나 tag 이면 wrap skip (하나라도 콘텐츠 push 면 검증).
+REFS=$(cat)
+if [ -n "$REFS" ]; then
+  CONTENT_PUSH=0
+  while read -r LREF LSHA RREF RSHA; do
+    [ -z "$LREF" ] && continue
+    case "$LSHA" in
+      # zero-sha = 삭제 push
+      0000000000000000000000000000000000000000) continue ;;
+    esac
+    case "$LREF" in
+      refs/tags/*) continue ;;
+    esac
+    CONTENT_PUSH=1
+  done <<EOF_REFS
+$REFS
+EOF_REFS
+  if [ "$CONTENT_PUSH" = "0" ]; then
+    echo "[methodology hook] 참조 전용 push(브랜치 삭제·tag) 감지 — wrap skip"
+    exit 0
+  fi
+fi
 
 # ship 이 호출한 push 인 경우 wrap 재실행 skip
 # (ship step 1 에서 이미 wrap --strict 통과 + step 6 직전 wrap-state 동기화 →
@@ -3647,14 +3747,47 @@ def staleness_warnings(target: Path) -> list[str]:
     return warnings
 
 
-def _dev_server_running() -> str | None:
-    """실행 중인 next dev/dev 서버 프로세스 감지 — build 충돌 가드 (METH-122, P6 7회 재발)."""
+def _dev_server_running(target: Path | None = None) -> str | None:
+    """실행 중인 next dev 서버 감지 — build 충돌 가드 (METH-122, P6 7회 재발).
+
+    target 이 주어지면 **그 프로젝트에서 뜬 dev 서버만** 본다.
+    (캡슐 gamblescan__2026-07-31_ship-no-build-bypass-masked-break: 전역 pgrep 이
+     타 프로젝트 dev 서버를 오탐 → 매번 --no-build 우회 → 빌드 파손이 은폐돼
+     Vercel 전 배포가 Error. 오탐이 우회를 학습시키면 가드는 사라진 것과 같다.)
+    """
     try:
         out = subprocess.run(["pgrep", "-fl", "next dev"], capture_output=True, text=True, timeout=10)
-        if out.returncode == 0 and out.stdout.strip():
-            return out.stdout.strip().splitlines()[0]
     except Exception:
-        pass
+        return None
+    if out.returncode != 0 or not out.stdout.strip():
+        return None
+    lines = [l for l in out.stdout.strip().splitlines() if l.strip()]
+    if target is None:
+        return lines[0]
+    target = target.resolve()
+    for line in lines:
+        pid = line.split(None, 1)[0]
+        cwd = _process_cwd(pid)
+        if cwd is None:
+            # cwd 판정 불가 → 안전하게 '이 프로젝트일 수 있다'로 본다(가드 유지)
+            return f"{line}  (cwd 판정 불가 — 안전측 차단)"
+        if cwd == target or target in cwd.parents or cwd in target.parents:
+            return line
+    return None
+
+
+def _process_cwd(pid: str) -> Path | None:
+    """PID 의 작업 디렉터리 — macOS/Linux 공통(lsof). 실패 시 None."""
+    try:
+        out = subprocess.run(["lsof", "-a", "-p", str(pid), "-d", "cwd", "-Fn"],
+                             capture_output=True, text=True, timeout=10)
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    for line in out.stdout.splitlines():
+        if line.startswith("n/"):
+            return Path(line[1:]).resolve()
     return None
 
 

@@ -2,24 +2,26 @@
 
 > **수동 승급이 정식.** 이 리포트는 지표 집계 + 승급 *후보* 마킹만 한다 — 자동 승급 없음.
 > 승급은 사람이 PR로(백서 §8-2). 분기 회고 §1 지표의 소스 — 회고 직전 실행.
-> Generated at: 2026-08-07T03:14:18Z
+> Generated at: 2026-08-07T05:23:38Z
 
 ## 지표 (Metrics)
 
-- 관찰 로그: **136건** (충족)
-- 기간: 2026-05-07 ~ 2026-07-29 (83일)
-- 케이던스: 주당 약 11.5건
-- task_type 분포: docs 71, feature 23, refactor 19, bugfix 16, research 6, bootstrap 1
-- 마찰 총계: 22건 · Catalog 재적중(repeat_of): 7건 · 승급 후보(≥2회): 2건
+- 관찰 로그: **142건** (충족)
+- 기간: 2026-05-07 ~ 2026-08-07 (92일)
+- 케이던스: 주당 약 10.8건
+- task_type 분포: docs 74, feature 25, refactor 19, bugfix 17, research 6, bootstrap 1
+- 마찰 총계: 25건 · Catalog 재적중(repeat_of): 6건 · 승급 후보(≥2회): 2건
 
 ## Repeated Friction Candidates
 
 - `PROMOTE-CANDIDATE` x2: TODO 섹션 이동 스크립트의 문자열 index() 오매칭
 - `PROMOTE-CANDIDATE` x2: 다운스트림 pre-push wrap 훅이 상류 sync push 차단
 - `watch` x1: .git write lock
+- `watch` x1: CI validate red 3회 연속 미발견
 - `watch` x1: HANDOFF.md Working-on 단일 불릿을 부분 문장만 교체하면 이전 task 텍스트가 잔존
 - `watch` x1: ai-icons push
 - `watch` x1: browser preview
+- `watch` x1: icons-vault를 독립 repo로 오인
 - `watch` x1: init 스캐폴드 HANDOFF
 - `watch` x1: ship push step
 - `watch` x1: stacked-PR을 순차 머지했으나 GitHub 재타깃 미작동으로 #85/#86/#87이 main 아닌 중간 브랜치에 머지돼 096~098이 main 미반영
@@ -33,6 +35,7 @@
 - `watch` x1: 다운스트림(icons-invest)에 축적된 대량 도메인 작업을 상류 방법론으로 역환류할 때 원료가 스냅샷·빌드스크립트·관찰로그 3곳에 흩어져 통독 비용 큼
 - `watch` x1: 대시보드(generate-dashboard.py) sprint 결합이 15+ JS 사이트에 산재 — 티어 제거 시 데이터+UI+호출부 모두 추적 필요
 - `watch` x1: 새 세션이 부팅 계약(브리프 로드·dashboard)을 건너뛰고 IR 질문에 바로 뛰어들어 기존 프로세스 모른 채 오답 — 부팅 강제장치 없음 + HANDOFF 81KB 비대화로 부팅 프라이머 무력
+- `watch` x1: 새 지침을 만들었지만 로딩 트리거를 안 만듦
 - `watch` x1: 한글 파일명·본문 편집을 perl/sed+hex로 하니 개행 삭제·인코딩 mojibake 발생(doc_id·title 병합)
 
 ## Observations
@@ -173,6 +176,12 @@
 - `2026-07-29_sync-propagate-meth-125-127` — domain `meta`, task `docs`
 - `2026-07-29_sync-propagate-meth-128-final` — domain `meta`, task `docs`
 - `2026-07-29_sync-propagate-meth-129` — domain `meta`, task `docs`
+- `2026-08-07_capsule-collect-2026-08` — domain `meta`, task `docs`
+- `2026-08-07_ci-validate-repair` — domain `meta`, task `bugfix`
+- `2026-08-07_land-lab-autopilot` — domain `meta`, task `feature`
+- `2026-08-07_mode-keyword-routing` — domain `meta`, task `feature`
+- `2026-08-07_sync-propagate-meth-133-135` — domain `meta`, task `docs`
+- `2026-08-07_sync-propagate-meth-136` — domain `meta`, task `docs`
 
 ## Collected Capsules (_inbox)
 
@@ -183,7 +192,6 @@
 - `single` x1: target `60_tools/ship-build-guard` — repo gamblescan
 - `single` x1: target `guide-24` — repo gamblescan
 - `single` x1: target `tool/hooks` — repo invest-ops
-- `single` x1: target `tool/land` — repo invest-ops
 - `single` x1: target `tool/ship` — repo invest-ops
 
 > 트리아지 판정(유효/이미 반영/만료)·분배는 사람 — `50_resources/meth_inbox/_README.md`.

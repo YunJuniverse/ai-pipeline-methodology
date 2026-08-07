@@ -29,18 +29,20 @@
 
 ## InProgress
 
+### METH-131 · 캡슐 트리아지 2026-08 — 15건 전량 종결
+- **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
+- **acceptance criteria**:
+  - [x] 15건 판정 — **유효 13 · 이미 반영 1 · 만료 0**(사람 확정 2026-08-07). 초안: `40_dev/snapshots/2026-08-07_캡슐-트리아지-판정초안.md`
+  - [x] 유효분 반영 — 도구 3(`land`·hook 참조전용 면제·build-guard 스코프+tsc 폴백·Done 주장 경고) · 지침 23 v2 5조항 · 지침 19 v3 §8b · 지침 07 부작용 범위 봉쇄 · 지침 24 v2 §3b
+  - [x] `_inbox` 정리 — 14건 삭제, **원장 16건 유지**(재수거 방지)
+  - [ ] 전파 12/12 후 origin 대조
+- **notes**: 캡슐 루프 2회차(1회차는 METH-128). **판정 중 근거 정정 1건**: 초안에 `tool/hooks` 를 "이 세션 22회 우회로 실증"이라 적었으나 실측 결과 훅 설치 repo 는 11개 중 3개뿐이고 그 3개 전부 이미 sync 면제를 갖고 있었다 — 내 우회는 측정 없는 예방적 우회였다. 판정(유효)은 코드 판독 근거로 유지: delete/tag push 는 여전히 `wrap --strict` 를 통과해야 한다. **승급 2건**: `perf-ab-sampling`·`no-kill-foreign-process` 를 이번 세션에 지침 29·28(모드 전용)에 넣었던 것이 잘못 — 캡슐이 지목한 23·07 로 옮기고 모드 지침은 참조만 남겼다.
+
+
 
 ## Blocked
 
-### METH-131 · 캡슐 트리아지 2026-08 — 14건 잔여 / 3 repo (_inbox)
-- **mode**: fullstack
-- **change-class**: A / **owner**: Human(트리아지 판정) + AI(반영)
-- **대기 사유(외부 게이트)**: 캡슐 판정(유효/이미 반영/만료)은 **사람만** 내린다 — 백서 §8-2 자동 승급 금지. 판정 전 반영 착수 불가.
-- **acceptance criteria**:
-  - [ ] 잔여 14건 각각 판정 → 유효분만 목적지 분배(지침 보강 PR / TODO 백로그 / `catalog/_pending` / 도구 변경)
-  - [ ] 판정 후 '이미 반영'·'만료'분은 `_inbox`에서 삭제(원장 유지 — 재수거 방지), 근거 한 줄을 커밋 메시지에
-  - [ ] 유효분 반영 PR은 main 직행 단일 PR·maincheck로 도달 확인
-- **notes**: **1건 트리아지 종결(14건 잔여)** — `invest-ops__2026-07-31_land-command-post-merge` = 유효 → METH-133으로 반영 완료, `_inbox`에서 정리(원장 유지·재수거 방지). 같은 repo의 `tool/ship`(Done 주장 감지)·`tool/hooks`(브랜치 삭제 push 차단)는 **미반영 — 여전히 판정 대기**. 2026-08-07 `collect --apply` 수거(원장 1→16건). thinktank 교차 집계: **CROSS-REPO** guide-23 x4(gamblescan·lifeManager) · guide-07 x2 · guide-19 x2, **DUP-TARGET** catalog x2 — 우선 검토 신호. 도구 변경 3건(tool/ship·tool/land·tool/hooks, invest-ops)은 서로 의존하는 한 세트라 함께 판정. `tool/hooks`(pre-push가 브랜치 삭제 push 차단)는 thinktank 승급 후보 ≥2회와 동일 마찰. `catalog` 2건은 07-31 제안의 08-07 재발 캡슐(누적 5실사례)이라 중복이 아닌 승급 근거. 집계: `40_dev/snapshots/insights/2026-W32_thinktank.md`.
+
 
 ## Done
 
