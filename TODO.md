@@ -29,17 +29,6 @@
 
 ## InProgress
 
-### METH-136 · 운영 모드 키워드 트리거 — 지침 28·29 로딩 경로 연결
-- **mode**: fullstack / **change-class**: A / **owner**: AI
-- **acceptance criteria**:
-  - [x] 지침 01 §5.11 신설 — 운영 모드 라우팅 표(키워드 → 지침 28/29/07/land) + 경계 disambiguation 3항
-  - [x] CLAUDE.md·AGENTS.md §2 를 *서술*에서 **동작 지시**로 전환 — "키워드가 나오면 지침 본문을 먼저 로드한 뒤 착수, 요약만 보고 시작 금지"
-  - [ ] 전파 12/12 후 origin 대조
-- **notes**: 사용자 질문("자율주행·실험모드를 키워드로 쓰면 그 모드 규칙을 찾아 시행하는가")에서 도출된 실제 갭. **기존 상태는 절반만 작동** — CLAUDE.md 요약은 매 세션 자동 로드되지만 지침 28/29 *본문* 로드는 AI 판단에 의존했고, 지침 01 라우팅 표(§5.9 기획서·§5.10 작업 모드)에는 **운영 모드 축이 아예 없었다**. 요약(3~4줄)만으로 8시간 루프를 돌리면 조건·정지 규칙이 빠진다. 핵심 안전장치: "제약 없이 빨리"라는 속도 요구만으로 실험 모드가 켜지지 않게 — **4조건 확인이 선행**이고 어긋나면 일반 모드로 진행하며 사용자에게 알린다.
-
-
-
-
 
 ## Blocked
 
@@ -54,6 +43,15 @@
 - **notes**: **1건 트리아지 종결(14건 잔여)** — `invest-ops__2026-07-31_land-command-post-merge` = 유효 → METH-133으로 반영 완료, `_inbox`에서 정리(원장 유지·재수거 방지). 같은 repo의 `tool/ship`(Done 주장 감지)·`tool/hooks`(브랜치 삭제 push 차단)는 **미반영 — 여전히 판정 대기**. 2026-08-07 `collect --apply` 수거(원장 1→16건). thinktank 교차 집계: **CROSS-REPO** guide-23 x4(gamblescan·lifeManager) · guide-07 x2 · guide-19 x2, **DUP-TARGET** catalog x2 — 우선 검토 신호. 도구 변경 3건(tool/ship·tool/land·tool/hooks, invest-ops)은 서로 의존하는 한 세트라 함께 판정. `tool/hooks`(pre-push가 브랜치 삭제 push 차단)는 thinktank 승급 후보 ≥2회와 동일 마찰. `catalog` 2건은 07-31 제안의 08-07 재발 캡슐(누적 5실사례)이라 중복이 아닌 승급 근거. 집계: `40_dev/snapshots/insights/2026-W32_thinktank.md`.
 
 ## Done
+
+### METH-136 · 운영 모드 키워드 트리거 — 지침 28·29 로딩 경로 연결
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 지침 01 §5.11 신설 — 운영 모드 라우팅 표(키워드 → 지침 28/29/07/land) + 경계 disambiguation 3항
+  - [x] CLAUDE.md·AGENTS.md §2 를 *서술*에서 **동작 지시**로 전환 — "키워드가 나오면 지침 본문을 먼저 로드한 뒤 착수, 요약만 보고 시작 금지"
+  - [x] 전파 **12/12** — main 6곳 직접·비-main/dirty 5곳 worktree, 전부 origin 대조(CLAUDE.md 트리거 + 지침 01 §5.11)
+- **notes**: 사용자 질문("자율주행·실험모드를 키워드로 쓰면 그 모드 규칙을 찾아 시행하는가")에서 도출된 실제 갭. **기존 상태는 절반만 작동** — CLAUDE.md 요약은 매 세션 자동 로드되지만 지침 28/29 *본문* 로드는 AI 판단에 의존했고, 지침 01 라우팅 표(§5.9 기획서·§5.10 작업 모드)에는 **운영 모드 축이 아예 없었다**. 요약(3~4줄)만으로 8시간 루프를 돌리면 조건·정지 규칙이 빠진다. 핵심 안전장치: "제약 없이 빨리"라는 속도 요구만으로 실험 모드가 켜지지 않게 — **4조건 확인이 선행**이고 어긋나면 일반 모드로 진행하며 사용자에게 알린다.
+
 
 ### METH-135 · 자율주행 모드 — 지침 29 신설 (장시간 자율 턴)
 - **mode**: fullstack / **change-class**: A (근거: ADR-004) / **owner**: AI

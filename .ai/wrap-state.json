@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "c826fcc0a710ba0e5926931ac6732ea8ae23c329",
-  "last_validated_at": "2026-08-07T05:01:27Z",
+  "last_validated_commit": "96ca7054b7c510a1bd8445f2b8e98e77e6a5ea47",
+  "last_validated_at": "2026-08-07T05:03:48Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "0fa61e5bf5abe99caf22ddf2096a346b86c904a8f1fd1059a0ab3c585748f8fa"
+      "sha256": "29790f14f9d248837f3ace84533f846fc699547d9bd72c1ea9776a6eed115559"
     },
     "TODO.md": {
-      "sha256": "bcc70faca3dda5e538ab3013229a9fef2aa8c3100f2afe5c7b0cf53370e22c69"
+      "sha256": "cf26cb4806167b1fbf37704da65fbda302b72f2bcea845405b7b2f497e7b380d"
     },
     ".ai/checkpoint.md": {
-      "sha256": "bacd6a03b3b943f4ec6db56f7a8f6bc220d80765af113be6e1f10bd191ef8727"
+      "sha256": "d111440b7da68c295afe4fdcaaebbe689880bc98e3d675e27d132b36021c14a0"
     }
   },
   "observations": {
@@ -157,6 +157,7 @@
       "50_resources/ai_observations/2026-08-07_land-lab-autopilot.md",
       "50_resources/ai_observations/2026-08-07_mode-keyword-routing.md",
       "50_resources/ai_observations/2026-08-07_sync-propagate-meth-133-135.md",
+      "50_resources/ai_observations/2026-08-07_sync-propagate-meth-136.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
