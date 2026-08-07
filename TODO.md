@@ -29,12 +29,31 @@
 
 ## InProgress
 
-### METH-132 · CI `validate` 복구 — observation lint 6건 형식 위반
-- **mode**: fullstack / **change-class**: A / **owner**: AI
+### METH-133 · `land` — 머지 착지 자동화 (Class A + CI green)
+- **mode**: fullstack / **change-class**: A (근거: ADR-004, 사람 승인 2026-08-07) / **owner**: AI
 - **acceptance criteria**:
-  - [x] `repeat_of` 자유서술 6건 정규화(허용형: null · session_id · kebab-슬러그 · C-NNN) — 서술은 `resolution`으로 이동
-  - [ ] main 머지 후 Actions `validate` green 확인(maincheck + `gh run list`)
-- **notes**: **CI가 #136·#137·#138 세 번 연속 main에서 red였다** — 자동 머지(METH-133)의 전제가 이미 깨져 있었음. 원인은 5월 레거시 관찰로그 5건 + 07-24 1건이 나중에 도입된 `repeat_of` 스키마를 위반한 것. 내용 손실 없음(서술은 resolution에 보존). **교훈: 스키마를 좁힐 때 기존 자산 전수 재검증** — 수거 캡슐 `measure-before-widening-a-guard`(가드 확장 전 전수 재측정)의 거울상.
+  - [x] `methodology.py land` 신설 — PR 식별 → Class 판정 → CI green → squash 머지 → 기본 브랜치 동기화 → maincheck (6단계, 전부 fail-closed)
+  - [x] `ship --land` 연결 실행 + `--dry-run`·`--no-ci-check` 플래그
+  - [x] Class B/C 경로 판정기 더미 위반 실효 증명(지침 23 §1-3) — 마이그레이션·인증·과금·외부API·큐·CI·법무 7종 차단, 일반 경로 통과
+  - [ ] 이 PR을 `land`로 실제 머지해 end-to-end 증명 → maincheck ✓ 후 Done 전이
+- **notes**: 수거 캡슐 `invest-ops__2026-07-31_land-command-post-merge` 설계 채택(트리아지 **유효** → 반영 완료, `_inbox`에서 정리·원장 유지). **알려진 한계: Class 판정이 경로 패턴 기반이라 의미적 정책 변경을 못 잡는다** — 예컨대 이 PR(거버넌스 변경)도 경로상으론 Class A로 보인다. 그래서 land 는 "사람 판단의 대체"가 아니라 "기계로 확인 가능한 것만 자동화"다. 놓친 트리거는 friction으로 기록하되 **패턴을 넓히기 전 신규 적중분 전수 재측정**(캡슐 `measure-before-widening-a-guard`).
+
+### METH-134 · 실험 모드 — 지침 28 신설 (샌드박스 경계 + 졸업 게이트)
+- **mode**: fullstack / **change-class**: A (근거: ADR-004) / **owner**: AI
+- **acceptance criteria**:
+  - [x] 지침 28 신설 — 샌드박스 4조건·해제/유지 목록·시간범위 박스 선언·졸업 게이트 7항·실패 모드 4종
+  - [x] CLAUDE.md·AGENTS.md §2 진입 규칙, `20_guides/README.md` 카탈로그 등록
+  - [ ] 첫 실전 적용 시 선언 형식·졸업 정산이 실제로 작동하는지 확인 → 안 맞으면 v2
+- **notes**: 사용자 제기("경영상 제약이 프로토타입 개발을 막는다") 대응. 결정: **전면 해제가 아니라 샌드박스 경계 + 졸업 게이트**(사용자 선택). 진단은 "규칙이 많다"가 아니라 "프로토타입과 운영이 같은 게이트 사다리를 쓴다" — 그래서 사다리를 분리했다. invest-ops(조합원·금융)·운영 서비스가 같은 규칙을 받는 무경계 안은 기각.
+
+### METH-135 · 자율주행 모드 — 지침 29 신설 (장시간 자율 턴)
+- **mode**: fullstack / **change-class**: A (근거: ADR-004) / **owner**: AI
+- **acceptance criteria**:
+  - [x] 지침 29 신설 — 기계강제/운영계약 구분·사전 요구 4종·P0 기획 환산·4단계 루프·정지 조건 7종·stop report
+  - [x] CLAUDE.md·AGENTS.md §2 진입 규칙, `20_guides/README.md` 카탈로그 등록
+  - [ ] **첫 실주행으로 검증** — 사이클 45~90분 환산치가 실제와 맞는지, 정지 조건이 실제로 발동하는지 실측 → 지침 29 v2에 환류
+  - [ ] 무인 실행용 권한 사전 allowlist 정리(settings.json) — 없으면 첫 권한 프롬프트에서 정지
+- **notes**: 8시간 자율주행 요청. **가능하되 조건부** — 지침 07 §5.2대로 wall-clock은 런타임 미강제(반복수·비용·권한범위 3개만 강제)라 시간은 *사이클 환산 단위 + 사람이 돌아올 약속*으로만 쓴다. 이게 "시간 다 채울 필요 없음" 요구와 정확히 일치. **METH-134가 선결 조건** — 샌드박스 밖 자율주행은 Class B/C에서 반복 정지한다. 실질 blocker 3종: 권한 프롬프트(최대)·컴팩션·Class 게이트.
 
 
 
@@ -66,9 +85,16 @@
   - [ ] 15건 각각 판정 → 유효분만 목적지 분배(지침 보강 PR / TODO 백로그 / `catalog/_pending` / 도구 변경)
   - [ ] 판정 후 '이미 반영'·'만료'분은 `_inbox`에서 삭제(원장 유지 — 재수거 방지), 근거 한 줄을 커밋 메시지에
   - [ ] 유효분 반영 PR은 main 직행 단일 PR·maincheck로 도달 확인
-- **notes**: 2026-08-07 `collect --apply` 수거(원장 1→16건). thinktank 교차 집계: **CROSS-REPO** guide-23 x4(gamblescan·lifeManager) · guide-07 x2 · guide-19 x2, **DUP-TARGET** catalog x2 — 우선 검토 신호. 도구 변경 3건(tool/ship·tool/land·tool/hooks, invest-ops)은 서로 의존하는 한 세트라 함께 판정. `tool/hooks`(pre-push가 브랜치 삭제 push 차단)는 thinktank 승급 후보 ≥2회와 동일 마찰. `catalog` 2건은 07-31 제안의 08-07 재발 캡슐(누적 5실사례)이라 중복이 아닌 승급 근거. 집계: `40_dev/snapshots/insights/2026-W32_thinktank.md`.
+- **notes**: **1건 트리아지 종결(14건 잔여)** — `invest-ops__2026-07-31_land-command-post-merge` = 유효 → METH-133으로 반영 완료, `_inbox`에서 정리(원장 유지·재수거 방지). 같은 repo의 `tool/ship`(Done 주장 감지)·`tool/hooks`(브랜치 삭제 push 차단)는 **미반영 — 여전히 판정 대기**. 2026-08-07 `collect --apply` 수거(원장 1→16건). thinktank 교차 집계: **CROSS-REPO** guide-23 x4(gamblescan·lifeManager) · guide-07 x2 · guide-19 x2, **DUP-TARGET** catalog x2 — 우선 검토 신호. 도구 변경 3건(tool/ship·tool/land·tool/hooks, invest-ops)은 서로 의존하는 한 세트라 함께 판정. `tool/hooks`(pre-push가 브랜치 삭제 push 차단)는 thinktank 승급 후보 ≥2회와 동일 마찰. `catalog` 2건은 07-31 제안의 08-07 재발 캡슐(누적 5실사례)이라 중복이 아닌 승급 근거. 집계: `40_dev/snapshots/insights/2026-W32_thinktank.md`.
 
 ## Done
+
+### METH-132 · CI `validate` 복구 — observation lint 6건 형식 위반
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] `repeat_of` 자유서술 6건 정규화(허용형: null · session_id · kebab-슬러그 · C-NNN) — 서술은 `resolution`으로 이동
+  - [x] main 머지 후 Actions `validate` green 확인 — **maincheck addfb63 ✓ · main CI conclusion=success**
+- **notes**: **CI가 #136·#137·#138 세 번 연속 main에서 red였다** — 자동 머지(METH-133)의 전제가 이미 깨져 있었음. 원인은 5월 레거시 관찰로그 5건 + 07-24 1건이 나중에 도입된 `repeat_of` 스키마를 위반한 것. 내용 손실 없음(서술은 resolution에 보존). **교훈: 스키마를 좁힐 때 기존 자산 전수 재검증** — 수거 캡슐 `measure-before-widening-a-guard`(가드 확장 전 전수 재측정)의 거울상. 근본 원인(머지 후 CI 확인 단계 부재)은 METH-133 `land`의 maincheck 단계로 닫음. #139 머지.
 
 
 

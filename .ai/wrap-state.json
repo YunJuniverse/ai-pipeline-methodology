@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "eba1b7a37d074dc35fc9997779453e242de44e22",
-  "last_validated_at": "2026-08-07T03:23:34Z",
+  "last_validated_commit": "addfb63dfda13079265ad8b9c1a2fb779f2c4655",
+  "last_validated_at": "2026-08-07T04:51:32Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "95569da9104bacc43f300dd43424fbc952978e372a2599312cbe002ad7d3237c"
+      "sha256": "8484ef286a042b8df32c6dce4c60f84988111809b9962059ba96b957393639cb"
     },
     "TODO.md": {
-      "sha256": "caa57cb745857ec1e83e031d3f1c6624b1ef504d5187da8beb0504b8a673a9d2"
+      "sha256": "5cd9a9ed876458dd0bf157da785fd05e51ab1d6e47941bd1521bfee7e0aa6805"
     },
     ".ai/checkpoint.md": {
-      "sha256": "f7f99d046d124d778c12692189b5f59fbd77aa01e5f64e83c9b72aded8bba4cb"
+      "sha256": "9f2f3224589dcbca8d2e8703f4fa91dc6039580d586c488a84040e9c246284cf"
     }
   },
   "observations": {
@@ -154,6 +154,7 @@
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-129.md",
       "50_resources/ai_observations/2026-08-07_capsule-collect-2026-08.md",
       "50_resources/ai_observations/2026-08-07_ci-validate-repair.md",
+      "50_resources/ai_observations/2026-08-07_land-lab-autopilot.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
