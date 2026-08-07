@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "96ca7054b7c510a1bd8445f2b8e98e77e6a5ea47",
-  "last_validated_at": "2026-08-07T05:03:48Z",
+  "last_validated_commit": "cb26b025ae6b855edc219190b5b503fa671e49fb",
+  "last_validated_at": "2026-08-07T05:43:46Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "29790f14f9d248837f3ace84533f846fc699547d9bd72c1ea9776a6eed115559"
+      "sha256": "b4d54b0a72e1e98de656557ead0d68a5cfd36784d9bc32d0721f0685c92823dd"
     },
     "TODO.md": {
-      "sha256": "cf26cb4806167b1fbf37704da65fbda302b72f2bcea845405b7b2f497e7b380d"
+      "sha256": "5805300561030b4b99411709aa8839968ef9ed7e63cdedb2db09b77f5d660041"
     },
     ".ai/checkpoint.md": {
-      "sha256": "d111440b7da68c295afe4fdcaaebbe689880bc98e3d675e27d132b36021c14a0"
+      "sha256": "7466e3365f4dd0afd45de7cba3febe51e38b8787ef3774db7d23f95babea15d6"
     }
   },
   "observations": {
@@ -153,6 +153,7 @@
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-128-final.md",
       "50_resources/ai_observations/2026-07-29_sync-propagate-meth-129.md",
       "50_resources/ai_observations/2026-08-07_capsule-collect-2026-08.md",
+      "50_resources/ai_observations/2026-08-07_capsule-triage-reflect.md",
       "50_resources/ai_observations/2026-08-07_ci-validate-repair.md",
       "50_resources/ai_observations/2026-08-07_land-lab-autopilot.md",
       "50_resources/ai_observations/2026-08-07_mode-keyword-routing.md",
