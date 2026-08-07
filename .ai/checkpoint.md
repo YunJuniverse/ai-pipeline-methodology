@@ -1,7 +1,7 @@
 # Checkpoint — 2026-08-07 (자율 범위 확장 12/12 + 모드 키워드 트리거)
 
 > ✅ `land`·지침 28 실험 모드·지침 29 자율주행이 전 repo 가동. **PR #140 을 land 가 스스로 착지**시켜 end-to-end 증명.
-> ✅ METH-136 — 지침 28·29 를 **키워드로 불러오는 경로** 연결(지침 01 §5.11 + CLAUDE/AGENTS 동작 지시화). PR 대기.
+> ✅ METH-136 — 지침 28·29 를 **키워드로 불러오는 경로** 연결(지침 01 §5.11 + CLAUDE/AGENTS 동작 지시화). #142 머지·전파 12/12 종결.
 > 다음: METH-131 캡슐 14건 트리아지 · METH-135 첫 실주행 검증(사이클 환산 실측).
 
 ---
@@ -12,7 +12,7 @@
 
 ## 작성자
 - Agent: claude-opus-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `feat/mode-keyword-routing` (base=main, branch-first)
+- Branch `chore/sync-propagate-meth-136` (base=main, branch-first)
 
 ## 방금 한 것 (한 세션 4건)
 
@@ -31,7 +31,7 @@
 
 ## 다음 구체 행동
 
-1. 이 PR 을 `python3 60_tools/methodology.py land` 로 착지 후 **sync-all 전파 12/12**(METH-136 잔여 acceptance).
+1. 이 PR 을 `land` 로 착지(전파 기록). **세션 표준 종료 절차 = ship → land** 로 굳었다.
 2. **METH-131 트리아지 14건** — 순서: invest-ops `tool/ship`(Done 주장 감지)·`tool/hooks`(브랜치 삭제 push 차단) 2건 → CROSS-REPO 3묶음(guide-23 x4 · 07 x2 · 19 x2) → catalog 재발 건(누적 5실사례).
 3. **METH-135 첫 실주행** — 짧은 것부터(2~3 사이클). 사이클 소요·정지 조건 발동을 실측해 지침 29 v2 로 환류.
 4. 무인 실행 권한 allowlist(settings.json) 정리 — 없으면 자율주행이 첫 프롬프트에서 멈춘다.
