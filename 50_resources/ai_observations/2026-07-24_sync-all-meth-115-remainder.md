@@ -14,8 +14,8 @@ friction:
   - id: F-001
     where: "worktree push 직전 origin 전진"
     cost_minutes: 8
-    resolution: "활성 세션이 있는 repo는 push 직전에도 origin이 움직임 — 새 push 검증이 non-FF를 즉시 포착, pull --rebase 후 재push로 해소. 다중 세션 repo sync는 임시 worktree+rebase 패턴이 안전"
-    repeat_of: ICONS-365
+    resolution: "활성 세션이 있는 repo는 push 직전에도 origin이 움직임 — 새 push 검증이 non-FF를 즉시 포착, pull --rebase 후 재push로 해소. 다중 세션 repo sync는 임시 worktree+rebase 패턴이 안전. 다운스트림 ai-icons ICONS-365(push 유실 사고)와 동일 계열"
+    repeat_of: null
 prompt_patterns:
   - intent: "l1 observation capture"
     success: true

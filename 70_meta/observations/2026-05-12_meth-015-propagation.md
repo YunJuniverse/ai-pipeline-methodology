@@ -25,7 +25,7 @@ friction:
     where: "talmocom 의 untracked 이미지 2건 (talmocom-home-images.png, talmocom-products-images.png) 가 git add -A 시 마이그레이션 commit에 혼입 위험"
     cost_minutes: 1
     resolution: "명시 add: 'git add -u' (modified/deleted) + 'git add .github/workflows/' (신규 워크플로). 이미지 의도적 untracked 유지. 이전 v3.1→v3.2 sync에서 채택한 동일 패턴 재사용."
-    repeat_of: "F-004 (2026-05-12_v3.1-to-v3.2-migration)"
+    repeat_of: 2026-05-12_v3-1-to-v3-2-migration
 prompt_patterns:
   - intent: "3개 프로젝트 동시 pre-check → 안전 확인 후 순차 sync"
     success: true

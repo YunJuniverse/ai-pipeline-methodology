@@ -29,6 +29,13 @@
 
 ## InProgress
 
+### METH-132 · CI `validate` 복구 — observation lint 6건 형식 위반
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] `repeat_of` 자유서술 6건 정규화(허용형: null · session_id · kebab-슬러그 · C-NNN) — 서술은 `resolution`으로 이동
+  - [ ] main 머지 후 Actions `validate` green 확인(maincheck + `gh run list`)
+- **notes**: **CI가 #136·#137·#138 세 번 연속 main에서 red였다** — 자동 머지(METH-133)의 전제가 이미 깨져 있었음. 원인은 5월 레거시 관찰로그 5건 + 07-24 1건이 나중에 도입된 `repeat_of` 스키마를 위반한 것. 내용 손실 없음(서술은 resolution에 보존). **교훈: 스키마를 좁힐 때 기존 자산 전수 재검증** — 수거 캡슐 `measure-before-widening-a-guard`(가드 확장 전 전수 재측정)의 거울상.
+
 
 
 

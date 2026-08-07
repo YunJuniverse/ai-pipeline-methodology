@@ -35,7 +35,7 @@ friction:
     where: "spawn 시 적용 프로젝트의 local methodology.py 가 옛 버전이면 --branch 옵션 모름 → spawn 실패"
     cost_minutes: 0
     resolution: "spawn 동작 자체는 본 저장소(generate-dashboard.py 가 호출됨 → 본 저장소 자기 root 의 60_tools/methodology.py)에서 OK. 단 적용 프로젝트는 sync 전까지 옛 동작. 알려진 한계 (F-001 of 2026-05-12_meth-015-propagation 와 동일 패턴 — N=4 째 목격, MC-002 승급 더 명백해짐)."
-    repeat_of: "F-001 (2026-05-12_meth-015-propagation)"
+    repeat_of: 2026-05-12_meth-015-propagation
 prompt_patterns:
   - intent: "여러 dashboard 동시 + 브랜치 라디오 — 별도 포트 spawn 방식 (A)"
     success: true

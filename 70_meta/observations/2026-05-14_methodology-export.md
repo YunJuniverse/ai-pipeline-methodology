@@ -23,8 +23,8 @@ friction:
   - id: F-003
     where: ".env.local 같은 sensitive 파일이 export 결과에 *자동 포함* 되면 외주에 비밀 노출"
     cost_minutes: 0
-    resolution: "EXPORT_SENSITIVE 패턴 (.env/credential/secret/.pem/.key/.p12/.pfx) 발견 시 *기본 차단*. .sample/.example 확장자는 통과. 의도된 포함이면 --allow-sensitive 명시 — 의식적 선택."
-    repeat_of: "F-001 (sensitive 차단 패턴은 ship CLI 와 공통)"
+    resolution: "EXPORT_SENSITIVE 패턴 (.env/credential/secret/.pem/.key/.p12/.pfx) 발견 시 *기본 차단*. .sample/.example 확장자는 통과. 의도된 포함이면 --allow-sensitive 명시 — 의식적 선택. sensitive 차단 패턴은 ship CLI 와 공통."
+    repeat_of: null
   - id: F-004
     where: "결과 export 폴더에 *방법론 흔적*이 우연히 남으면 발견 어려움 — 외주 인계 후 발견 시 신뢰 손실"
     cost_minutes: 0

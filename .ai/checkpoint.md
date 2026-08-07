@@ -1,6 +1,7 @@
-# Checkpoint — 2026-08-07 (캡슐 수거 2026-08 — 15건/3 repo)
+# Checkpoint — 2026-08-07 (CI validate 복구 + 자동머지/실험모드/자율주행 설계 착수)
 
-> ✅ `_inbox` 적재·원장 16건·thinktank 재집계 완료. **다음은 사람 트리아지(METH-131, Blocked)** — 판정 없이는 반영 착수 금지(백서 §8-2).
+> ⚠️ **CI가 #136·#137·#138 세 번 연속 main에서 red였다** — METH-132로 복구(로컬 린트 0 오류). 자동 머지 설계의 전제였다.
+> 다음: METH-133/134/135 설계 — 사용자 결정 2건(자동 머지 범위·실험 모드 경계) 대기.
 
 ---
 
@@ -10,39 +11,36 @@
 
 ## 작성자
 - Agent: claude-opus-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/collect-capsules-20260807` (base=main, branch-first — 직전 브랜치는 #137로 머지 완료라 main에서 새로 분기)
+- Branch `fix/ci-observation-lint-20260807` (base=main, branch-first — #138 머지 후 main에서 새로 분기)
 
 ## 방금 한 것
 
-- `collect` dry-run으로 12개 repo 전수 확인 → **미수거 15건/3 repo**(gamblescan 8·lifeManager 4·invest-ops 3). icons-invest 1건은 원장에 있어 skip(중복 방지 정상 작동).
-- `collect --apply` 적재 — `50_resources/meth_inbox/` 15파일, 원장 1→16건.
-- `thinktank` 재실행 → `40_dev/snapshots/insights/2026-W32_thinktank.md`. 캡슐 교차 집계: **CROSS-REPO** guide-23 x4(gamblescan·lifeManager)·guide-07 x2·guide-19 x2, **DUP-TARGET** catalog x2, single 5.
-- METH-131 등록(**Blocked** — 판정 주체가 사람).
+1. **캡슐 수거 종결**(#138 머지됨) — 15건 `_inbox` 적재·원장 16건·thinktank 재집계. 트리아지는 METH-131(Blocked).
+2. **METH-132 CI 복구** — `gh run list --branch main`로 #136~#138 전부 `failure` 확인. 원인은 observation lint의 `repeat_of` 형식 위반 6건(5월 레거시 `70_meta/observations/` 5건 + `50_resources/ai_observations/2026-07-24_sync-all-meth-115-remainder.md` 1건). 자유서술을 `resolution`으로 옮기고 `repeat_of`는 허용형(session_id·null)으로. 로컬 전수 린트 exit=0.
+3. 사용자 신규 요청 3건 조사 — 아래.
 
-## 수거분 요지 (트리아지 입력)
+## 사용자 요청 3건 (설계 대기)
 
-- **도구 3건(invest-ops, 한 세트)**: `tool/ship` Done 주장 감지+pending 원장(maincheck를 push 게이트로 넣는 안은 반대 — 브랜치 push는 항상 미도달) · `tool/land` ship의 대칭짝 신설(maincheck→Done 확정→브랜치 안전 삭제) · `tool/hooks` pre-push가 브랜치 삭제 push까지 차단해 `--no-verify` 상습화.
-- **guide-23(검증) 4건**: 가드 '통과' 판정은 약함(거부 86 전부 타당 vs 통과 10 중 5 가짜) · 탐지 규칙 확장 전 신규 적중분 전수 재측정 · 성능 A/B는 워밍 후 다회 중앙값 · 픽스처에 스키마가 만드는 특이값(null→기본값) 포함.
-- **guide-07(자율 정지조건) 2건**: 열린 PR 브랜치에 커밋 축적 → 고아 커밋(4회 재발) · 내가 만들지 않은 프로세스·포트 kill 금지.
-- **guide-19(클린코드) 2건**: 판정 원시함수 중복 금지(가드 2개 동시 무력화 위험) · 일괄 치환은 범위 최소화+카나리.
-- **catalog 2건**: "대리 신호 말고 원본 검증" — 07-31 제안이 08-07에 새 기제 2종으로 재발(누적 5실사례). 중복 아님, 승급 근거.
-- **기타**: `60_tools/ship-build-guard`(--no-build 우회가 빌드 파손 은폐) · `guide-24`(이식 요청은 입력 축 실측 → 부재 크면 Class C).
+- **METH-133 자동 머지**: ship이 머지까지. 조사 결과 — main **브랜치 보호 없음**(즉시 머지 가능), `.github/workflows/methodology-auto-merge.yml` **이미 존재**(`auto-merge` 라벨 트리거), 단 repo 설정 `allow_auto_merge=false`라 `gh pr merge --auto` 불가. `delete_branch_on_merge=false`. 수거 캡슐 `invest-ops__2026-07-31_land-command-post-merge`(land 명령 신설안)가 이 요청과 **동일 설계** — 트리아지 유효 판정 후 흡수하면 됨.
+- **METH-134 실험 모드(god mode)**: 경영 제약이 프로토타입 개발을 막는 문제. 핵심 논점 = 자유 구역의 **경계**. 무경계 시 invest-ops(조합원·금융 데이터)·운영 서비스까지 게이트 없이 열림.
+- **METH-135 자율주행 8시간**: 가능하나 조건부 — 지침 07 §5.2가 이미 "wall-clock은 SDK 미강제, 운영 계약"이라 명시. 실질 blocker는 권한 프롬프트(settings.json 사전 allowlist 없으면 무인 실행 중단)·컴팩션(지침 06)·Class B/C 게이트(→ METH-134가 선결).
 
 ## 다음 구체 행동
 
-1. 이 PR(`chore/collect-capsules-20260807` → main) 머지 — 수거·집계 기록만, 규칙 변경 없음.
-2. **사용자 트리아지**: 15건 각각 유효/이미 반영/만료 판정. 시작점 권장 = CROSS-REPO 3묶음(guide-23·07·19) → invest-ops 도구 3건 한 세트 → catalog 재발 건.
-3. 유효분 반영은 main 직행 단일 PR로, maincheck 확인 후 Done 전이.
+1. 이 PR(`fix/ci-observation-lint-20260807` → main) 머지 → **Actions `validate` green 실측**(red 복구 확인이 acceptance).
+2. 사용자 결정 2건 수령 → METH-133/134/135 ADR 작성(거버넌스 변경이라 Class C) → 구현.
+3. METH-131 캡슐 트리아지 — METH-133이 `land` 캡슐을 흡수하므로 함께 처리.
 
 ## 현재 열린 트랙 (콜드스타트용)
 
+- **METH-132**(InProgress): CI 복구, PR 대기.
+- **METH-133/134/135**(미등록, 설계 대기): 자동 머지 · 실험 모드 · 자율주행.
 - **METH-131**(Blocked): 캡슐 트리아지 15건.
-- **METH-130**(Backlog): UI repo 6곳 방어층 설치(axe·간격 린트·절대색 차단·프리미티브) — 더미 위반 실효 증명 필수.
-- **METH-113**(Backlog): retrofit. **스켈레톤 ai-asset-pipeline**: 첫 이미지/영상 실작업 시.
-- 후속 후보: graph.json에 outbox/collect 노드 · invest-ops `capsule_policy: restricted`(그 repo 세션) · RFC-003 관찰(8/12경) · grooman sync(타 호스트) · AI 디자인 도구 지형 재검증(10월) · 월간 전수조사 2회차(8월 말).
+- **METH-130**(Backlog): UI repo 6곳 방어층 설치. **METH-113**(Backlog): retrofit.
+- 후속 후보: graph.json outbox/collect 노드 · invest-ops `capsule_policy: restricted` · RFC-003 관찰(8/12경) · grooman sync(타 호스트) · 월간 전수조사 2회차(8월 말).
 
 ## 막힌 것
-- 없음(METH-131은 막힘이 아니라 사람 판정 대기 — Blocked로 명시).
+- 없음. METH-133~135는 막힘이 아니라 사람 결정 대기.
 
 ## 환경
 - macOS, python3. 대시보드 http://localhost:8768.

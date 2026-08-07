@@ -19,7 +19,7 @@ friction:
     where: "기존 적용 프로젝트(icons/gamblescan/talmocom)에 옛 루트 dashboard.html 잔존 가능성 — sync 만으로는 자동 제거 안 됨 (F-005 패턴)"
     cost_minutes: 0
     resolution: "cmd_dashboard 가 다음 호출 시 legacy.unlink() 자동 실행 — 첫 .app 더블클릭으로 자가 정리. 다만 *그 사이* 사용자가 옛 dashboard.html 더블클릭하면 정적 페이지 봄. 다음 dashboard 호출 시 깨끗."
-    repeat_of: "F-005 (2026-05-13_dashboard-port-conflict-fix)"
+    repeat_of: 2026-05-13_dashboard-port-conflict-fix
 prompt_patterns:
   - intent: "사용자 휴먼에러 우려 → 진입점 분리 (정적 file 노출 0)"
     success: true
