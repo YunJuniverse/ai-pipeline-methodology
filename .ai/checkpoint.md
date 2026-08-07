@@ -1,6 +1,6 @@
 # Checkpoint — 2026-08-07 (캡슐 트리아지 반영 — 15건 전량 종결)
 
-> ✅ 판정 확정(유효 13·이미 반영 1·만료 0) → 전량 반영 → `_inbox` 비움. PR 대기·전파 미완.
+> ✅ 판정 확정(유효 13·이미 반영 1·만료 0) → 전량 반영 → **전파 12/12 종결** → `_inbox` 비움·미수거 0건. 훅 3개 repo 재설치 완료.
 > ⚠️ **판정 근거 정정 1건**과 **내 실수 승급 2건**이 있었다 — 아래 참조.
 
 ---
@@ -11,7 +11,7 @@
 
 ## 작성자
 - Agent: claude-opus-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `feat/capsule-triage-reflect` (base=main, branch-first)
+- Branch `chore/sync-propagate-meth-131` (base=main, branch-first)
 
 ## 방금 한 것
 
@@ -28,13 +28,14 @@
 
 ## 다음 구체 행동
 
-1. 이 PR 을 `land` 로 착지 → **sync-all 전파 12/12**(METH-131 잔여 acceptance).
-2. **훅 재설치 필요** — 훅 본문이 바뀌었으므로 설치된 3개 repo 는 `methodology.py hooks install --force` 를 해야 새 면제가 적용된다. 나머지 8개는 미설치 상태(설치 여부는 각 repo 판단).
-3. METH-135 첫 실주행 검증(사이클 45~90분 환산 실측) · 무인 권한 allowlist.
+1. 이 PR 을 `land` 로 착지(전파 기록).
+2. **METH-135 첫 실주행 검증** — 짧게(2~3 사이클) 돌려 사이클 45~90분 환산치와 정지 조건 발동을 실측 → 지침 29 v2 환류. **사용자가 다른 프로젝트에서 실측해 알려주기로 함.**
+3. 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용.
+4. 훅 미설치 repo 8개는 그대로 뒀다 — 설치 여부는 각 repo 판단(강제하지 않음).
 
 ## 현재 열린 트랙 (콜드스타트용)
 
-- **METH-131**(InProgress): 반영 완료, PR·전파 대기.
+- **METH-131**(Done): 캡슐 루프 2회차 완결. 다음 수거는 다운스트림 축적 후.
 - **METH-134/135 잔여**: 실험 모드 첫 실전 적용 · 자율주행 첫 실주행 + 권한 allowlist.
 - **METH-130**(Backlog): UI repo 6곳 방어층 설치. **METH-113**(Backlog): retrofit.
 - 후속 후보: graph.json 에 outbox/collect/land 노드 · invest-ops `capsule_policy: restricted` · RFC-003 관찰(8/12경) · grooman sync(타 호스트) · 월간 전수조사 2회차(8월 말).

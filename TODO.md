@@ -29,22 +29,23 @@
 
 ## InProgress
 
-### METH-131 · 캡슐 트리아지 2026-08 — 15건 전량 종결
-- **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
-- **acceptance criteria**:
-  - [x] 15건 판정 — **유효 13 · 이미 반영 1 · 만료 0**(사람 확정 2026-08-07). 초안: `40_dev/snapshots/2026-08-07_캡슐-트리아지-판정초안.md`
-  - [x] 유효분 반영 — 도구 3(`land`·hook 참조전용 면제·build-guard 스코프+tsc 폴백·Done 주장 경고) · 지침 23 v2 5조항 · 지침 19 v3 §8b · 지침 07 부작용 범위 봉쇄 · 지침 24 v2 §3b
-  - [x] `_inbox` 정리 — 14건 삭제, **원장 16건 유지**(재수거 방지)
-  - [ ] 전파 12/12 후 origin 대조
-- **notes**: 캡슐 루프 2회차(1회차는 METH-128). **판정 중 근거 정정 1건**: 초안에 `tool/hooks` 를 "이 세션 22회 우회로 실증"이라 적었으나 실측 결과 훅 설치 repo 는 11개 중 3개뿐이고 그 3개 전부 이미 sync 면제를 갖고 있었다 — 내 우회는 측정 없는 예방적 우회였다. 판정(유효)은 코드 판독 근거로 유지: delete/tag push 는 여전히 `wrap --strict` 를 통과해야 한다. **승급 2건**: `perf-ab-sampling`·`no-kill-foreign-process` 를 이번 세션에 지침 29·28(모드 전용)에 넣었던 것이 잘못 — 캡슐이 지목한 23·07 로 옮기고 모드 지침은 참조만 남겼다.
-
-
 
 ## Blocked
 
 
 
 ## Done
+
+### METH-131 · 캡슐 트리아지 2026-08 — 15건 전량 종결
+- **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
+- **acceptance criteria**:
+  - [x] 15건 판정 — **유효 13 · 이미 반영 1 · 만료 0**(사람 확정 2026-08-07). 초안: `40_dev/snapshots/2026-08-07_캡슐-트리아지-판정초안.md`
+  - [x] 유효분 반영 — 도구 3(`land`·hook 참조전용 면제·build-guard 스코프+tsc 폴백·Done 주장 경고) · 지침 23 v2 5조항 · 지침 19 v3 §8b · 지침 07 부작용 범위 봉쇄 · 지침 24 v2 §3b
+  - [x] `_inbox` 정리 — 14건 삭제, **원장 16건 유지**(재수거 방지)
+  - [x] 전파 **12/12** — main 7곳 직접·비-main/dirty 4곳 worktree, 전부 origin 대조(지침 23·19·07·24 + 도구 5항목)
+  - [x] 훅 재설치 — 설치된 3개 repo(ai-icons·invest-ops·lifeManager)에 `hooks install --force`, 참조전용 면제 반영 확인
+- **notes**: 캡슐 루프 2회차(1회차는 METH-128). **판정 중 근거 정정 1건**: 초안에 `tool/hooks` 를 "이 세션 22회 우회로 실증"이라 적었으나 실측 결과 훅 설치 repo 는 11개 중 3개뿐이고 그 3개 전부 이미 sync 면제를 갖고 있었다 — 내 우회는 측정 없는 예방적 우회였다. 판정(유효)은 코드 판독 근거로 유지: delete/tag push 는 여전히 `wrap --strict` 를 통과해야 한다. **승급 2건**: `perf-ab-sampling`·`no-kill-foreign-process` 를 이번 세션에 지침 29·28(모드 전용)에 넣었던 것이 잘못 — 캡슐이 지목한 23·07 로 옮기고 모드 지침은 참조만 남겼다.
+
 
 ### METH-136 · 운영 모드 키워드 트리거 — 지침 28·29 로딩 경로 연결
 - **mode**: fullstack / **change-class**: A / **owner**: AI
