@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-133/134/135 — 자율 범위 확장**(2026-08-07): `land`(Class A+CI green 자동 머지·6단계 fail-closed) · 지침 28 실험 모드(샌드박스 4조건+졸업 게이트 7항) · 지침 29 자율주행(사이클 환산+4단계 루프+정지 7종). 근거 ADR-004, 사람 승인 완료. branch `feat/land-lab-autopilot-20260807`. 직전: METH-132 CI 복구(#139 머지, main CI green 회복).
+- **Working on**: **METH-133/134/135 전파 종결 — 12/12**(2026-08-07) — `land`·지침 28 실험 모드·지침 29 자율주행이 전 repo 반영(origin 대조 완료). PR #140 은 **land 가 스스로 착지**시켜 end-to-end 증명. branch `chore/sync-propagate-meth-133-135`. 직전: METH-132 CI 복구(main CI green 회복).
 - **Current mode**: fullstack
-- **Next TODO**: 이 PR을 `land`로 머지해 end-to-end 증명 → METH-133/134/135 Done 전이 → sync-all 전파(12 repo). 이어서 METH-135 첫 실주행 검증(사이클 환산 실측)·무인 권한 allowlist. METH-131 캡슐 14건 트리아지. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 시작 = `methodology boot`.** 상세는 checkpoint.
+- **Next TODO**: METH-131 캡슐 14건 트리아지(우선 invest-ops `tool/ship`·`tool/hooks` 2건 — land 와 한 세트였음 → CROSS-REPO 3묶음 → catalog 재발 건). METH-135 **첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 스택-PR 지양(main 직행) · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: METH-131 — 캡슐 **14건** 트리아지 판정 대기(사람만 판정 가능, 백서 §8-2). land 캡슐 1건은 METH-133으로 반영 완료·정리.
 
 ## Active Links
@@ -43,8 +43,8 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
+- 2026-08-07: **METH-133/134/135 전파 종결 12/12 (Class A, ADR-004)** — `land`(Class A+CI green fail-closed 자동 착지)·지침 28 실험 모드·지침 29 자율주행이 전 repo 반영. sync-all: main 7곳 직접·비-main/dirty 4곳 worktree, 전부 origin 대조(icons-vault 는 icons 워크트리라 자동 커버 — 실 repo 는 11개). **PR #140 을 land 가 스스로 머지**해 end-to-end 증명(maincheck 747e9457 ✓).
 - 2026-08-07: **METH-133/134/135 자율 범위 확장 (Class A, 근거 ADR-004)** — ① `land` 신설: PR 식별→Class 판정→CI green→squash 머지→기본브랜치 동기화→maincheck, 전 단계 fail-closed(판정 불가 시 진행 금지). 수거 캡슐 `land-command-post-merge` 설계 채택. ② 지침 28 실험 모드: 샌드박스 4조건 안에서 Class B/C 유예, 경계 넘을 때 졸업 게이트 7항 일괄 정산. ③ 지침 29 자율주행: 시간→사이클 환산, 개발·검토·QA·신규작업 루프, ground-truth 판정, 기획 소진 시 시간 남아도 종료.
 - 2026-08-07: **METH-132 CI `validate` 복구 (Class A)** — observation lint `repeat_of` 자유서술 6건(5월 레거시 5 + 07-24 1)을 허용 스키마로 정규화, 서술은 `resolution` 보존. **CI가 #136~#138 세 번 연속 main red였고 아무도 못 봄** — 자동 머지 설계(METH-133)의 전제를 먼저 복구. 교훈: 스키마를 좁힐 때 기존 자산 전수 재검증.
 - 2026-08-07: **캡슐 수거 2026-08 — 15건/3 repo (Class A)** — 12개 repo 스캔 후 `collect --apply`: gamblescan 8·lifeManager 4·invest-ops 3을 `_inbox` 적재, 원장 1→16건(icons-invest 1건은 기수거 skip). thinktank 재집계로 CROSS-REPO guide-23 x4·guide-07 x2·guide-19 x2, DUP-TARGET catalog x2 마킹. 트리아지 판정은 사람 — METH-131(Blocked).
 - 2026-07-29: **지침 20 v3 전파 종결 11/11 (Class A)** — #136 머지 후 sync-all: main 5곳 직접·비-main/dirty 6곳 worktree, 전부 origin 대조. 절대색 차단·프리미티브 내장 간격·기계 게이트 규칙이 전 repo 반영 — 실설치는 METH-130.
-- 2026-07-29: **지침 20 v3 — 기본 실수 3층 방어 (Class A)** — 사용자 반복 실수 환류(다크 배경+검은 텍스트 / 패딩 누락 붙음): §4 가드레일에 절대색(`text-black` 등) 차단 추가, §9.5 신설 — 1층 구조(시맨틱 토큰 자동 반전·프리미티브 내장 간격, 기본 패딩 0 구조 금지) 2층 기계(axe 대비 차단·bounding box 간격 린트·양모드 스크린샷·computed 확인) 3층 friction 기록. METH-130(UI repo 6곳 실설치 과제) 등록. #135는 cherry-pick 통합 후 close(스택-PR 금지 준수).
