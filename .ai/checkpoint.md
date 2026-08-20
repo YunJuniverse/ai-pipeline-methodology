@@ -1,7 +1,7 @@
-# Checkpoint — 2026-08-20 (METH-137 캡슐 트리아지 3회차 — 반영 완료, ship/land/전파 진행 중)
+# Checkpoint — 2026-08-20 (METH-137 종결 — 캡슐 3회차 5건 반영·전파 11/11·훅 재설치)
 
-> ✅ 수거 5건 → 사람 확정(유효 5) → 전량 반영 + negative case 증명 + `_inbox` 정리.
-> ▶ 지금 하던 것: ship → PR → land → sync-all 전파 → 훅 3 repo 재설치.
+> ✅ 수거 5건 → 사람 확정(유효 5) → 반영 + negative case 증명 → PR #146 land(squash 0e1a6aef) → 전파 11/11 origin 대조 → 훅 3 repo 재설치. `_inbox` 비움(원장 21건).
+> 이 checkpoint 는 전파 종결 커밋(branch `chore/meth-137-propagation`)과 함께 ship→land 됨.
 
 ---
 
@@ -11,33 +11,28 @@
 
 ## 작성자
 - Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/meth-137-capsule-triage` (base=main, branch-first)
+- Branch `chore/meth-137-propagation` (base=main, branch-first) — 직전 반영 PR #146 은 land 완료
 
 ## 방금 한 것
 
-- 판정 확정(AskUserQuestion): 5건 전부 유효 — 캡슐 3은 "훅 보강(fail-closed 유지)", 캡슐 1은 "지침 05 v3 보강" 선택.
-- **지침 05 v3**: §9b 배포 문서 작성 규율 6항(제목 사실형·용어 락·수치 원천 대조·자기설명 메타 제거·시각화 형태 문법·신뢰 등급 보존) + frontmatter v1 표기 지연을 v3 로 정정(§10에 v2 이력 이미 존재).
-- **지침 23 v3**: §4b 공개 주장 릴리스 표면 매트릭스 3항 + §5 자기점검에 연결.
-- **훅**(`hooks install` 본문): `run_guarded` 폴링 감시자 — GNU timeout 없는 macOS 대응, 1초 폴링·자기소멸(PID 재사용 오살 방지), manifest-check 120s·wrap 300s, 타임아웃 시 fail-closed + "--no-verify 우회는 사람 승인 + friction 기록" 안내.
-- **land**: ① 4/6 `gh pr merge` rc≠0 시 `_pr_merge_info`(state,mergeCommit API 재조회)로 '머지 실패' vs '머지 성공+로컬 정리 실패' 분리 ② 5/6 checkout rc 검사 + worktree 점유 안내 + `--no-sync` 플래그 ③ 6/6 maincheck 를 squash SHA 로(HEAD 아님). ship→land 연결부 no_sync=False 전달.
-- **catalog `_pending/P-002_consumer-surface-copy.md`** 등재.
-- **증명**: land 가짜 gh 하네스(scratchpad/landtest) — A: 머지성공+정리실패+worktree 점유 → 경고 2종 출력 후 squash SHA 도달 ✓ exit 0 / B: 진짜 실패 → "(PR 상태: OPEN)" exit 1 / C: 구 방식 입력(원본 W SHA) → 미도달 exit 1. 훅(scratchpad/hooktest, 타임아웃 3s 축소 사본) — D1 행→3s 차단 exit 1 · D2 정상 0 · D3 실패 전파 2 · D4 wrap 행 차단.
-- `_inbox` 5건 삭제(원장 21건 유지). TODO·HANDOFF 갱신.
+- **반영 PR #146 을 land 로 착지** — 새 land 코드가 첫 실전에서 squash SHA(0e1a6aef)로 maincheck 판정. CI validate green 대기 후 착지(fail-closed 정상 작동 확인).
+- **전파**: main·clean 6곳 직접(ai-icons·cafe24·icons-marketing·lifeManager·talmo·tshome) + main·dirty 4곳 타깃 스테이징(icons·icons-invest·insta-toon·invest-ops — sync 경로와 dirty 교차 0 확인 후) + gamblescan(스캔 시점엔 비-main·dirty였으나 실행 시점 main·clean으로 바뀌어 직접 — **착수 전 상태 재확인이 worktree 우회를 절약**). 커밋 메시지는 훅 sync 면제 패턴(`chore(methodology): sync*`) 준수.
+- **origin 실내용 대조 11/11**: guide05 §9b·guide23 §4b·methodology.py run_guarded 을 origin/main 블롭에서 직접 grep — push rc 아닌 내용 확인(지침 23 §1-4). icons 계열 worktree 5곳은 icons origin 공유로 자동 커버.
+- **훅 재설치 3/3**(ai-icons·invest-ops·lifeManager) — `hooks install --force`, run_guarded 3건·실행권한 확인.
+- TODO METH-137 → Done(maincheck 근거) · rotate --apply(Done 7건 → `40_dev/snapshots/live-archive/2026-08-20_todo-done.md`, 최신 4건 유지) · HANDOFF 갱신.
 
 ## 다음 구체 행동
 
-1. observe 로그(CLI) → `ship -m "feat: 캡슐 트리아지 5건 전량 반영 — 지침 05 v3·23 v3 + 훅 timeout + land 오진 수정 + P-002 (METH-137)"`.
-2. `gh pr create` → `land` (이 repo 는 main 비점유라 정상 경로 — 새 코드 dogfood).
-3. **전파**: `sync-all` 12/12 (main 직접 + 비-main/dirty 는 worktree 방식 — METH-131 전례) → origin 대조.
-4. **훅 재설치**: ai-icons·invest-ops·lifeManager 에 `hooks install --force`(훅 본문 변경됨 — timeout 가드 배포).
-5. 완료 시 TODO METH-137 → Done(maincheck 후), HANDOFF Recent 갱신, 관찰로그 전파분 반영.
+1. (이 커밋의 land 까지가 이번 세션 몫 — 완료 시 잔여 없음)
+2. **METH-135 첫 실주행 검증** — 사용자가 타 프로젝트에서 실측해 알려주기로 한 건 유지.
+3. 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용.
+4. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주 — 만료 0 유지 중).
 
 ## 현재 열린 트랙 (콜드스타트용)
 
-- **METH-137**(InProgress): 위 잔여 1~5.
 - **METH-134/135 잔여**: 실험 모드 첫 실전 적용 · 자율주행 첫 실주행 + 권한 allowlist.
 - **METH-130**(Backlog): UI repo 6곳 방어층 설치. **METH-113**(Backlog): retrofit.
-- 후속 후보: capsule id 검증을 발신 시점으로 당기기(gamblescan `gamblescan-p0-pr__` 접두어 경고 재발 방지) · 월간 전수조사 2회차(8월 말).
+- 후속 후보: **capsule 발신 시점 id 검증**(capsule 명령이 worktree 디렉터리명으로 id 접두어 생성 — gamblescan-p0-pr 형식 경고 2건 재발 방지) · 월간 전수조사 2회차(8월 말) · graph.json outbox/collect/land 노드.
 
 ## 막힌 것
 - 없음.

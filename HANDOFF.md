@@ -4,9 +4,9 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-137 캡슐 트리아지 3회차 — 5건 반영 완료**(2026-08-20) — 판정 사람 확정(유효 5) → 지침 05 v3·23 v3 + 훅 timeout + `land` 오진 수정 + P-002. negative case 실효 증명 완료(land 시나리오 A/B/C·훅 D1~D4). 잔여: ship→land→전파 12/12→훅 3 repo 재설치. branch `chore/meth-137-capsule-triage`.
+- **Working on**: **METH-137 종결**(2026-08-20) — 캡슐 3회차 5건 전량 반영·PR #146 land(squash 0e1a6aef)·전파 11/11 origin 대조 ✓·훅 3 repo 재설치. `_inbox` 비었고 미수거 0건. 직전: METH-131(2회차 15건).
 - **Current mode**: fullstack
-- **Next TODO**: METH-137 전파 종결 → **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다른 repo(별도 세션): ai-icons 92 환류·비대 라이브파일 트리밍·grooman sync(타 호스트). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
+- **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(gamblescan-p0-pr 접두어 경고 재발 방지) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none.
 
 ## Active Links
@@ -43,7 +43,7 @@
 
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
-- 2026-08-20: **METH-137 캡슐 트리아지 3회차 — 신규 5건 전량 반영 (Class A)** — 수거(원장 16→21·icons 미러 6repo dedup) → 사람 확정(유효 5) → **지침 05 v3**(§9b 배포 문서 작성 규율 6항) · **23 v3**(§4b 공개 주장 릴리스 표면 매트릭스) · 훅 timeout(폴링 감시자·fail-closed·우회 friction 기록 안내) · **`land` 오진 수정**(머지/로컬정리 분리 판정·checkout 실패 안내·`--no-sync`·squash SHA maincheck) · catalog P-002(소비자 표면 카피 4원칙). 전부 negative case 실효 증명.
+- 2026-08-20: **METH-137 캡슐 트리아지 3회차 — 5건 전량 종결·전파 11/11 (Class A)** — 수거(원장 16→21·icons 미러 6repo dedup) → 사람 확정(유효 5) → **지침 05 v3**(§9b 배포 문서 작성 규율) · **23 v3**(§4b 공개 주장 릴리스 표면 매트릭스) · 훅 timeout(fail-closed·우회 friction 기록) · **`land` 오진 수정**(머지/로컬정리 분리·`--no-sync`·squash SHA maincheck — PR #146 자체 착지로 e2e 증명) · catalog P-002. negative case 증명(land A/B/C·훅 D1~D4). 전파 11 repo push·origin 실내용 대조·훅 3 repo 재설치.
 - 2026-08-07: **METH-131 캡슐 트리아지 — 15건 종결·전파 12/12 (Class A)** — 유효 13·이미 반영 1·만료 0. 도구 3건(pre-push 참조전용 면제·build-guard 프로젝트 스코프+`tsc --noEmit` 폴백·ship Done 주장 경고) + **지침 23 v2**(대리 신호 금지·성능 다회 중앙값·픽스처 특이값·§4 판정기 신뢰도 신설) · **19 v3**(§8b 원시함수 단일화·일괄 편집) · **07**(부작용 범위 봉쇄) · **24 v2**(§3b 이식 요청 입력 실측). `_inbox` 비움(원장 16건 유지).
 - 2026-08-07: **METH-136 운영 모드 키워드 트리거 — 전파 12/12 (Class A)** — 지침 28·29 를 만들었지만 *키워드로 불러오는 경로*가 없던 갭을 닫음. 지침 01 §5.11 운영 모드 라우팅 표(실험/자율주행/07/land + 경계 판정 3항) 신설, CLAUDE.md·AGENTS.md §2 를 서술→**동작 지시**로 전환("본문 먼저 로드 후 착수, 요약만 보고 시작 금지"). 안전장치: 속도 요구만으로 실험 모드가 켜지지 않고 **샌드박스 4조건 확인이 선행**.
 - 2026-08-07: **METH-133/134/135 전파 종결 12/12 (Class A, ADR-004)** — `land`(Class A+CI green fail-closed 자동 착지)·지침 28 실험 모드·지침 29 자율주행이 전 repo 반영. sync-all: main 7곳 직접·비-main/dirty 4곳 worktree, 전부 origin 대조(icons-vault 는 icons 워크트리라 자동 커버 — 실 repo 는 11개). **PR #140 을 land 가 스스로 머지**해 end-to-end 증명(maincheck 747e9457 ✓).
