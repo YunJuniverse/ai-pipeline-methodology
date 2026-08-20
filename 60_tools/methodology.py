@@ -1671,6 +1671,25 @@ def _pr_checks_pending(target: Path, pr_number: int) -> list[str]:
     return [r.get("name", "?") for r in rows if str(r.get("state", "")).upper() in pend]
 
 
+def _pr_merge_info(target: Path, pr_num: int | str) -> tuple[str | None, str | None]:
+    """PR 의 (state, merge commit SHA) — gh 조회 실패 시 (None, None).
+
+    squash 머지는 새 SHA 를 만들므로 브랜치 원본 SHA 로는 maincheck 가 영원히
+    미도달이다. 머지 판정·도달 확인은 이 API 값으로 한다(METH-137).
+    """
+    try:
+        out = subprocess.check_output(
+            ["gh", "pr", "view", str(pr_num), "--json", "state,mergeCommit"],
+            cwd=str(target), text=True, stderr=subprocess.DEVNULL,
+        )
+        data = json.loads(out)
+        commit = data.get("mergeCommit") or {}
+        state = str(data.get("state") or "").upper() or None
+        return state, (commit.get("oid") or None)
+    except Exception:  # noqa: BLE001 — gh 미설치·네트워크 모두 "판정 불가"
+        return None, None
+
+
 def cmd_land(args: argparse.Namespace) -> int:
     """PR 머지 → main 도달 확인 → 브랜치 정리까지의 '착지' — METH-133.
 
@@ -1767,31 +1786,49 @@ def cmd_land(args: argparse.Namespace) -> int:
             cwd=str(target),
         )
         if rc != 0:
-            err("머지 실패 — 충돌·권한·보호 규칙을 확인.")
-            return 1
+            # gh 종료코드만으로는 '머지 실패'와 '머지 성공 + 로컬 정리 실패'를 구분할
+            # 수 없다 — --delete-branch 의 로컬 checkout 이 worktree 점유 등으로
+            # 죽어도 rc≠0 이다. 오진 상태로 재시도하면 이중 머지를 부른다.
+            # (캡슐 gamblescan__2026-08-18_land-merge-error-misreport)
+            state, _sha = _pr_merge_info(target, pr_num)
+            if state != "MERGED":
+                err(f"머지 실패 — 충돌·권한·보호 규칙을 확인. (PR 상태: {state or '조회 불가'})")
+                return 1
+            warn("  머지는 성공 — 로컬 정리(브랜치 삭제·체크아웃)만 실패. 재머지 금지, 동기화로 진행.")
     else:
         info("land: 3/6 — CI green 확인 — skip (이미 머지됨)")
         info("land: 4/6 — merge — skip (이미 머지됨)")
 
-    # 5) 기본 브랜치 동기화
-    info(f"land: 5/6 — {default_branch} 동기화")
-    subprocess.call(["git", "-C", str(target), "checkout", "-q", default_branch])
-    rc = subprocess.call(["git", "-C", str(target), "pull", "--ff-only", "-q"])
-    if rc != 0:
-        warn("pull --ff-only 실패 — 로컬 기본 브랜치가 갈라져 있을 수 있음. 수동 확인.")
+    # 5) 기본 브랜치 동기화 — checkout 실패(worktree 점유 등)를 침묵시키지 않는다
+    if getattr(args, "no_sync", False):
+        info(f"land: 5/6 — {default_branch} 동기화 skip (--no-sync)")
+    else:
+        info(f"land: 5/6 — {default_branch} 동기화")
+        rc = subprocess.call(["git", "-C", str(target), "checkout", "-q", default_branch])
+        if rc != 0:
+            warn(f"{default_branch} 체크아웃 실패 — 다른 worktree 가 점유 중일 수 있다.")
+            warn(f"  점유 worktree 에서 `git pull --ff-only` 로 동기화하거나 land --no-sync 로 재실행.")
+        else:
+            rc = subprocess.call(["git", "-C", str(target), "pull", "--ff-only", "-q"])
+            if rc != 0:
+                warn("pull --ff-only 실패 — 로컬 기본 브랜치가 갈라져 있을 수 있음. 수동 확인.")
 
-    # 6) main 도달 기계 확인
+    # 6) main 도달 기계 확인 — squash 머지는 새 SHA 를 만들므로 원본 브랜치 SHA 가
+    # 아니라 merge commit SHA 로 판정한다 (maincheck 의 fetch 가 해당 오브젝트를 가져온다)
     info("land: 6/6 — maincheck (main 도달)")
-    head = subprocess.check_output(
+    _state, merge_sha = _pr_merge_info(target, pr_num)
+    check_sha = merge_sha or subprocess.check_output(
         ["git", "-C", str(target), "rev-parse", "HEAD"], text=True
     ).strip()
+    if merge_sha is None:
+        warn("merge commit SHA 조회 불가 — HEAD 로 대체 판정(동기화 실패 상태면 미도달로 나올 수 있음).")
     rc = subprocess.call([sys.executable, str(Path(__file__).resolve()),
-                          "maincheck", head, "--path", str(target)])
+                          "maincheck", check_sha, "--path", str(target)])
     if rc != 0:
         err("main 도달 미확인 — TODO Done 전이 금지.")
         return 1
 
-    ok(f"land 완료 — PR #{pr_num} 이 {default_branch} 에 도달({head[:8]}). "
+    ok(f"land 완료 — PR #{pr_num} 이 {default_branch} 에 도달(squash {check_sha[:8]}). "
        "이제 TODO Done 전이가 기계적으로 정당하다.")
     print("  다음: TODO Done 이동 → HANDOFF/checkpoint 갱신 → ship")
     return 0
@@ -2892,6 +2929,7 @@ def cmd_ship(args: argparse.Namespace) -> int:
         land_args = argparse.Namespace(
             path=str(target), dry_run=False,
             no_ci_check=getattr(args, "no_ci_check", False),
+            no_sync=False,
         )
         return cmd_land(land_args)
     return 0
@@ -2920,7 +2958,7 @@ def cmd_hooks(args: argparse.Namespace) -> int:
     hook_body = """#!/bin/sh
 # methodology pre-push hook — installed by `methodology hooks install`
 # push 직전 4 라이브 파일 갱신 + 격리 안전망 검증.
-# 우회: git push --no-verify
+# 우회: git push --no-verify (사람 승인 + 사유를 관찰로그 --friction 으로 기록)
 
 set -e
 METH=""
@@ -2934,7 +2972,35 @@ if [ -z "$METH" ]; then
   exit 0
 fi
 
-python3 "$METH" manifest-check
+# 검증은 결정적으로 끝난다 — 행이면 타임아웃으로 fail-closed 차단(무한 대기 금지).
+# macOS 에 GNU timeout 이 없어 1초 폴링 감시자로 구현: 대상이 먼저 끝나면 감시자는
+# 1초 내 자기소멸(무관 프로세스 오살 방지 — 지침 07 부작용 범위 봉쇄).
+# (캡슐 gamblescan__2026-08-13_observe-timeout-approved-fallback)
+run_guarded() {
+  GUARD_LABEL=$1; GUARD_SECS=$2; shift 2
+  "$@" &
+  GUARD_PID=$!
+  ( GUARD_T=0
+    while [ "$GUARD_T" -lt "$GUARD_SECS" ]; do
+      sleep 1
+      kill -0 "$GUARD_PID" 2>/dev/null || exit 0
+      GUARD_T=$((GUARD_T+1))
+    done
+    kill -TERM "$GUARD_PID" 2>/dev/null ) >/dev/null 2>&1 </dev/null &
+  GUARD_RC=0
+  wait "$GUARD_PID" || GUARD_RC=$?
+  if [ "$GUARD_RC" -ge 128 ]; then
+    echo "[methodology hook] $GUARD_LABEL — ${GUARD_SECS}s 타임아웃, fail-closed 차단." >&2
+    echo "  검증이 끝나지 않는 상태다. 원인(권한 프롬프트·행)을 해소해 재시도하라." >&2
+    echo "  사람 승인 우회 시: git push --no-verify 후 사유를 관찰로그 --friction 으로 기록." >&2
+    exit 1
+  fi
+  if [ "$GUARD_RC" -ne 0 ]; then
+    exit "$GUARD_RC"
+  fi
+}
+
+run_guarded "manifest-check" 120 python3 "$METH" manifest-check
 
 # 참조만 바꾸는 push 면제 (캡슐 invest-ops__2026-07-31_prepush-hook-blocks-ref-delete):
 # 브랜치 삭제(local sha = zero)와 tag push 는 *콘텐츠를 올리지 않는다*. 그런데도
@@ -2986,7 +3052,7 @@ case "$HEAD_MSG" in
     ;;
 esac
 
-python3 "$METH" wrap --strict
+run_guarded "wrap --strict" 300 python3 "$METH" wrap --strict
 """
 
     if args.action == "install":
@@ -2996,7 +3062,7 @@ python3 "$METH" wrap --strict
         pre_push.write_text(hook_body, encoding="utf-8")
         pre_push.chmod(0o755)
         ok(f"pre-push hook 설치: {pre_push}")
-        print("  검증 우회 (예외 상황): git push --no-verify")
+        print("  검증 우회 (예외 상황): git push --no-verify — 사람 승인 + 사유를 관찰로그 --friction 으로 기록")
         return 0
     elif args.action == "uninstall":
         if pre_push.exists():
@@ -4595,6 +4661,8 @@ def main(argv: list[str] | None = None) -> int:
                      help="머지 직전까지만 — Class 판정·CI 확인 결과만 보고")
     pld.add_argument("--no-ci-check", dest="no_ci_check", action="store_true",
                      help="CI green 검증 생략 (무검증 머지 — 기본 금지)")
+    pld.add_argument("--no-sync", dest="no_sync", action="store_true",
+                     help="기본 브랜치 로컬 동기화 생략 — main 이 다른 worktree 에 점유된 경우")
     pld.set_defaults(func=cmd_land)
 
     prt = sub.add_parser(
