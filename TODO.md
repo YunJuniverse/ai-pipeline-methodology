@@ -29,6 +29,15 @@
 
 ## InProgress
 
+### METH-137 · 캡슐 트리아지 2026-08-20 — 신규 5건 (수거 3회차)
+- **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
+- **acceptance criteria**:
+  - [x] `collect --apply` — 신규 5건 적재(원장 16→21), icons 미러 5건은 dedup
+  - [x] 5건 판정 사람 확정(2026-08-20) — **유효 5 · 이미 반영 0 · 만료 0**. 초안: `40_dev/snapshots/2026-08-20_캡슐-트리아지-판정초안.md`
+  - [x] 유효분 반영 — 지침 05 v3(§9b 배포 문서 작성 규율) · 지침 23 v3(§4b 공개 주장 릴리스 표면 매트릭스) · 훅 timeout(fail-closed·우회 friction 기록 안내) · `land` 오진 수정(머지/로컬정리 분리·`--no-sync`·squash SHA maincheck) · catalog P-002. **negative case 실효 증명**: land 시나리오 A(오진 케이스 정상 착지)/B(진짜 실패 보존)/C(구 HEAD 방식 미도달 재현) · 훅 D1~D4(행 타임아웃·정상·실패 전파·wrap 행)
+  - [x] `_inbox` 정리 — 5건 삭제, 원장 21건 유지
+  - [ ] ship/land → 전파(sync-all) → 훅 설치 3 repo(ai-icons·invest-ops·lifeManager) `--force` 재설치(훅 본문 변경)
+- **notes**: 캡슐 루프 3회차(1회차 METH-128·2회차 METH-131). gamblescan 2건은 id 접두어 `gamblescan-p0-pr__` 형식 경고 — 워크트리명으로 생성된 것, 내용 무관. land 오진 보고 건은 코드에서 3지점(4/6 rc 일괄 처리·5/6 checkout rc 무시·6/6 HEAD 기준 maincheck) 전부 재현 확인.
 
 ## Blocked
 
