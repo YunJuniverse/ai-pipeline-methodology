@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **지침 22 README 정합 정정**(branch `docs/guide-22-readme-v4`) — 본문은 v4 인데 `20_guides/README.md` 현황표가 v1 로 3개 릴리스 연속 방치된 갭 소급 정정. 직전: METH-116 정련 v4 land(#148, squash 6f6aec5a).
+- **Working on**: **지침 22 v4 전파 종결**(branch `chore/guide-22-propagation`) — sync-all 7/8 적용·origin 대조 6/6 ✓. 잔여: cafe24-renewal(진행중 작업으로 skip). 직전: #148 정련 land · #149 README 정합 land.
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(gamblescan-p0-pr 접두어 경고 재발 방지) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none.
@@ -41,7 +41,7 @@
 
 ## Recent Changes
 
-- 2026-08-22: **지침 22 v4 정련 land + README 정합 정정 (Class A)** — 정련 브랜치를 main(61커밋 앞섬) 위로 리베이스하며 v2(METH-128) 불변규율 4·5 와 P3 리드백 게이트를 승계 통합(규율 6개), 변경이력 v1~v3 보존 + v4 추가 → #148 land(squash 6f6aec5a). 후속으로 `20_guides/README.md` §3.6·현황표(v1→v4)·변경이력 v4.4 정정 — 본문 개정이 인덱스에 3릴리스 연속 미반영된 갭.
+- 2026-08-22: **지침 22 v4 — 정련 land + README 정합 + 다운스트림 전파 7/8 (Class A)** — 정련 브랜치를 main(61커밋 앞섬) 위로 리베이스해 v2(METH-128) 불변규율 4·5 와 P3 리드백 게이트를 승계 통합(규율 6개)·변경이력 v1~v3 보존 + v4 → #148 land(6f6aec5a). `20_guides/README.md` §3.6·현황표(v1→v4, 3릴리스 연속 미반영분 소급)·변경이력 v4.4 → #149 land(4f573de5). sync-all 전파 **7/8**(ai-icons·gamblescan·grooman·icons-invest·talmo-com·tshome + icons) · **origin 실내용 대조 6/6 ✓**(블롭 grep, 지침 23 §1-4) · skip 1(cafe24-renewal 진행중 작업 보호). **icons 이력 오염 1건**: 브랜치 전환 레이스로 sync 커밋이 피처 브랜치에 유입 → PR #386 squash 로 main 도달(내용 정상, 존치 판단).
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
 - 2026-08-20: **METH-137 캡슐 트리아지 3회차 — 5건 전량 종결·전파 11/11 (Class A)** — 수거(원장 16→21·icons 미러 6repo dedup) → 사람 확정(유효 5) → **지침 05 v3**(§9b 배포 문서 작성 규율) · **23 v3**(§4b 공개 주장 릴리스 표면 매트릭스) · 훅 timeout(fail-closed·우회 friction 기록) · **`land` 오진 수정**(머지/로컬정리 분리·`--no-sync`·squash SHA maincheck — PR #146 자체 착지로 e2e 증명) · catalog P-002. negative case 증명(land A/B/C·훅 D1~D4). 전파 11 repo push·origin 실내용 대조·훅 3 repo 재설치.
