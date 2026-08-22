@@ -51,7 +51,7 @@
 - **mode**: fullstack
 - **change-class**: A
 - **owner**: AI + Human
-- **notes**: 2026-07-25. 신설분(지침 22 + 스켈레톤 `ir-deck-build`)은 PR #112 로 이미 land — 본 항목은 그 뒤 사용자 피드백으로 이어진 **정련**. 텍스트 md 덱을 지속 SSOT 로 승격하고 콘텐츠(스토리라인→슬라이드 텍스트 구조화)를 디자인보다 먼저 닫는 모델로 §2 를 6단계 재편(P0 데이터·P1 스토리라인·P2 텍스트구조화·P3 디자인후보 탐색·P4 빌드검증·P5 파생), §3 "후보 탐색 후 고정"·§8 재작성. 스켈레톤: `contract.py` `THEMES` 후보 레지스트리+`apply_theme()`(호출시점 late-bind), `build.py --theme`/`--candidates`(테마별 대표 슬라이드 비교 렌더), `deck.template.md`(SSOT 2층). 검증: 3모드 동작·테마 색 실제 교체(A네이비·B화이트·C딥차콜)·geometry 통과. branch-first(`docs/guide-22-ir-deck-methodology`). **main 리베이스(2026-08-22)**: 그 사이 land 된 v2(METH-128)·v3(METH-129)와 병합 — 불변규율을 6개로 통합(v2 규율 4 파일=유일소스·5 안정 슬라이드 ID 승계), P3 리드백 게이트를 신 P4 행에 이관, 변경이력 v1~v3 보존 + v4 추가.
+- **notes**: 2026-07-25. 신설분(지침 22 + 스켈레톤 `ir-deck-build`)은 PR #112 로 이미 land — 본 항목은 그 뒤 사용자 피드백으로 이어진 **정련**. 텍스트 md 덱을 지속 SSOT 로 승격하고 콘텐츠(스토리라인→슬라이드 텍스트 구조화)를 디자인보다 먼저 닫는 모델로 §2 를 6단계 재편(P0 데이터·P1 스토리라인·P2 텍스트구조화·P3 디자인후보 탐색·P4 빌드검증·P5 파생), §3 "후보 탐색 후 고정"·§8 재작성. 스켈레톤: `contract.py` `THEMES` 후보 레지스트리+`apply_theme()`(호출시점 late-bind), `build.py --theme`/`--candidates`(테마별 대표 슬라이드 비교 렌더), `deck.template.md`(SSOT 2층). 검증: 3모드 동작·테마 색 실제 교체(A네이비·B화이트·C딥차콜)·geometry 통과. branch-first(`docs/guide-22-ir-deck-methodology`). **main 리베이스(2026-08-22)**: 그 사이 land 된 v2(METH-128)·v3(METH-129)와 병합 — 불변규율을 6개로 통합(v2 규율 4 파일=유일소스·5 안정 슬라이드 ID 승계), P3 리드백 게이트를 신 P4 행에 이관, 변경이력 v1~v3 보존 + v4 추가. **후속(2026-08-22)**: `20_guides/README.md` 3곳 정정 — §3.6 역할 설명(5단계→콘텐츠·디자인 분리 6단계)·현황표 22 항목 **v1→v4**(v2·v3 누락분 소급)·변경이력 v4.4 추가.
 
 ### METH-131 · 캡슐 트리아지 2026-08 — 15건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)

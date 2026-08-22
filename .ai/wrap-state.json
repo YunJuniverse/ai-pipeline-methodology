@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "a57f9b5719e3a91b143f478c45d4043f07b1fc04",
-  "last_validated_at": "2026-08-22T13:15:14Z",
+  "last_validated_commit": "6f6aec5af9595d4c91aa70c7645dc763ac3eea05",
+  "last_validated_at": "2026-08-22T13:36:47Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "84f2c21920cf33cc941fe4eca11070997d33c5b1584985866164cf661b06092b"
+      "sha256": "dc280b34726ce360166f93042617a5a353ccec7c5240f3c1481e3d5281981f17"
     },
     "TODO.md": {
-      "sha256": "38e4c45aceb8230bf25aa2a596c7c9755fa35deb8f2927c3f95e76484c006254"
+      "sha256": "eb83066d8f3f1976120c73fad8771ebee051641159d1964f7f0b402ce7a08594"
     },
     ".ai/checkpoint.md": {
-      "sha256": "1261cdf0fc17acbda9e66c2457fdd8bda32e2fe6e56382d814b3ad92c012b907"
+      "sha256": "08154ee05d367e2ca7c7f7931538751827a153e6619554990d6141d0c6731c5c"
     }
   },
   "observations": {
@@ -163,6 +163,7 @@
       "50_resources/ai_observations/2026-08-07_sync-propagate-meth-136.md",
       "50_resources/ai_observations/2026-08-20_meth-137-capsule-triage.md",
       "50_resources/ai_observations/2026-08-20_meth-137-propagation.md",
+      "50_resources/ai_observations/2026-08-22_guide-22-rebase-and-readme-v4.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

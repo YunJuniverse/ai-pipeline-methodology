@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-116 지침 22 정련 — 콘텐츠·디자인 분리** (branch `docs/guide-22-ir-deck-methodology`, main 리베이스 완료) — 텍스트 md 덱=지속 SSOT, 콘텐츠(스토리라인→슬라이드 텍스트) 먼저, 디자인은 여러 후보로 탐색·선택. §2 6단계 재편 + `contract.py` `THEMES` 레지스트리 + `build.py --theme/--candidates`. 신설분은 [PR #112](https://github.com/YunJuniverse/ai-pipeline-methodology/pull/112) 로 이미 land, 본 정련 커밋은 PR 대기. 직전(main): METH-137 캡슐 3회차 종결(08-20).
+- **Working on**: **지침 22 README 정합 정정**(branch `docs/guide-22-readme-v4`) — 본문은 v4 인데 `20_guides/README.md` 현황표가 v1 로 3개 릴리스 연속 방치된 갭 소급 정정. 직전: METH-116 정련 v4 land(#148, squash 6f6aec5a).
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(gamblescan-p0-pr 접두어 경고 재발 방지) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none.
@@ -41,11 +41,10 @@
 
 ## Recent Changes
 
+- 2026-08-22: **지침 22 v4 정련 land + README 정합 정정 (Class A)** — 정련 브랜치를 main(61커밋 앞섬) 위로 리베이스하며 v2(METH-128) 불변규율 4·5 와 P3 리드백 게이트를 승계 통합(규율 6개), 변경이력 v1~v3 보존 + v4 추가 → #148 land(squash 6f6aec5a). 후속으로 `20_guides/README.md` §3.6·현황표(v1→v4)·변경이력 v4.4 정정 — 본문 개정이 인덱스에 3릴리스 연속 미반영된 갭.
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
 
 - 2026-08-20: **METH-137 캡슐 트리아지 3회차 — 5건 전량 종결·전파 11/11 (Class A)** — 수거(원장 16→21·icons 미러 6repo dedup) → 사람 확정(유효 5) → **지침 05 v3**(§9b 배포 문서 작성 규율) · **23 v3**(§4b 공개 주장 릴리스 표면 매트릭스) · 훅 timeout(fail-closed·우회 friction 기록) · **`land` 오진 수정**(머지/로컬정리 분리·`--no-sync`·squash SHA maincheck — PR #146 자체 착지로 e2e 증명) · catalog P-002. negative case 증명(land A/B/C·훅 D1~D4). 전파 11 repo push·origin 실내용 대조·훅 3 repo 재설치.
 - 2026-08-07: **METH-131 캡슐 트리아지 — 15건 종결·전파 12/12 (Class A)** — 유효 13·이미 반영 1·만료 0. 도구 3건(pre-push 참조전용 면제·build-guard 프로젝트 스코프+`tsc --noEmit` 폴백·ship Done 주장 경고) + **지침 23 v2**(대리 신호 금지·성능 다회 중앙값·픽스처 특이값·§4 판정기 신뢰도 신설) · **19 v3**(§8b 원시함수 단일화·일괄 편집) · **07**(부작용 범위 봉쇄) · **24 v2**(§3b 이식 요청 입력 실측). `_inbox` 비움(원장 16건 유지).
 - 2026-08-07: **METH-136 운영 모드 키워드 트리거 — 전파 12/12 (Class A)** — 지침 28·29 를 만들었지만 *키워드로 불러오는 경로*가 없던 갭을 닫음. 지침 01 §5.11 운영 모드 라우팅 표(실험/자율주행/07/land + 경계 판정 3항) 신설, CLAUDE.md·AGENTS.md §2 를 서술→**동작 지시**로 전환("본문 먼저 로드 후 착수, 요약만 보고 시작 금지"). 안전장치: 속도 요구만으로 실험 모드가 켜지지 않고 **샌드박스 4조건 확인이 선행**.
 - 2026-08-07: **METH-133/134/135 전파 종결 12/12 (Class A, ADR-004)** — `land`(Class A+CI green fail-closed 자동 착지)·지침 28 실험 모드·지침 29 자율주행이 전 repo 반영. sync-all: main 7곳 직접·비-main/dirty 4곳 worktree, 전부 origin 대조(icons-vault 는 icons 워크트리라 자동 커버 — 실 repo 는 11개). **PR #140 을 land 가 스스로 머지**해 end-to-end 증명(maincheck 747e9457 ✓).
-- 2026-08-07: **METH-133/134/135 자율 범위 확장 (Class A, 근거 ADR-004)** — ① `land` 신설: PR 식별→Class 판정→CI green→squash 머지→기본브랜치 동기화→maincheck, 전 단계 fail-closed(판정 불가 시 진행 금지). 수거 캡슐 `land-command-post-merge` 설계 채택. ② 지침 28 실험 모드: 샌드박스 4조건 안에서 Class B/C 유예, 경계 넘을 때 졸업 게이트 7항 일괄 정산. ③ 지침 29 자율주행: 시간→사이클 환산, 개발·검토·QA·신규작업 루프, ground-truth 판정, 기획 소진 시 시간 남아도 종료.
-- 2026-07-25: **METH-116 지침 22 정련 — 콘텐츠·디자인 분리 (Class A)** — 신설분(PR #112)에 이어, 사용자 피드백으로 텍스트 md 덱을 지속 SSOT 로 승격. §2 를 6단계로 재편(P0 데이터·P1 스토리라인·P2 슬라이드 텍스트 구조화·P3 디자인 후보 탐색·P4 빌드검증·P5 파생), §3 "후보 탐색 후 고정"·§8 재작성. 스켈레톤: `contract.py` `THEMES` 후보 레지스트리+`apply_theme()` late-bind, `build.py --theme`/`--candidates`, `deck.template.md`(SSOT 2층). 3모드·테마 색 교체(A네이비·B화이트·C딥차콜)·geometry 검증. ※ main 리베이스 시 v2(METH-128) 불변규율 4·5 와 P3 리드백 게이트를 6개 규율로 승계 통합, 변경이력 v4 추가.
