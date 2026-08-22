@@ -1,6 +1,6 @@
-# Checkpoint — 2026-08-22 (지침 22 v4 land + README 정합 정정 · sync-all 전파)
+# Checkpoint — 2026-08-22 (지침 22 v4 전파 종결 — sync-all 7/8·origin 대조 6/6)
 
-> ✅ METH-116 정련을 리베이스(v2·v3 승계 통합)해 #148 land(squash 6f6aec5a). 후속으로 `20_guides/README.md` 가 본문 v4 를 못 따라간 갭(3릴리스 연속 v1 표기)을 소급 정정하고 다운스트림 전파.
+> ✅ #148(정련 v4) · #149(README 정합) land 후 다운스트림 8곳 전파 — **처리 7 · skip 1**. origin 실내용 대조 6/6 ✓. icons 이력 오염 1건은 사용자 판단으로 존치.
 
 ---
 
@@ -10,29 +10,33 @@
 
 ## 작성자
 - Agent: claude-opus-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `docs/guide-22-readme-v4` (base=main, branch-first)
+- Branch `chore/guide-22-propagation` (base=main, branch-first)
 
 ## 방금 한 것
 
-- **METH-116 정련 리베이스 → land**: 브랜치(정련 1커밋)가 v1 기준 §2 전면 재작성이라, 그 사이 main 에 들어온 **v2(METH-128)·v3(METH-129)** 와 정면 충돌. 한쪽 채택 시 **불변규율 4(파일=유일 소스)·5(안정 슬라이드 ID)와 P3 리드백 게이트가 조용히 유실**되는 구조여서 승계 병합으로 해소 — 6단계 모델은 브랜치 것 채택, v2 규율 승계해 **규율 6개 통합**, 리드백 게이트는 **신 P4 행으로 이관**, 변경이력 v1~v3 보존 + **v4(2026-08-22)** 추가. `wrap` 4/4 → force-push → PR #148 → CI green → `land`(squash **6f6aec5a**, maincheck 도달 ✓).
-- **README 정합 정정**(본 브랜치): `20_guides/README.md` 3곳 — ① §3.6 역할 설명 5단계 → **콘텐츠·디자인 분리 6단계** ② 현황표 22 항목 **v1 → v4 · 2026-07 → 2026-08**(v2·v3 누락분 소급) ③ 변경이력 **v4.4** 추가.
-- **마찰 기록**: 본문 개정(v2·v3·v4)이 인덱스(README)에 3릴리스 연속 미반영 — 관찰로그 `2026-08-22_guide-22-rebase-and-readme-v4.md` 에 friction 등록(교정안: 본문 개정 시 README 3곳 동시 정정).
-- HANDOFF Recent Changes 5건으로 정리(07-25 정련 항목은 08-22 land 항목이 승계).
+- **전파 실행**: `sync-all --apply` — 대상 8 · **처리 7** · skip 1. 각 repo 는 `git add -A` 없이 방법론 경로만 타깃 스테이징 후 `chore(methodology): sync*`(훅 면제 패턴) 커밋·push.
+  - 3파일 정합 5곳: **ai-icons · gamblescan · icons-invest · talmo-com · tshome** (지침 22 + `20_guides/README.md` + 버전 스탬프)
+  - **grooman** — 누적 catch-up 24파일(지침 15건·`methodology.py`·`build-guard.sh`·templates·catalog/outbox README·SOP·CLAUDE/AGENTS).
+- **origin 실내용 대조 6/6 ✓** — push rc 가 아니라 `origin/main` 블롭을 직접 grep(README `**v4**` · 지침 22 `불변 규율 6개`). 지침 23 §1-4.
+- **icons — 사고 1건(존치 판단)**: `sync-all` 상태표는 스캔 시점 기준 `main` 이었으나, 커밋·푸시 시점엔 **다른 활성 세션이 피처 브랜치로 전환한 뒤**였다. `push origin HEAD` 가 sync 커밋(`a797936`)을 그 브랜치에 올렸고, 그 세션이 위에 작업을 쌓아 **PR #386 squash 로 main 에 머지**. 결과적으로 icons `origin/main` 에 지침 22 v4·README v4 는 **정상 도착**(grep 확인)했으나, 전용 sync 커밋이 아니라 무관한 문서 PR 에 딸려 들어간 **이력 오염**. 정정은 destructive 라 사용자 판단으로 **그대로 둠**.
+- **skip 1 — cafe24-renewal**: 당일 PDP 밀도 작업 미커밋 7건이 있어 sync-all 이 보호(기본 동작). 강제 안 함.
+- **ai-icons 원격 이전 감지**: `YunJuniverse/ai-icons` → `icons-hq/ai-icons` 로 이동, 리다이렉트로 push 성공. **remote URL 갱신 필요**(다음 push 부터 깨질 수 있음).
 
 ## 다음 구체 행동
 
 1. 본 브랜치 `ship` → `land` (Class A).
-2. **`sync-all --apply` 다운스트림 전파** — `20_guides` 가 shared_paths 라 지침 22 v4 + README 가 함께 전파된다. 비-main/dirty repo 는 기본 skip 이니 **착수 전 각 repo 상태 재확인**(METH-137 교훈 — 실행 시점에 clean 으로 바뀌어 있으면 worktree 우회 절약). 전파 후 **origin 실내용 대조**(push rc 아닌 블롭 grep, 지침 23 §1-4).
-3. 스켈레톤 `ir-deck-build` 는 shared_paths 아님(`50_resources/skeletons/_README.md` 만 공유) — 다운스트림에 필요하면 별도 경로 결정 필요.
+2. **cafe24-renewal 잔여 전파** — 진행 중 작업 커밋 후 `sync-all --apply` 재실행 + origin 대조.
+3. **ai-icons remote URL 갱신** — `git remote set-url origin https://github.com/icons-hq/ai-icons.git`.
+4. `methodology collect` **미수거 캡슐 16건** — sync-all 이 경고로 보고(METH-117).
 
 ## 현재 열린 트랙 (콜드스타트용)
 
 - **METH-134/135 잔여**: 실험 모드 첫 실전 적용 · 자율주행 첫 실주행 + 권한 allowlist.
 - **METH-130**(Backlog): UI repo 6곳 방어층 설치. **METH-113**(Backlog): retrofit.
-- 후속 후보: capsule 발신 시점 id 검증 · 월간 전수조사 2회차(8월 말) · graph.json outbox/collect/land 노드 · **인덱스(README) 자동 정합 검사**(본 세션 friction 파생).
+- 후속 후보: **전파 시 브랜치 레이스 방어**(본 세션 friction — push 직전 `rev-parse --abbrev-ref HEAD` 재확인 + `push origin main`, 활성 세션 repo 는 임시 worktree; METH-137 "착수 전 상태 재확인" 재발) · **인덱스(README) 자동 정합 검사** · capsule 발신 시점 id 검증 · 월간 전수조사 2회차.
 
 ## 막힌 것
-- 없음. (지침 22 §1.2 서술 "디자인 계약 고정 후 콘텐츠 주입"이 신 6단계 모델과 어긋남 — 사람 확인 후 문구 정리 권장, 이전 세션에서 이월.)
+- 없음. (지침 22 §1.2 서술 "디자인 계약 고정 후 콘텐츠 주입"이 신 6단계 모델과 어긋남 — 이월 중, 사람 확인 후 문구 정리 권장.)
 
 ## 환경
 - macOS, python3. 대시보드 http://localhost:8768.
