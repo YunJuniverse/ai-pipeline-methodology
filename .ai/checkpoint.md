@@ -1,7 +1,6 @@
-# Checkpoint — 2026-08-20 (METH-137 종결 — 캡슐 3회차 5건 반영·전파 11/11·훅 재설치)
+# Checkpoint — 2026-08-22 (METH-116 정련 브랜치 main 리베이스 — 지침 22 v2·v3 병합 승계)
 
-> ✅ 수거 5건 → 사람 확정(유효 5) → 반영 + negative case 증명 → PR #146 land(squash 0e1a6aef) → 전파 11/11 origin 대조 → 훅 3 repo 재설치. `_inbox` 비움(원장 21건).
-> 이 checkpoint 는 전파 종결 커밋(branch `chore/meth-137-propagation`)과 함께 ship→land 됨.
+> ✅ `docs/guide-22-ir-deck-methodology`(정련 커밋 1개)를 61커밋 앞선 main 위로 리베이스. 충돌 5파일 해소 — 지침 22 는 v2·v3 내용을 **승계 통합**, 라이브 상태 파일은 최신(main) 채택.
 
 ---
 
@@ -10,32 +9,35 @@
 > 형식 정의: `10_foundation/WHITEPAPER.md` §2-2.
 
 ## 작성자
-- Agent: claude-fable-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
-- Branch `chore/meth-137-propagation` (base=main, branch-first) — 직전 반영 PR #146 은 land 완료
+- Agent: claude-opus-5 · Tool: claude-code-desktop · Host: darwin 25.5.0
+- Branch `docs/guide-22-ir-deck-methodology` (base=main, 리베이스 후 main+1) — 신설분 PR #112 는 이미 land
 
 ## 방금 한 것
 
-- **반영 PR #146 을 land 로 착지** — 새 land 코드가 첫 실전에서 squash SHA(0e1a6aef)로 maincheck 판정. CI validate green 대기 후 착지(fail-closed 정상 작동 확인).
-- **전파**: main·clean 6곳 직접(ai-icons·cafe24·icons-marketing·lifeManager·talmo·tshome) + main·dirty 4곳 타깃 스테이징(icons·icons-invest·insta-toon·invest-ops — sync 경로와 dirty 교차 0 확인 후) + gamblescan(스캔 시점엔 비-main·dirty였으나 실행 시점 main·clean으로 바뀌어 직접 — **착수 전 상태 재확인이 worktree 우회를 절약**). 커밋 메시지는 훅 sync 면제 패턴(`chore(methodology): sync*`) 준수.
-- **origin 실내용 대조 11/11**: guide05 §9b·guide23 §4b·methodology.py run_guarded 을 origin/main 블롭에서 직접 grep — push rc 아닌 내용 확인(지침 23 §1-4). icons 계열 worktree 5곳은 icons origin 공유로 자동 커버.
-- **훅 재설치 3/3**(ai-icons·invest-ops·lifeManager) — `hooks install --force`, run_guarded 3건·실행권한 확인.
-- TODO METH-137 → Done(maincheck 근거) · rotate --apply(Done 7건 → `40_dev/snapshots/live-archive/2026-08-20_todo-done.md`, 최신 4건 유지) · HANDOFF 갱신.
+- **리베이스 배경 확인**: 이 브랜치의 *신설분*은 PR #112 로 이미 머지(`285041e`)됐고, 그 뒤 main 에서 지침 22 가 **v2(METH-128)·v3(METH-129)** 로 두 번 더 진화. 남은 정련 커밋은 v1 기준 §2 전면 재작성이라 정면 충돌 — 기계적 해소 불가 판정.
+- **충돌 5파일 해소**:
+  - `20_guides/22_IR_...지침.md` — 정련의 **2트랙·6단계(P0~P5)** 모델 채택 + 그대로 두면 유실될 **v2 불변규율 4(파일=유일 소스)·5(안정 슬라이드 ID) 승계**(규율 6개로 통합), v2 **P3 리드백 게이트를 신 P4 행으로 이관**, 변경이력 v1~v3 보존 + **v4(2026-08-22) 추가**.
+  - `TODO.md` — main 의 METH-137 Done 유지 + METH-116 **정련** 항목 별도 추가(신설분 land 기록 명시).
+  - `HANDOFF.md` — Recent Changes 는 main 최신 5건 유지 + 정련 1줄 추가, Working on 갱신.
+  - `.ai/checkpoint.md`·`.ai/wrap-state.json` — **최신(main) 채택**. 세션 스냅샷/생성물이라 07-25 서사로 되감지 않음.
+- **검증**: source CI 동등 체크 로컬 통과 — `manifest-check` ✓ · observation lint 전건 ✓ · `generate-dashboard.py` ✓(kanban 7 cards).
+- 백업 ref `backup/pre-rebase-guide22`(= 리베이스 전 `5153171`) 보존.
 
 ## 다음 구체 행동
 
-1. (이 커밋의 land 까지가 이번 세션 몫 — 완료 시 잔여 없음)
-2. **METH-135 첫 실주행 검증** — 사용자가 타 프로젝트에서 실측해 알려주기로 한 건 유지.
-3. 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용.
-4. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주 — 만료 0 유지 중).
+1. force-push 후 **정련분 PR 생성** — #112 는 신설분으로 이미 머지됐으므로 새 PR 필요. Class A.
+2. `20_guides/README.md:183` 현황표가 지침 22 를 아직 **v1** 로 표기 — v2·v3 때도 누락된 기존 갭. v4 로 정정(현황표·§3.6 요약·변경이력 v4.x) 필요.
+3. 머지 후 `sync-all` 로 다운스트림 전파(지침 22·스켈레톤 `ir-deck-build` 는 shared_paths 여부 확인 후).
 
 ## 현재 열린 트랙 (콜드스타트용)
 
+- **METH-116 정련**: 본 브랜치 — PR 대기.
 - **METH-134/135 잔여**: 실험 모드 첫 실전 적용 · 자율주행 첫 실주행 + 권한 allowlist.
 - **METH-130**(Backlog): UI repo 6곳 방어층 설치. **METH-113**(Backlog): retrofit.
-- 후속 후보: **capsule 발신 시점 id 검증**(capsule 명령이 worktree 디렉터리명으로 id 접두어 생성 — gamblescan-p0-pr 형식 경고 2건 재발 방지) · 월간 전수조사 2회차(8월 말) · graph.json outbox/collect/land 노드.
+- 후속 후보: capsule 발신 시점 id 검증 · 월간 전수조사 2회차(8월 말) · graph.json outbox/collect/land 노드.
 
 ## 막힌 것
-- 없음.
+- 없음. (지침 22 병합은 v2·v3 규율을 모두 승계했으나, 6단계 재편으로 §1.2 서술("디자인 계약 고정 후 콘텐츠 주입")이 신 모델과 어긋남 — 사람 확인 후 문구 정리 권장.)
 
 ## 환경
 - macOS, python3. 대시보드 http://localhost:8768.
