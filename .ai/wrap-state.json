@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "4f573de5bebaf4d96c4e88208d03796ac92569c5",
-  "last_validated_at": "2026-08-22T13:56:59Z",
+  "last_validated_commit": "86f687449b24ff937a0c5009aed23dacdcdc45ae",
+  "last_validated_at": "2026-09-01T08:52:24Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "178d56c8fa61b30f0e2958476abd035ee8891810e560f6384835f4aae751c968"
+      "sha256": "90468fc2c3a9cc9fa061d4b7f9ebcf09c2c893d12bcd00759e8286aea1c9e65b"
     },
     "TODO.md": {
-      "sha256": "f7d94fa23a1068242bc48734aa8c4b09ffd714d66999eda155a73e3888e0ecd0"
+      "sha256": "a09dda6d5d68ee21d35e28796e03ab53032d00e7919d2eb0a08181bbc5bd11ee"
     },
     ".ai/checkpoint.md": {
-      "sha256": "f7731e31ce6680436f87f4c63031727f889bd9a8d3028b1cf536a74fc52413aa"
+      "sha256": "861c6741c7c7b8484f92d837ad967f883b36413d40c36db94213f66b36376ce1"
     }
   },
   "observations": {
@@ -165,6 +165,7 @@
       "50_resources/ai_observations/2026-08-20_meth-137-propagation.md",
       "50_resources/ai_observations/2026-08-22_guide-22-rebase-and-readme-v4.md",
       "50_resources/ai_observations/2026-08-22_guide-22-v4-propagation.md",
+      "50_resources/ai_observations/2026-09-01_land-class-plan-false-positive.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

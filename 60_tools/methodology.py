@@ -1601,7 +1601,16 @@ CLASS_BC_PATTERNS: list[tuple[str, str]] = [
     # (설명, 정규식 — repo 상대경로에 대해 검사)
     ("DB 마이그레이션·스키마", r"(^|/)(migrations?|prisma)/|\.sql$|schema\.(prisma|sql)$"),
     ("인증·인가", r"(^|/)(auth|authz|authentication|authorization|session|middleware|permissions?|rbac|roles?)[./_-]"),
-    ("과금·결제·가격", r"(^|/)(billing|payment|pricing|checkout|invoice|subscription|plan)s?[./_-]"),
+    # `plan` 만 경계가 좁다 — 세그먼트·파일명 전체가 plan 일 때만 (`plans.ts`·`/plan/`).
+    # 나머지 낱말과 달리 plan 은 요금제 밖에서도 흔한 수식어라, 넓은 경계 `[./_-]` 로 두면
+    # `plan-viewer`(기획 뷰어)·`plan-of-record` 같은 경로가 통째로 과금으로 오판된다.
+    # 실사고: icons 레포 `50_apps/plan-viewer/` 아래 *모든* 변경이 Class B 로 걸려
+    # 자동 머지가 영구 불가능해졌다(문서 본문 단어 오탐과 달리 경로라 회피 불가).
+    # 대가로 `plan_limits.json` 류 복합어를 놓치지만, 실제 과금 코드는 거의 언제나
+    # billing·pricing·subscription 이 경로 어딘가에 함께 있어 그쪽으로 걸린다.
+    ("과금·결제·가격",
+     r"(^|/)(billing|payment|pricing|checkout|invoice|subscription)s?[./_-]"
+     r"|(^|/)plans?[./]"),
     ("외부 API 계약", r"(^|/)(openapi|swagger)|\.proto$|(^|/)api[-_]?contract"),
     ("백그라운드 작업·스케줄러·큐", r"(^|/)(cron|scheduler|queue|worker|job)s?[./_-]"),
     ("CI·배포 파이프라인", r"^\.github/workflows/|(^|/)(Dockerfile|docker-compose|vercel\.json|fly\.toml)$"),
