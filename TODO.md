@@ -36,6 +36,16 @@
 
 ## Done
 
+### METH-140 · 캡슐 `origin_repo` 워크트리 갈라짐 — `_repo_name` 을 git 공통 디렉터리 기준으로
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 원인 — `_repo_name` 이 디렉터리명만 써서, 워크트리에서 발행한 캡슐이 워크트리명(`icons-wt-hub`·`.claude/worktrees/<임시명>`)을 `origin_repo`·id 로 갖는다. 캡슐 id 는 `_collect_plan` 의 **중복 수거 방지 키**라 같은 제안이 워크트리마다 갈라져 중복 적재
+  - [x] METH-137 에서 경고만 남기고 원인 미해소였던 `gamblescan-p0-pr__...` 건의 근본 원인
+  - [x] 수정 — `git rev-parse --git-common-dir` 로 주 체크아웃 이름 환원, bare(`<repo>.git`)·非git·git 부재 전부 폴백
+  - [x] 테스트 2건 — 실제 worktree 생성 후 주 체크아웃 이름 반환 확인 / 非git 폴백. 상류 8파일 전체 green
+  - [x] 실측 — 이 세션 워크트리 `priceless-perlman-c80820` → `icons` 반환 확인
+- **notes**: 하류(icons#668)에서 먼저 고쳐진 것을 상류로 역주입. `60_tools/methodology.py` 는 sync 로 내려오는 파일이라 **하류 로컬 패치만으로는 다음 sync 에 덮여 되돌아온다** — 같은 이유로 METH-138·139 도 상류에 올렸다. 하류 수정을 발견하면 상류 반영 여부를 함께 확인할 것.
+
 ### METH-139 · land `plan` 규칙 정련 — 병렬 세션 두 수정안의 합집합 채택
 - **mode**: fullstack / **change-class**: A / **owner**: AI
 - **acceptance criteria**:
