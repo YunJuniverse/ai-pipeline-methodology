@@ -1647,6 +1647,24 @@ CLASS_BC_PATTERNS: list[tuple[str, str]] = [
 ]
 
 
+# 표현용 바이너리 자산 — 경로 트리거에서 제외한다.
+# 트리거는 «경로 단어»로 위험을 추정하는데, 이미지·영상·폰트는 그 경로에 놓여 있어도
+# 스키마·인증·과금·계약 «로직»을 바꿀 수 없다. icons 실측: 인증 트리거 적중 25건 중
+# 16건이 `public/gallery/auth-*.jpg` 갤러리 스크린샷이었다 — 재촬영 PR 마다 Class B.
+# **문서 확장자(.pdf·.md·.docx·.json 등)는 일부러 넣지 않는다** — `legal/terms.pdf`
+# 처럼 정책·약관·가격을 실제로 담는 파일이라 Class C 판정 대상으로 남아야 한다.
+ASSET_EXTS: frozenset[str] = frozenset({
+    ".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif", ".bmp", ".tiff", ".ico", ".svg",
+    ".mp4", ".webm", ".mov", ".avi", ".mp3", ".wav", ".ogg",
+    ".woff", ".woff2", ".ttf", ".otf", ".eot",
+})
+
+
+def _is_asset(path: str) -> bool:
+    """표현용 바이너리 자산인가 — 확장자만 본다(경로 위치와 무관)."""
+    return Path(path).suffix.lower() in ASSET_EXTS
+
+
 def _classify_change(target: Path, base_ref: str, head_ref: str = "HEAD") -> list[tuple[str, str]]:
     """base..head 변경 경로에서 Class B/C 트리거를 찾는다.
 
@@ -1661,11 +1679,27 @@ def _classify_change(target: Path, base_ref: str, head_ref: str = "HEAD") -> lis
         return [("변경 경로 조회 실패 — 자동 판정 불가", "(unknown)")]
     hits: list[tuple[str, str]] = []
     for path in (p.strip() for p in out.splitlines() if p.strip()):
+        if _is_asset(path):
+            continue  # 자산은 로직을 바꾸지 않는다 — ASSET_EXTS 주석 참조
         for label, pattern in CLASS_BC_PATTERNS:
             if re.search(pattern, path, re.IGNORECASE):
                 hits.append((label, path))
                 break
     return hits
+
+
+def _excluded_assets(target: Path, base_ref: str, head_ref: str = "HEAD") -> list[str]:
+    """트리거 검사에서 자산으로 제외된 경로 — land 가 «무엇을 안 봤는지» 밝히기 위함."""
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "diff", "--name-only", f"{base_ref}...{head_ref}"],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return []
+    return [p.strip() for p in out.splitlines()
+            if p.strip() and _is_asset(p.strip())
+            and any(re.search(pat, p.strip(), re.IGNORECASE) for _, pat in CLASS_BC_PATTERNS)]
 
 
 def _pr_for_branch(target: Path, branch: str) -> dict | None:
@@ -1791,6 +1825,10 @@ def cmd_land(args: argparse.Namespace) -> int:
             err(f"      {path}")
         err("CLAUDE.md §3: 근거·영향 범위·롤백 계획·리스크를 PR 에 남기고 사람이 머지한다.")
         return 2
+    skipped = _excluded_assets(target, base_ref)
+    if skipped:
+        print(f"  · 자산 {len(skipped)}건은 트리거 검사 제외(이미지·영상·폰트) — "
+              f"예: {skipped[0]}")
     print("  ✓ Class B/C 트리거 없음 — Class A")
 
     if str(pr.get("state", "")).upper() != "MERGED":

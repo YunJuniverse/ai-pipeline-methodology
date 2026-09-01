@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "f3fc28648d9eaa5cbf362ec55e5a735f8a25a3ab",
-  "last_validated_at": "2026-09-01T09:05:42Z",
+  "last_validated_commit": "d91cefd536f7c99979972c97c7b90b6e1fd505aa",
+  "last_validated_at": "2026-09-01T09:25:40Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "c32e80e36d8774018db47f1d8a3e06198c5ecf95c439642dcdc38ef2c168afd0"
+      "sha256": "7fd48e22d06cfd7aa0931885424904163192dec9673b3c1554be32ae7eda7d3f"
     },
     "TODO.md": {
-      "sha256": "3cc4a4748f1d9f0d0a8f6f3424a557d3decfd5b394ad89a2db54bc78a17c43b7"
+      "sha256": "5a4882d7ebb43ed5bdaba6cfb75ca29b229f659e97ece2f5aff3b417ee2a56f3"
     },
     ".ai/checkpoint.md": {
-      "sha256": "bc0779ff4b49e840038fddce956fb952b7f8be98d31404261781f26beb7f1d85"
+      "sha256": "1ca95c21507815dd5df182521961b8e8ebec38cee71537ab25584988d6d06e17"
     }
   },
   "observations": {
@@ -166,6 +166,7 @@
       "50_resources/ai_observations/2026-08-22_guide-22-rebase-and-readme-v4.md",
       "50_resources/ai_observations/2026-08-22_guide-22-v4-propagation.md",
       "50_resources/ai_observations/2026-09-01_capsule-repo-name-worktree.md",
+      "50_resources/ai_observations/2026-09-01_class-trigger-asset-exclusion.md",
       "50_resources/ai_observations/2026-09-01_land-class-plan-false-positive.md",
       "50_resources/ai_observations/2026-09-01_land-plan-union-refine.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
