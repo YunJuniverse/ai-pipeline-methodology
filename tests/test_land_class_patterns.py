@@ -6,8 +6,9 @@ plain assert + 자체 러너. CLASS_BC_PATTERNS 는 순수 정규식 표라 git 
 fail-closed 설계(오탐은 싸고 미탐은 비싸다)를 **깨지 않으면서** 구조적 오탐만 걷어내는 것이
 이 테스트의 목적이다. 그래서 두 방향을 같은 무게로 고정한다.
 
-- `test_*_triggers`   — 진짜 B/C 경로가 계속 걸리는가 (미탐 방지 · 이쪽이 더 비싸다)
+- `test_*_trigger*`   — 진짜 B/C 경로가 계속 걸리는가 (미탐 방지 · 이쪽이 더 비싸다)
 - `test_*_not_*`      — 이름만 닮은 경로가 안 걸리는가 (오탐 방지)
+- `test_bare_plan_*`  — 왜 지금 규칙이 이 모양인지의 근거(실측 숫자) 박제
 """
 from __future__ import annotations
 
@@ -43,28 +44,63 @@ def test_billing_paths_trigger() -> None:
         "lib/pricing.ts",
         "server/invoice_pdf.py",
         "api/subscription-webhook.ts",
-        "src/plans.ts",              # 요금제 목록 — 파일명 전체가 plan
-        "src/plan.ts",
-        "billing/plan/limits.ts",    # 세그먼트 전체가 plan
+        "billing/plan/limits.ts",     # billing 세그먼트로 걸린다
     ]:
         assert "과금·결제·가격" in _hits(path), f"미탐: {path}"
 
 
-def test_plan_compound_is_accepted_coverage_loss() -> None:
-    """`plan` 복합어는 놓친다 — 감수한 대가이지 사고가 아니다.
+def test_plan_billing_compounds_trigger() -> None:
+    """plan 이 과금 낱말과 붙은 복합어 — 다른 대안이 못 잡으므로 이 규칙이 필요하다.
 
-    `plan` 은 요금제 밖에서도 흔한 수식어라 경계를 `[./]`(세그먼트·파일명 전체)로
-    좁혔다. 그 결과 `plan_limits.json` 처럼 plan 이 수식어로 쓰인 진짜 과금 파일은
-    이 낱말로는 안 걸린다. 실제 과금 코드는 거의 언제나 billing·pricing·subscription
-    이 경로 어딘가에 함께 있어 그쪽으로 걸리므로(아래 대조군) 순손실은 작다.
-
-    이 테스트는 그 대가를 **눈에 보이게** 고정한다 — 나중에 경계를 다시 넓히려는
-    사람이 무엇을 사고 무엇을 파는지 알고 결정하도록.
+    `plan_pricing.json` 의 `pricing` 은 `_` 뒤라 `(^|/)pricing` 에 안 걸린다.
+    이 케이스를 위해 `plans?[._-](pricing|price|billing|tier|quota)` 를 둔다.
     """
-    assert "과금·결제·가격" not in _hits("config/plan_limits.json")
-    # 대조군 — 같은 파일이 과금 맥락 안에 있으면 여전히 걸린다
-    assert "과금·결제·가격" in _hits("billing/plan_limits.json")
-    assert "과금·결제·가격" in _hits("src/pricing/plan_limits.json")
+    for path in [
+        "config/plan_pricing.json",
+        "src/plan-tier.ts",
+        "app/plan_quota.ts",
+        "lib/plan-billing.ts",
+    ]:
+        assert "과금·결제·가격" in _hits(path), f"미탐: {path}"
+
+
+def test_plural_plans_triggers_but_singular_plan_does_not() -> None:
+    """복수형 `plans` 만 요금제로 본다 — 단수 `plan` 은 기획 용법이 지배적이다.
+
+    `plans.ts`·`plans/` 는 요금제 목록의 관용 표기라 과금으로 보는 편이 맞다.
+    반면 단수 `plan.md`·`app/plan/page.js` 는 icons 실측에서 **전부 기획 문서·라우트**였다.
+    단수까지 넣으면 기획 중심 레포에서 다시 오탐이 된다.
+    """
+    for path in ["src/plans.ts", "src/plans/index.ts"]:
+        assert "과금·결제·가격" in _hits(path), f"미탐: {path}"
+    for path in [
+        "50_apps/plan-viewer/app/plan/page.js",   # 기획 뷰어의 plan 라우트
+        "50_resources/prompts/plan.md",           # 기획 프롬프트 문서
+    ]:
+        assert "과금·결제·가격" not in _hits(path), f"오탐: {path}"
+
+
+def test_bare_plan_would_be_catastrophic() -> None:
+    """왜 단독 `plan` 을 넓은 경계로 두면 안 되는가 — 판별자로서 죽는다.
+
+    icons 레포 실측(2502 경로): 단독 `plan` + `[./_-]` 는 **824개**를 물었다.
+    레포의 3분의 1이 Class B 면 사람은 스캐너를 읽지 않고 `--no-ci-check` 로 간다.
+    현재 패턴은 같은 레포에서 2건만 물고, 그 2건은 전부 진짜 `checkout/` 이다.
+
+    이 테스트는 회귀 방지가 아니라 **근거의 박제**다 — 경계를 다시 넓히자는 제안이
+    오면 이 숫자를 먼저 보게 한다.
+    """
+    import re as _re
+    old = r"(^|/)(billing|payment|pricing|checkout|invoice|subscription|plan)s?[./_-]"
+    # 옛 패턴이 *실제로* 물었던 경로만 — `(^|/)plan` 이라 `floor-plan` 처럼 plan 이
+    # 세그먼트 중간에 오는 것은 옛 패턴도 안 물었다(그건 이 규칙의 피해자가 아니다).
+    victims = [
+        "50_apps/plan-viewer/components/BentoPopupLayout.jsx",
+        "docs/plan-of-record.md",
+    ]
+    for path in victims:
+        assert _re.search(old, path, _re.IGNORECASE), f"전제 오류 — 옛 패턴이 {path} 를 안 물었다"
+        assert "과금·결제·가격" not in _hits(path), f"오탐 재발: {path}"
 
 
 def test_plan_viewer_is_not_billing() -> None:

@@ -36,6 +36,17 @@
 
 ## Done
 
+### METH-139 · land `plan` 규칙 정련 — 병렬 세션 두 수정안의 합집합 채택
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 계기 — METH-138(경계 `[./]`)과 icons 병렬 세션의 독립 수정(icons#667, 과금낱말 복합어만)이 **상보적**임을 실측으로 확인. 어느 쪽도 상대를 포함하지 않았다
+  - [x] 실측 근거 — icons 2502 경로 전수: 옛 단독 `plan` **824건**(레포의 1/3) · icons#667 **2건** · METH-138 **4건** · 채택안 **2건**. 남은 2건은 전부 진짜 `checkout/`
+  - [x] METH-138 의 단수 허용이 오히려 오탐이었음 확인 — `50_apps/plan-viewer/app/plan/page.js`·`50_resources/prompts/plan.md` 둘 다 기획 용법
+  - [x] 채택 — 과금낱말 복합어(`plan_pricing`·`plan-tier`) **+ 복수형만**(`plans.ts`·`plans/`). 단수 `plan` 은 제외
+  - [x] 복수형 추가가 이 repo 군에서 무비용임을 실측 — icons 전체에 `plans` 경로 0건
+  - [x] 테스트 8케이스(신규 3) · 상류 8파일 전체 green
+- **notes**: 병렬 작업이 낳은 이득 — 단독으로는 둘 다 최적이 아니었다. `test_bare_plan_would_be_catastrophic` 은 회귀 방지가 아니라 **근거의 박제**(824 숫자)로, 경계를 다시 넓히자는 제안이 오면 먼저 보게 한다. icons 로컬 패치(#667)는 이 상류 반영으로 대체된다.
+
 ### METH-138 · land Class 스캐너 `plan` 오탐 — 경계 축소 + 회귀 테스트 신설
 - **mode**: fullstack / **change-class**: A / **owner**: AI
 - **acceptance criteria**:
