@@ -1601,16 +1601,19 @@ CLASS_BC_PATTERNS: list[tuple[str, str]] = [
     # (설명, 정규식 — repo 상대경로에 대해 검사)
     ("DB 마이그레이션·스키마", r"(^|/)(migrations?|prisma)/|\.sql$|schema\.(prisma|sql)$"),
     ("인증·인가", r"(^|/)(auth|authz|authentication|authorization|session|middleware|permissions?|rbac|roles?)[./_-]"),
-    # `plan` 만 경계가 좁다 — 세그먼트·파일명 전체가 plan 일 때만 (`plans.ts`·`/plan/`).
-    # 나머지 낱말과 달리 plan 은 요금제 밖에서도 흔한 수식어라, 넓은 경계 `[./_-]` 로 두면
-    # `plan-viewer`(기획 뷰어)·`plan-of-record` 같은 경로가 통째로 과금으로 오판된다.
-    # 실사고: icons 레포 `50_apps/plan-viewer/` 아래 *모든* 변경이 Class B 로 걸려
-    # 자동 머지가 영구 불가능해졌다(문서 본문 단어 오탐과 달리 경로라 회피 불가).
-    # 대가로 `plan_limits.json` 류 복합어를 놓치지만, 실제 과금 코드는 거의 언제나
-    # billing·pricing·subscription 이 경로 어딘가에 함께 있어 그쪽으로 걸린다.
+    # `plan` 만 규칙이 다르다 — 나머지 여섯 낱말과 달리 요금제 밖에서도 흔한 수식어라,
+    # 같은 경계 `[./_-]` 를 주면 기획 낱말을 통째로 문다. icons 실측: 단독 `plan` 으로
+    # 2502 경로 중 **824개** 오탐(레포의 1/3) — `50_apps/plan-viewer/` 아래 모든 변경이
+    # Class B 로 걸려 그 앱은 자동 머지가 영구 불가능했다. 판별자로서 죽은 상태였다.
+    # 그래서 plan 은 셋 중 하나일 때만 건다.
+    #   ① 과금 낱말과 붙은 복합어 — `plan_pricing`·`plan-tier`(다른 대안은 못 잡는다)
+    #   ② **복수형** 파일명·세그먼트 — `plans.ts`·`plans/`(요금제 목록의 관용 표기)
+    # 단수 `plan.md`·`app/plan/` 은 뺀다 — 기획 용법이 지배적이다(실측 2건 전부 기획).
+    # 이 조합이 icons 에서 824 → 2 로 줄고, 남은 2건은 전부 진짜 `checkout/` 이다.
     ("과금·결제·가격",
      r"(^|/)(billing|payment|pricing|checkout|invoice|subscription)s?[./_-]"
-     r"|(^|/)plans?[./]"),
+     r"|(^|/)plans?[._-](pricing|price|billing|tier|quota)"
+     r"|(^|/)plans[./]"),
     ("외부 API 계약", r"(^|/)(openapi|swagger)|\.proto$|(^|/)api[-_]?contract"),
     ("백그라운드 작업·스케줄러·큐", r"(^|/)(cron|scheduler|queue|worker|job)s?[./_-]"),
     ("CI·배포 파이프라인", r"^\.github/workflows/|(^|/)(Dockerfile|docker-compose|vercel\.json|fly\.toml)$"),
