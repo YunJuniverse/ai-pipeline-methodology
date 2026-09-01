@@ -36,6 +36,18 @@
 
 ## Done
 
+### METH-138 · land Class 스캐너 `plan` 오탐 — 경계 축소 + 회귀 테스트 신설
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 재현 — `CLASS_BC_PATTERNS` 과금 항의 `plan` 대안이 넓은 경계 `[./_-]` 라 `plan-viewer` 를 문다. icons 레포 `50_apps/plan-viewer/` 아래 **모든** 변경이 Class B 로 판정돼 자동 머지 영구 불가(실사고 PR #664)
+  - [x] 테스트 선행 — `tests/test_land_class_patterns.py` 신설, 수정 전 3/5 fail 로 오탐 재현 확인
+  - [x] 수정 — `plan` 만 분리해 경계 `[./]`(세그먼트·파일명 전체)로 축소. 나머지 6낱말은 경계 불변
+  - [x] 미탐 방지 고정 — 진짜 과금 경로 8종·타 트리거 10종·평범 경로 4종 회귀 테스트 (6/6 pass)
+  - [x] 감수한 대가를 테스트로 명시 — `plan_limits.json` 류 복합어는 놓친다(대조군: `billing/plan_limits.json`·`src/pricing/plan_limits.json` 은 계속 걸림)
+  - [x] 실사고 재판정 — 수정된 `_classify_change` 로 PR #664 실제 diff → **Class A, 트리거 없음**
+  - [x] 상류 전체 회귀 — 8파일 64테스트 전부 pass
+- **notes**: fail-closed 설계(오탐 싸고 미탐 비쌈)는 유지. 다만 앱 디렉터리 하나를 통째로 오판하는 오탐은 사람을 `--no-ci-check`·수동 머지로 밀어내 **오히려 안전을 깎는다** — 늘 우는 늑대는 무시된다. `plan` 은 목록 7낱말 중 유일하게 요금제 밖에서도 흔한 수식어라 이 항만 좁혔다. 발신 캡슐: icons `50_resources/meth_outbox/2026-09-01_land-billing-pattern-path-false-positive.md`.
+
 ### METH-137 · 캡슐 트리아지 3회차 2026-08-20 — 신규 5건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:

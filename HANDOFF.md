@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-01 — **METH-138 land `plan` 오탐 수정**: 과금 트리거의 `plan` 경계를 `[./_-]`→`[./]` 로 축소(`plan-viewer` 오판 해소 · 나머지 6낱말 불변). `tests/test_land_class_patterns.py` 신설 6케이스 — 상류 64테스트 green. 전파 필요(11 repo).
 
 - 2026-08-22: **지침 22 v4 — 정련 land + README 정합 + 다운스트림 전파 7/8 (Class A)** — 정련 브랜치를 main(61커밋 앞섬) 위로 리베이스해 v2(METH-128) 불변규율 4·5 와 P3 리드백 게이트를 승계 통합(규율 6개)·변경이력 v1~v3 보존 + v4 → #148 land(6f6aec5a). `20_guides/README.md` §3.6·현황표(v1→v4, 3릴리스 연속 미반영분 소급)·변경이력 v4.4 → #149 land(4f573de5). sync-all 전파 **7/8**(ai-icons·gamblescan·grooman·icons-invest·talmo-com·tshome + icons) · **origin 실내용 대조 6/6 ✓**(블롭 grep, 지침 23 §1-4) · skip 1(cafe24-renewal 진행중 작업 보호). **icons 이력 오염 1건**: 브랜치 전환 레이스로 sync 커밋이 피처 브랜치에 유입 → PR #386 squash 로 main 도달(내용 정상, 존치 판단).
 > 최근 5건만 유지 (HANDOFF 150줄 한도). 이전 이력은 `git log` 및 `40_dev/snapshots/` 참조.
