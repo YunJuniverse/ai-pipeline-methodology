@@ -1206,7 +1206,33 @@ def cmd_prompt_report(args: argparse.Namespace) -> int:
 
 
 def _repo_name(target: Path) -> str:
-    return target.resolve().name
+    """repo 이름 — 워크트리에서도 주 체크아웃 이름을 준다.
+
+    디렉터리명만 쓰면 워크트리에서 발행한 캡슐이 워크트리명(`icons-wt-hub`,
+    `.claude/worktrees/<임시명>`)을 origin_repo·id 로 갖는다. 캡슐 id 는 상류
+    `_collect_plan` 의 **중복 수거 방지 키**라서, 같은 제안이 워크트리마다 다른
+    id 로 갈라져 중복 적재된다(원장 실사례: `gamblescan-p0-pr__...` — METH-137
+    에서 경고만 남기고 원인 미해소였던 그 건).
+    git 공통 디렉터리(.git 본체)의 위치가 주 체크아웃이므로 그것을 이름으로 쓴다.
+    """
+    fallback = target.resolve().name
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "rev-parse", "--git-common-dir"],
+            text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:  # noqa: BLE001 — git 없음·非 repo 모두 폴백
+        return fallback
+    if not out:
+        return fallback
+    common = Path(out)
+    if not common.is_absolute():
+        common = target / common
+    common = common.resolve()
+    # 통상 <repo>/.git · bare 는 <repo>.git — 어느 쪽이든 repo 이름으로 환원
+    name = common.parent.name if common.name == ".git" else common.name
+    if name.endswith(".git"):
+        name = name[:-4]
+    return name or fallback
 
 
 def _capsule_policy(target: Path) -> str:

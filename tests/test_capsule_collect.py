@@ -8,6 +8,7 @@ git·네트워크를 건드리는 collect 전체가 아니라 순수 로직
 from __future__ import annotations
 
 import sys
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -141,6 +142,42 @@ def test_thinktank_cross_repo_marking_logic() -> None:
     repos = {a["origin_repo"], b["origin_repo"]}
     assert a["target"] == b["target"] and len(repos) == 2
 
+
+
+def test_repo_name_uses_main_checkout_from_worktree() -> None:
+    """워크트리에서도 주 체크아웃 이름 — 캡슐 id 갈라짐 방지 (origin_repo 중복 수거 키).
+
+    디렉터리명만 쓰면 워크트리마다 다른 origin_repo 가 박혀 같은 제안이 상류에
+    중복 적재된다. git 공통 디렉터리로 환원해 하나로 모은다.
+    """
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        main = root / "myrepo"
+        main.mkdir()
+        subprocess.run(["git", "init", "-q", str(main)], check=True)
+        subprocess.run(["git", "-C", str(main), "config", "user.email", "t@t"], check=True)
+        subprocess.run(["git", "-C", str(main), "config", "user.name", "t"], check=True)
+        (main / "f.txt").write_text("x", encoding="utf-8")
+        subprocess.run(["git", "-C", str(main), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(main), "commit", "-qm", "init"], check=True)
+
+        assert m._repo_name(main) == "myrepo"
+
+        wt = root / "wt-some-branch"
+        subprocess.run(
+            ["git", "-C", str(main), "worktree", "add", "-q", "-b", "wip", str(wt)],
+            check=True,
+        )
+        # 핵심 — 워크트리 디렉터리명(wt-some-branch)이 아니라 주 체크아웃 이름이어야 한다
+        assert m._repo_name(wt) == "myrepo", m._repo_name(wt)
+
+
+def test_repo_name_falls_back_outside_git() -> None:
+    """git repo 가 아니면 디렉터리명으로 폴백 — 예외로 죽지 않는다."""
+    with tempfile.TemporaryDirectory() as td:
+        plain = Path(td) / "plaindir"
+        plain.mkdir()
+        assert m._repo_name(plain) == "plaindir"
 
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]

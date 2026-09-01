@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-01 — **METH-140 캡슐 `origin_repo` 워크트리 갈라짐 수정**: `_repo_name` 을 `--git-common-dir` 기준으로 — 워크트리 발행 캡슐이 중복 수거되던 원인(METH-137 미해소 건). 하류 icons#668 역주입.
 - 2026-09-01 — **METH-139 `plan` 규칙 정련**: METH-138 과 icons 병렬 수정이 상보적이라 합집합 채택 — 과금낱말 복합어 + **복수형만**. icons 실측 824→2건(잔여 전부 진짜 checkout). 단수 `plan` 은 기획 용법이라 제외.
 - 2026-09-01 — **METH-138 land `plan` 오탐 수정**: 과금 트리거의 `plan` 경계를 `[./_-]`→`[./]` 로 축소(`plan-viewer` 오판 해소 · 나머지 6낱말 불변). `tests/test_land_class_patterns.py` 신설 6케이스 — 상류 64테스트 green. 전파 필요(11 repo).
 
