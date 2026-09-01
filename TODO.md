@@ -36,6 +36,17 @@
 
 ## Done
 
+### METH-141 · Class B/C 트리거에서 표현용 자산 제외 (하류 icons#670 역주입)
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 원인 — 트리거는 «경로 단어»로 위험을 추정하는데 이미지·영상·폰트는 그 경로에 있어도 로직을 못 바꾼다. icons 실측: 인증 트리거 적중 25건 중 **16건이 `public/gallery/auth-*.jpg`** 갤러리 스크린샷 — 재촬영 PR 마다 Class B
+  - [x] `ASSET_EXTS`(이미지·영상·폰트 22종) + `_is_asset` — 확장자만 보고 경로 위치는 무관
+  - [x] **문서 확장자는 의도적 제외** — `legal/terms.pdf`·`billing/pricing.json` 은 정책·약관·가격을 실제로 담으므로 Class C 판정 대상 유지. 이 경계가 무너지면 자산 제외가 곧 법무·과금 미탐
+  - [x] `_excluded_assets` + land 출력 — «무엇을 안 봤는지» 밝힌다(침묵 제외 금지)
+  - [x] 테스트 3건 추가(자산 인식·문서 비자산·경로 무관) — 11/11 · 상류 8파일 전체 green
+  - [x] end-to-end — 임시 repo 로 `_classify_change` 실검증: `public/auth-shot.jpg` 제외 / `legal/terms.pdf` 는 Class C 유지
+- **notes**: 하류 icons#670 역주입. `60_tools/methodology.py` 는 sync 대상이라 하류 로컬 패치는 다음 sync 에 덮인다 — METH-139(#667)·140(#668)과 같은 사유. 이로써 이번 경합에서 나온 하류 패치 3건이 전부 상류에 안착했다.
+
 ### METH-140 · 캡슐 `origin_repo` 워크트리 갈라짐 — `_repo_name` 을 git 공통 디렉터리 기준으로
 - **mode**: fullstack / **change-class**: A / **owner**: AI
 - **acceptance criteria**:

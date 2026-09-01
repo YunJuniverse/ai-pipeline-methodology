@@ -158,6 +158,53 @@ def test_ordinary_paths_are_class_a() -> None:
         assert _hits(path) == [], f"오탐: {path} → {_hits(path)}"
 
 
+
+# ── 표현용 자산 제외 ──────────────────────────────────────────────────────────
+
+def test_assets_are_excluded_from_triggers() -> None:
+    """트리거 경로에 놓인 이미지·영상·폰트는 Class B/C 가 아니다.
+
+    트리거는 «경로 단어»로 위험을 추정하는데, 자산은 그 경로에 있어도 스키마·인증·
+    과금·계약 «로직»을 바꿀 수 없다. icons 실측: 인증 트리거 적중 25건 중 16건이
+    `public/gallery/auth-*.jpg` 갤러리 스크린샷이었다 — 재촬영 PR 마다 Class B.
+    """
+    for path in [
+        "public/gallery/auth-login.jpg",
+        "assets/billing/pricing-hero.png",
+        "static/legal/terms-banner.webp",
+        "media/checkout/demo.mp4",
+        "fonts/auth/Inter.woff2",
+        "public/migrations/diagram.svg",
+    ]:
+        assert m._is_asset(path), f"자산으로 인식 못함: {path}"
+
+
+def test_documents_are_not_treated_as_assets() -> None:
+    """문서 확장자는 자산이 아니다 — 정책·약관·가격을 실제로 담는다.
+
+    `legal/terms.pdf`·`pricing/plans.json` 은 Class C 판정 대상으로 남아야 한다.
+    이 경계를 무너뜨리면 자산 제외가 곧 법무·과금 미탐이 된다.
+    """
+    for path in [
+        "legal/terms.pdf",
+        "legal/privacy.md",
+        "billing/pricing.json",
+        "policy/compliance.docx",
+        "db/migrations/001.sql",
+    ]:
+        assert not m._is_asset(path), f"문서를 자산으로 오인: {path}"
+    # 그리고 여전히 트리거에 걸려야 한다
+    assert _hits("legal/terms.pdf"), "legal/terms.pdf 는 Class C 대상이어야 한다"
+    assert _hits("billing/pricing.json"), "billing/pricing.json 은 과금 대상이어야 한다"
+
+
+def test_asset_detection_ignores_path_position() -> None:
+    """확장자만 본다 — 경로 어디에 있든 동일 판정."""
+    assert m._is_asset("a/b/c/deep/auth/x.PNG"), "대문자 확장자"
+    assert m._is_asset("x.jpg")
+    assert not m._is_asset("src/auth/session.ts")
+    assert not m._is_asset("noextension")
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
