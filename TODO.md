@@ -37,9 +37,11 @@
 - **acceptance criteria**:
   - [x] `collect --apply` 전 repo 순회 — 16곳 스캔, **신규 24건** 적재(원장 21→45). icons 계열 워크트리 5곳은 METH-140 수정 효과로 전부 dedup(첫 실전 검증 ✓). 착지: PR #155 squash `4c8b57f5` · maincheck origin/main 도달 ✓
   - [x] **판정 초안 작성**(AI) — `40_dev/snapshots/2026-09-02_캡슐-트리아지-판정초안.md`. 전 24건 상류 코드·지침 실측 대조. 초안 집계: **유효 19 · 이미 반영 5 · 만료 0**
-  - [ ] 24건 사람 확정 — 유효 / 이미 반영 / 만료 (+ 초안이 남긴 사람 판단 3지점: land 콘텐츠 판정 채택 여부 · 동시 세션 격리 절의 위치 · 플랫폼 고유 지식의 상류 정책)
-  - [ ] 유효분 반영 + negative case 실효 증명(지침 23 §1-3)
-  - [ ] `_inbox` 정리(원장은 유지 — 재수거 방지) · 전파
+  - [x] **초안 기준 16건 선반영**(2026-09-02) — 사람 판단 3지점에 걸리지 않는 전부. 도구 3(rotate 순서 검사 · build-guard 를 `dev-check` 단일 판정으로 · ship 스테이징 확인) · 지침 5(05 v4 · 19 v4 · 23 v4 · 24 v3 · 25 v2) · catalog `_pending` 3(P-003·004·005) · 하류 존치 1
+  - [x] negative case 실효 증명(지침 23 §1-3) — rotate 역전 감지 5테스트(수정 전 미감지) · build-guard 실프로세스 A/B/C(같은 repo 차단 1 · 타 디렉터리 통과 0 · 자기적중 배제 0) · ship 인덱스 4테스트. 전 테스트 **80/80 green**
+  - [x] `_inbox` 정리 — 21건 삭제(반영 16 + 이미 반영 5), **원장 45건 유지**(재수거 방지). 잔여 3건은 판단 대기분
+  - [ ] **사람 판단 3지점** — ① land 콘텐츠 순증 판정 채택 여부(초안은 비채택 권고) ② 동시 세션 격리 절의 위치(지침 08 §9 vs 신설 30) ③ 플랫폼 고유 지식의 하류 존치를 캡슐 발신 규칙으로 명문화할지
+  - [ ] 잔여 3건 반영(위 판단 후) · 전 repo 전파
 - **notes**: 초안 분배 — 지침 5갈래(05 §9b·19 §8b·23 §3/§4·24 §2/§4b·25 §5) · 도구 4건(land 주석·rotate 정렬·build-guard cwd·ship 스테이징 경고) · catalog `_pending` 3건 · 하류 존치 1건. 내역 — icons 14(도구 4·지침 4·catalog 6) · cafe24-renewal 5(플랫폼 캐시·자가치유 게이트·편집배포 안전장치) · ai-icons 1(대시 꼬리 금지) · 상류 선반영 의심 4(`land-billing-pattern`·`asset-exts`·`repo-name-from-git-common-dir`·`land-classbc-plan-viewer` = METH-138~141 로 이미 처리 → **판정 시 '이미 반영' 유력**). 형식 경고 1건: `icons-wt-hub__2026-08-31_land-class-regex-plan-viewer-false-positive` 는 id 접두어가 워크트리명(`priceless-perlman-c80820`) — METH-140 이전 발행분, 내용은 위 선반영 건과 중복.
 
 
