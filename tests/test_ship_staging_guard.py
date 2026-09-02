@@ -95,6 +95,16 @@ def test_hook_template_judges_by_path_not_only_message() -> None:
 
 
 
+def test_hook_sync_path_check_disables_quotepath() -> None:
+    """한글 경로 함정 — core.quotePath 기본값이면 `git diff --name-only` 가 경로를
+    "20_guides/30_\\353\\217..." 로 이스케이프해 관리 경로 패턴에 안 걸린다.
+    ai-icons·lifeManager 에서 sync push 가 차단된 실사고(METH-145). ASCII 픽스처만으로
+    증명했던 A/B/C 가 이걸 못 잡았다 — 이 테스트가 그 구멍을 고정한다."""
+    src = (Path(__file__).resolve().parent.parent / "60_tools" / "methodology.py").read_text()
+    assert 'git -c core.quotePath=false diff --name-only "$PUSH_RANGE"' in src
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
