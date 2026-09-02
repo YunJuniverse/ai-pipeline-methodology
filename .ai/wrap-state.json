@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "d3c70d45b1856ae491b484036c9c1f7e012df7c8",
-  "last_validated_at": "2026-09-02T07:32:36Z",
+  "last_validated_commit": "9647386da20cd1162999687b7d45a0d0d75a689d",
+  "last_validated_at": "2026-09-02T07:35:27Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "dd6e6e5b1fa4416cc2eec5d69c4fbb79f978e2997c5dd2989227b05605bdb6fe"
+      "sha256": "868aa519609d2816d2654a7e765e8883ea830f52cab42aeef7e42d85f1aefa65"
     },
     "TODO.md": {
-      "sha256": "99ee03e61bfb25e7297cafe4fa259dce49e381ff213c4924e5d5ca41acd660cd"
+      "sha256": "2ba4f0f7e8bb12f43fdec710ecfd742d4afc35b155e9148c43ad552f02b27381"
     },
     ".ai/checkpoint.md": {
-      "sha256": "fb9ddc06a6027b3573ee0c3dc7636c1612284bbb2f48a644a7bae999b5eecd52"
+      "sha256": "1f308f110e749a90d9f7f34009474f975b4608942b369f2acb188203f4d51d7c"
     }
   },
   "observations": {
@@ -173,6 +173,7 @@
       "50_resources/ai_observations/2026-09-02_capsule-collect-round4.md",
       "50_resources/ai_observations/2026-09-02_capsule-triage-round4-draft.md",
       "50_resources/ai_observations/2026-09-02_capsule-triage-round4-reflect.md",
+      "50_resources/ai_observations/2026-09-02_meth-142-closeout.md",
       "50_resources/ai_observations/2026-09-02_meth-142-propagation.md",
       "50_resources/ai_observations/2026-09-02_meth-142-remaining-decisions.md",
       "50_resources/ai_observations/2026-09-02_meth-142-second-propagation.md",
