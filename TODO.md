@@ -37,6 +37,16 @@
 
 ## Done
 
+### METH-144 · METH-142 후속 2건 — 지침 30 워크트리 push 부작용 · 그래프 22~30 노드 백필
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 지침 30 v2 — §1 에 「워크트리 `push origin HEAD:main` 은 원본 체크아웃의 로컬 main 을 따라오게 하지 않는다」 + 대응(원본이 main 이면 `pull --ff-only`, 아니면 fetch 만 하고 checkpoint 기록 — 브랜치 전환은 §1 위반). invest-ops 2차 전파 3파일 충돌 실사고를 근거로
+  - [x] `methodology-graph.json` — 지침 22~30 **노드 9개 + 엣지 18개** 백필(nodes 42→51 · edges 53→71). 22 이후가 통째로 빠져 있던 것. 계층: 23·24·28·29·30 은 g00 parent-of(메타 지침 tier 3), 25 는 26·27·20·22 의 상위(guide-ai tier 5), 01 §5.11 라우팅 → 28·29·30, 29→28 선결·29→07 예산, 30→08 축 구분, 23↔19 상보, 10→22 변환 공정
+  - [x] lifecycle 배치 — L2 += g22 · L5 += g24 · L6 += g19·g20·g23·g30(개발 단계에 개발 규칙이 하나도 없던 것도 함께 정정)
+  - [x] **원본 포맷 보존** — 첫 시도가 `json.dumps` 재직렬화로 1055+/187- 전면 재작성이 되어 되돌리고 **행 단위 텍스트 삽입**으로 49+/4- 로 축소(지침 19 §8b.3). 치환 건수 assert
+  - [x] 검증 — JSON 파싱·전 엣지 노드 존재·경로 실존 assert · graph-viz 렌더 nodes=51 · dashboard nodes=51 · 테스트 87/87
+- **notes**: METH-142 종결 시 남긴 후속 2건. 그래프 version 스탬프 `v3.2-2026-07`→`v4.0-2026-09`.
+
 ### METH-143 · wrap 라이브 파일 구조 검증 — 편집 사고 기계 탐지
 - **mode**: fullstack / **change-class**: A / **owner**: AI
 - **acceptance criteria**:
