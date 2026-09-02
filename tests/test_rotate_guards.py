@@ -133,6 +133,61 @@ def test_staleness_needs_git() -> None:
         assert m.staleness_warnings(Path(tmp)) == []
 
 
+# ── METH-142 · 라이브 파일 구조 검증 (상류 실사고 2026-09-02)
+# 인덱스 기반 편집으로 `# HANDOFF.md` 제목이 덮이고 Working-on 이 둘이 된 채
+# PR 6개를 지났다 — boot 가 첫 매치만 읽어 출력은 정상으로 보였기 때문이다.
+
+def test_structure_flags_duplicate_working_on_as_error() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "HANDOFF.md").write_text(
+            "- **Working on**: 새 작업(제목을 덮은 줄)\n\n> Live state file.\n\n"
+            "- **Working on**: 옛 작업(스테일)\n- **Blockers**: none.\n")
+        errors, warns = m.live_file_structure_issues(t)
+        assert any("Working on" in e and "2개" in e for e in errors), errors
+        assert any("제목" in w for w in warns), warns
+
+
+def test_structure_absence_is_warning_not_error() -> None:
+    """부재·드리프트는 경고다 — 다운스트림 12곳 실측에서 부재가 흔했다(오탐 금지)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "HANDOFF.md").write_text("# HANDOFF.md\n\n- **Blockers**: none.\n")
+        (t / "TODO.md").write_text("# TODO\n\n## Done\n")
+        errors, warns = m.live_file_structure_issues(t)
+        assert errors == [], errors
+        assert any("Working on" in w for w in warns)
+        assert any("Backlog" in w for w in warns)
+
+
+def test_structure_duplicate_kanban_section_is_error() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "TODO.md").write_text("# TODO\n\n## Done\n\n### A\n\n## Done\n")
+        errors, _ = m.live_file_structure_issues(t)
+        assert any("## Done" in e for e in errors), errors
+
+
+def test_structure_clean_files_are_silent() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "HANDOFF.md").write_text(
+            "# HANDOFF.md\n\n- **Working on**: 하나뿐\n\n## Active Links\n\n## Recent Changes\n- x\n")
+        (t / "TODO.md").write_text(
+            "# TODO\n\n## Backlog\n\n## Ready\n\n## InProgress\n\n## Blocked\n\n## Done\n")
+        assert m.live_file_structure_issues(t) == ([], [])
+
+
+def test_structure_accepts_non_bold_working_on() -> None:
+    """boot 파서(METH-114)가 비볼드 형식을 허용하므로 검사도 같은 계약을 따른다."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "HANDOFF.md").write_text("# HANDOFF.md\n\n- Working on: 비볼드 스캐폴드 형식\n")
+        errors, warns = m.live_file_structure_issues(t)
+        assert errors == [] and not any("Working on" in w for w in warns)
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

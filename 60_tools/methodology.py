@@ -3819,6 +3819,61 @@ def live_file_hard_violations(target: Path) -> list[str]:
     return violations
 
 
+# ─── 라이브 파일 구조 검증 (METH-142) ──────────────────────────────────────
+# 사이즈 린트가 «너무 큰가»를 본다면 이것은 «파싱 가능한가»를 본다.
+# 계기(상류 실사고 2026-09-02): 라이브 파일을 인덱스 기반으로 편집하다 `# HANDOFF.md`
+# 제목 줄을 덮어썼고, 그 뒤 Working-on 갱신이 그 자리에 쌓여 **원래 Working-on 이
+# 스테일인 채 둘이 공존**했다. boot 파서는 첫 매치를 읽으므로 출력은 정상으로 보였고,
+# PR 6개를 지나도록 아무도 못 봤다. 지침 19 §8b.3(편집 후 구조 검증)의 기계화다.
+#
+# **판정 경계**: 모호성(중복)만 error 로 막고, 부재·형식 드리프트는 warn 이다.
+# 다운스트림 12곳 실측 결과 Working-on 부재 7곳·H1 부재 1곳·칸반 섹션 부재 2곳이라,
+# 이것들을 fail 로 잡으면 가드가 매 push 를 막아 곧 무시당한다(지침 23 §4-3: 규칙을
+# 넓히기 전에 신규 적중분을 전수 재측정). 중복은 실측 0건 — 즉 오탐 없이 사고만 잡는다.
+
+WORKING_ON_RE = r"^-\s+(?:\*\*)?Working on(?:\*\*)?[ \t]*:"
+KANBAN_SECTIONS = ("## Backlog", "## Ready", "## InProgress", "## Blocked", "## Done")
+
+
+def live_file_structure_issues(target: Path) -> tuple[list[str], list[str]]:
+    """라이브 파일 구조 검사 — (errors, warnings).
+
+    errors = 파서가 «조용히 하나를 골라야 하는» 모호성. warnings = 부재·드리프트.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    h = target / "HANDOFF.md"
+    if h.exists():
+        lines = read_text(h).splitlines()
+        working = [i + 1 for i, l in enumerate(lines) if re.match(WORKING_ON_RE, l)]
+        if len(working) > 1:
+            errors.append(
+                f"HANDOFF.md: 'Working on' 불릿이 {len(working)}개다(행 {working}) — "
+                "boot 는 첫 줄만 읽으므로 나머지는 스테일인 채 숨는다. 한 줄만 남겨라")
+        elif not working:
+            warnings.append("HANDOFF.md: 'Working on' 불릿이 없다 — boot 가 현재 포커스를 못 보여준다")
+        first = next((l for l in lines if l.strip()), "")
+        if not first.startswith("# "):
+            warnings.append(
+                f"HANDOFF.md: 첫 내용 줄이 제목(`# `)이 아니다 — 편집 사고로 제목이 덮였을 수 있다: {first[:40]!r}")
+        for sec in ("## Active Links", "## Recent Changes"):
+            if sum(1 for l in lines if l.strip() == sec) > 1:
+                errors.append(f"HANDOFF.md: '{sec}' 섹션이 중복이다 — 어느 쪽이 정본인지 파서가 모른다")
+
+    todo = target / "TODO.md"
+    if todo.exists():
+        lines = read_text(todo).splitlines()
+        for sec in KANBAN_SECTIONS:
+            n = sum(1 for l in lines if l.strip() == sec)
+            if n > 1:
+                errors.append(f"TODO.md: 칸반 섹션 '{sec}' 이 {n}개다 — 대시보드 파싱이 갈린다")
+            elif n == 0:
+                warnings.append(f"TODO.md: 칸반 섹션 '{sec}' 이 없다 — 대시보드에서 그 칼럼이 비어 보인다")
+
+    return errors, warnings
+
+
 class RotateOrderError(Exception):
     """Done 문서 순서가 최신-우선 관례를 어겼다 — 조용한 아카이브 대신 중단(METH-142).
 
@@ -4302,6 +4357,15 @@ def cmd_wrap(args: argparse.Namespace) -> int:
             info(f"prompting report 갱신: {PROMPT_REPORT_PATH}")
     except Exception as exc:  # 리포트 실패가 wrap 을 막으면 안 됨
         warn(f"prompting report 갱신 실패(무시): {exc}")
+
+    # ── 구조 검증 (METH-142) — 중복(모호성)은 --strict fail, 부재는 경고 ──
+    struct_errors, struct_warns = live_file_structure_issues(target)
+    for w in struct_warns:
+        warn(f"구조: {w}")
+    for e in struct_errors:
+        err(f"구조(경성): {e}")
+    if struct_errors and args.strict:
+        missing += len(struct_errors)
 
     # ── 경성 한도 (METH-122) — 규정 2배 초과는 --strict fail (탈출구: rotate) ──
     hard = live_file_hard_violations(target)
