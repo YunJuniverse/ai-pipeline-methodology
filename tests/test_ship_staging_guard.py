@@ -105,6 +105,44 @@ def test_hook_sync_path_check_disables_quotepath() -> None:
 
 
 
+# ── METH-146 · 훅의 wrap 은 읽기 전용 (pre-push 가 repo 를 dirty 로 만들던 부작용)
+# 훅 경로의 wrap 이 프롬프팅 리포트를 재생성하고 wrap-state 를 부트스트랩해, push 가
+# 실패해도 파일이 남았다 → 다음 sync-all 이 «진행 중 작업»으로 오인해 skip(하루 2회).
+
+import argparse
+
+
+def _live_dir(tmp: str) -> Path:
+    t = Path(tmp)
+    (t / ".ai").mkdir()
+    (t / "HANDOFF.md").write_text("# HANDOFF.md\n\n- **Working on**: x\n")
+    (t / "TODO.md").write_text("# TODO\n\n## Done\n")
+    return t
+
+
+def test_wrap_read_only_writes_nothing() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        t = _live_dir(tmp)
+        before = {p.relative_to(t) for p in t.rglob("*") if p.is_file()}
+        rc = m.cmd_wrap(argparse.Namespace(path=str(t), strict=True, read_only=True))
+        after = {p.relative_to(t) for p in t.rglob("*") if p.is_file()}
+        assert rc == 0 and after == before, after - before
+
+
+def test_wrap_without_read_only_bootstraps_state() -> None:
+    """대조군 — 플래그 없으면 baseline 을 쓴다(정상 wrap 의 의도된 동작)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = _live_dir(tmp)
+        m.cmd_wrap(argparse.Namespace(path=str(t), strict=True, read_only=False))
+        assert (t / ".ai" / "wrap-state.json").exists()
+
+
+def test_hook_template_runs_wrap_read_only() -> None:
+    src = (Path(__file__).resolve().parent.parent / "60_tools" / "methodology.py").read_text()
+    assert 'wrap --strict --read-only' in src
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

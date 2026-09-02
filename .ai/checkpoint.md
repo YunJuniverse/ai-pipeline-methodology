@@ -2,15 +2,18 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-02 · 세션 마감 rotate)
+## 방금 한 것 (2026-09-02 · METH-146)
 
-- #167 land(`b44cbe5`)로 METH-142~145 전부 종결. boot 가 TODO Done 8건 비대를 경고해 `rotate --apply` 로 회전 — **오늘 넣은 Done 순서 검사(METH-142)가 첫 실전을 통과**했다(경계 역전 없음, 날짜 없는 항목은 미판정 건수로 보고).
-- 이 세션 총계: PR **#155~#167**(13건), maincheck 전건. 지침 5개 개정 + 지침 30 신설(v2) · 도구 6건(rotate 순서 검사 · build-guard `dev-check` · ship 스테이징 확인 · 훅 sync 경로 판정 + quotePath · wrap 구조 검증) · 그래프 22~30 백필 · catalog `_pending` 3 · `_inbox` 비움(원장 45) · 테스트 88/88 · 전파 5회 각 11/11.
+**pre-push 훅의 wrap 을 읽기 전용으로 바꿨다.** 오늘 두 번 `git restore` 로 치운 그 부작용이다.
+
+- 원인: 훅이 돌리는 `wrap --strict` 가 검사만 하는 게 아니라 `prompting-report.md` 를 재생성하고, wrap-state 가 없으면 부트스트랩까지 **써 버린다**. push 가 실패해도 파일이 남고, 다음 `sync-all` 이 그걸 «진행 중 작업»으로 오인해 skip 한다.
+- 수정: `wrap --read-only` — 두 쓰기를 생략. baseline 이 없으면 「pass + 다음 ship 이 저장」으로 밝힌다. 훅 템플릿은 `wrap --strict --read-only`. **ship 의 wrap 은 그대로** — 거기선 리포트 갱신이 의도된 산출물이다.
+- 증명: 대조군(플래그 없음 → `wrap-state.json` 생성) vs 실험군(생성 안 함) · 임시 repo 에 훅 설치 후 sync 아닌 커밋 push → `git status` 비어 있음 · 단위 3테스트. **91/91.**
 
 ## 다음 구체 행동
 
-1. 다음 작업은 사용자 지시 대기. 후속 후보 1개만 남았다(작음): pre-push 훅의 wrap 이 `prompting-report.md`·`wrap-state.json` 을 수정해 repo 를 dirty 로 만든다 — 훅은 읽기 전용이거나 실패 시 원복.
-2. 다음 캡슐 수거는 다운스트림 축적 후(outbox 126건 중 대부분 기수거·원장 45 기준 dedup).
+1. ship → PR → land → `methodology.py` 전파 11 repo → **훅 3 repo 재설치** → origin 대조(`--read-only` 블롭 grep) → 재설치 후 훅 repo 의 `git status` 가 비어 있는지 확인(그게 실전 증명).
+2. 끝나면 Working-on 「다음 작업 대기」. 후속 후보는 이걸로 없다.
 
 ## 막힌 것
 
@@ -18,4 +21,4 @@
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `chore/rotate-2026-09-02`
+- repo: `/Users/hayden/methodology` · branch `fix/hook-wrap-readonly`
