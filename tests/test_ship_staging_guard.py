@@ -75,6 +75,26 @@ def test_added_new_file_is_flagged() -> None:
         assert m._externally_staged(t) == ["new.txt"]
 
 
+# ── METH-142 · 훅 sync 면제를 «변경 경로» 로 판정 (캡슐 아님 — 3회 재발한 자체 마찰)
+# 예전 훅은 커밋 메시지 접두어 목록으로만 sync 를 면제해 `chore: 방법론 sync …` 가 막혔다.
+# 셸 분기 자체는 A/B/C 실 push 로 증명했고(같은 PR 본문), 여기서는 그 분기가 딛고 선
+# 단일 소스(`shared-paths`)와 템플릿 내용을 고정한다.
+
+def test_shared_paths_covers_sync_targets() -> None:
+    out = m.MANIFEST["shared_paths"]
+    for rel in ["20_guides", "60_tools/methodology.py", "60_tools/build-guard.sh"]:
+        assert rel in out, rel
+
+
+def test_hook_template_judges_by_path_not_only_message() -> None:
+    """훅 템플릿이 경로 판정 분기를 담고 있는가 — 메시지 단독 판정으로 되돌아가면 실패."""
+    src = (Path(__file__).resolve().parent.parent / "60_tools" / "methodology.py").read_text()
+    assert "shared-paths" in src            # 단일 소스 호출
+    assert "PUSH_RANGE" in src              # 푸시 범위로 변경 경로 산출
+    assert "관리 경로 밖 변경이 있다" in src   # 경로 밖이면 검증 진행(무음 우회 금지)
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

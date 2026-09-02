@@ -34,6 +34,7 @@
 - **스택-PR 금지·Done 검증 (의무, METH-120)**: PR은 **main 직행 단일 PR**만 — 열린 PR 브랜치 위에 다음 작업을 쌓지 않는다(앞 PR 머지 후 main에서 새로 분기). 중간 브랜치로 머지되면 "머지됨"이어도 main엔 코드가 없다(6개 repo 실사고). **TODO Done 전이·배포 판정 전 `methodology.py maincheck <sha>`로 main 도달을 기계 확인** — 미도달 상태의 Done 표기는 허위 기록이다.
 - **컨텍스트 컴팩션 (의무, 긴 세션)**: 요약 예고 시 *요약 전에* 라이브 파일(특히 `.ai/checkpoint.md`) 먼저 갱신 — 파일에 있으면 요약이 잃어도 복원. 규칙 `20_guides/06_컨텍스트_컴팩션_프로토콜.md`.
 - **외부 게이트 = Blocked 강제 (의무, METH-122)**: 대표 승인·결제·자격증명·타인 응답 등 *사람/외부만 풀 수 있는* 대기 항목은 TODO `## Blocked`로 이동하고 HANDOFF Blockers와 일치시킨다 — Ready 체크박스·notes 산문에 숨기지 않는다(전수조사: 4개 repo에서 Blocked 0건인데 실 병목 다수, 최장 19일 은닉). 라이브 파일이 규정 2배를 넘으면 wrap --strict 가 fail — `methodology.py rotate --apply`로 회전(삭제 아님·아카이브 이관). dev 서버 실행 중 build 금지 — ship이 차단하며 수동 빌드는 `60_tools/build-guard.sh` 경유.
+- **동시 세션 격리 (METH-142)**: 같은 repo 에 다른 세션이 돌고 있을 가능성이 있으면 `origin/<기본브랜치>` 기반 **격리 워크트리에서 시작**한다 — 브랜치 전환·스테이징·커밋·배포가 서로를 덮는다. 경로 지정 `git add` 는 안전장치가 아니다(추적 중인 파일 안의 미커밋 편집이 함정 — `git diff --stat` 까지 확인). 워크트리 배포는 `.vercel/project.json` 류 링크 파일을 먼저 복사한다. 상세 `20_guides/30_동시_세션_git_격리.md`.
 - **자율 진행 예산·정지 (권장)**: 다단계 자율 시 착수 전 예산(파일/PR/반복) 선언, no-progress 2회·예산 초과 시 멈춰 보고, 범위 축소 시 남긴 것 보고. `20_guides/07_자율진행_예산_및_정지조건.md` (멀티에이전트 팬아웃 `20_guides/08_서브에이전트_오케스트레이션.md`).
 - **외주 인계·로컬 안전망**: 코드만 추출 `methodology.py export --path <p> --dry-run`(방법론·sensitive 기본 차단; `--allow-sensitive`/`--zip`); push 가드 `methodology.py hooks install`(pre-push manifest+wrap --strict).
 - 식별자·버전 규칙은 `20_guides/02_식별자_및_버전_관리_규칙.md` 준수 후 새 ID 생성.
