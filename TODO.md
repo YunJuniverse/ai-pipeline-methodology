@@ -46,6 +46,7 @@
   - [x] boot 파서 계약 준수 — 비볼드 `- Working on:`(METH-114 스캐폴드 이력) 허용
   - [x] wrap 배선 — 경고는 항상 출력, error 는 `--strict` 에서 fail(탈출구 없음: 중복은 고치는 것 말고 정당한 상태가 없다)
   - [x] negative case 5테스트 — 사고 재현·부재는 경고·칸반 중복·정상 무음·비볼드 허용. 전체 87/87 green
+  - [x] **전파 11/11**(2026-09-02) — main 직접 8 · 격리 워크트리 3(icons·icons-invest·insta-toon). origin 실내용 대조 11/11 ✓(`live_file_structure_issues` 블롭 grep) · 훅 3 repo 재설치. 전파 후 실측 **error 0 · warn 11**(gamblescan 6·tshome 2·icons/icons-invest/lifeManager 각 1) — 예측과 일치
 - **notes**: 사이즈 린트(METH-101/122)가 「너무 큰가」라면 이것은 「파싱 가능한가」다. 지침 19 §8b.3(편집 후 구조 검증)의 기계화 — 그 조항을 쓴 당일에 내가 그 조항을 어긴 것이 계기다.
 
 ### METH-142 · 캡슐 트리아지 4회차 — 수거 24건 전량 종결
