@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "559408be574553a20c8cac81aa8544f19855bc5a",
-  "last_validated_at": "2026-09-02T07:28:36Z",
+  "last_validated_commit": "d3c70d45b1856ae491b484036c9c1f7e012df7c8",
+  "last_validated_at": "2026-09-02T07:32:36Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "e7898d9bba7ae1f35a77e669a6e0cf074313120174ac5e45ee73189b3718657d"
+      "sha256": "dd6e6e5b1fa4416cc2eec5d69c4fbb79f978e2997c5dd2989227b05605bdb6fe"
     },
     "TODO.md": {
-      "sha256": "e104a7ca7b6532f2655f4671ae22810e668ab44dc73c727e6cd04071bbcdcc46"
+      "sha256": "99ee03e61bfb25e7297cafe4fa259dce49e381ff213c4924e5d5ca41acd660cd"
     },
     ".ai/checkpoint.md": {
-      "sha256": "6f747ceba687bd3b4e449f0bb851a6400d907f85ea244f8b7fe3cb27507b3bfd"
+      "sha256": "fb9ddc06a6027b3573ee0c3dc7636c1612284bbb2f48a644a7bae999b5eecd52"
     }
   },
   "observations": {
@@ -175,6 +175,7 @@
       "50_resources/ai_observations/2026-09-02_capsule-triage-round4-reflect.md",
       "50_resources/ai_observations/2026-09-02_meth-142-propagation.md",
       "50_resources/ai_observations/2026-09-02_meth-142-remaining-decisions.md",
+      "50_resources/ai_observations/2026-09-02_meth-142-second-propagation.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",

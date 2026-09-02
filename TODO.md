@@ -44,7 +44,7 @@
   - [x] **전 repo 전파 11/11**(2026-09-02) — main 직접 7곳 · origin/main 기반 격리 워크트리 4곳(icons·icons-invest·insta-toon·invest-ops, 진행 중 작업 보호). icons 계열 워크트리 5곳은 icons origin 공유로 자동 커버. **origin 실내용 대조 11/11 ✓**(지침 5개 + build-guard `dev-check` 블롭 grep). 훅 3 repo 재설치
   - [x] **잔여 3건 반영** — #6 비채택 종결 · #10·#11 지침 30 으로 병합 승급. `_inbox` **비움**(원장 45 유지) → **24건 전량 종결**
   - [x] 판단 ④ 실 증명 A/B/C(실 push) — 한국어 sync 메시지+관리경로만 통과 · 경로 밖 섞이면 차단 · sync 의도 없으면 차단. 테스트 82/82
-  - [ ] 2차 전파(지침 30·훅 변경분) 11 repo · 훅 재설치
+  - [x] **2차 전파 11/11**(지침 30·훅 경로판정·outbox 규칙) — main 직접 8곳 · 격리 워크트리 3곳(icons·icons-invest·insta-toon). origin 실내용 대조 11/11 ✓(지침30 파일·`shared-paths`·outbox 원칙·CLAUDE 트리거 4항목). 훅 3 repo 재설치 후 **경로 판정 반영 확인**
 - **notes**: 초안 분배 — 지침 5갈래(05 §9b·19 §8b·23 §3/§4·24 §2/§4b·25 §5) · 도구 4건(land 주석·rotate 정렬·build-guard cwd·ship 스테이징 경고) · catalog `_pending` 3건 · 하류 존치 1건. 내역 — icons 14(도구 4·지침 4·catalog 6) · cafe24-renewal 5(플랫폼 캐시·자가치유 게이트·편집배포 안전장치) · ai-icons 1(대시 꼬리 금지) · 상류 선반영 의심 4(`land-billing-pattern`·`asset-exts`·`repo-name-from-git-common-dir`·`land-classbc-plan-viewer` = METH-138~141 로 이미 처리 → **판정 시 '이미 반영' 유력**). 형식 경고 1건: `icons-wt-hub__2026-08-31_land-class-regex-plan-viewer-false-positive` 는 id 접두어가 워크트리명(`priceless-perlman-c80820`) — METH-140 이전 발행분, 내용은 위 선반영 건과 중복.
 
 
