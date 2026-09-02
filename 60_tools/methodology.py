@@ -3181,7 +3181,10 @@ case "$HEAD_MSG" in
 esac
 
 if [ "$SYNC_INTENT" = "1" ]; then
-  CHANGED=$(git diff --name-only "$PUSH_RANGE" 2>/dev/null)
+  # core.quotePath=false — 기본값이면 한글 경로가 "20_guides/30_\353\217\231..." 로
+  # 따옴표+8진 이스케이프되어 관리 경로 패턴에 안 걸린다(ai-icons·lifeManager push 차단 실사고,
+  # 상류 sync 검증에서도 같은 함정이 이미 한 번 기록됨). 경로를 비교할 땐 항상 끈다.
+  CHANGED=$(git -c core.quotePath=false diff --name-only "$PUSH_RANGE" 2>/dev/null)
   if [ -n "$CHANGED" ]; then
     SHARED=$(python3 "$METH" shared-paths 2>/dev/null)
     OUTSIDE=0

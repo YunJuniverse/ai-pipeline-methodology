@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "30ea47072811d59be2e02bb805b414152888f082",
-  "last_validated_at": "2026-09-02T08:09:05Z",
+  "last_validated_commit": "cdc6a3881403461e2cb1669128a975432f040a2e",
+  "last_validated_at": "2026-09-02T08:13:03Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "884cbada3e1705d8e7059ed44f3063119e21da83970970f2af31906f50b0101b"
+      "sha256": "9988bfca7d2fb3d2622c3e5ddfb9bff3ed54f3097d27d328c972ac3180949a09"
     },
     "TODO.md": {
-      "sha256": "36be9d6bfd9d7de1e4865b025f7c0d53262ad0482dd6001dea01d2e797a778d9"
+      "sha256": "a17790daaee5acb3532972348279f07403b88235c29f101c429ab0c104e61964"
     },
     ".ai/checkpoint.md": {
-      "sha256": "b479c31cb0019fbe8c27d28b0fa5af5acfbfc69356caef6493c6bfd30651d02f"
+      "sha256": "38cf448f8d6393b64cb5b47dff883ec4c31d9ce112543cc29bfbffd84212171a"
     }
   },
   "observations": {
@@ -180,6 +180,7 @@
       "50_resources/ai_observations/2026-09-02_meth-143-propagation.md",
       "50_resources/ai_observations/2026-09-02_meth-143-wrap-structure-check.md",
       "50_resources/ai_observations/2026-09-02_meth-144-followups.md",
+      "50_resources/ai_observations/2026-09-02_meth-145-hook-quotepath.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
