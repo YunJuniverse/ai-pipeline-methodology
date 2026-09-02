@@ -41,7 +41,8 @@
   - [x] negative case 실효 증명(지침 23 §1-3) — rotate 역전 감지 5테스트(수정 전 미감지) · build-guard 실프로세스 A/B/C(같은 repo 차단 1 · 타 디렉터리 통과 0 · 자기적중 배제 0) · ship 인덱스 4테스트. 전 테스트 **80/80 green**
   - [x] `_inbox` 정리 — 21건 삭제(반영 16 + 이미 반영 5), **원장 45건 유지**(재수거 방지). 잔여 3건은 판단 대기분
   - [ ] **사람 판단 3지점** — ① land 콘텐츠 순증 판정 채택 여부(초안은 비채택 권고) ② 동시 세션 격리 절의 위치(지침 08 §9 vs 신설 30) ③ 플랫폼 고유 지식의 하류 존치를 캡슐 발신 규칙으로 명문화할지
-  - [ ] 잔여 3건 반영(위 판단 후) · 전 repo 전파
+  - [x] **전 repo 전파 11/11**(2026-09-02) — main 직접 7곳 · origin/main 기반 격리 워크트리 4곳(icons·icons-invest·insta-toon·invest-ops, 진행 중 작업 보호). icons 계열 워크트리 5곳은 icons origin 공유로 자동 커버. **origin 실내용 대조 11/11 ✓**(지침 5개 + build-guard `dev-check` 블롭 grep). 훅 3 repo 재설치
+  - [ ] 잔여 3건 반영(위 판단 후) · 그 분량 전파
 - **notes**: 초안 분배 — 지침 5갈래(05 §9b·19 §8b·23 §3/§4·24 §2/§4b·25 §5) · 도구 4건(land 주석·rotate 정렬·build-guard cwd·ship 스테이징 경고) · catalog `_pending` 3건 · 하류 존치 1건. 내역 — icons 14(도구 4·지침 4·catalog 6) · cafe24-renewal 5(플랫폼 캐시·자가치유 게이트·편집배포 안전장치) · ai-icons 1(대시 꼬리 금지) · 상류 선반영 의심 4(`land-billing-pattern`·`asset-exts`·`repo-name-from-git-common-dir`·`land-classbc-plan-viewer` = METH-138~141 로 이미 처리 → **판정 시 '이미 반영' 유력**). 형식 경고 1건: `icons-wt-hub__2026-08-31_land-class-regex-plan-viewer-false-positive` 는 id 접두어가 워크트리명(`priceless-perlman-c80820`) — METH-140 이전 발행분, 내용은 위 선반영 건과 중복.
 
 
