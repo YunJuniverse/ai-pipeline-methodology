@@ -44,7 +44,8 @@
   - [x] `wrap --read-only` 신설 — 부트스트랩 쓰기·리포트 재생성 생략. baseline 이 없으면 부트스트랩 대신 「pass + 다음 ship 이 저장」으로 밝힌다
   - [x] 훅 템플릿 `wrap --strict --read-only` — 훅은 검사만 한다
   - [x] 증명 — 대조군(플래그 없음 → `wrap-state.json` 생성) vs 실험군(→ 생성 안 함) · 임시 repo 실 push 후 `git status` 비어 있음 · 단위 3테스트. 91/91
-- **notes**: ship 의 wrap(step 1)은 그대로 쓴다 — 거기선 리포트 갱신이 의도된 산출물이고 commit 에 포함된다. 훅 재설치 3 repo 필요.
+  - [x] **전파 11/11 + 훅 3 repo 재설치**(2026-09-02) — 재설치 직후 ai-icons·invest-ops·lifeManager 가 새 훅을 통해 push 했고 **직후 `git status` 가 전부 비어 있었다**(구 훅이면 dirty=1). origin 대조 `--read-only` × 11 ✓
+- **notes**: ship 의 wrap(step 1)은 그대로 쓴다 — 거기선 리포트 갱신이 의도된 산출물이고 commit 에 포함된다.
 
 ### METH-145 · 훅 sync 경로 판정의 한글 경로 함정 — core.quotePath
 - **mode**: fullstack / **change-class**: A / **owner**: AI
