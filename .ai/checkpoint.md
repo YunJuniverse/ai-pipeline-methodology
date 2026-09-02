@@ -6,7 +6,7 @@
 
 **전 repo 순회 캡슐 수거를 끝냈다 — `collect --apply`, 신규 24건 적재(원장 21→45).**
 
-- 브랜치: `chore/collect-capsules-2026-09-02` (main 에서 pull 후 분기)
+- **PR #155 land 완료**(squash `4c8b57f5` · maincheck origin/main 도달 ✓). 첫 land 시도는 GitHub GraphQL i/o timeout 으로 머지 실패 — 재실행으로 통과(일시 네트워크).
 - 스캔 16 repo. 발신처: **icons 14 · cafe24-renewal 5 · ai-icons 1 · 워크트리 잔재 2**(id 접두어가 워크트리명·내용 중복). gamblescan 11·invest-ops 3·lifeManager 4·icons-invest 1 은 전부 기수거 dup.
 - **dry-run 105건 → 실적재 24건**. 차이는 METH-140(`_repo_name` 을 `--git-common-dir` 기준) 효과 — icons 계열 워크트리 5곳(vault·wt-hub/hud/scene/zone)이 같은 `icons__` id 로 수렴해 전부 dedup 됐다. **어제 고친 것이 오늘 첫 실전에서 검증됐다.**
 - 잔재 2건은 METH-140 *이전* 발행분이라 여전히 워크트리명 id(`priceless-perlman-c80820__…`, `icons-wt-hub__…`) — collect 가 형식 경고를 내며 적재. 내용은 plan-viewer 오탐 건으로 METH-138/139 에 이미 반영돼 있다.
@@ -25,5 +25,5 @@
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `chore/collect-capsules-2026-09-02`
+- repo: `/Users/hayden/methodology` · main 동기화 완료
 - 대시보드: http://localhost:8772 (pid 80001)

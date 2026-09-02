@@ -35,7 +35,7 @@
 ### METH-142 · 캡슐 트리아지 4회차 — 수거 24건 판정 대기
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:
-  - [x] `collect --apply` 전 repo 순회 — 16곳 스캔, **신규 24건** 적재(원장 21→45). icons 계열 워크트리 5곳은 METH-140 수정 효과로 전부 dedup(첫 실전 검증 ✓)
+  - [x] `collect --apply` 전 repo 순회 — 16곳 스캔, **신규 24건** 적재(원장 21→45). icons 계열 워크트리 5곳은 METH-140 수정 효과로 전부 dedup(첫 실전 검증 ✓). 착지: PR #155 squash `4c8b57f5` · maincheck origin/main 도달 ✓
   - [ ] 24건 사람 판정 — 유효 / 이미 반영 / 만료
   - [ ] 유효분 반영 + negative case 실효 증명(지침 23 §1-3)
   - [ ] `_inbox` 정리(원장은 유지 — 재수거 방지) · 전파

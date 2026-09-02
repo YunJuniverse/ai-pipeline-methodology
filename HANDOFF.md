@@ -40,7 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
-- 2026-09-02 — **캡슐 수거 4회차(METH-142)**: 16 repo 순회 `collect --apply` — 신규 **24건**(icons 14·cafe24-renewal 5·ai-icons 1·선반영 의심 4), 원장 21→45. icons 워크트리 5곳이 전부 dedup 돼 **METH-140 수정이 첫 실전에서 효과 확인**(직전 dry-run 105건 → 실적재 24건). 판정은 사람 몫 — TODO Blocked.
+- 2026-09-02 — **캡슐 수거 4회차(METH-142)**: 16 repo 순회 `collect --apply` — 신규 **24건**(icons 14·cafe24-renewal 5·ai-icons 1·선반영 의심 4), 원장 21→45. icons 워크트리 5곳이 전부 dedup 돼 **METH-140 수정이 첫 실전에서 효과 확인**(직전 dry-run 105건 → 실적재 24건). 판정은 사람 몫 — TODO Blocked. **#155 land(squash 4c8b57f5) · maincheck ✓**
 - 2026-09-01 — **METH-141 트리거 자산 제외**: 이미지·영상·폰트를 Class B/C 경로 검사에서 제외(문서 확장자는 유지 — 법무·과금 미탐 방지). icons 인증 적중 25→9건. 하류 icons#670 역주입으로 경합 패치 3건 전부 상류 안착.
 - 2026-09-01 — **METH-140 캡슐 `origin_repo` 워크트리 갈라짐 수정**: `_repo_name` 을 `--git-common-dir` 기준으로 — 워크트리 발행 캡슐이 중복 수거되던 원인(METH-137 미해소 건). 하류 icons#668 역주입.
 - 2026-09-01 — **METH-139 `plan` 규칙 정련**: METH-138 과 icons 병렬 수정이 상보적이라 합집합 채택 — 과금낱말 복합어 + **복수형만**. icons 실측 824→2건(잔여 전부 진짜 checkout). 단수 `plan` 은 기획 용법이라 제외.
