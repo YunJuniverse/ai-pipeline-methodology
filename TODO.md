@@ -32,7 +32,12 @@
 
 ## Blocked
 
-### METH-142 · 캡슐 트리아지 4회차 — 수거 24건 판정 대기
+
+
+
+## Done
+
+### METH-142 · 캡슐 트리아지 4회차 — 수거 24건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:
   - [x] `collect --apply` 전 repo 순회 — 16곳 스캔, **신규 24건** 적재(원장 21→45). icons 계열 워크트리 5곳은 METH-140 수정 효과로 전부 dedup(첫 실전 검증 ✓). 착지: PR #155 squash `4c8b57f5` · maincheck origin/main 도달 ✓
@@ -47,10 +52,7 @@
   - [x] **2차 전파 11/11**(지침 30·훅 경로판정·outbox 규칙) — main 직접 8곳 · 격리 워크트리 3곳(icons·icons-invest·insta-toon). origin 실내용 대조 11/11 ✓(지침30 파일·`shared-paths`·outbox 원칙·CLAUDE 트리거 4항목). 훅 3 repo 재설치 후 **경로 판정 반영 확인**
 - **notes**: 초안 분배 — 지침 5갈래(05 §9b·19 §8b·23 §3/§4·24 §2/§4b·25 §5) · 도구 4건(land 주석·rotate 정렬·build-guard cwd·ship 스테이징 경고) · catalog `_pending` 3건 · 하류 존치 1건. 내역 — icons 14(도구 4·지침 4·catalog 6) · cafe24-renewal 5(플랫폼 캐시·자가치유 게이트·편집배포 안전장치) · ai-icons 1(대시 꼬리 금지) · 상류 선반영 의심 4(`land-billing-pattern`·`asset-exts`·`repo-name-from-git-common-dir`·`land-classbc-plan-viewer` = METH-138~141 로 이미 처리 → **판정 시 '이미 반영' 유력**). 형식 경고 1건: `icons-wt-hub__2026-08-31_land-class-regex-plan-viewer-false-positive` 는 id 접두어가 워크트리명(`priceless-perlman-c80820`) — METH-140 이전 발행분, 내용은 위 선반영 건과 중복.
 
-
-
-
-## Done
+- **종결**(2026-09-02): 수거→초안→반영→전파를 한 세션에 완주. PR **#155**(수거 24건)·**#157**(판정 초안)·**#158**(16건 반영)·**#159**(1차 전파)·**#160**(잔여 3건+판단 4지점)·**#161**(2차 전파). maincheck 전건 통과. 산출: 지침 5개 개정 + **지침 30 신설** · 도구 4건(rotate·build-guard·ship·훅 sync 판정) · catalog `_pending` 3건 · `_inbox` 비움(원장 45 유지). 테스트 82/82.
 
 ### METH-141 · Class B/C 트리거에서 표현용 자산 제외 (하류 icons#670 역주입)
 - **mode**: fullstack / **change-class**: A / **owner**: AI
