@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **다음 작업 대기.** 직전 완결: METH-143(wrap 구조 검증, 전파 11/11) · METH-142 캡슐 루프 4회차 — 수거 24건→판정→반영→전파 2회를 한 세션에 완주(#155·#157·#158·#159·#160·#161, maincheck 전건 ✓).
+- **Working on**: **METH-144 후속 2건 반영**(branch `feat/guide30-worktree-note-and-graph-backfill`) — 구현·검증 완료, 전파 남음. 직전 완결: METH-143 · METH-142 캡슐 루프 4회차 — 수거 24건→판정→반영→전파 2회를 한 세션에 완주(#155·#157·#158·#159·#160·#161, maincheck 전건 ✓).
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none.
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-02 — **METH-144 후속 2건**: 지침 30 v2(워크트리 push 는 로컬 main 을 안 따라온다 — invest-ops 충돌 실사고) · 그래프 **지침 22~30 노드 9·엣지 18 백필**(42→51·53→71, lifecycle L2/L5/L6 배치). 첫 시도의 `json.dumps` 전면 재작성(1055줄 diff)을 되돌리고 행 단위 삽입으로 49줄 — §8b.3 자기적용.
 - 2026-09-02 — **METH-143 전파 11/11 종결**: main 직접 8·격리 워크트리 3, origin 대조 ✓, 훅 3 repo 재설치. 전파 후 다운스트림 실측 **error 0 · warn 11** — 착수 전 예측과 일치(오탐 0).
 - 2026-09-02 — **METH-143 wrap 라이브 파일 구조 검증**: Working-on·섹션·칸반 **중복을 error**(모호성 = 파서가 조용히 하나를 고름), 부재는 warn. 착수 전 12 repo 전수 실측으로 경계 확정(**error 0건** — 오탐 없이 사고만 잡는다). 87/87 green.
 - 2026-09-02 — **METH-142 종결**: 캡슐 루프 4회차 완주. 산출 = 지침 5개 개정 + **지침 30 신설**(동시 세션 git 격리) · 도구 4건(rotate 순서 검사 · build-guard `dev-check` 단일화 · ship 스테이징 확인 · 훅 sync 판정 경로 기준) · `_pending` 3건 · `_inbox` 비움(원장 45). 전파 2회 각 11/11 + origin 실내용 대조. 테스트 82/82.

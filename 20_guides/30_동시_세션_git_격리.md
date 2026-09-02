@@ -1,7 +1,7 @@
 ---
 doc_id: guide-30
 title: 동시 세션 git 격리 (Concurrent Session Isolation)
-version: v1
+version: v2
 status: active
 last_updated: 2026-09-02
 ai_relevance: foundational
@@ -29,6 +29,8 @@ git -C <repo> worktree add --detach <경로> origin/main
 # 작업 → commit → git push origin HEAD:main (또는 PR 브랜치)
 git -C <repo> worktree remove <경로>
 ```
+
+- **워크트리에서 `push origin HEAD:main` 하면 원본 체크아웃의 로컬 `main` 은 따라오지 않는다.** 원격만 앞서고 로컬은 그 자리다. 다음 세션이 그 체크아웃에서 main 에 커밋하면 뒤처진 main 위에 쌓여 push 가 거부되고, 같은 파일을 만졌으면 충돌한다(상류 실사고: invest-ops 1차 전파를 워크트리로 push → 2차 전파에서 로컬 main 이 1커밋 뒤처져 `.methodology-version`·`README`·`methodology.py` 3파일 충돌). 워크트리를 제거한 뒤 **원본 체크아웃이 main 이면 `git pull --ff-only`, 다른 브랜치면 `git fetch` 만 해두고 이 사실을 checkpoint 에 남긴다** — 그 체크아웃의 브랜치를 바꾸는 것은 지침 §1 위반이다.
 
 ## 2. 경로 지정 `git add` 는 안전장치가 아니다
 
@@ -64,4 +66,5 @@ git -C <repo> worktree remove <경로>
 
 | 버전 | 날짜 | 내용 |
 |---|---|---|
+| v2 | 2026-09-02 | §1 보강 — 워크트리 push 는 로컬 기본브랜치를 따라오게 하지 않는다(invest-ops 2차 전파 충돌 실사고, METH-142 friction) |
 | v1 | 2026-09-02 | 신설 — 캡슐 2건 승급(METH-142). 지침 08(서브에이전트, 한 세션 내 팬아웃)과 축이 달라 별도 지침으로 분리 |
