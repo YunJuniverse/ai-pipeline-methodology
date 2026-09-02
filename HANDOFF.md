@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-146 훅 wrap 읽기 전용**(branch `fix/hook-wrap-readonly`) — 구현·증명 완료, land 후 전파+훅 재설치 남음. 직전 완결: METH-145(훅 한글 경로) · 144(후속 2건) · 143(wrap 구조 검증) · 142(캡슐 4회차) — 전부 전파 11/11·origin 대조 ✓. 직전 완결: METH-143 · METH-142 캡슐 루프 4회차 — 수거 24건→판정→반영→전파 2회를 한 세션에 완주(#155·#157·#158·#159·#160·#161, maincheck 전건 ✓).
+- **Working on**: **다음 작업 대기.** 직전 완결: METH-146(훅 wrap 읽기 전용) · 145 · 144 · 143 · 142 — 전부 전파 11/11·origin 대조 ✓. 후속 후보 없음. · 144(후속 2건) · 143(wrap 구조 검증) · 142(캡슐 4회차) — 전부 전파 11/11·origin 대조 ✓. 직전 완결: METH-143 · METH-142 캡슐 루프 4회차 — 수거 24건→판정→반영→전파 2회를 한 세션에 완주(#155·#157·#158·#159·#160·#161, maincheck 전건 ✓).
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none.
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-02 — **METH-146 전파 종결 11/11**: 훅 재설치 후 훅 repo 3곳이 push 직후 `git status` 비어 있음 — 하루 2회 `git restore` 하던 부작용의 실전 종결. 캡슐 4회차에서 파생된 후속 후보가 이걸로 전부 닫혔다.
 - 2026-09-02 — **METH-146 훅 wrap 읽기 전용**: pre-push 의 wrap 이 리포트 재생성·wrap-state 부트스트랩으로 repo 를 dirty 로 만들어 sync-all 이 skip 하던 부작용 제거(`wrap --read-only`). 대조군/실험군 + 실 push 증명, 91/91.
 - 2026-09-02 — **METH-144·145 전파 종결 11/11**: 훅 재설치 직후 ai-icons·lifeManager 의 막혔던 커밋이 통과 — 한글 경로 수정의 e2e 증명. origin 대조 3항목 × 11 ✓. icons 워크트리가 계속 늘어(wt-admin·wt-cast 신규) sync-all 대상 18 — 전부 icons origin 공유라 실 repo 는 11.
 - 2026-09-02 — **METH-145 훅 한글 경로 함정**: METH-142 훅 경로 판정이 `core.quotePath` 기본값 때문에 한글 지침 경로를 못 알아봐 2 repo push 차단. `-c core.quotePath=false` 로 수정, **한글 파일명 픽스처로 재증명**(ASCII 픽스처가 놓친 구멍 — 지침 23 §2-5). METH-144 전파는 9/11(잔여 2 는 훅 재설치 후).
