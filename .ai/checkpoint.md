@@ -2,28 +2,32 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-02 · 캡슐 수거 4회차 METH-142)
+## 방금 한 것 (2026-09-02 · METH-142)
 
-**전 repo 순회 캡슐 수거를 끝냈다 — `collect --apply`, 신규 24건 적재(원장 21→45).**
+**① 전 repo 캡슐 수거 → ② 24건 판정 초안 작성.** 둘 다 끝났고, 남은 것은 사람 확정뿐이다.
 
-- **PR #155 land 완료**(squash `4c8b57f5` · maincheck origin/main 도달 ✓). 첫 land 시도는 GitHub GraphQL i/o timeout 으로 머지 실패 — 재실행으로 통과(일시 네트워크).
-- 스캔 16 repo. 발신처: **icons 14 · cafe24-renewal 5 · ai-icons 1 · 워크트리 잔재 2**(id 접두어가 워크트리명·내용 중복). gamblescan 11·invest-ops 3·lifeManager 4·icons-invest 1 은 전부 기수거 dup.
-- **dry-run 105건 → 실적재 24건**. 차이는 METH-140(`_repo_name` 을 `--git-common-dir` 기준) 효과 — icons 계열 워크트리 5곳(vault·wt-hub/hud/scene/zone)이 같은 `icons__` id 로 수렴해 전부 dedup 됐다. **어제 고친 것이 오늘 첫 실전에서 검증됐다.**
-- 잔재 2건은 METH-140 *이전* 발행분이라 여전히 워크트리명 id(`priceless-perlman-c80820__…`, `icons-wt-hub__…`) — collect 가 형식 경고를 내며 적재. 내용은 plan-viewer 오탐 건으로 METH-138/139 에 이미 반영돼 있다.
-- 선반영 의심 4건(`land-billing-pattern`·`asset-exts`·`repo-name-from-git-common-dir`·`land-classbc-plan-viewer`) = 어제 처리한 METH-138~141 의 발신 캡슐. 판정에서 '이미 반영'으로 먼저 걷어내면 실판정 대상은 20건.
-- TODO/HANDOFF rotate 실행(Done 5건·Recent 4건 → `40_dev/snapshots/live-archive/2026-09-02_*`) — boot 가 Done 9건 비대 경고를 냈던 건 해소.
+- 수거: 16 repo `collect --apply` — 신규 24건(원장 21→45). PR #155 land(squash `4c8b57f5`) · 기록 PR #156 land(`385a8658`).
+- dry-run 105 → 실적재 24. METH-140(`_repo_name` git-common-dir) 첫 실전 검증 — icons 계열 워크트리 5곳 dedup.
+- 초안: `40_dev/snapshots/2026-09-02_캡슐-트리아지-판정초안.md` (211줄). **전 24건을 상류 코드·지침과 실측 대조**했다. 집계 **유효 19 · 이미 반영 5 · 만료 0**.
+
+**조사에서 나온 실질 발견 3가지**
+
+1. **`60_tools/build-guard.sh` 가 절반만 고쳐져 있다.** METH-131 에서 dev 서버 감지에 lsof cwd 스코프를 넣은 것은 `methodology.py::_dev_server_running` 뿐이고, CLAUDE.md 가 수동 빌드에 지시하는 셸 스크립트는 아직 머신 전역 `pgrep` 이다 — **사람이 실제로 지나는 경로가 안 고쳐졌다.** 같은 판정이 두 벌인 것 자체가 지침 19 §8b.1(원시함수 단일화) 위반이다.
+2. **`_rotate_todo_done` 의 미정렬 가정이 이 repo 에서도 재현된다.** 오늘 rotate 직전 Done 순서에 116(07-25)이 131·136·135(08-07)보다 위에 있었다. keep=4 라 피해는 없었지만 keep=6 이었으면 최신을 버렸다.
+3. **icons 와 cafe24 가 같은 편집 사고를 독립 재현했다**(범위 매칭 월경 · 치환 no-op · 통삭제). 서로 다른 repo N≥2 라 지침 19 §8b 확장이 승급 기준을 충족한다.
 
 ## 다음 구체 행동
 
-1. **24건 트리아지 판정 초안 작성** — `40_dev/snapshots/2026-09-02_캡슐-트리아지-판정초안.md` 에 건별 유효/이미 반영/만료 + 근거. 앞선 회차(METH-131·137) 초안 형식을 따른다.
-2. 사람 확정 후 유효분 반영 → negative case 실효 증명(지침 23 §1-3) → `_inbox` 정리(원장은 유지) → 전 repo 전파.
-3. 반영 시 주의: `60_tools/methodology.py`·지침은 sync 대상이라 **상류에 넣어야** 하류 로컬 패치가 안 덮인다(METH-138~141 에서 반복 확인).
+1. **사람 확정 대기** — 초안 §마지막의 판단 3지점을 먼저 물을 것: ① land 콘텐츠 순증 판정 채택 여부(초안은 **비채택** 권고) ② 동시 세션 격리를 지침 08 §9 로 얹을지 신설 지침 30 으로 뺄지 ③ 플랫폼 고유 지식의 하류 존치를 캡슐 발신 규칙으로 명문화할지.
+2. 확정 후 처리 순서는 초안 말미 5단계 그대로 — `_inbox` 정리(5건) → 도구 4건 + negative case 증명 → 지침 5갈래 → `_pending` 3건 등재 → 전파.
+3. 도구 수정 시 주의: `methodology.py`·`build-guard.sh` 는 sync 대상이라 상류에 넣어야 하류 패치가 안 덮인다.
 
 ## 막힌 것
 
-- 없음. 판정은 사람 게이트 — TODO `## Blocked` METH-142.
+- 없음. 외부 게이트(사람 확정)만 — TODO `## Blocked` METH-142.
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · main 동기화 완료
-- 대시보드: http://localhost:8772 (pid 80001)
+- repo: `/Users/hayden/methodology` · branch `docs/capsule-triage-round4`
+- thinktank 리포트 동시 생성: `40_dev/snapshots/insights/2026-W36_thinktank.md`(_inbox target 집계 · CROSS-REPO x10 catalog)
+- 대시보드: http://localhost:8772
