@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "e8158372573da3f57e671f919b3380ddedb45a87",
-  "last_validated_at": "2026-09-02T06:43:24Z",
+  "last_validated_commit": "4c8b57f580ad45acd497aedc85aabc13f142ab55",
+  "last_validated_at": "2026-09-02T06:46:11Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "24735ca5e08a48eda9722f490c274decf1b99f9e4c0e31deac358ccdeda72ecd"
+      "sha256": "a5ee506b0968bb0e587553a41a55b4b394d2afb7503c569bdf33c69f20d373c3"
     },
     "TODO.md": {
-      "sha256": "e1530584eda4ba027d2ca317b0e65e5a4109000791a4ae996a48640cd4832857"
+      "sha256": "064817920115849f3de9a8c6c2c6f917014c1fde2fa7ba41537c9cdd83819cc2"
     },
     ".ai/checkpoint.md": {
-      "sha256": "bbf9ade1bf1945a9f5615e287c4290581d42c11b45642b3168f6ba655bcfbd40"
+      "sha256": "2c831418e5d8cf3e4711082caed016eb24d980263d64ef9c10bf3eb6377ffbe2"
     }
   },
   "observations": {
@@ -169,6 +169,7 @@
       "50_resources/ai_observations/2026-09-01_class-trigger-asset-exclusion.md",
       "50_resources/ai_observations/2026-09-01_land-class-plan-false-positive.md",
       "50_resources/ai_observations/2026-09-01_land-plan-union-refine.md",
+      "50_resources/ai_observations/2026-09-02_capsule-collect-round4-land.md",
       "50_resources/ai_observations/2026-09-02_capsule-collect-round4.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
