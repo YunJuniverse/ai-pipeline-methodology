@@ -3210,7 +3210,10 @@ if [ "$SYNC_INTENT" = "1" ]; then
   fi
 fi
 
-run_guarded "wrap --strict" 300 python3 "$METH" wrap --strict
+# --read-only (METH-146): 훅은 검사만 한다. 예전엔 여기서 wrap 이 프롬프팅 리포트를
+# 재생성하고 wrap-state 를 부트스트랩해 *push 가 실패해도* repo 가 dirty 로 남았다 —
+# 다음 sync-all 이 그것을 «진행 중 작업»으로 보고 skip 하는 오판이 하루 2회 났다.
+run_guarded "wrap --strict" 300 python3 "$METH" wrap --strict --read-only
 """
 
     if args.action == "install":
@@ -4239,6 +4242,11 @@ def cmd_wrap(args: argparse.Namespace) -> int:
 
     state = load_wrap_state(target)
     bootstrapped = False
+    if state is None and getattr(args, "read_only", False):
+        # 훅 경로(METH-146): 검사만 하고 아무것도 쓰지 않는다. baseline 이 없으면
+        # 판정 불가이므로 pass 시키되 그 사실을 밝힌다 — 부트스트랩은 ship/wrap 몫.
+        warn(".ai/wrap-state.json 없음 — read-only 라 부트스트랩하지 않고 pass (다음 ship 이 baseline 저장)")
+        return 0
     if state is None:
         warn(".ai/wrap-state.json 없음 — 현재 파일 상태를 baseline 으로 부트스트랩.")
         warn("다음 wrap부터는 라이브 파일이 *실제로 변경*되어야 통과합니다.")
@@ -4355,8 +4363,10 @@ def cmd_wrap(args: argparse.Namespace) -> int:
         warn(f"사이즈: {w}")
 
     # ── 프롬프팅 리포트 자동 갱신 (METH-118) — 기록이 있으면 wrap 마다 최신화 ──
+    # read-only(훅 경로, METH-146)에서는 건너뛴다: 훅이 남긴 리포트 갱신이 repo 를
+    # dirty 로 만들어 다음 sync-all 이 «진행 중 작업»으로 오인해 skip 했다(하루 2회 실사고).
     try:
-        if _regenerate_prompt_report(target):
+        if not getattr(args, "read_only", False) and _regenerate_prompt_report(target):
             info(f"prompting report 갱신: {PROMPT_REPORT_PATH}")
     except Exception as exc:  # 리포트 실패가 wrap 을 막으면 안 됨
         warn(f"prompting report 갱신 실패(무시): {exc}")
@@ -4862,6 +4872,8 @@ def main(argv: list[str] | None = None) -> int:
     pw = sub.add_parser("wrap", help="작업·세션 종료 검증 — 4개 라이브 파일(HANDOFF/TODO/checkpoint/observation) 갱신 누락 점검")
     pw.add_argument("--path", help="대상 폴더 (기본: 현재)")
     pw.add_argument("--strict", action="store_true", help="누락 시 exit 1 (CI/hook용)")
+    pw.add_argument("--read-only", dest="read_only", action="store_true",
+                    help="검사만 — wrap-state 부트스트랩·프롬프팅 리포트 재생성 등 파일 쓰기 없음 (pre-push 훅용, METH-146)")
     pw.set_defaults(func=cmd_wrap)
 
     psh = sub.add_parser("ship", help="작업 종료 통합 — wrap+manifest-check+sensitive 검사+(test/build)+commit+push")
