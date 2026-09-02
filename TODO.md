@@ -37,6 +37,17 @@
 
 ## Done
 
+### METH-143 · wrap 라이브 파일 구조 검증 — 편집 사고 기계 탐지
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 계기 — 2026-09-02 상류 실사고: 인덱스 기반 편집으로 `# HANDOFF.md` 제목이 덮이고 Working-on 이 둘이 된 채 **PR 6개**를 지났다. boot 가 첫 매치만 읽어 출력이 정상으로 보인 탓
+  - [x] `live_file_structure_issues()` — **중복(모호성)은 error · 부재·드리프트는 warn**. Working-on 중복 · HANDOFF 섹션 중복 · 칸반 섹션 중복이 error
+  - [x] **착수 전 전수 실측**(지침 23 §4-3) — 12 repo 스캔: **error 0건**, warn 은 gamblescan 6·tshome 2·icons/icons-invest/lifeManager 각 1. 부재를 fail 로 잡으면 10곳이 매 push 막혀 가드가 무시당한다는 근거로 경계를 그었다
+  - [x] boot 파서 계약 준수 — 비볼드 `- Working on:`(METH-114 스캐폴드 이력) 허용
+  - [x] wrap 배선 — 경고는 항상 출력, error 는 `--strict` 에서 fail(탈출구 없음: 중복은 고치는 것 말고 정당한 상태가 없다)
+  - [x] negative case 5테스트 — 사고 재현·부재는 경고·칸반 중복·정상 무음·비볼드 허용. 전체 87/87 green
+- **notes**: 사이즈 린트(METH-101/122)가 「너무 큰가」라면 이것은 「파싱 가능한가」다. 지침 19 §8b.3(편집 후 구조 검증)의 기계화 — 그 조항을 쓴 당일에 내가 그 조항을 어긴 것이 계기다.
+
 ### METH-142 · 캡슐 트리아지 4회차 — 수거 24건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:
