@@ -1623,6 +1623,16 @@ def cmd_maincheck(args: argparse.Namespace) -> int:
 # Class B/C 자동 트리거 경로·패턴 (CLAUDE.md §3). fail-closed:
 # 하나라도 걸리면 자동 머지를 *거부*하고 사람을 부른다.
 # 오탐(사람 호출)은 싸고, 미탐(무검토 머지)은 비싸다 — 비대칭을 그대로 반영.
+# 판정은 **경로만** 본다 — 파일 내용은 스캔하지 않는다(METH-142 에서 명시 결정).
+# 캡슐 `icons__2026-08-22_land-classifier-cries-wolf` 가 «용어별 순증(added−removed)
+# 기준 콘텐츠 판정»을 제안했다. 근거는 강했다 — 개행 0개 단일 라인 JSON 산출물이
+# 한 글자 변경에도 전 코퍼스가 추가된 줄로 잡혀 PR #355·#356·#381 에서 3연속 오탐했고,
+# 그 «또 오탐» 학습 때문에 #381 의 진짜 신규 가격(유상 럭키드로우 12,000원)을 통과시킬
+# 뻔했다. **그래도 채택하지 않는다**: 이 판정기의 신뢰는 단순함에서 나온다 — 경로 목록은
+# 사람이 눈으로 검증할 수 있지만, 내용 판정은 임계값·토큰화·예외의 축을 새로 만들고
+# 그 축이 틀리면 «조용한 미탐»이 된다. 내용 판단은 Class B/C 로 올려 **사람이 보는**
+# 현 설계가 이미 맡고 있다. 오탐은 여기서 줄이되(METH-138·139 의 `plan` 정련,
+# METH-141 의 자산 제외) 방식은 경로에 머문다. 이 결정을 뒤집으려면 ADR 을 먼저 쓴다.
 CLASS_BC_PATTERNS: list[tuple[str, str]] = [
     # (설명, 정규식 — repo 상대경로에 대해 검사)
     ("DB 마이그레이션·스키마", r"(^|/)(migrations?|prisma)/|\.sql$|schema\.(prisma|sql)$"),
@@ -3119,6 +3129,22 @@ EOF_REFS
   fi
 fi
 
+# 이 push 가 올리는 커밋 범위 — sync 경로 판정에 쓴다(METH-142).
+# 원격에 없는 브랜치(RSHA=0)면 범위를 못 잡으므로 HEAD 단일 커밋으로 본다.
+PUSH_RANGE="HEAD~1..HEAD"
+if [ -n "$REFS" ]; then
+  while read -r LREF LSHA RREF RSHA; do
+    [ -z "$LREF" ] && continue
+    case "$RSHA" in
+      0000000000000000000000000000000000000000|"") continue ;;
+    esac
+    PUSH_RANGE="$RSHA..$LSHA"
+    break
+  done <<EOF_RANGE
+$REFS
+EOF_RANGE
+fi
+
 # ship 이 호출한 push 인 경우 wrap 재실행 skip
 # (ship step 1 에서 이미 wrap --strict 통과 + step 6 직전 wrap-state 동기화 →
 #  이 시점 wrap 은 항상 sha 일치 = fail. 직접 git push 시는 env 미설정으로 정상 실행).
@@ -3127,19 +3153,59 @@ if [ -n "$METHODOLOGY_SHIP_IN_PROGRESS" ]; then
   exit 0
 fi
 
-# 방법론 sync commit 면제 (METH-022):
+# 방법론 sync commit 면제 (METH-022 · 판정 방식 METH-142):
 # 본 저장소의 방법론 자산을 적용 프로젝트로 전파하는 commit 은 라이브 파일
 # (HANDOFF/TODO/checkpoint/observation) 갱신을 동반하지 않으므로 wrap --strict
 # 가 정당하게 실패한다. 매번 --no-verify 수동 우회는 마찰 + 우회 습관화 위험.
-# HEAD commit 메시지가 sync 패턴이면 manifest-check 만 유지하고 wrap skip.
+#
+# 판정은 **변경 경로**로 한다 — 예전엔 커밋 메시지 접두어 목록으로만 판정해서
+# `chore: 방법론 sync …`(실제로 쓰이는 한국어 메시지)가 목록에 없어 push 가 막혔다.
+# 같은 마찰이 3회 재발했다(METH-142 전파 중 2 repo). 메시지는 사람이 매번 다르게 쓰고
+# 경로는 도구가 정한다 — 판정은 도구가 정하는 쪽에 건다.
+# 조건 둘 다 만족해야 skip: ① 푸시되는 변경 경로가 *전부* 방법론 관리 경로
+# ② 커밋 메시지에 sync 의도 표시(chore + sync). ②는 사람이 손으로 고친 지침 편집이
+# 조용히 wrap 을 건너뛰지 않게 하는 잠금장치다.
 HEAD_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "")
 case "$HEAD_MSG" in
-  "chore(methodology): sync"*|"chore: sync methodology"*|"chore(methodology): v"*"마이그레이션"*)
-    echo "[methodology hook] 방법론 sync commit 감지 — wrap skip (manifest-check 는 통과함)"
-    echo "  ($HEAD_MSG)"
+  "chore(methodology): v"*"마이그레이션"*)
+    echo "[methodology hook] 방법론 마이그레이션 commit 감지 — wrap skip"
     exit 0
     ;;
 esac
+
+case "$HEAD_MSG" in
+  chore*sync*|chore*Sync*|chore*SYNC*)
+    SYNC_INTENT=1 ;;
+  *)
+    SYNC_INTENT=0 ;;
+esac
+
+if [ "$SYNC_INTENT" = "1" ]; then
+  CHANGED=$(git diff --name-only "$PUSH_RANGE" 2>/dev/null)
+  if [ -n "$CHANGED" ]; then
+    SHARED=$(python3 "$METH" shared-paths 2>/dev/null)
+    OUTSIDE=0
+    if [ -z "$SHARED" ]; then
+      OUTSIDE=1   # 목록을 못 얻으면 판정 불가 — 안전측(검증 진행)
+    else
+      for F in $CHANGED; do
+        MATCHED=0
+        for S in $SHARED; do
+          case "$F" in
+            "$S"|"$S"/*) MATCHED=1; break ;;
+          esac
+        done
+        [ "$MATCHED" = "0" ] && { OUTSIDE=1; break; }
+      done
+    fi
+    if [ "$OUTSIDE" = "0" ]; then
+      echo "[methodology hook] 방법론 sync push 감지 — 변경이 전부 관리 경로 → wrap skip (manifest-check 는 통과함)"
+      echo "  ($HEAD_MSG)"
+      exit 0
+    fi
+    echo "[methodology hook] sync 메시지지만 관리 경로 밖 변경이 있다 — wrap 검증 진행"
+  fi
+fi
 
 run_guarded "wrap --strict" 300 python3 "$METH" wrap --strict
 """
@@ -3864,6 +3930,19 @@ def _externally_staged(target: Path) -> list[str]:
     dirty = _names("diff", "--name-only")            # 작업트리 미스테이징 변경
     untracked = _names("ls-files", "--others", "--exclude-standard")
     return sorted(staged - dirty - untracked)
+
+
+def cmd_shared_paths(args: argparse.Namespace) -> int:
+    """sync 가 덮어쓰는 방법론 관리 경로 목록 출력 — 훅의 sync 판정 단일 소스 (METH-142).
+
+    pre-push 훅이 «이 push 가 방법론 sync 인가»를 커밋 메시지가 아니라 **변경 경로**로
+    판정하려면 이 목록이 필요하다. 셸에 한 벌 더 복사하면 MANIFEST 가 바뀔 때 갈라진다
+    (지침 19 §8b.1). 한 줄에 하나씩, repo 상대경로.
+    """
+    for rel in MANIFEST["shared_paths"]:
+        print(rel)
+    print(".methodology-version")   # sync 가 함께 갱신하는 버전 파일
+    return 0
 
 
 def cmd_dev_check(args: argparse.Namespace) -> int:
@@ -4872,6 +4951,12 @@ def main(argv: list[str] | None = None) -> int:
     prt.add_argument("--force-order", dest="force_order", action="store_true",
                      help="Done 순서 검사를 건너뛴다 — 문서 순서가 최신-우선이 아닌 것이 의도된 경우만")
     prt.set_defaults(func=cmd_rotate)
+
+    psp = sub.add_parser(
+        "shared-paths",
+        help="sync 가 덮어쓰는 방법론 관리 경로 목록 — pre-push 훅의 sync 판정 단일 소스 (METH-142)",
+    )
+    psp.set_defaults(func=cmd_shared_paths)
 
     pdc = sub.add_parser(
         "dev-check",
