@@ -2931,7 +2931,20 @@ def cmd_ship(args: argparse.Namespace) -> int:
         commit_wrap_state(target)
     except Exception as e:
         warn(f"wrap-state 사전 갱신 실패: {e}")
-    if not args.no_add_all:
+    if args.no_add_all:
+        # 인덱스를 그대로 커밋하는 경로 — 무엇이 담겼는지 밝힌다(METH-142).
+        external = _externally_staged(target)
+        if external and not args.index_verified:
+            err("인덱스에 이 세션이 만들지 않았을 수 있는 스테이징이 있다 "
+                f"({len(external)}건) — 공유 체크아웃이면 남의 미완성 작업이 함께 커밋된다:")
+            for path in external[:10]:
+                err(f"    {path}")
+            if len(external) > 10:
+                err(f"    … 외 {len(external) - 10}건")
+            err("인덱스를 확인했고 전부 이 작업의 것이면 --index-verified 로 진행하거나, "
+                "격리 워크트리에서 다시 시작한다(지침 08 §9).")
+            return 1
+    else:
         rc = subprocess.call(["git", "-C", str(target), "add", "-A"])
         if rc != 0:
             err("git add 실패.")
@@ -3740,26 +3753,78 @@ def live_file_hard_violations(target: Path) -> list[str]:
     return violations
 
 
-def _rotate_todo_done(text: str, keep: int = ROTATE_KEEP_DONE) -> tuple[str, str, int]:
+class RotateOrderError(Exception):
+    """Done 문서 순서가 최신-우선 관례를 어겼다 — 조용한 아카이브 대신 중단(METH-142).
+
+    캡슐 `icons__2026-08-22_rotate-assumes-sorted-done`: `items[:keep]` 는 «문서 상위
+    N건»인데 docstring 은 «최신 keep건»이라 주장했다. 순서가 어긋나면 최신 항목이
+    조용히 아카이브된다(지침 23 §1-1 무음 실패). 상류 TODO 에서도 재현 — METH-116
+    (2026-07-25)이 131·136·135(2026-08-07)보다 위에 있었다.
+    """
+
+
+def _item_date(item: str) -> str | None:
+    """Done 항목에서 대표 날짜(ISO) — 없으면 None.
+
+    날짜 필드가 없는 항목이 흔해서(상류 실측 9건 중 6건) *정렬 키*로는 못 쓴다.
+    읽어낼 수 있는 날짜들의 **최대값**을 그 항목의 시점으로 본다 — 착수일이 아니라
+    가장 최근 활동일이 완료 시점에 가깝기 때문(METH-116 은 07-25 착수·08-22 완료).
+    """
+    dates = re.findall(r"\d{4}-\d{2}-\d{2}", item)
+    return max(dates) if dates else None
+
+
+def _assert_done_order(kept: list[str], moved: list[str]) -> None:
+    """아카이브 경계가 날짜를 역전시키면 RotateOrderError.
+
+    검사 범위는 **경계를 넘는 역전**뿐이다 — 유지 항목 사이의 순서는 피해가 없다.
+    날짜가 없는 항목은 판정 대상에서 빠진다(지침 23 §1-2: 검사 못 함 ≠ 깨끗함 —
+    호출부가 미판정 건수를 보고한다).
+    """
+    kept_dates = [d for d in (_item_date(i) for i in kept) if d]
+    if not kept_dates:
+        return
+    oldest_kept = min(kept_dates)
+    for item in moved:
+        d = _item_date(item)
+        if d and d > oldest_kept:
+            title = item.splitlines()[0].lstrip("# ").strip()
+            return _raise_order_error(title, d, oldest_kept)
+
+
+def _raise_order_error(title: str, moved_date: str, oldest_kept: str) -> None:
+    raise RotateOrderError(
+        f"아카이브 대상 «{title}»({moved_date})이 유지 대상 최고참({oldest_kept})보다 최신이다 — "
+        "Done 순서가 최신-우선이 아니다. TODO 를 재정렬한 뒤 다시 실행하거나, "
+        "순서가 의도된 것이면 --force-order 로 진행한다."
+    )
+
+
+def _rotate_todo_done(text: str, keep: int = ROTATE_KEEP_DONE,
+                      force_order: bool = False) -> tuple[str, str, int, int]:
     """TODO Done 섹션에서 최신 keep건만 남기고 나머지를 아카이브 블록으로 분리.
 
-    반환: (새 TODO 텍스트, 아카이브 md, 이관 건수). Done 항목 순서는 최신-우선 관례를 따른다.
+    반환: (새 TODO 텍스트, 아카이브 md, 이관 건수, 날짜 미판정 건수).
+    Done 항목 순서는 최신-우선 관례를 따르며, **그 가정을 검사한다**(METH-142).
     """
     m = re.search(r"^##\s+Done\s*$\n(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
     if not m:
-        return text, "", 0
+        return text, "", 0, 0
     body = m.group(1)
     parts = re.split(r"(?=^###\s+)", body, flags=re.MULTILINE)
     head = parts[0] if parts and not parts[0].startswith("### ") else ""
     items = [p for p in parts if p.startswith("### ")]
     if len(items) <= keep:
-        return text, "", 0
+        return text, "", 0, 0
     kept, moved = items[:keep], items[keep:]
+    if not force_order:
+        _assert_done_order(kept, moved)
+    undated = sum(1 for i in items if _item_date(i) is None)
     # 항목 이후의 꼬리 주석(> ...)은 head/kept 에 안 섞이도록 마지막 항목에서 분리하지 않고 그대로 둔다
     new_body = head + "".join(kept)
     new_text = text[:m.start(1)] + new_body + text[m.end(1):]
     archive = "".join(moved).rstrip() + "\n"
-    return new_text, archive, len(moved)
+    return new_text, archive, len(moved), undated
 
 
 def _rotate_recent_changes(text: str, keep: int = ROTATE_KEEP_RECENT) -> tuple[str, str, int]:
@@ -3779,6 +3844,46 @@ def _rotate_recent_changes(text: str, keep: int = ROTATE_KEEP_RECENT) -> tuple[s
     return new_text, archive, len(bullets) - keep
 
 
+def _externally_staged(target: Path) -> list[str]:
+    """인덱스에 있는데 작업트리 변경이 아닌 경로 — 남이 스테이징해 둔 것 (METH-142).
+
+    공유 체크아웃에서 `--no-add-all` 로 ship 하면 **인덱스를 그대로 커밋**한다.
+    다른 세션이 자기 작업을 스테이징해 두었으면 그것이 함께 커밋된다 — 실사고:
+    미완성 참조가 섞여 프로덕션이 깨졌다(캡슐 icons__2026-08-27_ship-add-all-on-shared-checkout).
+    staged 집합에서 «작업트리에서도 수정 중»인 경로를 뺀 나머지를 외부분으로 본다.
+    """
+    def _names(*args: str) -> set[str]:
+        try:
+            out = subprocess.check_output(
+                ["git", "-C", str(target), *args], text=True, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            return set()
+        return {l.strip() for l in out.splitlines() if l.strip()}
+
+    staged = _names("diff", "--cached", "--name-only")
+    dirty = _names("diff", "--name-only")            # 작업트리 미스테이징 변경
+    untracked = _names("ls-files", "--others", "--exclude-standard")
+    return sorted(staged - dirty - untracked)
+
+
+def cmd_dev_check(args: argparse.Namespace) -> int:
+    """이 프로젝트에서 뜬 dev 서버 감지 — build 충돌 가드의 단일 판정 지점 (METH-142).
+
+    `60_tools/build-guard.sh` 가 이 명령을 호출한다. 같은 판정을 셸에 한 벌 더 두면
+    한쪽만 고쳐진다 — 실제로 METH-131 의 cwd 스코프가 파이썬 경로에만 들어가고
+    사람이 지나는 셸 경로는 머신 전역 `pgrep` 인 채로 남았다(캡슐
+    `icons__2026-08-27_build-guard-judge-by-cwd`). 지침 19 §8b.1 의 자기적용.
+
+    exit 0 = 뜬 서버 없음, 1 = 이 프로젝트의 dev 서버 실행 중.
+    """
+    target = Path(args.path or ".").resolve()
+    found = _dev_server_running(target)
+    if found is None:
+        return 0
+    print(found)
+    return 1
+
+
 def cmd_rotate(args: argparse.Namespace) -> int:
     """라이브 파일 기계 회전 — 초과분을 40_dev/snapshots/live-archive/ 로 이관 (METH-122).
 
@@ -3793,11 +3898,19 @@ def cmd_rotate(args: argparse.Namespace) -> int:
 
     todo_p = target / "TODO.md"
     if todo_p.exists():
-        new_text, archive, moved = _rotate_todo_done(read_text(todo_p))
+        try:
+            new_text, archive, moved, undated = _rotate_todo_done(
+                read_text(todo_p), force_order=args.force_order)
+        except RotateOrderError as e:
+            err(f"TODO.md 회전 중단 — {e}")
+            return 1
         if moved:
             header = f"# TODO Done 아카이브 — {today} rotate ({moved}건)\n\n> 정본 이력은 git log·PR. 이 파일은 열람용 사본.\n\n"
             actions.append((todo_p, new_text, arch_dir / f"{today}_todo-done.md", header + archive))
             info(f"TODO.md: Done {moved}건 이관 예정 (최신 {ROTATE_KEEP_DONE}건 유지)")
+            if undated:
+                warn(f"TODO.md: Done {undated}건은 날짜가 없어 순서 검사 대상에서 빠졌다 "
+                     "— 통과가 «순서가 옳다»는 뜻은 아니다(지침 23 §1-2)")
 
     ho_p = target / "HANDOFF.md"
     if ho_p.exists():
@@ -3903,7 +4016,12 @@ def _dev_server_running(target: Path | None = None) -> str | None:
         return None
     if out.returncode != 0 or not out.stdout.strip():
         return None
-    lines = [l for l in out.stdout.strip().splitlines() if l.strip()]
+    # 자기적중 배제 — `pkill -f "next dev"`·이 가드 자신처럼 *명령 문자열에* 그 낱말을
+    # 담고 있을 뿐인 프로세스(캡슐 build-guard-judge-by-cwd: 오탐 4회 중 1회가 이것).
+    lines = [l for l in out.stdout.strip().splitlines()
+             if l.strip() and not re.search(r"\b(pkill|pgrep|build-guard|methodology\.py)\b", l)]
+    if not lines:
+        return None
     if target is None:
         return lines[0]
     target = target.resolve()
@@ -4606,6 +4724,8 @@ def main(argv: list[str] | None = None) -> int:
     psh.add_argument("--no-test", action="store_true", help="test 단계 skip")
     psh.add_argument("--no-build", action="store_true", help="build 단계 skip")
     psh.add_argument("--no-add-all", action="store_true", help="git add -A 안 함 (사용자가 미리 staging)")
+    psh.add_argument("--index-verified", dest="index_verified", action="store_true",
+                     help="--no-add-all 시 스테이징 확인 경고를 통과 — 인덱스 내용을 직접 확인했을 때만")
     psh.add_argument("--no-commit", action="store_true", help="commit 단계 skip (검증만)")
     psh.add_argument("--no-push", action="store_true", help="push 단계 skip (commit까지만)")
     psh.add_argument("--allow-sensitive", action="store_true", help="sensitive 파일 의심 패턴 차단 우회")
@@ -4749,7 +4869,16 @@ def main(argv: list[str] | None = None) -> int:
     prt.add_argument("--apply", action="store_true", help="실제 이관 (없으면 dry-run)")
     prt.add_argument("--checkpoint", action="store_true",
                      help="checkpoint 도 회전(전체 사본 아카이브 + 상단 요지 유지)")
+    prt.add_argument("--force-order", dest="force_order", action="store_true",
+                     help="Done 순서 검사를 건너뛴다 — 문서 순서가 최신-우선이 아닌 것이 의도된 경우만")
     prt.set_defaults(func=cmd_rotate)
+
+    pdc = sub.add_parser(
+        "dev-check",
+        help="이 프로젝트의 dev 서버 실행 감지 — build-guard.sh 가 호출하는 단일 판정 지점 (exit 1 = 실행 중)",
+    )
+    pdc.add_argument("--path", help="대상 폴더 (기본: 현재)")
+    pdc.set_defaults(func=cmd_dev_check)
 
     ppr = sub.add_parser(
         "prompt-report",
