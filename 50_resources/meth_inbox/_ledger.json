@@ -5,6 +5,36 @@
       "file": "2026-08-19_deploy-doc-writing-rules.md",
       "repo": "ai-icons"
     },
+    "ai-icons__2026-08-26_no-dash-tail-explanations": {
+      "collected_at": "2026-09-02T06:41:36Z",
+      "file": "2026-08-26_no-dash-tail-explanations.md",
+      "repo": "ai-icons"
+    },
+    "cafe24-renewal__2026-09-02_cafe24-cache-4layer-defense": {
+      "collected_at": "2026-09-02T06:41:37Z",
+      "file": "2026-09-02_cafe24-cache-4layer-defense.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-02_cafe24-platform-findings": {
+      "collected_at": "2026-09-02T06:41:37Z",
+      "file": "2026-09-02_cafe24-platform-findings.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-02_client-self-heal-display-gate": {
+      "collected_at": "2026-09-02T06:41:37Z",
+      "file": "2026-09-02_client-self-heal-display-gate.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-02_edit-deploy-safeguards": {
+      "collected_at": "2026-09-02T06:41:37Z",
+      "file": "2026-09-02_edit-deploy-safeguards.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-02_verification-measurement-pitfalls": {
+      "collected_at": "2026-09-02T06:41:37Z",
+      "file": "2026-09-02_verification-measurement-pitfalls.md",
+      "repo": "cafe24-renewal"
+    },
     "gamblescan-p0-pr__2026-08-13_class-c-public-surface-release-matrix": {
       "collected_at": "2026-08-20T06:18:59Z",
       "file": "2026-08-13_class-c-public-surface-release-matrix.md",
@@ -65,9 +95,94 @@
       "file": "2026-07-29_guide-22-audit-gaps.md",
       "repo": "icons-invest"
     },
+    "icons-wt-hub__2026-09-01_land-classbc-plan-viewer-false-positive": {
+      "collected_at": "2026-09-02T06:41:44Z",
+      "file": "2026-09-01_land-classbc-plan-viewer-false-positive.md",
+      "repo": "icons-wt-hub"
+    },
     "icons__2026-08-13_consumer-surface-copy-zero-sentence": {
       "collected_at": "2026-08-20T06:18:59Z",
       "file": "2026-08-13_consumer-surface-copy-zero-sentence.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-22_land-classifier-cries-wolf": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-22_land-classifier-cries-wolf.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-22_rotate-assumes-sorted-done": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-22_rotate-assumes-sorted-done.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_build-guard-judge-by-cwd": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_build-guard-judge-by-cwd.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_diagnose-artifact-before-research": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_diagnose-artifact-before-research.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_embedded-preview-canvas-pitfalls": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_embedded-preview-canvas-pitfalls.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_graybox-gate-before-asset-spend": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_graybox-gate-before-asset-spend.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_headless-verifiable-game-logic": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_headless-verifiable-game-logic.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_isolated-worktree-for-concurrent-sessions": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_isolated-worktree-for-concurrent-sessions.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_read-source-before-writing-rules": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_read-source-before-writing-rules.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_shared-checkout-path-add-not-safe": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_shared-checkout-path-add-not-safe.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_ship-add-all-on-shared-checkout": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_ship-add-all-on-shared-checkout.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_structural-edit-by-line-not-regex": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_structural-edit-by-line-not-regex.md",
+      "repo": "icons"
+    },
+    "icons__2026-08-27_unresolved-premise-recheck-at-decision": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-08-27_unresolved-premise-recheck-at-decision.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-01_asset-exts-excluded-from-class-triggers": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-09-01_asset-exts-excluded-from-class-triggers.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-01_land-billing-pattern-path-false-positive": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-09-01_land-billing-pattern-path-false-positive.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-01_repo-name-from-git-common-dir": {
+      "collected_at": "2026-09-02T06:41:40Z",
+      "file": "2026-09-01_repo-name-from-git-common-dir.md",
       "repo": "icons"
     },
     "invest-ops__2026-07-31_done-claim-guard-ship-boot": {
@@ -104,6 +219,11 @@
       "collected_at": "2026-08-07T03:13:59Z",
       "file": "2026-08-07_scoped-bulk-edit.md",
       "repo": "lifeManager"
+    },
+    "priceless-perlman-c80820__2026-08-31_land-class-regex-plan-viewer-false-positive": {
+      "collected_at": "2026-09-02T06:41:44Z",
+      "file": "2026-08-31_land-class-regex-plan-viewer-false-positive.md",
+      "repo": "icons-wt-hub"
     }
   }
 }
