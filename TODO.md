@@ -43,7 +43,8 @@
   - [x] 재현 — METH-144 전파에서 ai-icons·lifeManager push 가 「sync 메시지지만 관리 경로 밖 변경」으로 차단. 원인 = `git diff --name-only` 가 기본 `core.quotePath=true` 라 `20_guides/30_동시_…` 를 `"20_guides/30_\353\217…"` 로 이스케이프 → `20_guides/*` 패턴 불일치
   - [x] 수정 — 훅 템플릿에서 `git -c core.quotePath=false diff --name-only`. 상류 sync 검증에서 이미 한 번 기록된 함정(관찰로그 `git ls-tree 한글 경로 octal-escape`)의 재발
   - [x] **ASCII 픽스처의 구멍** — METH-142 의 A/B/C 실 push 증명은 `20_guides/a.md` 로 했기에 통과했다. 한글 파일명 픽스처로 A/B 재증명(skip·성공 / 검증·차단) + 회귀 테스트 1건. 88/88
-- **notes**: 지침 23 §2-5(픽스처는 스키마가 실제로 만들어내는 특이값을 포함) — 이 repo 의 특이값은 한글 경로다. 전파 후 훅 3 repo 재설치 필요.
+  - [x] **전파 11/11 + 훅 3 repo 재설치**(2026-09-02) — 재설치 직후 ai-icons·lifeManager 의 막혔던 METH-144 커밋을 push 해 **새 훅이 한글 경로 sync 를 통과시키는 것을 실 push 로 e2e 증명**. origin 대조 3항목(지침 30 v2 문구·그래프 g30·quotePath) × 11 ✓
+- **notes**: 지침 23 §2-5(픽스처는 스키마가 실제로 만들어내는 특이값을 포함) — 이 repo 의 특이값은 한글 경로다. METH-144 도 이로써 11/11.
 
 ### METH-144 · METH-142 후속 2건 — 지침 30 워크트리 push 부작용 · 그래프 22~30 노드 백필
 - **mode**: fullstack / **change-class**: A / **owner**: AI
