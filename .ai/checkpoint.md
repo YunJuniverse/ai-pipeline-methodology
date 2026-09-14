@@ -2,23 +2,28 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-14 · METH-147 수거)
+## 방금 한 것 (2026-09-14 · METH-147 판정 초안)
 
-**전 repo 캡슐 수거 5회차 — 신규 23건 적재(원장 45→68).**
+**23건 판정 초안을 썼다** — `40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`. 집계 유효 22 · 이미 반영 1(도구 측) · 만료 0.
 
-- 19곳 스캔(icons 워크트리가 8곳으로 늘었다: admin·cast·hose·hub·hud·scene·zone·vault). dry-run 119 → 실적재 23 — 워크트리 dedup 은 계속 정상.
-- 발신처: **cafe24-renewal 11 · icons 12.** 형식 경고 1건(`icons__2026-09-02_self-citation-drift-adr` — id 접두어 불일치, 워크트리 발행 잔재).
-- HANDOFF Working-on 줄에 지난 세션 부분 교체가 남긴 잔존 텍스트가 있었다(«후속 후보 없음. · 144(...) · 직전 완결: METH-143 ...»). 줄 전체를 다시 썼다 — 새 wrap 구조 검증은 *중복*만 잡지 *한 줄 안의 잔재*는 못 잡는다. 이런 편집은 항상 줄 전체 교체로.
+실측으로 확인한 것:
+- **병렬 세션 경합 7건은 한 구조다.** 상류엔 `.gitattributes` 없음 · 생성물 2종(wrap-state·prompting-report)을 ship 이 매 커밋 포함 · land 는 `mergeable` 을 읽지만 DIRTY 분기 없음 · CI 판정은 pending/failing 2분류(잡 steps=0 미판독) · ship 기본 `add -A` 경로에 미추적 열거 없음(METH-142 가드는 `--no-add-all` 만) · ID 예약 명령 없음. → 묶음 A(지침 30 v3 + ship/land/todo).
+- **P-004 → C-002 승급 요건 충족** — icons 2번째 케이스(getAnimations progress 동결) + cafe24 #13 근거에 같은 원인(백그라운드 탭 rAF 정지). 교차 repo N≥2.
+- observe `parse_friction` 이 `split("|")` 4필드 강제 → resolution 의 세로줄이 형식 오류. 즉시 유효.
+- ship 테스트 판정은 상류가 이미 exit code(`subprocess.call`) — 캡슐의 사고는 하류 test 스크립트 체인. 이미 반영 + 지침 23 §1-4 한 줄.
+
+비채택 권고 2: land 「로컬 통과한 Class A 는 CI 미대기 즉시 머지」(ADR-004 위반) · checkpoint 세션별 분리(바통은 하나여야 콜드스타트 성립).
 
 ## 다음 구체 행동
 
-1. **23건 판정 초안** — 앞선 회차 형식(`40_dev/snapshots/2026-09-02_캡슐-트리아지-판정초안.md`)대로, 전 건 상류 코드·지침 실측 대조. 먼저 볼 것: 병렬 세션 경합 계열 5건(icons 4 + cafe24 ID 예약 1)은 **한 주제**다 — 지침 30 v3 + ship/land 도구 묶음으로 병합 판정이 맞는지. `observe` 세로줄 건은 즉시 유효(도구 결함).
-2. 사람 확정 → 반영 → 전파.
+1. **사람 확정** — 판단 3지점: ① `wrap-state.json` 커밋 유지 vs HEAD 재계산(권고 전환) ② `merge=union` TODO·HANDOFF(권고 채택, checkpoint 제외 — METH-143 구조 검증이 안전망) ③ ID 예약 방식(권고 원격 태그 `refs/tags/id/METH-NNN`).
+2. 확정 전에도 돌릴 수 있는 것: 즉시 유효 도구 3(observe rsplit · boot preflight · wrap ADR 인용 검사) + 지침 4갈래 + C-002 승급 + pending 3 + 묶음 A 의 무판단분(gitignore prompting-report · land DIRTY/경합 분기 · ship 공유 체크아웃 가드 · 지침 30 v3).
+3. 처리 순서는 초안 말미.
 
 ## 막힌 것
 
-- 없음. 판정은 사람 게이트 — TODO `## Blocked` METH-147.
+- 없음. 확정은 사람 게이트 — TODO `## Blocked` METH-147.
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `chore/collect-capsules-2026-09-14`
+- repo: `/Users/hayden/methodology` · branch `docs/capsule-triage-round5`

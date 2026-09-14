@@ -4,10 +4,10 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **캡슐 수거 5회차(METH-147)** — `collect --apply` 완료(신규 23건·원장 45→68). 다음은 판정 초안 → 사람 확정. TODO `## Blocked`.
+- **Working on**: **캡슐 5회차 판정 초안 작성 완료(METH-147)** — 유효 22·이미 반영 1·만료 0. 사람 확정 대기(판단 3지점). 초안 `40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`.
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
-- **Blockers**: METH-147 캡슐 23건 사람 판정 대기(2026-09-14~).
+- **Blockers**: METH-147 **사람 확정** 대기(2026-09-14~) — 판단 3지점(wrap-state 재계산 · union merge · ID 예약 방식).
 
 ## Active Links
 
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-14 — **캡슐 5회차 판정 초안(METH-147)**: 23건 전량 실측 대조 — 유효 22·이미 반영 1·만료 0. 발견: 병렬 세션 경합 7건이 한 구조(PR 13건 중 11건 라이브 파일 충돌, 내용 충돌 0) → 묶음 A · **P-004 가 icons 2회 + cafe24 교차로 C-002 승급 요건 충족** · observe 세로줄 파서 결함 재현 · ship 테스트 판정은 상류가 이미 exit code.
 - 2026-09-14 — **캡슐 수거 5회차(METH-147)**: 19곳 순회, 신규 **23건**(cafe24-renewal 11 · icons 12), 원장 45→68. dry-run 119 → 23(워크트리 dedup). 병렬 세션 경합 계열이 5건 겹쳐 지침 30 v3 후보. 직전 Working-on 줄의 잔존 텍스트(부분 교체 잔재)도 정리.
 - 2026-09-02 — **METH-146 전파 종결 11/11**: 훅 재설치 후 훅 repo 3곳이 push 직후 `git status` 비어 있음 — 하루 2회 `git restore` 하던 부작용의 실전 종결. 캡슐 4회차에서 파생된 후속 후보가 이걸로 전부 닫혔다.
 - 2026-09-02 — **METH-146 훅 wrap 읽기 전용**: pre-push 의 wrap 이 리포트 재생성·wrap-state 부트스트랩으로 repo 를 dirty 로 만들어 sync-all 이 skip 하던 부작용 제거(`wrap --read-only`). 대조군/실험군 + 실 push 증명, 91/91.
