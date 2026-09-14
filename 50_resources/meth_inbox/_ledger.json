@@ -35,6 +35,61 @@
       "file": "2026-09-02_verification-measurement-pitfalls.md",
       "repo": "cafe24-renewal"
     },
+    "cafe24-renewal__2026-09-14_absence-verdict-observation-conditions": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_absence-verdict-observation-conditions.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_boot-deploy-access-preflight": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_boot-deploy-access-preflight.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_bug-report-triage-order": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_bug-report-triage-order.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_contract-change-consumer-inventory": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_contract-change-consumer-inventory.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_css-override-find-winner-first": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_css-override-find-winner-first.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_deploy-target-drift-diff": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_deploy-target-drift-diff.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_doc-rot-premise-change-sweep": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_doc-rot-premise-change-sweep.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_doc-sync-write-readback": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_doc-sync-write-readback.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_outbound-diagnosis-hypothesis-label": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_outbound-diagnosis-hypothesis-label.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_read-vendor-js-before-docs": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_read-vendor-js-before-docs.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-14_sequential-id-reservation": {
+      "collected_at": "2026-09-14T07:16:59Z",
+      "file": "2026-09-14_sequential-id-reservation.md",
+      "repo": "cafe24-renewal"
+    },
     "gamblescan-p0-pr__2026-08-13_class-c-public-surface-release-matrix": {
       "collected_at": "2026-08-20T06:18:59Z",
       "file": "2026-08-13_class-c-public-surface-release-matrix.md",
@@ -99,6 +154,11 @@
       "collected_at": "2026-09-02T06:41:44Z",
       "file": "2026-09-01_land-classbc-plan-viewer-false-positive.md",
       "repo": "icons-wt-hub"
+    },
+    "icons-wt-hub__2026-09-02_self-citation-drift-adr": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-02_self-citation-drift-adr.md",
+      "repo": "icons"
     },
     "icons__2026-08-13_consumer-surface-copy-zero-sentence": {
       "collected_at": "2026-08-20T06:18:59Z",
@@ -183,6 +243,61 @@
     "icons__2026-09-01_repo-name-from-git-common-dir": {
       "collected_at": "2026-09-02T06:41:40Z",
       "file": "2026-09-01_repo-name-from-git-common-dir.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-03_wrap-generated-files-pr-conflict-race": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-03_wrap-generated-files-pr-conflict-race.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-04_ship-untracked-file-guard": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-04_ship-untracked-file-guard.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-09_land-merge-ref-race": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-09_land-merge-ref-race.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-09_live-files-append-only-union": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-09_live-files-append-only-union.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_blocked-dedupe-before-register": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_blocked-dedupe-before-register.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_ci-absent-local-replication-gate": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_ci-absent-local-replication-gate.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_hidden-pane-frozen-animations-headless-measure": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_hidden-pane-frozen-animations-headless-measure.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_monthly-grammar-synthesis-fanout": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_monthly-grammar-synthesis-fanout.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_observe-friction-pipe-in-text": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_observe-friction-pipe-in-text.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_rebase-docs-ours-drops-checkpoint": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_rebase-docs-ours-drops-checkpoint.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-11_test-verdict-grep-fail-closed": {
+      "collected_at": "2026-09-14T07:17:02Z",
+      "file": "2026-09-11_test-verdict-grep-fail-closed.md",
       "repo": "icons"
     },
     "invest-ops__2026-07-31_done-claim-guard-ship-boot": {

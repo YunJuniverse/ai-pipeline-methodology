@@ -1,17 +1,17 @@
 {
   "version": 1,
   "bootstrapped_at": "2026-05-14T16:04:14Z",
-  "last_validated_commit": "9099c330820a6502b4122b5cdb89a9de8dbb7925",
-  "last_validated_at": "2026-09-02T08:37:43Z",
+  "last_validated_commit": "8211903fa0ffc1ba7b497f6d017aa54da08ea1d1",
+  "last_validated_at": "2026-09-14T07:18:08Z",
   "files": {
     "HANDOFF.md": {
-      "sha256": "bc0215a3766d92a1a7ff2ddd27eea1e4cd77707dbca9b1b78ab849b264f2dd14"
+      "sha256": "c6b4d1b3647c737476d462130fdc4f14887205732f61064c33fc354b310990d6"
     },
     "TODO.md": {
-      "sha256": "6e495a26beb192ecdb9e144179226044a00ec5e927ecae9876cf787d6451c29b"
+      "sha256": "5a8602e70a9f640e6f39a1ba7d02a1939be0e40d1967640ad21dbd49dff39409"
     },
     ".ai/checkpoint.md": {
-      "sha256": "447526873c09bd24891140f535af2fc5c3848321d01ea9415508e4f8bb079f81"
+      "sha256": "d8fd67c408f548bfa2ab6f525d8cc5ba5972b9091bfc7bce189940f281a11552"
     }
   },
   "observations": {
@@ -185,6 +185,7 @@
       "50_resources/ai_observations/2026-09-02_meth-146-hook-wrap-readonly.md",
       "50_resources/ai_observations/2026-09-02_meth-146-propagation.md",
       "50_resources/ai_observations/2026-09-02_session-close-rotate.md",
+      "50_resources/ai_observations/2026-09-14_capsule-collect-round5.md",
       "70_meta/observations/2026-05-12_dashboard-cli-and-boot-protocol.md",
       "70_meta/observations/2026-05-12_dashboard-dev-server-controls.md",
       "70_meta/observations/2026-05-12_meth-015-propagation.md",
