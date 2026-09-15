@@ -2,28 +2,30 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-14 · METH-147 판정 초안)
+## 방금 한 것 (2026-09-15 · METH-147 PR 1 도구 묶음)
 
-**23건 판정 초안을 썼다** — `40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`. 집계 유효 22 · 이미 반영 1(도구 측) · 만료 0.
+사용자가 판단 3지점을 전부 권고안대로 확정했다. 도구 묶음을 먼저 넣었다.
 
-실측으로 확인한 것:
-- **병렬 세션 경합 7건은 한 구조다.** 상류엔 `.gitattributes` 없음 · 생성물 2종(wrap-state·prompting-report)을 ship 이 매 커밋 포함 · land 는 `mergeable` 을 읽지만 DIRTY 분기 없음 · CI 판정은 pending/failing 2분류(잡 steps=0 미판독) · ship 기본 `add -A` 경로에 미추적 열거 없음(METH-142 가드는 `--no-add-all` 만) · ID 예약 명령 없음. → 묶음 A(지침 30 v3 + ship/land/todo).
-- **P-004 → C-002 승급 요건 충족** — icons 2번째 케이스(getAnimations progress 동결) + cafe24 #13 근거에 같은 원인(백그라운드 탭 rAF 정지). 교차 repo N≥2.
-- observe `parse_friction` 이 `split("|")` 4필드 강제 → resolution 의 세로줄이 형식 오류. 즉시 유효.
-- ship 테스트 판정은 상류가 이미 exit code(`subprocess.call`) — 캡슐의 사고는 하류 test 스크립트 체인. 이미 반영 + 지침 23 §1-4 한 줄.
+- **wrap baseline = HEAD 재계산** — `head_wrap_state()` 가 HEAD 블롭 sha 로 baseline 을 만든다. ship 은 `commit_wrap_state` 를 더 이상 부르지 않고, 생성물 2종(`.ai/wrap-state.json`·`50_resources/prompting-report.md`)을 `git rm --cached` + `.gitignore` 블록으로 커밋에서 뺀다(파일은 남는다). 실 repo 에서 동치 확인(라이브 파일 미편집 → 4/4 미갱신, wrap-state 무접촉).
+- **ship 공유 체크아웃 가드** — 워크트리 ≥2 이고 현재가 주 체크아웃이면 커밋 후보를 열거하고 `--allow-shared` 없이는 거부. 격리 워크트리 안에서는 안 걸린다.
+- **`reserve`** — `id/METH-N` 원격 태그로 원자 예약. e2e: METH-4 → 5 → (6 선점) → 7.
+- **land** — DIRTY 면 origin/base 머지·재푸시 1회 후 CI 재실행 대기 / 실패 체크가 전부 «스텝 0개»면 내용 오류가 아니라 경합·CI 부재로 분류(billing annotation 판독) / `--local-ci` 는 TODO Blocked 의 PM 판정 + 로컬 재현(manifest·wrap read-only·observe validate 전수·tests) 통과 시에만.
+- observe `parse_friction_item` rsplit(세로줄 허용) · boot `required_local_files` preflight · wrap ADR 인용 검사(warn).
+- `.gitattributes`(TODO·HANDOFF union) 를 shared_paths 에 추가.
+- 테스트 9건 신설, 전체 96/96. `ship --land` 의 Namespace 에 `local_ci` 누락을 발견해 고쳤다(AttributeError 였을 것).
 
-비채택 권고 2: land 「로컬 통과한 Class A 는 CI 미대기 즉시 머지」(ADR-004 위반) · checkpoint 세션별 분리(바통은 하나여야 콜드스타트 성립).
+**이 ship 자체가 상류 이행이다** — 이 커밋에서 wrap-state·prompting-report 가 인덱스에서 빠지고 `.gitignore` 블록이 들어간다.
 
 ## 다음 구체 행동
 
-1. **사람 확정** — 판단 3지점: ① `wrap-state.json` 커밋 유지 vs HEAD 재계산(권고 전환) ② `merge=union` TODO·HANDOFF(권고 채택, checkpoint 제외 — METH-143 구조 검증이 안전망) ③ ID 예약 방식(권고 원격 태그 `refs/tags/id/METH-NNN`).
-2. 확정 전에도 돌릴 수 있는 것: 즉시 유효 도구 3(observe rsplit · boot preflight · wrap ADR 인용 검사) + 지침 4갈래 + C-002 승급 + pending 3 + 묶음 A 의 무판단분(gitignore prompting-report · land DIRTY/경합 분기 · ship 공유 체크아웃 가드 · 지침 30 v3).
-3. 처리 순서는 초안 말미.
+1. land → **PR 2**: 지침 05 §9 확장·§9b 8·9항 / 19 §8b.4 / 23 §1-4·§1-5 1줄·§2 애니메이션·§2-6 부재 관측조건 / 24 §2b 제보 트리아지·§4 벤더 JS·§4b 보강 / **30 v3**(§6 리베이스 라이브 파일·§7 ID 예약·§8 생성물·union) / CLAUDE.md·AGENTS.md Blocked dedupe 1줄 / README 현황표 / C-002 승급(P-004 → active) / P-006·007·008.
+2. **PR 3**: `_inbox` 23건 정리(원장 68 유지) → 전파 11 repo(`methodology.py`·`.gitattributes`·지침) → 훅 3 repo 재설치 → 다운스트림에서 생성물 2종이 다음 ship 에 인덱스에서 빠지는지 1곳 확인.
+3. 주의: 전파 후 다운스트림 첫 ship 이 `.gitignore` 를 바꾸고 생성물을 빼는 커밋을 만든다 — 정상.
 
 ## 막힌 것
 
-- 없음. 확정은 사람 게이트 — TODO `## Blocked` METH-147.
+- 없음.
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `docs/capsule-triage-round5`
+- repo: `/Users/hayden/methodology` · branch `feat/meth-147-tools`

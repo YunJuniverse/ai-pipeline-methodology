@@ -37,7 +37,10 @@
 - **acceptance criteria**:
   - [x] `collect --apply` 전 repo 순회(2026-09-14) — 19 스캔(icons 워크트리 8곳 포함), **신규 23건** 적재(원장 45→68). dry-run 119 → 실적재 23(워크트리 dedup 정상)
   - [x] **판정 초안 작성**(AI, 2026-09-14) — `40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`. 전 건 실측 대조. 집계 **유효 22 · 이미 반영 1(도구 측) · 만료 0**. 병렬 세션 경합 7건을 묶음 A 로 병합(지침 30 v3 + ship/land/todo). **C-002 승급 후보 1**(P-004 숨은 패널 애니메이션 — icons 2회 + cafe24 교차)
-  - [ ] 사람 확정 — 판단 3지점: ① `wrap-state.json` 커밋 유지 vs HEAD 재계산(권고 전환) ② `.gitattributes merge=union` TODO·HANDOFF(권고 채택, checkpoint 제외) ③ ID 예약 방식(권고 원격 태그). 비채택 권고 2(land CI 미대기 머지 · checkpoint 세션별 분리)
+  - [x] **사람 확정**(2026-09-15) — 판단 3지점 전부 권고안 채택: ① wrap baseline **HEAD 재계산**(wrap-state 커밋 중단) ② `.gitattributes merge=union` TODO·HANDOFF ③ ID 예약 **원격 태그**. 비채택 2 확정(land CI 미대기 머지 · checkpoint 세션별 분리)
+  - [x] **도구 묶음 반영**(PR 1) — wrap HEAD baseline · ship 생성물 2종 인덱스 제외+`.gitignore` 블록 · ship 공유 체크아웃 가드(`--allow-shared`) · `reserve` · land DIRTY 1회 자동 해소 · land 스텝0 경합 분류 · `land --local-ci`(Blocked PM 판정 전제) · observe 세로줄 파서 · boot `required_local_files` preflight · wrap ADR 인용 검사. 단위 9테스트 + e2e 3(HEAD baseline 동치 · ship 제외 커밋 · reserve 선점 스킵). 전체 96/96
+  - [ ] 지침 4갈래(05·19·23·24) + 30 v3 + CLAUDE.md Blocked 1줄 + catalog(C-002 승급·P-006~008) — PR 2
+  - [ ] `_inbox` 정리(원장 유지) · 전파 · 훅 재설치 — PR 3
   - [ ] 유효분 반영 + negative case 증명 · `_inbox` 정리(원장 유지) · 전파
 - **notes**: 발신처 — **cafe24-renewal 11**(지침 23·24·05 보강 4 · catalog 3 · 도구 3: boot 배포접속 preflight·TODO ID 예약·노션 미러 read-back · 계약 소비처 인벤토리 1) · **icons 12**(도구 6: land 머지참조 경합·CI 부재 로컬 게이트·ship 미추적 가드·라이브파일 append-only·observe 세로줄·테스트 판정 fail-closed·rebase ours · 지침 4 · skeleton/planning 1). 형식 경고 1: `icons__2026-09-02_self-citation-drift-adr` id 불일치(워크트리 발행 잔재). **주제 겹침 눈에 띔** — 병렬 세션 경합 계열이 icons 에서 5건(wrap 생성물 PR 충돌·라이브파일 union·ID 예약(cafe24 도 1건)·land 머지참조 경합·ship 미추적) → 지침 30 v3 + 도구 묶음 후보.
 
