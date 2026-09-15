@@ -2,25 +2,20 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-15 · METH-147 PR 1 도구 묶음)
+## 방금 한 것 (2026-09-15 · METH-147 PR 2 지침·catalog)
 
-사용자가 판단 3지점을 전부 권고안대로 확정했다. 도구 묶음을 먼저 넣었다.
+PR 1(#173 도구) land 후, **격리 워크트리**(지침 30 §1 — 주 체크아웃엔 stale 워크트리가 있어 ship 가드가 걸렸다)에서 PR 2 를 만들었다.
 
-- **wrap baseline = HEAD 재계산** — `head_wrap_state()` 가 HEAD 블롭 sha 로 baseline 을 만든다. ship 은 `commit_wrap_state` 를 더 이상 부르지 않고, 생성물 2종(`.ai/wrap-state.json`·`50_resources/prompting-report.md`)을 `git rm --cached` + `.gitignore` 블록으로 커밋에서 뺀다(파일은 남는다). 실 repo 에서 동치 확인(라이브 파일 미편집 → 4/4 미갱신, wrap-state 무접촉).
-- **ship 공유 체크아웃 가드** — 워크트리 ≥2 이고 현재가 주 체크아웃이면 커밋 후보를 열거하고 `--allow-shared` 없이는 거부. 격리 워크트리 안에서는 안 걸린다.
-- **`reserve`** — `id/METH-N` 원격 태그로 원자 예약. e2e: METH-4 → 5 → (6 선점) → 7.
-- **land** — DIRTY 면 origin/base 머지·재푸시 1회 후 CI 재실행 대기 / 실패 체크가 전부 «스텝 0개»면 내용 오류가 아니라 경합·CI 부재로 분류(billing annotation 판독) / `--local-ci` 는 TODO Blocked 의 PM 판정 + 로컬 재현(manifest·wrap read-only·observe validate 전수·tests) 통과 시에만.
-- observe `parse_friction_item` rsplit(세로줄 허용) · boot `required_local_files` preflight · wrap ADR 인용 검사(warn).
-- `.gitattributes`(TODO·HANDOFF union) 를 shared_paths 에 추가.
-- 테스트 9건 신설, 전체 96/96. `ship --land` 의 Namespace 에 `local_ci` 누락을 발견해 고쳤다(AttributeError 였을 것).
+- **지침 5개 개정**: 05 v5(§9b 8 전제 변경 전수 대조·9 회신문안 가설 표지) · 19 v5(§8b.4 계약 변경 = 소비처 인벤토리) · 23 v5(§1-4 테스트 판정 exit code · §1-5 외부 쓰기 read-back · **§2-6 부재 판정의 관측 조건** · **§2-7 애니메이션 visible 실측**) · 24 v4(**§2b 버그 제보 트리아지 6단계** · §4 벤더 원본 우선+폴백 · §4b 인용 원문·§번호·참조 포인터만) · **30 v3**(§6 리베이스 라이브 파일 · §7 ID 예약+Blocked 중복 방지 · §8 생성물 비커밋; 적용 지점은 §9 로).
+- CLAUDE.md·AGENTS.md: Blocked 등록 전 grep + `reserve` 한 줄. README 현황표·변경이력 v4.8(첫 시도가 표 *첫* 행 앞에 끼어들어 v4.2 로 잘못 붙는 것을 발견해 마지막 행 뒤로 고쳤다 — 정규식 first-match 함정).
+- **catalog**: P-004 → **C-002 active**(seen_in 3: 08-27·09-09·09-14, icons 2 + cafe24 교차) · P-006 CSS override 승자 먼저 · P-007 배포 대상 드리프트 · P-008 월간 문법 종합.
 
-**이 ship 자체가 상류 이행이다** — 이 커밋에서 wrap-state·prompting-report 가 인덱스에서 빠지고 `.gitignore` 블록이 들어간다.
+**추가 발견**: README 변경이력 표가 v4.1·4.2·4.3·**4.7·4.6·4.5·4.4** 순이었다 — METH-142 부터 세 세션이 «`| v4.N |` 행 앞에 새 행 끼워넣기»로 편집해 최신 행이 거꾸로 쌓였다. 오늘 마지막 행 기준 삽입이 v4.4 뒤에 붙어 «v4.5» 중복을 만들 뻔했고, 표 전체를 오름차순으로 다시 정렬해 v4.8 로 넣었다. 열 수 검증은 이 오류를 못 본다 — **순서가 의미인 표는 정렬 검증도 필요**.
 
 ## 다음 구체 행동
 
-1. land → **PR 2**: 지침 05 §9 확장·§9b 8·9항 / 19 §8b.4 / 23 §1-4·§1-5 1줄·§2 애니메이션·§2-6 부재 관측조건 / 24 §2b 제보 트리아지·§4 벤더 JS·§4b 보강 / **30 v3**(§6 리베이스 라이브 파일·§7 ID 예약·§8 생성물·union) / CLAUDE.md·AGENTS.md Blocked dedupe 1줄 / README 현황표 / C-002 승급(P-004 → active) / P-006·007·008.
-2. **PR 3**: `_inbox` 23건 정리(원장 68 유지) → 전파 11 repo(`methodology.py`·`.gitattributes`·지침) → 훅 3 repo 재설치 → 다운스트림에서 생성물 2종이 다음 ship 에 인덱스에서 빠지는지 1곳 확인.
-3. 주의: 전파 후 다운스트림 첫 ship 이 `.gitignore` 를 바꾸고 생성물을 빼는 커밋을 만든다 — 정상.
+1. 이 PR land → **PR 3**: `_inbox` 23건 정리(원장 68 유지) → 전파 11 repo(`methodology.py`·`.gitattributes`·지침 5개·CLAUDE/AGENTS·catalog README?) → 훅 3 repo 재설치 → 다운스트림 1곳에서 다음 ship 이 생성물을 인덱스에서 빼는지 확인.
+2. 전파 시 다운스트림 `.gitignore` 는 shared 가 아니다 — ship 이 첫 실행에서 블록을 추가하므로 sync 로 밀 필요 없음(그 커밋은 각 repo 세션 몫).
 
 ## 막힌 것
 
@@ -28,4 +23,4 @@
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `feat/meth-147-tools`
+- 격리 워크트리 `$SCRATCHPAD/guides` · branch `feat/meth-147-guides` (주 체크아웃은 main)

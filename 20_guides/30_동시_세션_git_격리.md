@@ -1,7 +1,7 @@
 ---
 doc_id: guide-30
 title: 동시 세션 git 격리 (Concurrent Session Isolation)
-version: v2
+version: v3
 status: active
 last_updated: 2026-09-02
 ai_relevance: foundational
@@ -54,7 +54,27 @@ git -C <repo> worktree remove <경로>
 - 대규모 전파·스윕에서 「스캔 시점의 branch/dirty」를 근거로 커밋하지 않는다 — **커밋 직전에 다시 확인**하거나 격리 워크트리를 쓴다.
 - 활성 세션이 있는 repo 는 예외 없이 격리 워크트리로 처리한다(상류 sync-all 의 확립된 절차).
 
-## 5. 적용 지점
+## 6. 리베이스 충돌에서 라이브 파일을 일괄 `ours` 로 풀지 않는다 (METH-147)
+
+리베이스 중 `ours` 는 **upstream** 이다. 라이브 파일(TODO·HANDOFF·checkpoint) 충돌을 일괄 `ours` 로 풀면 **내 checkpoint 와 HANDOFF 줄이 사라지고**, 그대로 ship 하면 wrap 이 4/4 미달로 선다(icons, docs PR 2건).
+
+- HANDOFF 의 내 줄(Working-on·Recent)은 **재삽입**한다.
+- checkpoint 는 «치환»이 아니라 **맨 위 prepend** 로만 쓴다 — 치환 대상 문자열이 리베이스로 사라져 있을 수 있다.
+- 리베이스 직후 `wrap` 으로 4/4 를 확인하고 ship 한다.
+- TODO·HANDOFF 는 `.gitattributes merge=union` 이라 대부분 자동 합쳐진다. union 이 만든 중복(Working-on 2줄·Done 항목 2개)은 wrap 구조 검증이 error 로 잡는다 — 그때는 오래된 쪽을 지운다.
+
+## 7. TODO ID 는 예약하고 쓴다 (METH-147)
+
+병렬 세션이 같은 번호를 선점해 번호 충돌·커밋 혼입이 월 3건 이상(cafe24-renewal·icons). 새 항목을 만들기 전에 `methodology.py reserve` 로 번호를 받는다 — 원격 태그 `id/METH-N` 의 생성은 원자적이라 두 세션 중 하나만 성공하고, 밀린 쪽은 다음 번호를 받는다. 예약 없이 쓴 번호가 충돌하면 **나중 세션이 재부여**한다.
+
+- Blocked 등록 전에는 기존 `## Blocked` 와 HANDOFF Blockers 를 grep 해 **같은 건이 PM 판정과 함께 이미 있는지** 본다(icons: 판정 있는 08-20 항목이 있는데 CI 결제 건을 중복 등재해 PM 에게 다시 물음). 판정 요청서는 뒤의 ADR 이 같은 결론을 세우면 스스로 닫힌다 — **월 1회 Blocked 를 후속 결정과 대조**해 stale 을 종결한다(16일 stale 실사례).
+
+## 8. 생성물은 커밋하지 않는다 (METH-147)
+
+`.ai/wrap-state.json`·`50_resources/prompting-report.md` 는 관찰로그와 HEAD 에서 언제든 재계산되는 생성물이다. 이것들이 모든 PR 에 실려 **PR 13건 중 11건이 이 두 파일과 라이브 파일 충돌**로 리베이스됐다(내용 충돌 0). ship 이 인덱스에서 빼고 `.gitignore` 가 막는다. wrap 의 baseline 은 HEAD 에서 재계산한다 — 파일이 없어도 판정은 같다.
+
+
+## 9. 적용 지점
 
 - 전파·sync·릴리스처럼 **여러 repo 를 순회하는 작업**: 비-main·dirty repo 는 전부 격리 워크트리.
 - 같은 repo 에서 사람과 AI 가 동시에 작업할 때, 또는 AI 세션이 둘 이상일 때.
@@ -66,5 +86,6 @@ git -C <repo> worktree remove <경로>
 
 | 버전 | 날짜 | 내용 |
 |---|---|---|
+| v3 | 2026-09-15 | §6 리베이스 라이브 파일 · §7 ID 예약(`reserve`)·Blocked 중복 등록 방지 · §8 생성물 비커밋·union. 캡슐 5회차 병렬 세션 경합 7건 병합(METH-147) |
 | v2 | 2026-09-02 | §1 보강 — 워크트리 push 는 로컬 기본브랜치를 따라오게 하지 않는다(invest-ops 2차 전파 충돌 실사고, METH-142 friction) |
 | v1 | 2026-09-02 | 신설 — 캡슐 2건 승급(METH-142). 지침 08(서브에이전트, 한 세션 내 팬아웃)과 축이 달라 별도 지침으로 분리 |

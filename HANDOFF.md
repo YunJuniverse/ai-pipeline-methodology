@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-147 반영 중**(판단 3지점 확정 → 권고안 채택) — PR 1 도구 묶음(branch `feat/meth-147-tools`) 구현·증명 완료, land 후 PR 2 지침·catalog → PR 3 정리·전파.
+- **Working on**: **METH-147 반영 중** — PR 1 도구(#173 land) · PR 2 지침·catalog(branch `feat/meth-147-guides`) 완료 → PR 3 `_inbox` 정리·전파·훅 재설치 남음.
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none. (METH-147 판단 3지점 2026-09-15 확정.)
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-15 — **METH-147 지침·catalog**: 05 v5·19 v5·23 v5·24 v4·30 v3 + CLAUDE.md Blocked 중복 grep·reserve 규칙. **C-002 승급**(숨은 컨텍스트 애니메이션 동결 — 교차 repo N≥2) · P-006~008. 지침 30 은 병렬 세션 경합 7건을 §6~§8 로 흡수. README 변경이력 표 순서 복구(3세션 누적 오염).
 - 2026-09-15 — **METH-147 도구 묶음**: wrap baseline 을 **HEAD 에서 재계산**(wrap-state·prompting-report 커밋 중단 — PR 충돌의 절반 제거) · `.gitattributes` union · ship 공유 체크아웃 가드 · `reserve`(원격 태그 원자 예약) · land DIRTY 자동 해소·스텝0 경합 분류·`--local-ci` · observe 세로줄 · boot preflight · ADR 인용 검사. 96/96.
 - 2026-09-14 — **캡슐 5회차 판정 초안(METH-147)**: 23건 전량 실측 대조 — 유효 22·이미 반영 1·만료 0. 발견: 병렬 세션 경합 7건이 한 구조(PR 13건 중 11건 라이브 파일 충돌, 내용 충돌 0) → 묶음 A · **P-004 가 icons 2회 + cafe24 교차로 C-002 승급 요건 충족** · observe 세로줄 파서 결함 재현 · ship 테스트 판정은 상류가 이미 exit code.
 - 2026-09-14 — **캡슐 수거 5회차(METH-147)**: 19곳 순회, 신규 **23건**(cafe24-renewal 11 · icons 12), 원장 45→68. dry-run 119 → 23(워크트리 dedup). 병렬 세션 경합 계열이 5건 겹쳐 지침 30 v3 후보. 직전 Working-on 줄의 잔존 텍스트(부분 교체 잔재)도 정리.
