@@ -32,7 +32,13 @@
 
 ## Blocked
 
-### METH-147 · 캡슐 트리아지 5회차 — 수거 23건 판정 대기
+
+
+
+
+## Done
+
+### METH-147 · 캡슐 트리아지 5회차 — 수거 23건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:
   - [x] `collect --apply` 전 repo 순회(2026-09-14) — 19 스캔(icons 워크트리 8곳 포함), **신규 23건** 적재(원장 45→68). dry-run 119 → 실적재 23(워크트리 dedup 정상)
@@ -42,15 +48,11 @@
   - [x] **지침·catalog 반영**(PR 2) — 05 v5(§9b 8·9항) · 19 v5(§8b.4 소비처 인벤토리) · 23 v5(§1-4 exit code·§1-5 read-back·§2-6 부재 관측조건·§2-7 애니메이션 visible) · 24 v4(§2b 제보 트리아지·§4 벤더 원본·§4b 인용 원문) · **30 v3**(§6 리베이스·§7 ID 예약·§8 생성물) · CLAUDE.md/AGENTS.md Blocked 중복 grep+reserve · README 현황표 · **P-004 → C-002 승급** · P-006~008. README 변경이력 표가 앞선 세션들의 «해당 행 앞에 끼워넣기» 편집 누적으로 v4.1·4.2·4.3·4.7·4.6·4.5·4.4 순으로 흐트러져 있던 것을 발견해 **오름차순 복구 + v4.7**
   - [x] `_inbox` 23건 정리(원장 68 유지 — 재수거 방지) — PR 3
   - [x] 전파 1차 8/11 — 훅 설치 3 repo(ai-icons·invest-ops·lifeManager)가 **새 경로 판정에 막힘**: `shared-paths` 가 managed_files(CLAUDE.md·AGENTS.md)를 안 내보내 CLAUDE.md 한 줄이 든 sync push 가 «관리 경로 밖»으로 판정됨. 게다가 세 repo 는 origin 이 앞서 있어 rebase 필요
-  - [ ] `shared-paths` 에 managed_files 포함(이 PR) → 훅 재설치 → 3 repo rebase·push → origin 대조 11/11(C-002 는 catalog 본체가 shared 아님 — 기준에서 제외)
+  - [x] **전파 종결 11/11**(2026-09-15) — #176 land 후 2차 sync(methodology.py)·훅 3 repo 재설치·rebase·push 전부 통과. origin 대조 4항목(30 v3·shared-paths managed·gitattributes·CLAUDE reserve) × 11 ✓. 다운스트림의 생성물 인덱스 제외는 각 repo 의 **다음 ship** 이 수행(그 커밋은 각 세션 몫)
   - [ ] 유효분 반영 + negative case 증명 · `_inbox` 정리(원장 유지) · 전파
 - **notes**: 발신처 — **cafe24-renewal 11**(지침 23·24·05 보강 4 · catalog 3 · 도구 3: boot 배포접속 preflight·TODO ID 예약·노션 미러 read-back · 계약 소비처 인벤토리 1) · **icons 12**(도구 6: land 머지참조 경합·CI 부재 로컬 게이트·ship 미추적 가드·라이브파일 append-only·observe 세로줄·테스트 판정 fail-closed·rebase ours · 지침 4 · skeleton/planning 1). 형식 경고 1: `icons__2026-09-02_self-citation-drift-adr` id 불일치(워크트리 발행 잔재). **주제 겹침 눈에 띔** — 병렬 세션 경합 계열이 icons 에서 5건(wrap 생성물 PR 충돌·라이브파일 union·ID 예약(cafe24 도 1건)·land 머지참조 경합·ship 미추적) → 지침 30 v3 + 도구 묶음 후보.
 
-
-
-
-
-## Done
+- **종결**(2026-09-15): PR **#171**(수거)·**#172**(초안)·**#173**(도구 10)·**#174**(지침 5·catalog 4)·**#175**(`_inbox` 정리)·**#176**(훅 판정 구멍 2호). maincheck ✓. 판단 3지점 권고안 채택(wrap HEAD baseline·union·reserve). 전파 2회 11/11. 도구 판정기 구멍 2개(한글 경로·managed_files)를 전파 중 잡아 고침.
 
 ### METH-146 · pre-push 훅의 wrap 을 읽기 전용으로 — 훅이 repo 를 dirty 로 만들던 부작용
 - **mode**: fullstack / **change-class**: A / **owner**: AI

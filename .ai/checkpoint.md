@@ -2,28 +2,19 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-15 · 전파 중 훅 구멍 2호)
+## 방금 한 것 (2026-09-15 · METH-147 종결)
 
-#175 land 후 전파: main 직접 8곳 중 훅 설치 3곳(ai-icons·invest-ops·lifeManager) push 차단. 원인 = `shared-paths` 가 **managed_files(CLAUDE.md·AGENTS.md)를 출력하지 않아** CLAUDE.md 한 줄이 든 sync 커밋이 «관리 경로 밖 변경»으로 wrap 검증에 걸렸다. 수정: managed_files 포함 + 테스트. 추가로 세 repo 는 origin 이 앞서 있어(다른 세션 활동) rebase 후 push 해야 한다. C-002 ✗ 는 catalog 본체가 원래 shared 가 아니라 기준 오류.
+**캡슐 5회차 23건을 전량 반영하고 11 repo 에 전파했다.** PR #171(수거)·#172(초안)·#173(도구 10)·#174(지침 5·catalog 4)·#175(`_inbox`)·#176(훅 구멍 2호), maincheck ✓.
 
-## 이전 (2026-09-15 · METH-147 PR 3 `_inbox` 정리)
-
-#174 land — 단, 백그라운드 land 가 **주 체크아웃이 main 이라 거부**됐다(PR 2 를 워크트리에서 만든 부작용). PR 브랜치 워크트리 + `land --no-sync` 로 착지. 그 뒤 main 에서 `_inbox` 23건 삭제(원장 68 유지). 앞 노트의 «v4.8» 은 실제 v4.7 — 표에 v4.7 행이 없었다.
-
-## PR 2 (지침·catalog)
-
-PR 1(#173 도구) land 후, **격리 워크트리**(지침 30 §1 — 주 체크아웃엔 stale 워크트리가 있어 ship 가드가 걸렸다)에서 PR 2 를 만들었다.
-
-- **지침 5개 개정**: 05 v5(§9b 8 전제 변경 전수 대조·9 회신문안 가설 표지) · 19 v5(§8b.4 계약 변경 = 소비처 인벤토리) · 23 v5(§1-4 테스트 판정 exit code · §1-5 외부 쓰기 read-back · **§2-6 부재 판정의 관측 조건** · **§2-7 애니메이션 visible 실측**) · 24 v4(**§2b 버그 제보 트리아지 6단계** · §4 벤더 원본 우선+폴백 · §4b 인용 원문·§번호·참조 포인터만) · **30 v3**(§6 리베이스 라이브 파일 · §7 ID 예약+Blocked 중복 방지 · §8 생성물 비커밋; 적용 지점은 §9 로).
-- CLAUDE.md·AGENTS.md: Blocked 등록 전 grep + `reserve` 한 줄. README 현황표·변경이력 v4.7(첫 시도가 표 *첫* 행 앞에 끼어들어 v4.2 로 잘못 붙는 것을 발견해 마지막 행 뒤로 고쳤다 — 정규식 first-match 함정).
-- **catalog**: P-004 → **C-002 active**(seen_in 3: 08-27·09-09·09-14, icons 2 + cafe24 교차) · P-006 CSS override 승자 먼저 · P-007 배포 대상 드리프트 · P-008 월간 문법 종합.
-
-**추가 발견**: README 변경이력 표가 v4.1·4.2·4.3·**4.6·4.5·4.4** 순이었다 — METH-142 부터 세 세션이 «`| v4.N |` 행 앞에 새 행 끼워넣기»로 편집해 최신 행이 거꾸로 쌓였다. 오늘 마지막 행 기준 삽입이 v4.4 뒤에 붙어 «v4.5» 중복을 만들 뻔했고, 표 전체를 오름차순으로 다시 정렬해 v4.7 로 넣었다. 열 수 검증은 이 오류를 못 본다 — **순서가 의미인 표는 정렬 검증도 필요**.
+- 판단 3지점(사용자 확정): wrap baseline **HEAD 재계산**(생성물 2종 비커밋) · `.gitattributes` **union**(TODO·HANDOFF) · `reserve` **원격 태그** 예약. 비채택 2(CI 미대기 머지·checkpoint 세션별).
+- 전파 중 잡은 판정기 구멍 2개: 한글 경로(`core.quotePath`, METH-145 계열)·**managed_files 누락**(#176). 둘 다 «도구가 정하는 목록»이 불완전했던 사례 — 판정 로직보다 그 입력 목록을 테스트해야 한다.
+- 새 ship 공유 체크아웃 가드가 상류에서 첫 발동(stale `.claude/worktrees`) → `--allow-shared` 로 통과, PR 2 는 격리 워크트리에서.
 
 ## 다음 구체 행동
 
-1. 이 PR land → **전파** 11 repo(`methodology.py`·`.gitattributes`·지침 5개·CLAUDE/AGENTS·catalog README?) → 훅 3 repo 재설치 → 다운스트림 1곳에서 다음 ship 이 생성물을 인덱스에서 빼는지 확인.
-2. 전파 시 다운스트림 `.gitignore` 는 shared 가 아니다 — ship 이 첫 실행에서 블록을 추가하므로 sync 로 밀 필요 없음(그 커밋은 각 repo 세션 몫).
+1. 이 브랜치 land 하면 종결. 남는 것: 다운스트림 각 repo 의 **다음 ship** 이 생성물 2종을 인덱스에서 빼는 커밋을 만든다(정상 — 그 세션 몫).
+2. 후속 후보 2(작음): ① 지침 30 에 「워크트리에서 만든 PR 은 land 도 그 워크트리(`--path`)에서, `--no-sync`」 한 줄 ② 순서가 의미인 표의 정렬 검증(README 변경이력이 3세션 역순 오염).
+3. 다음 캡슐 수거는 다운스트림 축적 후.
 
 ## 막힌 것
 
@@ -31,4 +22,4 @@ PR 1(#173 도구) land 후, **격리 워크트리**(지침 30 §1 — 주 체크
 
 ## 환경
 
-- 격리 워크트리 `$SCRATCHPAD/guides` · branch `feat/meth-147-guides` (주 체크아웃은 main)
+- repo: `/Users/hayden/methodology` · branch `chore/meth-147-closeout` · 주 체크아웃에 harness 워크트리 1개(ship 은 `--allow-shared`)
