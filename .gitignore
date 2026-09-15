@@ -12,3 +12,7 @@ __pycache__/
 
 # in-spire dashboard build cache (사용자가 직접 더블클릭하는 휴먼에러 차단)
 _start/.cache/
+
+# methodology 생성물 — 커밋하지 않는다 (METH-147: PR 충돌의 절반이 이 두 파일이었다)
+.ai/wrap-state.json
+50_resources/prompting-report.md
