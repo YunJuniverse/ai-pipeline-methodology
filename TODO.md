@@ -41,7 +41,8 @@
   - [x] **도구 묶음 반영**(PR 1) — wrap HEAD baseline · ship 생성물 2종 인덱스 제외+`.gitignore` 블록 · ship 공유 체크아웃 가드(`--allow-shared`) · `reserve` · land DIRTY 1회 자동 해소 · land 스텝0 경합 분류 · `land --local-ci`(Blocked PM 판정 전제) · observe 세로줄 파서 · boot `required_local_files` preflight · wrap ADR 인용 검사. 단위 9테스트 + e2e 3(HEAD baseline 동치 · ship 제외 커밋 · reserve 선점 스킵). 전체 96/96
   - [x] **지침·catalog 반영**(PR 2) — 05 v5(§9b 8·9항) · 19 v5(§8b.4 소비처 인벤토리) · 23 v5(§1-4 exit code·§1-5 read-back·§2-6 부재 관측조건·§2-7 애니메이션 visible) · 24 v4(§2b 제보 트리아지·§4 벤더 원본·§4b 인용 원문) · **30 v3**(§6 리베이스·§7 ID 예약·§8 생성물) · CLAUDE.md/AGENTS.md Blocked 중복 grep+reserve · README 현황표 · **P-004 → C-002 승급** · P-006~008. README 변경이력 표가 앞선 세션들의 «해당 행 앞에 끼워넣기» 편집 누적으로 v4.1·4.2·4.3·4.7·4.6·4.5·4.4 순으로 흐트러져 있던 것을 발견해 **오름차순 복구 + v4.7**
   - [x] `_inbox` 23건 정리(원장 68 유지 — 재수거 방지) — PR 3
-  - [ ] 전파 11 repo(`methodology.py`·`.gitattributes`·지침 5·CLAUDE/AGENTS·catalog) · 훅 3 repo 재설치 · 다운스트림 1곳 생성물 제외 확인
+  - [x] 전파 1차 8/11 — 훅 설치 3 repo(ai-icons·invest-ops·lifeManager)가 **새 경로 판정에 막힘**: `shared-paths` 가 managed_files(CLAUDE.md·AGENTS.md)를 안 내보내 CLAUDE.md 한 줄이 든 sync push 가 «관리 경로 밖»으로 판정됨. 게다가 세 repo 는 origin 이 앞서 있어 rebase 필요
+  - [ ] `shared-paths` 에 managed_files 포함(이 PR) → 훅 재설치 → 3 repo rebase·push → origin 대조 11/11(C-002 는 catalog 본체가 shared 아님 — 기준에서 제외)
   - [ ] 유효분 반영 + negative case 증명 · `_inbox` 정리(원장 유지) · 전파
 - **notes**: 발신처 — **cafe24-renewal 11**(지침 23·24·05 보강 4 · catalog 3 · 도구 3: boot 배포접속 preflight·TODO ID 예약·노션 미러 read-back · 계약 소비처 인벤토리 1) · **icons 12**(도구 6: land 머지참조 경합·CI 부재 로컬 게이트·ship 미추적 가드·라이브파일 append-only·observe 세로줄·테스트 판정 fail-closed·rebase ours · 지침 4 · skeleton/planning 1). 형식 경고 1: `icons__2026-09-02_self-citation-drift-adr` id 불일치(워크트리 발행 잔재). **주제 겹침 눈에 띔** — 병렬 세션 경합 계열이 icons 에서 5건(wrap 생성물 PR 충돌·라이브파일 union·ID 예약(cafe24 도 1건)·land 머지참조 경합·ship 미추적) → 지침 30 v3 + 도구 묶음 후보.
 

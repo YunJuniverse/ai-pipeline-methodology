@@ -86,6 +86,17 @@ def test_shared_paths_covers_sync_targets() -> None:
         assert rel in out, rel
 
 
+def test_shared_paths_include_managed_files() -> None:
+    """CLAUDE.md·AGENTS.md(managed_files) 가 빠지면 그 한 줄이 든 sync push 가 훅에 막힌다 —
+    METH-147 전파에서 훅 설치 3 repo 전부 차단된 실사고."""
+    import io, contextlib, argparse
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        m.cmd_shared_paths(argparse.Namespace())
+    out = buf.getvalue().splitlines()
+    assert "CLAUDE.md" in out and "AGENTS.md" in out and "20_guides" in out
+
+
 def test_hook_template_judges_by_path_not_only_message() -> None:
     """훅 템플릿이 경로 판정 분기를 담고 있는가 — 메시지 단독 판정으로 되돌아가면 실패."""
     src = (Path(__file__).resolve().parent.parent / "60_tools" / "methodology.py").read_text()

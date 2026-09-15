@@ -4283,6 +4283,13 @@ def cmd_shared_paths(args: argparse.Namespace) -> int:
     """
     for rel in MANIFEST["shared_paths"]:
         print(rel)
+    # managed_files(CLAUDE.md·AGENTS.md 등 마커 머지 파일)도 sync 가 갱신한다 — 빠지면 CLAUDE.md
+    # 한 줄이 바뀐 sync push 가 «관리 경로 밖 변경»으로 wrap 검증에 걸린다(METH-147 전파에서
+    # 훅 설치 3 repo 전부 차단 실사고).
+    for item in MANIFEST.get("managed_files", []):
+        rel = item[1] if isinstance(item, (list, tuple)) and len(item) > 1 else (item if isinstance(item, str) else None)
+        if rel:
+            print(rel)
     print(".methodology-version")   # sync 가 함께 갱신하는 버전 파일
     return 0
 
