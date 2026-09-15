@@ -2,7 +2,11 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-15 · METH-147 PR 3 `_inbox` 정리)
+## 방금 한 것 (2026-09-15 · 전파 중 훅 구멍 2호)
+
+#175 land 후 전파: main 직접 8곳 중 훅 설치 3곳(ai-icons·invest-ops·lifeManager) push 차단. 원인 = `shared-paths` 가 **managed_files(CLAUDE.md·AGENTS.md)를 출력하지 않아** CLAUDE.md 한 줄이 든 sync 커밋이 «관리 경로 밖 변경»으로 wrap 검증에 걸렸다. 수정: managed_files 포함 + 테스트. 추가로 세 repo 는 origin 이 앞서 있어(다른 세션 활동) rebase 후 push 해야 한다. C-002 ✗ 는 catalog 본체가 원래 shared 가 아니라 기준 오류.
+
+## 이전 (2026-09-15 · METH-147 PR 3 `_inbox` 정리)
 
 #174 land — 단, 백그라운드 land 가 **주 체크아웃이 main 이라 거부**됐다(PR 2 를 워크트리에서 만든 부작용). PR 브랜치 워크트리 + `land --no-sync` 로 착지. 그 뒤 main 에서 `_inbox` 23건 삭제(원장 68 유지). 앞 노트의 «v4.8» 은 실제 v4.7 — 표에 v4.7 행이 없었다.
 
