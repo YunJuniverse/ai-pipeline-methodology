@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-147 전파 마무리** — 8/11 도달, 훅 repo 3곳이 `shared-paths` managed_files 누락으로 차단 → 수정 PR(branch `fix/hook-shared-paths-managed`) 후 재설치·rebase·push.
+- **Working on**: **다음 작업 대기.** 직전 완결: METH-147 캡슐 5회차 — 수거 23건→판정→반영(도구 10·지침 5·catalog 4)→전파 11/11(#171~#176).
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none. (METH-147 판단 3지점 2026-09-15 확정.)
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-15 — **METH-147 종결·전파 11/11**: #176 후 2차 sync 로 훅 3 repo 통과. 후속 후보 2(작음): ① 워크트리에서 PR 을 만들면 주 체크아웃이 main 이라 백그라운드 land 가 거부 — land 는 PR 브랜치 워크트리에서 `--no-sync` 로(지침 30 한 줄) ② 순서가 의미인 표(변경이력)는 정렬 검증.
 - 2026-09-15 — **훅 경로 판정 구멍 2호**: `shared-paths` 가 managed_files(CLAUDE.md·AGENTS.md)를 빼먹어 CLAUDE.md 한 줄이 든 sync push 가 «관리 경로 밖»으로 차단(훅 3 repo 전부). 한글 경로(METH-145)에 이어 같은 판정기의 두 번째 구멍 — 판정 기준을 도구가 정한다더니 도구 자신의 목록이 불완전했다.
 - 2026-09-15 — **METH-147 `_inbox` 정리**: 23건 삭제(원장 68 유지). 캡슐 5회차 23건 전량 반영 완료 — 도구 10 · 지침 5 · catalog 4(C-002 승급 포함). 전파만 남음.
 - 2026-09-15 — **METH-147 지침·catalog**: 05 v5·19 v5·23 v5·24 v4·30 v3 + CLAUDE.md Blocked 중복 grep·reserve 규칙. **C-002 승급**(숨은 컨텍스트 애니메이션 동결 — 교차 repo N≥2) · P-006~008. 지침 30 은 병렬 세션 경합 7건을 §6~§8 로 흡수. README 변경이력 표 순서 복구(3세션 누적 오염).
