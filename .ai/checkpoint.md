@@ -2,24 +2,28 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-15 · METH-147 종결)
+## 방금 한 것 (2026-09-18 · METH-148 수거)
 
-**캡슐 5회차 23건을 전량 반영하고 11 repo 에 전파했다.** PR #171(수거)·#172(초안)·#173(도구 10)·#174(지침 5·catalog 4)·#175(`_inbox`)·#176(훅 구멍 2호), maincheck ✓.
+**전 repo 캡슐 수거 6회차 — 신규 10건 적재(원장 68→78).**
 
-- 판단 3지점(사용자 확정): wrap baseline **HEAD 재계산**(생성물 2종 비커밋) · `.gitattributes` **union**(TODO·HANDOFF) · `reserve` **원격 태그** 예약. 비채택 2(CI 미대기 머지·checkpoint 세션별).
-- 전파 중 잡은 판정기 구멍 2개: 한글 경로(`core.quotePath`, METH-145 계열)·**managed_files 누락**(#176). 둘 다 «도구가 정하는 목록»이 불완전했던 사례 — 판정 로직보다 그 입력 목록을 테스트해야 한다.
-- 새 ship 공유 체크아웃 가드가 상류에서 첫 발동(stale `.claude/worktrees`) → `--allow-shared` 로 통과, PR 2 는 격리 워크트리에서.
+- 19곳 스캔. dry-run 18 → 실적재 10(icons 1건이 워크트리 9곳에서 dedup — 정상).
+- 발신처: **cafe24-renewal 7 · ai-icons 2 · icons 1.** 형식 경고 0.
+- TODO ID 는 `methodology.py reserve` 로 받았다 — 원격 태그 `id/METH-148`. METH-147 에서 만든 예약 규칙의 **첫 실사용**.
 
 ## 다음 구체 행동
 
-1. 이 브랜치 land 하면 종결. 남는 것: 다운스트림 각 repo 의 **다음 ship** 이 생성물 2종을 인덱스에서 빼는 커밋을 만든다(정상 — 그 세션 몫).
-2. 후속 후보 2(작음): ① 지침 30 에 「워크트리에서 만든 PR 은 land 도 그 워크트리(`--path`)에서, `--no-sync`」 한 줄 ② 순서가 의미인 표의 정렬 검증(README 변경이력이 3세션 역순 오염).
-3. 다음 캡슐 수거는 다운스트림 축적 후.
+1. **10건 판정 초안** — 앞선 회차 형식(`40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`)대로 전 건 상류 실측 대조. 먼저 볼 것:
+   - `merge-is-deploy-ci-path` ↔ 5회차 `boot-deploy-access-preflight`(#19, boot preflight 로 반영) — 증상 알림 vs 근본 해법. 겹침 판정.
+   - `hosted-platform-observability-bootstrap` + `third-party-integration-registry` ↔ P-005·P-007(캐시 적대 플랫폼 계열) — 한 skeleton 후보로 묶이는지. 단 스켈레톤은 active 아니면 bake 불가.
+   - `incident-to-blocking-tool` — 「재발 2회 또는 대외 노출이면 문장이 아니라 차단 도구로」는 이 방법론이 5회차 내내 해온 것의 명문화 후보(지침 23 또는 catalog `_README`).
+   - `friction-phase-split` · `retro-friction-aggregate` — observe/thinktank 도구 변경. 스키마 변경이라 기존 관찰로그 소급 재검증(지침 23 §4-4) 필요.
+   - ai-icons 지침 26·27 도구 매트릭스 — **외부 사실(모델·단가)** 이라 원문 대조 없이 반영 금지(지침 24 §4).
+2. 사람 확정 → 반영 → 전파.
 
 ## 막힌 것
 
-- 없음.
+- 없음. 판정은 사람 게이트 — TODO `## Blocked` METH-148.
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `chore/meth-147-closeout` · 주 체크아웃에 harness 워크트리 1개(ship 은 `--allow-shared`)
+- repo: `/Users/hayden/methodology` · branch `chore/collect-capsules-2026-09-18`

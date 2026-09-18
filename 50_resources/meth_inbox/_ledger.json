@@ -10,6 +10,16 @@
       "file": "2026-08-26_no-dash-tail-explanations.md",
       "repo": "ai-icons"
     },
+    "ai-icons__2026-09-16_design-image-tool-matrix-2026q3": {
+      "collected_at": "2026-09-18T08:28:37Z",
+      "file": "2026-09-16_design-image-tool-matrix-2026q3.md",
+      "repo": "ai-icons"
+    },
+    "ai-icons__2026-09-16_design-video-tool-matrix-2026q3": {
+      "collected_at": "2026-09-18T08:28:37Z",
+      "file": "2026-09-16_design-video-tool-matrix-2026q3.md",
+      "repo": "ai-icons"
+    },
     "cafe24-renewal__2026-09-02_cafe24-cache-4layer-defense": {
       "collected_at": "2026-09-02T06:41:37Z",
       "file": "2026-09-02_cafe24-cache-4layer-defense.md",
@@ -88,6 +98,41 @@
     "cafe24-renewal__2026-09-14_sequential-id-reservation": {
       "collected_at": "2026-09-14T07:16:59Z",
       "file": "2026-09-14_sequential-id-reservation.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_friction-phase-split": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_friction-phase-split.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_hosted-platform-observability-bootstrap": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_hosted-platform-observability-bootstrap.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_incident-to-blocking-tool": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_incident-to-blocking-tool.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_interaction-spec-before-build": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_interaction-spec-before-build.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_merge-is-deploy-ci-path": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_merge-is-deploy-ci-path.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_retro-friction-aggregate": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_retro-friction-aggregate.md",
+      "repo": "cafe24-renewal"
+    },
+    "cafe24-renewal__2026-09-17_third-party-integration-registry": {
+      "collected_at": "2026-09-18T08:28:43Z",
+      "file": "2026-09-17_third-party-integration-registry.md",
       "repo": "cafe24-renewal"
     },
     "gamblescan-p0-pr__2026-08-13_class-c-public-surface-release-matrix": {
@@ -298,6 +343,11 @@
     "icons__2026-09-11_test-verdict-grep-fail-closed": {
       "collected_at": "2026-09-14T07:17:02Z",
       "file": "2026-09-11_test-verdict-grep-fail-closed.md",
+      "repo": "icons"
+    },
+    "icons__2026-09-14_probe-tool-capability-before-claiming": {
+      "collected_at": "2026-09-18T08:28:53Z",
+      "file": "2026-09-14_probe-tool-capability-before-claiming.md",
       "repo": "icons"
     },
     "invest-ops__2026-07-31_done-claim-guard-ship-boot": {
