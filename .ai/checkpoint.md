@@ -2,28 +2,29 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-18 · METH-148 수거)
+## 방금 한 것 (2026-09-18 · METH-148 판정 초안)
 
-**전 repo 캡슐 수거 6회차 — 신규 10건 적재(원장 68→78).**
+**10건 판정 초안을 썼다** — `40_dev/snapshots/2026-09-18_캡슐-트리아지-판정초안.md`. 유효 9 · 부분 이미 반영 1 · 만료 0.
 
-- 19곳 스캔. dry-run 18 → 실적재 10(icons 1건이 워크트리 9곳에서 dedup — 정상).
-- 발신처: **cafe24-renewal 7 · ai-icons 2 · icons 1.** 형식 경고 0.
-- TODO ID 는 `methodology.py reserve` 로 받았다 — 원격 태그 `id/METH-148`. METH-147 에서 만든 예약 규칙의 **첫 실사용**.
+도구 매트릭스 2건은 외부 사실이라 1차 출처를 직접 열었다.
+- **Sora**: OpenAI Help Center — 웹·앱 2026-04-26 종료, API 2026-09-24 종료. 상류 25 §1(04월)과 캡슐(09-24)이 **둘 다 맞다** — 상류는 앱 날짜만 적었다.
+- **FLUX [dev] 라이선스**: BFL Non-Commercial License v2.0 원문 — §2(d) 출력은 상업 사용 가능, 그러나 §2(a)(b)·§4(a) 모델 *구동 자체*는 비상업 목적만, 정의상 수익 활동·최종 사용자 영향은 비상업이 아니다. **상류 지침 26 «dev 웨이트는 출력만 상업 OK» 는 회사가 업무용으로 [dev] 를 돌려도 되는 것처럼 읽힌다 — 위험하게 불완전하다.** [klein] 4B Apache-2.0 · 9B 비상업 확인.
+- FLUX.2 다중 참조: API 8 · 플레이그라운드 10 · [dev] 권장 6 · [klein] 4. 캡슐의 «10장» 은 플레이그라운드 수치.
+- GPT Image 2 참조 16장은 리서치 출처가 루머 블로그 — 지침에 넣지 않는다.
+
+그 외: thinktank 는 비용 합계·월별·재발 비중이 없고 상류 repo 만 본다 · catalog 생애주기에 «문장 규칙 → 차단 도구» 단계가 없다(관행은 있음: METH-122·143·146·147) · 머지=배포 CI 는 4개 날짜 재현으로 active C-003 · 호스팅 플랫폼 계열 4건째 → P-009 우산 항목(스켈레톤은 pending 이라 불가).
+
+수거 직후 checkpoint 에 «phase 추가는 소급 재검증 필요»라 적었는데 틀렸다 — 스키마를 *넓히는* 변경이라 기존 로그는 그대로 유효하다. 초안에서 정정했다.
 
 ## 다음 구체 행동
 
-1. **10건 판정 초안** — 앞선 회차 형식(`40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`)대로 전 건 상류 실측 대조. 먼저 볼 것:
-   - `merge-is-deploy-ci-path` ↔ 5회차 `boot-deploy-access-preflight`(#19, boot preflight 로 반영) — 증상 알림 vs 근본 해법. 겹침 판정.
-   - `hosted-platform-observability-bootstrap` + `third-party-integration-registry` ↔ P-005·P-007(캐시 적대 플랫폼 계열) — 한 skeleton 후보로 묶이는지. 단 스켈레톤은 active 아니면 bake 불가.
-   - `incident-to-blocking-tool` — 「재발 2회 또는 대외 노출이면 문장이 아니라 차단 도구로」는 이 방법론이 5회차 내내 해온 것의 명문화 후보(지침 23 또는 catalog `_README`).
-   - `friction-phase-split` · `retro-friction-aggregate` — observe/thinktank 도구 변경. 스키마 변경이라 기존 관찰로그 소급 재검증(지침 23 §4-4) 필요.
-   - ai-icons 지침 26·27 도구 매트릭스 — **외부 사실(모델·단가)** 이라 원문 대조 없이 반영 금지(지침 24 §4).
-2. 사람 확정 → 반영 → 전파.
+1. **사람 확정** — 판단 3지점: ① friction `phase` 선택 vs 필수(권고 선택 + 기입률 보고) ② **지침 26 FLUX 라이선스 문장 교체(Class C)** — 기존 문장을 뒤집으므로 AI 가 정하지 않는다, 법무 확인 권고 ③ 지침 26·27 의 단가·스펙 수치를 날짜 스냅샷으로 분리할지.
+2. 판단 무관분은 먼저 돌릴 수 있다: C-003 · P-009 · 지침 23 §1-6·§2-7 · 21 §2 · 24 §4 · 25 §1 Sora 날짜 · 27 QA 3항 · thinktank 확장.
 
 ## 막힌 것
 
-- 없음. 판정은 사람 게이트 — TODO `## Blocked` METH-148.
+- 없음. 확정은 사람 게이트 — TODO `## Blocked` METH-148.
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `chore/collect-capsules-2026-09-18`
+- repo: `/Users/hayden/methodology` · branch `docs/capsule-triage-round6` · 주 체크아웃에 하네스 워크트리 1개(ship 은 `--allow-shared`)

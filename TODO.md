@@ -36,7 +36,8 @@
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:
   - [x] `collect --apply` 전 repo 순회(2026-09-18) — 19곳 스캔, **신규 10건** 적재(원장 68→78). dry-run 18 → 실적재 10(icons 1건이 워크트리 9곳에서 dedup). ID 는 `reserve` 로 원격 태그 예약(METH-147 이후 첫 사용)
-  - [ ] 판정 초안(AI) → 사람 확정 — 유효 / 이미 반영 / 만료
+  - [x] **판정 초안 작성**(AI, 2026-09-18) — `40_dev/snapshots/2026-09-18_캡슐-트리아지-판정초안.md`. 집계 **유효 9 · 부분 이미 반영 1 · 만료 0**. 도구 매트릭스 2건은 1차 출처 직접 확인(OpenAI Help Center·BFL 라이선스 원문·BFL 문서·HF 모델 카드). **발견: 상류 지침 26 의 FLUX [dev] 문장(«출력만 상업 OK»)이 라이선스 원문과 어긋난다** — 모델 구동 자체가 비상업 한정
+  - [ ] 사람 확정 — 판단 3지점: ① friction `phase` 선택 vs 필수(권고 선택 + 기입률 보고) ② **지침 26 FLUX 라이선스 문장 교체 — Class C**(권고 문안 초안에) ③ 지침 26·27 에 단가·스펙 수치를 둘지(권고: 날짜 스냅샷으로 분리)
   - [ ] 유효분 반영 + negative case · `_inbox` 정리(원장 유지) · 전파
 - **notes**: 발신처 — **cafe24-renewal 7**(도구 2: observe friction `phase` 필드 · thinktank 회고 집계 명령 / catalog 4: 사고→차단 도구 승급 기준 · 인터랙션 수치 스펙 선합의 · 머지=배포 CI 경로 · 서드파티 통합 레지스트리 / skeleton 1: 호스팅 플랫폼 관측 인프라 선구축) · **ai-icons 2**(지침 26·27 도구 매트릭스 2026Q3 갱신) · **icons 1**(외부 에이전트 CLI 능력은 헤드리스로 실행해 확인). 눈에 띄는 연결: cafe24 `merge-is-deploy-ci-path` 는 5회차 `boot-deploy-access-preflight`(배포 자격증명 로컬 부재)의 근본 해법 쪽 · `hosted-platform-observability-bootstrap` 은 P-005·P-007(캐시 적대 플랫폼) 계열과 묶일 후보.
 
