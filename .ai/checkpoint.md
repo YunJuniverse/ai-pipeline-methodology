@@ -2,20 +2,24 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-21 · METH-148 PR 3 + 첫 전파 실패·복구)
+## 방금 한 것 (2026-09-21 · METH-148 종결)
 
-PR 1(#180 도구)·PR 2(#181 지침·catalog·ADR-005) land 후 전파를 시도했다가 **실패했고, 그 진단 중 사고를 하나 냈다.**
+**캡슐 6회차 10건을 전량 반영하고 11 repo 에 전파했다.** PR #178(수거)·#179(초안)·#180(도구)·#181(지침·catalog·ADR-005)·#182(`_inbox`·ADR 표기).
 
-1. **전파가 11곳 모두 커밋 0건이었다.** 이 셸은 zsh 라 `git add $P` 에서 `$P` 가 공백으로 나뉘지 않아 경로 목록 전체가 경로 하나로 취급됐다. `2>/dev/null` 때문에 오류가 안 보였고, 출력의 SHA 는 각 repo 의 기존 origin/main 이었다. **교훈: 다중 repo 루프는 bash 스크립트 파일로 돌리고, 커밋 성공을 SHA 변화로 확인한다.**
-2. **진단 중 cafe24-renewal HEAD 를 되감았다.** 테스트 커밋이 실패했는데 뒤의 `git reset --soft HEAD~1` 이 조건 없이 실행돼 사용자 커밋 `53cc602` 에서 한 칸 뒤로 갔다. reflog 로 확인하고 즉시 `reset --soft 53cc602` 로 복구 — HEAD = origin/main, 인덱스 비어 있음, 작업 손실 0. **교훈: 되돌리기 명령은 앞 명령의 성공(`&&`)에 묶는다.**
-3. 6곳 작업 트리에 남은 sync 변경은 전부 원복(sync-all 은 깨끗한 repo 만 처리하므로 전부 내 산출물). HEAD 무변경 확인.
-4. **ai-icons 로컬 main 은 push 안 된 커밋 3개(`b71acf49` 등, 조직도 문서)로 원격과 갈라져 있다(ahead 3, behind 22).** 다른 세션 작업이라 손대지 않는다 — 격리 워크트리로 전파.
-5. 재시도 전 발견: 공유 지침이 상류 `ADR-005` 를 인용하면 다운스트림마다 «없는 ADR» 경고. → 공유 문서의 상류 ADR 은 `methodology:ADR-NNN`, 형식 예시는 인라인 코드, 검사기는 코드 안을 건너뜀. 잔여 0. 테스트 1.
+- 사용자가 판단 3지점 권고안 채택 + 법무 안내 변경(Class C) 명시 승인 → ADR-005 로 박제.
+- 전파 재시도는 bash 스크립트(`mapfile` 없는 bash 3.2 대응)로: repo 마다 커밋 전후 HEAD 변화·원격 일치를 확인하고 오류를 숨기지 않았다. 11/11 ✓, origin 실내용 5항목 × 11 ✓.
+- 첫 시도 실패 원인과 사고는 HANDOFF Recent·PR #182 본문에 기록. 교훈 둘: 다중 repo 루프는 bash 파일로 · 되돌리기 명령은 앞 명령 성공(`&&`)에 묶는다.
+
+## 사용자에게 알릴 것 (다른 세션·다른 repo 사정)
+
+1. **ai-icons 로컬 main 이 미푸시 커밋 3개로 원격과 갈라져 있다**(`b71acf49` 등 조직도 문서, ahead 3·behind 23). 다른 세션 작업이라 손대지 않았다 — 그 세션이 rebase·push 해야 한다.
+2. **ai-icons 리서치 문서의 HunyuanVideo-1.5 «Apache-2.0» 은 오기**다(원문: Tencent Hunyuan Community License, 한국·EU·영국 제외). 상류 데이터 파일은 원문대로 적었지만 ai-icons 의 원 문서 수정은 그 repo 몫.
+3. HunyuanVideo 지역 제외는 **승인 범위 밖**에서 넣은 법무 사실이다(ADR-005 Scope note). 원치 않으면 되돌린다.
 
 ## 다음 구체 행동
 
-1. PR 3 land → **bash 스크립트로 전파**: main 직접 5(cafe24·icons-marketing·lifeManager·talmo-com·tshome) + 격리 워크트리 6(ai-icons·gamblescan·icons·icons-invest·insta-toon·invest-ops). 각 repo 커밋 SHA 가 바뀌었는지와 origin 블롭으로 대조.
-2. 끝나면 TODO METH-148 Done.
+1. 이 브랜치 land 하면 종결. 다음 캡슐 수거는 다운스트림 축적 후.
+2. 다음 분기(2026-Q4)에 `20_guides/_data/2026-Q4_design-tool-landscape.md` 새로 작성(덮어쓰지 않음).
 
 ## 막힌 것
 
@@ -23,4 +27,4 @@ PR 1(#180 도구)·PR 2(#181 지침·catalog·ADR-005) land 후 전파를 시도
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `chore/meth-148-closeout-adr-qualify` · 하네스 워크트리 1개(ship `--allow-shared`)
+- repo: `/Users/hayden/methodology` · branch `chore/meth-148-closeout` · 전파 스크립트는 scratchpad `propagate.sh`·`verify.sh`

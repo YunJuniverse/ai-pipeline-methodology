@@ -32,7 +32,14 @@
 
 ## Blocked
 
-### METH-148 · 캡슐 트리아지 6회차 — 수거 10건 판정 대기
+
+
+
+
+
+## Done
+
+### METH-148 · 캡슐 트리아지 6회차 — 수거 10건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
 - **acceptance criteria**:
   - [x] `collect --apply` 전 repo 순회(2026-09-18) — 19곳 스캔, **신규 10건** 적재(원장 68→78). dry-run 18 → 실적재 10(icons 1건이 워크트리 9곳에서 dedup). ID 는 `reserve` 로 원격 태그 예약(METH-147 이후 첫 사용)
@@ -42,16 +49,11 @@
   - [x] **지침·catalog·ADR**(PR 2) — **ADR-005**(Class C 승인 박제) · 지침 26 v2(§1 역할·기준·라이선스 요구 · **§1b 라이선스 읽기**) · 27 v2(알파 부재·QA 4항) · 25 v3(Sora API 날짜·`_data/` 규칙) · 21 v2(인터랙션 수치 스펙 + wireframe-spec 템플릿) · 23 v6(**§1-6 문장→도구 승급 기준**·§2-7 스캔) · 24 v5(외부 CLI 헤드리스 확인) · `20_guides/_data/2026-Q3_design-tool-landscape.md`(행마다 1차/인용) · **C-003 승급** · P-009 · catalog README 생애주기. **덤**: METH-147 ADR 인용 검사가 지침 24 의 icons ADR 사례 인용을 오경고 → 타 repo ADR 은 `<repo>:ADR-NNNN` 표기 규칙 + 검사기가 그 표기를 건너뜀(테스트 1)
   - [x] `_inbox` 10건 정리(원장 78 유지) — PR 3
   - [x] **ADR 인용 표기 정리**(PR 3) — 첫 전파 시도에서 공유 지침의 상류 `ADR-005` 가 다운스트림마다 «없는 ADR» 경고를 낼 구조임을 발견. 공유 문서의 상류 ADR 은 `methodology:ADR-NNN` 으로(16건 중 12건), 형식 예시(지침 02·18)는 인라인 코드로 두고 검사기가 코드 안을 건너뜀. 잔여 0
-  - [ ] 전파 11 repo(ai-icons 는 로컬 main 이 다른 세션 커밋 3개로 갈라져 있어 격리 워크트리로)
+  - [x] **전파 11/11**(2026-09-21) — bash 스크립트로 재시도: main 직접 5 · 격리 워크트리 6(ai-icons 포함). repo 마다 HEAD 변화·원격 일치를 스크립트가 확인, origin 실내용 5항목(26 §1b·데이터 파일·23 §1-6·phase·ADR 표기) × 11 ✓. 훅 3 repo 경로 판정 통과. ai-icons 로컬 main 의 다른 세션 커밋 3개 무접촉
   - [ ] 유효분 반영 + negative case · `_inbox` 정리(원장 유지) · 전파
 - **notes**: 발신처 — **cafe24-renewal 7**(도구 2: observe friction `phase` 필드 · thinktank 회고 집계 명령 / catalog 4: 사고→차단 도구 승급 기준 · 인터랙션 수치 스펙 선합의 · 머지=배포 CI 경로 · 서드파티 통합 레지스트리 / skeleton 1: 호스팅 플랫폼 관측 인프라 선구축) · **ai-icons 2**(지침 26·27 도구 매트릭스 2026Q3 갱신) · **icons 1**(외부 에이전트 CLI 능력은 헤드리스로 실행해 확인). 눈에 띄는 연결: cafe24 `merge-is-deploy-ci-path` 는 5회차 `boot-deploy-access-preflight`(배포 자격증명 로컬 부재)의 근본 해법 쪽 · `hosted-platform-observability-bootstrap` 은 P-005·P-007(캐시 적대 플랫폼) 계열과 묶일 후보.
 
-
-
-
-
-
-## Done
+- **종결**(2026-09-21): PR **#178**(수거)·**#179**(초안)·**#180**(도구)·**#181**(지침·catalog·ADR-005, Class C 승인)·**#182**(`_inbox`·ADR 표기). 전파 11/11. 첫 전파는 zsh 단어 분할 부재로 커밋 0건이었고, 진단 중 cafe24 HEAD 를 되감았다 즉시 복구(손실 0).
 
 ### METH-147 · 캡슐 트리아지 5회차 — 수거 23건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
