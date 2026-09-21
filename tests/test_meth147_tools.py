@@ -150,6 +150,17 @@ def test_friction_retro_aggregates_cost_month_repeat_phase() -> None:
 
 
 
+def test_adr_citation_repo_qualified_skipped() -> None:
+    """`icons:ADR-0029` 처럼 repo 를 붙인 인용은 다른 repo 의 ADR — 경고하지 않는다(METH-148)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = _repo(tmp)
+        (t / "40_dev" / "adr").mkdir(parents=True)
+        (t / "note.md").write_text("사례: icons:ADR-0029 조항 · 그리고 ADR-0077 (이 repo 에 없음)\n")
+        out = m._adr_citations_missing(t)
+        assert ("note.md", "ADR-0077") in out and all(c != "ADR-0029" for _, c in out)
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
