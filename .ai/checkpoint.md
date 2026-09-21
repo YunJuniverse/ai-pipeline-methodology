@@ -18,7 +18,7 @@
 
 ## 다음 구체 행동
 
-1. 이 브랜치 land 하면 종결. 다음 캡슐 수거는 다운스트림 축적 후.
+1. #183 land 완료(`123e733d`). boot 가 TODO Done 7건 비대를 경고해 `rotate --apply` — Done 3건·HANDOFF Recent 15건 이관(순서 검사 통과, 날짜 없는 1건은 미판정 보고). 다음 캡슐 수거는 다운스트림 축적 후.
 2. 다음 분기(2026-Q4)에 `20_guides/_data/2026-Q4_design-tool-landscape.md` 새로 작성(덮어쓰지 않음).
 
 ## 막힌 것
