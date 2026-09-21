@@ -428,7 +428,20 @@ def parse_prompting_item(raw: str) -> dict:
     }
 
 
+# friction 의 단계 — 선택 필드, 닫힌 5값 (METH-148 판단 ①).
+# 회고에서 «진단·확정 비용이 수정 비용을 넘었다»를 키워드 추정 없이 재려고 둔다(cafe24-renewal:
+# 마찰 4,684분 중 약 49% 가 «무엇이 실렸는지 확정»하는 비용). 선택이라 기존 로그는 그대로 유효하고,
+# thinktank 가 기입률을 함께 보고해 비어 있음이 숨지 않게 한다.
+FRICTION_PHASES: tuple[str, ...] = ("diagnose", "fix", "deploy", "verify", "communicate")
+
+
 def parse_friction_item(raw: str, index: int) -> dict:
+    # 선택 5번째 필드 phase — 마지막 토큰이 닫힌 5값 중 하나일 때만 phase 로 읽는다.
+    phase = None
+    if raw.count("|") >= 4:
+        _rest, _last = raw.rsplit("|", 1)
+        if _last.strip() in FRICTION_PHASES:
+            phase, raw = _last.strip(), _rest
     # 세로줄 4필드 — resolution 본문의 `|`(grep 인용문 등)가 형식 오류를 내던 결함(METH-147 #9).
     # 마지막 구분자 → repeat_of, 앞 두 구분자 → where·cost. 가운데 resolution 은 세로줄 허용.
     if raw.count("|") >= 3:
@@ -444,13 +457,16 @@ def parse_friction_item(raw: str, index: int) -> dict:
         cost_minutes = int(cost)
     except ValueError as exc:
         raise ValueError("friction cost_minutes는 정수여야 합니다") from exc
-    return {
+    item = {
         "id": f"F-{index:03d}",
         "where": where,
         "cost_minutes": cost_minutes,
         "resolution": resolution,
         "repeat_of": normalize_repeat_of(repeat_of),
     }
+    if phase:
+        item["phase"] = phase
+    return item
 
 
 def render_observation(payload: dict) -> str:
@@ -480,6 +496,8 @@ def render_observation(payload: dict) -> str:
                 f"    resolution: {yaml_scalar(item['resolution'])}",
                 f"    repeat_of: {item['repeat_of'] or 'null'}",
             ])
+            if item.get("phase"):
+                lines.append(f"    phase: {item['phase']}")
     else:
         lines.append("friction: []")
 
@@ -568,6 +586,9 @@ def validate_observation_file(path: Path) -> list[str]:
     if task_match and task_match.group(1) not in OBSERVATION_TASK_TYPES:
         errors.append(f"task_type은 {', '.join(sorted(OBSERVATION_TASK_TYPES))} 중 하나여야 합니다")
     # METH-121: repeat_of 형식 강제 — 오염되면 thinktank 반복 집계가 기계적으로 불가
+    for m in re.finditer(r"^\s+phase:\s*(.+?)\s*$", frontmatter, flags=re.MULTILINE):
+        if m.group(1).strip().strip('"') not in FRICTION_PHASES:
+            errors.append(f"friction phase 는 {', '.join(FRICTION_PHASES)} 중 하나여야 합니다 (선택 필드)")
     for m in re.finditer(r"^\s+repeat_of:\s*(.+?)\s*$", frontmatter, flags=re.MULTILINE):
         try:
             normalize_repeat_of(m.group(1))
@@ -932,8 +953,8 @@ def cmd_skeleton(args: argparse.Namespace) -> int:
 # ─── L3 Thinktank v0 ────────────────────────────────────────────────────────
 
 
-def observation_files() -> list[Path]:
-    base = METHODOLOGY_ROOT / OBSERVATION_DIR
+def observation_files(root: Path | None = None) -> list[Path]:
+    base = (root or METHODOLOGY_ROOT) / OBSERVATION_DIR
     if not base.exists():
         return []
     return sorted(p for p in base.glob("*.md") if OBSERVATION_FILE_RE.match(p.name))
@@ -947,7 +968,8 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
     승급은 사람이 PR로 한다(백서 §8-2, `50_resources/catalog/_README.md` §3).
     분기 회고(`70_meta/retrospectives`) §1 지표의 소스로 회고 직전 실행한다.
     """
-    files = observation_files()
+    root = Path(args.path).resolve() if getattr(args, "path", None) else METHODOLOGY_ROOT
+    files = observation_files(root)
     observations = [parse_observation_frontmatter(p) for p in files]
 
     friction_lines: list[str] = []
@@ -986,10 +1008,11 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
     iso_year, iso_week, _ = now.isocalendar()
     out_dir = METHODOLOGY_ROOT / INSIGHTS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"{iso_year}-W{iso_week:02d}_thinktank.md"
+    suffix = "" if root == METHODOLOGY_ROOT else f"_{root.name}"
+    out = out_dir / f"{iso_year}-W{iso_week:02d}_thinktank{suffix}.md"
     task_dist = ", ".join(f"{k} {v}" for k, v in sorted(task_counts.items(), key=lambda kv: -kv[1])) or "없음"
     lines = [
-        f"# Thinktank v0 — {iso_year}-W{iso_week:02d}",
+        f"# Thinktank v0 — {iso_year}-W{iso_week:02d}" + (f" · {root.name}" if suffix else ""),
         "",
         "> **수동 승급이 정식.** 이 리포트는 지표 집계 + 승급 *후보* 마킹만 한다 — 자동 승급 없음.",
         "> 승급은 사람이 PR로(백서 §8-2). 분기 회고 §1 지표의 소스 — 회고 직전 실행.",
@@ -1012,6 +1035,7 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
             lines.append(f"- `{marker}` x{count}: {name}")
     else:
         lines.append("- No friction entries yet.")
+    lines.extend(_friction_retro_section(files))
     lines.extend([
         "",
         "## Observations",
@@ -1021,7 +1045,7 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
         lines.append(f"- `{obs.get('session_id', 'unknown')}` — domain `{obs.get('domain', '?')}`, task `{obs.get('task_type', '?')}`")
     write_text(out, "\n".join(lines) + "\n")
 
-    capsule_lines = _thinktank_capsule_section()
+    capsule_lines = _thinktank_capsule_section() if root == METHODOLOGY_ROOT else []
     if capsule_lines:
         with out.open("a", encoding="utf-8") as fh:
             fh.write("\n".join(capsule_lines) + "\n")
@@ -1029,6 +1053,78 @@ def cmd_thinktank(args: argparse.Namespace) -> int:
     ok(f"thinktank report: {out.relative_to(METHODOLOGY_ROOT)}")
     info("수동 승급이 정식 — 승급 후보(≥2회)는 사람이 검토·PR로 승급(백서 §8-2).")
     return 0
+
+
+def _parse_friction_items(text: str) -> list[dict[str, Any]]:
+    """관찰 로그 frontmatter 의 friction 항목 — where·cost_minutes·repeat_of·phase·resolution."""
+    m = re.search(r"^friction:\s*\n((?:[ \t]+.*\n?)*)", text, flags=re.MULTILINE)
+    if not m:
+        return []
+    items: list[dict[str, Any]] = []
+    cur: dict[str, Any] | None = None
+    for line in m.group(1).splitlines():
+        s = line.strip()
+        if s.startswith("- "):
+            cur = {}
+            items.append(cur)
+            s = s[2:]
+        if cur is None or ":" not in s:
+            continue
+        k, v = s.split(":", 1)
+        v = v.strip().strip('"')
+        if k == "cost_minutes":
+            try:
+                cur[k] = int(v)
+            except ValueError:
+                cur[k] = 0
+        else:
+            cur[k] = None if v.lower() in {"null", "none", ""} else v
+    return items
+
+
+def _friction_retro_section(files: list[Path], top_n: int = 5) -> list[str]:
+    """마찰 비용 회고 — 합계·월별·재발 비중·phase 분포·상위 사례 (METH-148, 캡슐 retro-friction-aggregate).
+
+    cafe24-renewal 은 842건에서 마찰 204건·4,684분·재발 21% 를 임시 파서로 뽑았다. 같은 척도를
+    표준 명령으로 두면 프로젝트 종료·분기 회고를 반복하고 repo 간 비교가 된다.
+    """
+    rows: list[dict[str, Any]] = []
+    for p in files:
+        mm = re.match(r"(\d{4}-\d{2})-\d{2}_", p.name)
+        month = mm.group(1) if mm else "?"
+        for it in _parse_friction_items(read_text(p)):
+            it["month"], it["file"] = month, p.stem
+            rows.append(it)
+    out = ["", "## 마찰 비용 회고 (Retro)", ""]
+    if not rows:
+        return out + ["- friction 기록 없음."]
+    total = sum(r.get("cost_minutes", 0) for r in rows)
+    rep_rows = [r for r in rows if r.get("repeat_of")]
+    rep_cost = sum(r.get("cost_minutes", 0) for r in rep_rows)
+    phased = [r for r in rows if r.get("phase")]
+    out.append(f"- 마찰 **{len(rows)}건 · {total}분** · 재발(repeat_of) {len(rep_rows)}건 {rep_cost}분"
+               f" (**{round(100 * rep_cost / total) if total else 0}%**)")
+    out.append(f"- phase 기입률: **{len(phased)}/{len(rows)}**"
+               + (" — 기입률이 낮으면 아래 분포는 표본 편향이다" if len(phased) < len(rows) else ""))
+    if phased:
+        by_phase: dict[str, list[int]] = {}
+        for r in phased:
+            by_phase.setdefault(r["phase"], []).append(r.get("cost_minutes", 0))
+        out.append("- phase 분포: " + " · ".join(
+            f"{ph} {len(v)}건 {sum(v)}분" for ph, v in sorted(by_phase.items(), key=lambda kv: -sum(kv[1]))))
+    out += ["", "| 월 | 건수 | 분 | 재발 분 |", "|---|---|---|---|"]
+    months: dict[str, list[dict[str, Any]]] = {}
+    for r in rows:
+        months.setdefault(r["month"], []).append(r)
+    for mo in sorted(months):
+        rs = months[mo]
+        out.append(f"| {mo} | {len(rs)} | {sum(r.get('cost_minutes', 0) for r in rs)} | "
+                   f"{sum(r.get('cost_minutes', 0) for r in rs if r.get('repeat_of'))} |")
+    out += ["", f"**비용 상위 {top_n}**", ""]
+    for r in sorted(rows, key=lambda r: -r.get("cost_minutes", 0))[:top_n]:
+        tag = " · 재발" if r.get("repeat_of") else ""
+        out.append(f"- {r.get('cost_minutes', 0)}분 · `{r.get('where') or '?'}`{tag} — {r['file']}")
+    return out
 
 
 def _thinktank_capsule_section() -> list[str]:
@@ -5278,7 +5374,8 @@ def main(argv: list[str] | None = None) -> int:
     po.add_argument("--flow-used", default="ad-hoc", help="skeleton:<id>-<version> 또는 ad-hoc")
     po.add_argument("--intent", action="append", help="프롬프트 intent. 여러 번 지정 가능")
     po.add_argument("--rounds", action="append", type=int, help="각 intent의 turn 수. --intent와 같은 개수")
-    po.add_argument("--friction", action="append", help="'where|cost_minutes|resolution|repeat_of' 형식. 여러 번 지정 가능")
+    po.add_argument("--friction", action="append",
+                    help="'where|cost_minutes|resolution|repeat_of[|phase]' 형식. phase(선택) = diagnose|fix|deploy|verify|communicate. 여러 번 지정 가능")
     po.add_argument("--rounds-total", dest="rounds_total", type=int,
                     help="세션 총 핑퐁 라운드 수 — 상시 기록 의무 (METH-118)")
     po.add_argument("--prompting", action="append",
@@ -5313,7 +5410,8 @@ def main(argv: list[str] | None = None) -> int:
     ska.add_argument("--force", action="store_true")
     ska.set_defaults(func=cmd_skeleton)
 
-    pt = sub.add_parser("thinktank", help="L3 관찰 집계 — §7 지표 + 승급 후보 마킹 (수동 승급 정식, 회고 소스)")
+    pt = sub.add_parser("thinktank", help="L3 관찰 집계 — §7 지표 + 승급 후보 마킹 + 마찰 비용 회고 (수동 승급 정식, 회고 소스)")
+    pt.add_argument("--path", help="다른 repo 의 관찰 로그를 집계 (기본: 이 repo). 리포트는 이 repo insights 에 <주>_thinktank_<repo>.md 로")
     pt.set_defaults(func=cmd_thinktank)
 
     pc = sub.add_parser(

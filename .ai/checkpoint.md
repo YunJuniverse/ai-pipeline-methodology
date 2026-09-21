@@ -2,29 +2,28 @@
 
 > 세션 서사 바통. 누적 상태는 `HANDOFF.md`.
 
-## 방금 한 것 (2026-09-18 · METH-148 판정 초안)
+## 방금 한 것 (2026-09-21 · METH-148 PR 1 도구)
 
-**10건 판정 초안을 썼다** — `40_dev/snapshots/2026-09-18_캡슐-트리아지-판정초안.md`. 유효 9 · 부분 이미 반영 1 · 만료 0.
+사용자가 판단 3지점을 권고안대로 확정하고 **법무 안내 변경(Class C)을 명시 승인**했다(2026-09-21 채팅). 승인은 PR 2 의 ADR-005 로 박제한다 — CLAUDE.md «사람 승인은 머지된 PR·ADR 로만 성립».
 
-도구 매트릭스 2건은 외부 사실이라 1차 출처를 직접 열었다.
-- **Sora**: OpenAI Help Center — 웹·앱 2026-04-26 종료, API 2026-09-24 종료. 상류 25 §1(04월)과 캡슐(09-24)이 **둘 다 맞다** — 상류는 앱 날짜만 적었다.
-- **FLUX [dev] 라이선스**: BFL Non-Commercial License v2.0 원문 — §2(d) 출력은 상업 사용 가능, 그러나 §2(a)(b)·§4(a) 모델 *구동 자체*는 비상업 목적만, 정의상 수익 활동·최종 사용자 영향은 비상업이 아니다. **상류 지침 26 «dev 웨이트는 출력만 상업 OK» 는 회사가 업무용으로 [dev] 를 돌려도 되는 것처럼 읽힌다 — 위험하게 불완전하다.** [klein] 4B Apache-2.0 · 9B 비상업 확인.
-- FLUX.2 다중 참조: API 8 · 플레이그라운드 10 · [dev] 권장 6 · [klein] 4. 캡슐의 «10장» 은 플레이그라운드 수치.
-- GPT Image 2 참조 16장은 리서치 출처가 루머 블로그 — 지침에 넣지 않는다.
+도구:
+- observe friction `phase` 선택 필드 — 닫힌 5값(diagnose·fix·deploy·verify·communicate). 마지막 토큰이 5값일 때만 phase 로 읽어 기존 4필드와 호환. validate 가 오값 거부(음성 사례 확인).
+- thinktank `--path <repo>` + 마찰 비용 회고 절(합계·월별·재발 비중·phase 기입률·상위 5). **cafe24-renewal 에 돌려 캡슐의 임시 파서 수치를 그대로 재현**: 204건·4,684분·재발 42건 1,005분·21%. 상류는 47건·711분·재발 14%.
 
-그 외: thinktank 는 비용 합계·월별·재발 비중이 없고 상류 repo 만 본다 · catalog 생애주기에 «문장 규칙 → 차단 도구» 단계가 없다(관행은 있음: METH-122·143·146·147) · 머지=배포 CI 는 4개 날짜 재현으로 active C-003 · 호스팅 플랫폼 계열 4건째 → P-009 우산 항목(스켈레톤은 pending 이라 불가).
-
-수거 직후 checkpoint 에 «phase 추가는 소급 재검증 필요»라 적었는데 틀렸다 — 스키마를 *넓히는* 변경이라 기존 로그는 그대로 유효하다. 초안에서 정정했다.
+PR 2 준비 중 원문 확인 추가 발견:
+- **HunyuanVideo-1.5 라이선스는 한국·EU·영국에 적용되지 않는다**(Tencent Hunyuan Community License 첫 줄). ai-icons 리서치는 «Apache-2.0» 이라 적었다 — 틀렸다. 캡슐 #2 가 제안한 «오픈 모델 라이선스 조건» 항목에 원문 사실로 넣는다. 승인 범위(FLUX 문장) 밖의 법무 사실이라 최종 보고에서 따로 알린다.
+- Wan 2.2 Apache-2.0 확인 · LTX-2.x Community License(매출 기준 조건부, 금액은 원문에서 미확인 → 적지 않음) · Nano Banana Pro 참조 최대 14장 중 **캐릭터 일관성용 5장**·고충실 오브젝트 6장(Google 공식 문서).
 
 ## 다음 구체 행동
 
-1. **사람 확정** — 판단 3지점: ① friction `phase` 선택 vs 필수(권고 선택 + 기입률 보고) ② **지침 26 FLUX 라이선스 문장 교체(Class C)** — 기존 문장을 뒤집으므로 AI 가 정하지 않는다, 법무 확인 권고 ③ 지침 26·27 의 단가·스펙 수치를 날짜 스냅샷으로 분리할지.
-2. 판단 무관분은 먼저 돌릴 수 있다: C-003 · P-009 · 지침 23 §1-6·§2-7 · 21 §2 · 24 §4 · 25 §1 Sora 날짜 · 27 QA 3항 · thinktank 확장.
+1. PR 1 land.
+2. PR 2 — ADR-005 · 지침 26 v2(역할·원칙·라이선스 등급만, 수치는 데이터 파일) · 27 v2(머리말·§4 수치 → 데이터, QA 3항) · `20_guides/_data/2026-Q3_design-tool-landscape.md`(행마다 출처·확인 수준) · 25 §1 Sora API 날짜 · 21 §2 인터랙션 수치 · 23 §1-6·§2-7 · 24 §4 · C-003 · P-009 · catalog README 생애주기.
+3. PR 3 — `_inbox` 10건 정리 · 전파 11 · 훅 재설치. ai-icons 에는 리서치의 Hunyuan 라이선스 오기를 알릴 방법 검토(그 repo 문서는 그 세션 몫).
 
 ## 막힌 것
 
-- 없음. 확정은 사람 게이트 — TODO `## Blocked` METH-148.
+- 없음.
 
 ## 환경
 
-- repo: `/Users/hayden/methodology` · branch `docs/capsule-triage-round6` · 주 체크아웃에 하네스 워크트리 1개(ship 은 `--allow-shared`)
+- repo: `/Users/hayden/methodology` · branch `feat/meth-148-tools` · 하네스 워크트리 1개(ship `--allow-shared`)

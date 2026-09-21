@@ -1,0 +1,1087 @@
+# Thinktank v0 — 2026-W39 · cafe24-renewal
+
+> **수동 승급이 정식.** 이 리포트는 지표 집계 + 승급 *후보* 마킹만 한다 — 자동 승급 없음.
+> 승급은 사람이 PR로(백서 §8-2). 분기 회고 §1 지표의 소스 — 회고 직전 실행.
+> Generated at: 2026-09-21T02:31:16Z
+
+## 지표 (Metrics)
+
+- 관찰 로그: **845건** (충족)
+- 기간: 2026-05-07 ~ 2026-09-18 (134일)
+- 케이던스: 주당 약 44.1건
+- task_type 분포: bugfix 311, feature 291, docs 99, refactor 78, research 66
+- 마찰 총계: 204건 · Catalog 재적중(repeat_of): 42건 · 승급 후보(≥2회): 0건
+
+## Repeated Friction Candidates
+
+- `watch` x1: .git write lock
+- `watch` x1: 09-02 inline-block 변경이 모듈의 무시되던 height/line-height 를 살려 밑줄 위치 회귀
+- `watch` x1: 1차 재측정에서 PLP 악화·이벤트 CLS 배증으로 보였으나 2차 측정에서 노이즈로 판명 — 스로틀 Lighthouse 단발 수치는 ±10점·CLS ±0.5 흔들림, 서드파티 임베드 로딩 순서 복권이 주요 변동원
+- `watch` x1: 1차 조사를 PC@1440 vs MO@390 으로 해서 PDP 차이를 UA 문제로 오판할 뻔했다. 390/390 으로 맞추자 차이가 사라짐 — 뷰포트와 UA를 섞으면 반응형 설계를 결함으로 읽는다
+- `watch` x1: 1차 조사에서 overflow diff·DPR 8종·원본 SVG 대조로 재현 불가 판정했는데, 정작 원인은 '잘림'이 아니라 '접촉'이었다 — 잘렸는지만 봤지 여유가 있는지는 안 봤다
+- `watch` x1: 1차 종료 게이트가 '딜이 있느냐'만 물어서, 새 딜이 등록만 된 시작 전 상태를 잡지 못했다 — 상태를 물어야 하는데 존재를 물었다
+- `watch` x1: 1차에 판매가를 14px로 강제했다가 메인 진열 인라인(13px)을 오히려 키우는 부작용 — 지면마다 관리자 인라인 크기가 달라 blanket 강제값은 최소 지면 기준으로 잡아야 했다
+- `watch` x1: ?v 캐시버전 치환이 앞 단계 blanket replace 때문에 대상 문자열이 이미 바뀌어 있어 조용히 no-op 되었고, CSS를 두 번 고치고도 브라우저에 도달하지 않아 24회 폴링 동안 구버전을 보며 헛다리를 짚었다
+- `watch` x1: CSS 주석에 board/*/read.html 을 적었더니 별과 슬래시가 붙어 주석이 조기 종료, 파일이 200 으로 로드되고 styleSheets 에도 있는데 규칙 0개라 아무것도 적용 안 됐다
+- `watch` x1: CSS 트랜지션이 직전 잔상값에서 출발해 로고가 아래로 나타났다 올라오는 잔상이 났다 — 사용자가 말한 '로고가 내려간다' 의 정체였고, 5px 단위 정밀 스캔 전에는 25px 샘플링에 묻혀 안 보였다
+- `watch` x1: CSS 특이성 매칭
+- `watch` x1: CSS 특이성 재발
+- `watch` x1: CTA 를 decorateCard 에만 두었더니 상품이 늦게 도착하는 모바일에서 CTA 가 하나도 안 생겼다. 같은 코드인데 PC 만 되는 형태라 원인이 안 보였다
+- `watch` x1: CTA 생성 코드가 decorateCard와 applyBannerProduct 두 곳에 중복돼 있어 한쪽만 고치면 비동기로 늦게 오는 상품에서 옛 동작이 남을 뻔했다
+- `watch` x1: Cafe24 게시판 링크 필드 지원 여부를 프로브로 확인했으나 빈 문자열이라 판정 불가했다
+- `watch` x1: Cafe24 기본 시트의 #userStyle #mCafe24Order.typeHeader{padding-top:0}(0,2,1,0)에 밀려 규칙이 안 먹었고, 검증 때는 height 0 인 숨은 h2를 잡아 '안 내려갔다'고 한 번 오판했다
+- `watch` x1: Cafe24 앱이 서버 스킨 파일을 직접 수정해 로컬-서버가 조용히 어긋남
+- `watch` x1: Cafe24 페이지 캐시가 신버전 JS/CSS 를 계속 안 내보내 추가 조치 2건을 실사이트에서 검증하지 못했다
+- `watch` x1: Fixed-640 원칙대로 카드를 301px 고정했더니 좁은 실기기(360)에서 다음 카드가 3px만 보여 발주처 요구('걸치게')가 사실상 무효화됨
+- `watch` x1: GNB 라벨 스타일이 ts-header.css 14개 셀렉터 그룹에 흩어져 있어 수동으로 넣으면 반드시 빠뜨린다
+- `watch` x1: GNB 에 새 항목을 추가할 때 브랜드 스토리의 흰색 반전 목록을 함께 갱신해야 한다는 걸 놓쳤다 — 같은 파일 주석에 로고가 같은 이유로 묻혔던 전례가 이미 있었다
+- `watch` x1: HTTP 200 이지만 본문이 앱 오류 문구뿐 — 상태코드만 보면 정상 오판
+- `watch` x1: Notion MCP update_content가 한글 음절을 전송 중 변형(뀌→눘·뜨→띄·꼭→꿀)해 old_str 매칭 실패와 오타를 만듦
+- `watch` x1: PDP 되살리기까지 만들고도 PLP는 서버 마크업이 재료라는 차이를 놓쳐 진행함 전환 실측에서 90초 미노출 — 지면별 딜 재료의 출처가 다르면 되살리기도 지면별로 필요하다
+- `watch` x1: PLP가 이미 학습한 회원 마크업 규칙이 event_items 파서에 미이식
+- `watch` x1: PPT의 Figma 링크가 파일 루트(node-id=0-1)만 걸려 있어 대조 노드를 특정할 수 없음
+- `watch` x1: Playwright route.fulfill 로 응답을 재구성하니 대상 페이지의 JS 가 아예 실행되지 않아 내 코드 회귀로 오인할 뻔했다
+- `watch` x1: SFTP 업로드 성공 직후 랜덤 쿼리 확인에서도 구본이 나와 실패로 보였다 — FTP 스토리지에서 웹 서빙 계층까지 약 50초 전파 지연
+- `watch` x1: SFTP 업로드 성공했는데 서버가 옛 SVG 를 계속 서빙했다 — img src 에 버전 스트링이 없어서
+- `watch` x1: SFTP 자격증명(.vscode/sftp.json)이 gitignore 로 미추적인데 로컬에도 없어 업로드가 전면 차단됨 — 코드는 완성됐는데 배포만 3턴 지연
+- `watch` x1: Shadow DOM 위젯 스타일 우선순위
+- `watch` x1: TODO Blocked 정확성
+- `watch` x1: TODO-419 조사 때 루트 응답과 프리픽스 응답의 링크 표현 차이를 이미 관측해 로그에 남겼는데도 소비 지점(링크 생성)을 점검하지 않아 회귀를 냈다
+- `watch` x1: TODO-425 에서 같은 원인의 모바일 축을 '1.4px 라 미미하다'며 남겨 재보고로 돌아왔다
+- `watch` x1: TODO-429 에서 -10px 지시의 적용 범위를 확인 없이 PC·MO 동시로 잡았다 — 발주처가 되물어 되돌렸다
+- `watch` x1: Vimeo 실렌더를 헤드리스에서 검증할 수 없어(자동재생 미동작) 미검증 상태로 배포했다. 발주처 실등록 전까지 cover 동작을 확인할 방법이 없다
+- `watch` x1: aspect-ratio:1 + height:auto 로 원형 축소를 시도했다가 flex 기본 align-items:stretch 와 물려 썸네일이 이미지 원본 크기(800px)로 폭발
+- `watch` x1: band-sizing-steals-turn
+- `watch` x1: clip-is-directional
+- `watch` x1: cloud-session-sftp
+- `watch` x1: controls=0·modestbranding=1 로 지워질 거라 가정했으나 유튜브 UI 는 재생 시작마다 약 4.5초 노출되며 파라미터로 제거 불가
+- `watch` x1: curl 로는 두 주소 모두 신선했는데 브라우저 fetch 만 옛 문서를 받아, curl 검증만 믿었다면 원인을 못 찾았다. no-store 가 네트워크를 강제한다고 잘못 가정한 것도 겹쳤다
+- `watch` x1: dead-code-chain-on-feature-removal
+- `watch` x1: dense 효과를 재려고 런타임에서 html 클래스만 제거해 기준선을 만들었는데, 그 시점 멤버십은 이미 접힌 상태였고 클래스 제거로는 다시 펴지지 않아 기준선이 낮게 잡혔다. 그래서 440px 개선이라 보고했으나 실제 멤버십 기여는 415px이고 그 440은 대부분 업셀 몫이었다
+- `watch` x1: duplicate-scroll-engine
+- `watch` x1: event/list.html 에 공지 모듈 부재 — 관리자에서 공지로 지정해도 글이 사라졌을 상황
+- `watch` x1: figma-mcp-access
+- `watch` x1: flex 로 바꾼 첫 시도에서 ol 이 별도 아이템이라 이중 축소가 나 숫자 칸이 11.3px 로 뭉갰다
+- `watch` x1: font-size:0 으로 글자를 죽였는데 모바일 미디어쿼리에 font-size:32px 재지정이 남아 모바일만 글자가 되살아났다
+- `watch` x1: ftp-upload-auth
+- `watch` x1: grid 컨테이너 안 img와 div 사이 들여쓰기 공백이 익명 그리드 아이템이 되어 카피가 다음 행으로 밀림(1440 실측)
+- `watch` x1: img 를 인라인 SVG 로 바꾸자 #top_line_logo img 를 노리던 규칙(크기·filter·다른 파일의 흰색 반전)이 전부 조용히 무효화 — 브랜드스토리 페이지에서 초록 로고가 진한 초록 히어로에 묻혔다
+- `watch` x1: inapp_browser_blank_screenshot
+- `watch` x1: keyframe-beats-declaration
+- `watch` x1: live-files
+- `watch` x1: methodology land
+- `watch` x1: old_str 에 이미 손상된 음절을 넣어 배치가 두 번 실패했다 — 보내는 순간 또 다른 값으로 변형돼 매칭이 불가능하다
+- `watch` x1: override 를 얹었다가 세 번 연속 고특이성 규칙(:not()x4, id 4개)에 졌다 — 그 중 하나는 같은 파일 주석에 이미 경고돼 있던 함정이었다
+- `watch` x1: pin-handoff-needs-coincident-coords
+- `watch` x1: regex-delete-hits-shared-selector
+- `watch` x1: remote-session-egress
+- `watch` x1: reveal-mode-needs-own-activation
+- `watch` x1: scroll-anim-needs-time-beat
+- `watch` x1: sftp_credentials_missing
+- `watch` x1: sftp_json_missing_per_checkout
+- `watch` x1: swiper-flex-autolock
+- `watch` x1: todo-id
+- `watch` x1: ts-company.css 풀블리드
+- `watch` x1: ts-company2.css transform 상속
+- `watch` x1: ts-company2.css 헤더 반전
+- `watch` x1: 가이드 최신 여부를 기억으로 답할 뻔했으나 git log 대조에서 2건 누락이 드러났고 한 건은 현행과 반대로 적혀 있었다
+- `watch` x1: 가이드가 컷오버로 정반대가 된 문장을 그대로 안내하고 있었다 — 코드는 따라갔는데 문서가 남았다
+- `watch` x1: 가이드에 권장 글자수가 표 10자 / 본문 13자 로 서로 다르게 적혀 있었다 — 크기 변경 때마다 값이 어긋나 누적된 것
+- `watch` x1: 가이드의 메뉴 구성 섹션을 그대로 믿고 갱신했다면 틀린 문서를 그대로 두었을 것이다. 실제로는 EVENT 묶음 8종이 사라지고 for GIFT 그룹과 출석체크가 생기는 등 구조가 통째로 바뀌어 있었다
+- `watch` x1: 간격 수치만 보면 PC와 동일해 문제가 없어 보였다 — 줄 수와 색 위계까지 봐야 원인이 잡혔다
+- `watch` x1: 같은 ?v= 로 CSS 를 두 번 업로드해 브라우저가 구버전을 재사용 — 특이성 수정이 안 먹은 것으로 오판할 뻔했다(G-6 재현)
+- `watch` x1: 같은 요소가 PC와 모바일에서 서로 다른 부모에 있었다(JS 가 옮김). 클래스에 margin-top 을 줬다면 모바일에서는 컬럼 최상단에 불필요한 여백이 생겼을 것이다
+- `watch` x1: 같은 하드닝을 테이블(#totalProducts)에 적용했다가 20→40px 회귀 — div 는 인접 margin 상쇄되지만 table 은 안 됨
+- `watch` x1: 개별 요소를 하나씩 캡하는 방식이라 본문 텍스트(h1)를 빠뜨려 사용자가 같은 종류의 어긋남을 다시 제보했다
+- `watch` x1: 검증을 운영 루트 URL 로 먼저 띄워 .ts-ytz 가 없다고 나왔다 — 루트는 현 운영 스킨을 서빙하고 작업 정본은 /skin-skin184/ 경로인데 이를 확인하지 않고 시작했다
+- `watch` x1: 고정 레이어가 항상 중앙에 그려지는 구조라 핀을 늦추면 그만큼 점프가 생긴다 — 지연량에 비례해 커져 값 조정으로는 못 없앤다
+- `watch` x1: 규칙을 grep 으로 찾고 '이미 처리됨'으로 판단할 뻔했으나, 그 CSS 파일이 해당 페이지에 로드되지 않아 무효였다. 라이브 styleSheets 매칭 0건으로 확정
+- `watch` x1: 그림자 제거 요청을 CSS 만 보고 처리하면 이미지에 구워진 그림자가 남을 수 있다 — 반대로 이미지를 재가공하면 헛수고
+- `watch` x1: 기본 .ts-mobile-snb-group-btn 의 width:100% 때문에 아이콘 전용 버튼이 행을 다 먹어 라벨이 밀릴 뻔
+- `watch` x1: 내 override 가 기존 !important 규칙에 져서 배포 후에도 정렬이 안 맞았다
+- `watch` x1: 내 세션에서는 1페이지가 와서 정상이라고 답했으나 발주처 세션에서는 3페이지가 왔다 — 재현되지 않는다고 정상이라 단정한 오판
+- `watch` x1: 내가 만든 하단 정렬 변경이 다른 곳(필름 cover)을 깨뜨렸고, 넓은 뷰포트에서만 드러나 1440 검증만으로는 놓쳤다
+- `watch` x1: 네비만 캡하면 fixed 전환 후 resize 때 JS가 placeholder(holder) 폭을 읽어 네비를 원래 폭으로 되돌리는 간헐 버그가 생길 뻔했다 — 정적 확인으로는 안 잡히는 경로
+- `watch` x1: 노션 MCP 가 한글 음절을 전송 중 변형해 기존 오타 수정이 불가능했다(내가 보낸 검색 문자열 자체가 서버 도달 시 변형). 에러 메시지가 증거로 남음
+- `watch` x1: 높이 상수 산재
+- `watch` x1: 다수결 합의를 전환에만 적용하고 첫 판정은 무합의로 즉시 커밋한 빈틈 — 관리자 변경 직후 공백기 사본 복권 1장에 진행 중 딜이 통째로 꺼졌다
+- `watch` x1: 다수결·재조회·합의 장치를 다 쌓아도 조회 대상 자체가 다수-낡음이면 무력 — 방문자 트래픽과 캐시를 공유하지 않는 전용 데이터 주소가 근본 해법이었다(이벤트 그리드의 정확성이 힌트)
+- `watch` x1: 데스크톱 UA에 좁은 뷰포트로만 검증하면 앱이 아무것도 주입하지 않아 '모바일엔 앱이 없다'고 오판한다 — 실제 iPhone UA로는 정상 주입됐다
+- `watch` x1: 덱에 표를 추가할 때 앞 표의 행 줄바꿈으로 전체가 밀려 푸터를 침범 — 좌표만 계산해선 못 잡음
+- `watch` x1: 동시 세션이 8분 차로 같은 TODO 번호 발급
+- `watch` x1: 동시 세션이 같은 체크아웃에서 ship 하면 git add -A 가 상대의 미커밋 편집까지 커밋
+- `watch` x1: 동일 요청이 3라운드에 걸쳐 쪼개져 왔다 — 글씨(일부) → 박스 → 나머지 글씨+여백+박스 추가
+- `watch` x1: 드래그 구현에 setPointerCapture 를 썼더니 이어지는 click 의 대상이 캡처 요소로 바뀌어 썸네일 선택이 전부 죽었다 — 드래그는 되는데 클릭만 안 되는 형태라 원인이 안 보였다
+- `watch` x1: 라이브파일 트리밍(METH-101)이 해당 작업의 코드가 main 에 올라가기 전에 수행돼, 충돌 해결에서 원격판을 택하는 순간 미커밋 작업의 유일한 서술 기록이 사라질 뻔했다
+- `watch` x1: 레이아웃(3열) 변경 시 그 레이아웃 전제로 만들어둔 보조 장치(배경판)를 함께 회수하지 않아 사용자가 증상을 발견
+- `watch` x1: 링 완성 후 신 로고 진입까지 200ms 동안 빈 원만 남는 사공백 — opacity 수치 추적으로는 안 보이고 필름스트립 이미지로만 발견
+- `watch` x1: 링크 프리픽스 혼용
+- `watch` x1: 매번 새 브라우저로 검증해 캐시 문제를 못 봤다 — 사용자가 다른 브라우저는 정상이라고 알려주기 전까지 재현 불가
+- `watch` x1: 모바일 첫 측정에서 lazy 이미지 미로드로 높이 0 → 제품이 카피와 겹친 것처럼 보여 레이아웃 버그로 오진할 뻔함
+- `watch` x1: 박스 간격으로 20px 을 통일했지만 옵션 테이블은 내부 여백 때문에 시각 간격이 57/50 이었다. 또 하단을 마진으로 맞추려다 사이의 빈 .guideArea 가 마진 상쇄를 끊고 #totalProducts 가 비어도 마진을 내보내는 바람에 40 이 되어 여러 번 헛돌았다
+- `watch` x1: 받은 파일이 SVG 확장자였지만 전부 내부가 PNG 였고, 아이콘은 원형배경·라벨까지 합쳐진 통이미지라 단순 교체가 불가능했다
+- `watch` x1: 발주처 시안 해석
+- `watch` x1: 발주처가 '경계지는 부분'이라 표현한 것을 사이즈 조정 시에만 생기는 간헐 현상으로 오인할 뻔함 — 실제로는 전 폭 상시 존재. 폭별 섹션높이 대 이미지높이를 실측해 상시성을 확정
+- `watch` x1: 발주처가 맥 사파리 전용 문제로 제보했으나 실제로는 브라우저 무관하게 첫 바퀴만 잘리는 문제였다 — 추측으로 갔으면 환경 차이를 쫓느라 헛수고했을 것
+- `watch` x1: 발주처가 보낸 풀페이지 캡처의 빈칸(~750px)이 실제 뷰포트(183px)보다 4배 커서, 캡처만 믿었으면 없는 크기의 문제를 쫓을 뻔했다. vh 기반 CSS는 풀페이지 캡처에서 vh가 페이지 전체로 잡혀 레이아웃이 실제와 달라진다
+- `watch` x1: 발주처가 시작 시각을 계속 바꾸는데 내가 몇 시 시작인지 가정하고 판정해 2회 오판했다
+- `watch` x1: 발주처가 크롬 전용 문제로 제보했으나 두 엔진 실측 결과 동일했고, 내가 오늘 넣은 공지 모듈 중첩이 원인일까 의심됐다
+- `watch` x1: 배포 PDF에 재생성 수단이 없어 2.5개월 방치됐고, PDF로 렌더해 보고서야 md 4-4절이 구판(두 그룹)으로 남아 Notion과 어긋난 걸 발견
+- `watch` x1: 병렬 세션이 TODO 번호를 선점했고 그 ship 이 내 미커밋 변경을 함께 커밋해 메시지와 내용이 어긋났다
+- `watch` x1: 병렬 세션이 TODO 번호와 HANDOFF 차수를 계속 선점 — 이번 세션에서만 3번째
+- `watch` x1: 병렬 세션이 TODO-433 과 HANDOFF 39차를 선점하고 checkpoint 를 통째로 덮음 — 같은 repo 동시 실행 재발
+- `watch` x1: 본문 전체를 숨겼다 나중에 보이는 1차안이 4G에서 안전장치가 JS보다 먼저 터져 원문을 그대로 드러냈다
+- `watch` x1: 볼드 적용 후 같은 글자의 400/700 렌더 폭이 258에서 260px로 0.8%만 늘어 폰트가 볼드로 안 그려지는 줄 알았다. Paperlogy 는 굵기가 달라도 자간폭이 거의 같은 한글 폰트였다
+- `watch` x1: 부정 판정만 합의를 받는 비대칭 규칙이 반나절 만에 역효과 — 낡은 사본은 딜 없음 쪽으로도 진행 중 쪽으로도 거짓말한다는 걸 시작시각 후진 변경 테스트가 드러냄
+- `watch` x1: 불필요한 fetch로 FOUC
+- `watch` x1: 브라우저 패널 백그라운드 탭에서 rAF 가 멈춰 CSS 트랜지션이 시작값에 얼어붙은 것을 '접기 토글 고장'으로 오진하고 사용자에게 버그로 보고했다 — transition:none 주입 시 즉시 동작하는 것이 원인 확정처럼 보였으나 트랜지션 우회일 뿐이었다. 사용자 정정으로 발견
+- `watch` x1: 브랜드2 5→6장 병 등장 시점
+- `watch` x1: 브랜드2 story2.html 5→6장 고정 레이어
+- `watch` x1: 브랜드2 섹션5 고정 로고와 카피 겹침
+- `watch` x1: 브레드크럼을 display:none 으로 숨겨도 .path + .titleArea 인접 형제 선택자가 계속 매칭돼 안 보이는 요소 몫의 55px 여백이 남아 있었다
+- `watch` x1: 빈 컨테이너 잔존 여백
+- `watch` x1: 상품 토큰이 치환되지 않아 두 번 헛발 — (1) 영역 설정 상세API 토글이 꺼져 있었고 (2) 토큰이 morenvy-product-area>morenvy-product 안에 있어야 한다는 구조 요건을 몰랐다. 게다가 치환이 비동기라 우리 스크립트가 먼저 읽어 폴백이 잡혔다
+- `watch` x1: 생성 스크립트가 repo 안에 없어 undefined/ 오생성의 근본 원인을 코드에서 고칠 수 없었음 — 인라인 일회성 캡처 명령의 산출물이라 재발 방지를 gitignore 가드로 우회
+- `watch` x1: 선로딩 프레임에 playVideo 만 보내면 자동재생 정책에 막혀 상태가 -1→3→-1 로 되돌아왔다. 원인이 안 보여 수동 실험으로 mute 선행이 필요함을 발견
+- `watch` x1: 성격이 다른 두 연출(이어받기 vs 등장)이 한 셀렉터에 묶여 있어, 한쪽 기준으로 맞추면 다른 쪽이 틀린다
+- `watch` x1: 셀렉터를 .xans-myshop-asyncbenefit 로 잡으면 회원정보 수정 화면의 인사말까지 사라질 뻔했다. 같은 모듈이 두 페이지에 서로 다른 중첩으로 존재
+- `watch` x1: 손으로 만든 테스트 DOM 에는 자식이 없어 통과했으나 에디터 실제 출력은 한 겹 감싸져 있었다
+- `watch` x1: 쇼츠는 모렌비·상품은 진열 모듈이라는 이원 구조 탓에 사용자가 '배너에 상품을 넣었는데 왜 폴백이냐'로 혼선을 겪었다
+- `watch` x1: 숨길 대상을 내가 넓게 잡았다 — 중복 해소라는 목적에는 h3 만으로 충분한데 칩까지 껐다가 되살렸다
+- `watch` x1: 숨길 범위를 두 번 잘못 잡아 왕복했다 — 1차엔 칩까지 넓게, 2차엔 h3 조건을 좁게
+- `watch` x1: 스크롤 컨테이너를 만들 때 그 안에 함께 들어 있는 다른 요소들도 전부 스크롤된다는 걸 고려하지 않았고, overflow-y hidden 이 자식 박스 밖으로 그려지던 서드파티 위젯 내용을 잘라내는 것도 놓쳤다. 둘 다 사용자 제보와 후속 검사로 드러났다
+- `watch` x1: 시안 문구를 읽기 좋게 다듬은 것이 불필요한 왕복을 만들었다 — 발주처 제공 카피는 기본이 원문 유지다
+- `watch` x1: 시안 프레임이 + 표기를 일관되게 그리지 않아(EVENT 도 + 없음) Brand/Community 를 하위 없는 단순 링크로 오독할 뻔
+- `watch` x1: 시작 시각이 DOM 에 없다고 단정해 회신 문안까지 만들었으나 사용자가 되물어 다시 뒤져보니 PDP 에 .period 와 전입니다 문구가 있었다
+- `watch` x1: 신규 덱을 처음부터 새로 제작
+- `watch` x1: 썸네일 행을 걷어내며 ensureThumbImage()를 이름만 보고 같이 제거했는데 실제로는 카드 이미지 폴백이라 2번 카드가 빈 회색으로 떴다. 치수 검증은 전부 통과했고 스크린샷을 보고서야 발견
+- `watch` x1: 알파 위젯 지연로딩(IntersectionObserver)을 scrollIntoView/scrollTo 로 측정해 1px 자리표시를 빈 위젯으로 오판, 발주처 회신문안·미팅 안건까지 오염
+- `watch` x1: 앞 세션에서 PLP 표기와 맞추려 PDP 박스 할인율을 Cafe24 값 27%로 통일했는데 같은 화면에 금액이 다른 두 줄이 같은 %를 달아 발주처 재지적을 받고 되돌림
+- `watch` x1: 앱이 비동기로 감싸는 마크업이라 로드 직후 1회 실측으로는 이미지 종류를 오판했다 — 래핑 전 3장을 에디터 첨부 이미지로 착각해 초기 진단을 틀리게 씀
+- `watch` x1: 앵커 지정 코드를 insertBefore 앞에 둬서 DOM 미부착 상태의 previousElementSibling 이 null 이라 제목을 못 찾고 그리드에 걸렸다. 배포 후 실측에서 발견
+- `watch` x1: 어드민 화면을 볼 수 없는 상태에서 흐릿한 캡처의 날짜를 혜택 기간으로 추정해 가설을 세웠다가 정정받음 — 어드민 UI 필드 의미는 추정하지 말고 물어볼 것
+- `watch` x1: 어정쩡한 12.96·21.6px 값의 정체가 vw 단위여서, 한 뷰포트만 재면 '어떤 화면에선 비슷하고 어떤 화면에선 다른' 재현 애매한 증상이 된다
+- `watch` x1: 어제 실측으로 알고도 발주처에 검수 도메인 안내를 먼저 하지 않아, 같은 문제를 발주처가 먼저 발견해 보고했다
+- `watch` x1: 업로드 직후 Cafe24 optimizer 가 구버전 번들을 서빙해 뷰포트마다 display 가 엇갈림 — CSS 로직 오류로 오판할 뻔
+- `watch` x1: 업로드 직후 검증에서 PC 만 구파일이 잡혀 캐시 오염으로 오판할 뻔했다 — 실제로는 CSS 전파 지연이었다
+- `watch` x1: 업로드 후 브라우저가 구버전 header.js를 받아 검증 실패로 오인
+- `watch` x1: 여백을 구현 오류로 의심했으나 시안 비율 자체가 9:16 이 아니었다
+- `watch` x1: 여백을 박스 간격으로만 재면 시각 간격과 다르다. 또 첫 측정에서 접힌 멤버십의 숨은 자식이 잉크 범위에 잡혀 간격이 -369로 나와 판이 깨졌다
+- `watch` x1: 외부(광고) 원인 가설을 세우고 자사 페이지 링크 전수 스캔을 뒤로 미룸
+- `watch` x1: 요소를 다른 컨테이너로 옮기니 .eventArea{width:50%} 의 기준이 바뀌어 폭이 절반이 됐다 — 위치만 보고 끝냈으면 놓쳤을 것
+- `watch` x1: 요소의 좌우 여백을 볼 때 페이지 폭을 window.innerWidth(390)로 잡았는데 실제 레이아웃 폭은 documentElement.clientWidth(375)였다. 그 15px 차이 때문에 대칭인 여백을 13/28 비대칭이라고 사용자에게 잘못 보고했다
+- `watch` x1: 운영자가 순번을 세어 맞춰야 하는 식별자를 안내했고 첫 시도에서 그대로 실패했다(섹션 2개인데 3번을 지정)
+- `watch` x1: 원본 진실 확인을 curl 단발로 해서 '딜 소멸'로 오판, 정상 동작 중인 게이트를 원복 실패로 판정할 뻔 — 쿠키·UA 유무가 서빙 변형을 가른다는 3차 교훈을 같은 날 재위반
+- `watch` x1: 유동 바 내부 요소 누락
+- `watch` x1: 유튜브 실화면 재촬영이 3번 실패 — 첫방문 팝업 딤이 덮고 고정 헤더가 섹션 제목을 가림. Playwright clip 키도 w/h 가 아니라 width/height
+- `watch` x1: 이미지 로드 성공 여부를 onload/onerror 로만 판정했는데, 유튜브는 실패에도 디코딩 가능한 대체 이미지를 주기 때문에 onload 가 불린다. 네트워크 404 로그와 DOM 상태가 모순돼 보여 원인 파악이 늦었다
+- `watch` x1: 이미지에 배경이 있다는 제보를 그대로 받으면 이미지를 다시 가공했을 것 — 실제 원인은 섹션 배경이었다
+- `watch` x1: 이벤트 목록 MO 볼드는 Figma 도면 근거가 주석에 명시된 의도적 스타일이라 단순 버그가 아니었다 — 지우기 전에 근거를 확인해야 했다
+- `watch` x1: 절대배치 크기 변경
+- `watch` x1: 정황(일반 로그인 정상)만으로 간편회원 거부 가설을 앞세움
+- `watch` x1: 제보 한 문장에 증상이 둘(간편결제 미노출 + 가로스크롤)이었고 출처가 서로 달랐다 — 묶어서 진단했다면 고칠 수 있는 쪽까지 놓쳤을 것
+- `watch` x1: 제보가 '갤럭시에서만'이라 기기별 렌더 차이로 접근할 뻔했으나 실제로는 iPhone 포함 전 모바일 문제였다. 기기 지목 제보를 그대로 전제하면 엉뚱한 곳을 판다
+- `watch` x1: 제보에 URL 이 없어 list.html 로 찾다 헛돌았다 — 실제 화면은 template 이 다른 project.html 이었다
+- `watch` x1: 조회 응답의 신선/캐시 여부를 헤더(x-cache·date·age)로 구별하려 했으나 캐시본도 HIT·신선 date 로 와서 판별 불가였다
+- `watch` x1: 존재 확인 없이 '대표 도메인 자동 이동 설정을 켜라'고 발주처 회신문안까지 작성
+- `watch` x1: 좌우 배치로 근거를 잃은 보정 장치가 3개였는데(배경판·핀지연·center정렬) 한 번에 회수하지 않아 사용자가 두 번 지적
+- `watch` x1: 주석 앵커 2개 사이를 인덱스 슬라이스로 삭제하다 사이에 있던 461 딜 게이트 본체까지 통삭제된 파일을 업로드(9분 노출) — node --check는 문법만 봐서 통과했고 파일 크기 이상으로야 감지
+- `watch` x1: 직전 답변에서 기본배송비 라벨을 16px이라고 말했으나 실제는 13px이었다. 규칙 원문(16px 통일 선언)만 보고 답했고 computed 를 확인하지 않아 생긴 오답이다
+- `watch` x1: 직전 작업에서 '스와이프 후 재생 인덱스 불변'만 확인하고 슬라이드가 실제 움직였는지는 안 봐서 내가 만든 회귀를 못 잡았다 — 상태 불변을 동작 증거로 오인
+- `watch` x1: 직전 조치(폴백 흰색)로 해결됐다고 보고했으나 실제 원인은 폴백이 아니라 video poster 였다 — 제보 화면을 프레임 단위로 보기 전까지 엉뚱한 곳을 고쳤다
+- `watch` x1: 첫 프로브가 숨겨진 원래 가격줄(27%/13,900)을 집어 딜가 미적용으로 오판할 뻔했다 — 같은 클래스 접두의 가격줄이 2개(원래/딜)라 첫 매칭이 함정
+- `watch` x1: 치환 앵커 '.ts-s2-logos {' 가 파일에 3곳 있어 assert 로 걸림 — 짧은 셀렉터를 앵커로 쓰면 엉뚱한 규칙을 건드린다
+- `watch` x1: 카톡 캡처의 라임색을 강조 표시로 오독할 뻔했다 — 세라가 평소 노란 형광펜으로 영역을 표시해 왔다
+- `watch` x1: 캐시 버전을 올리고 업로드했는데도 브라우저가 HTML 자체를 캐시해 구버전 CSS link를 계속 로드했고, 검증 결과가 미적용으로 나와 규칙이 진 줄 알고 원인을 다시 파헤칠 뻔했다
+- `watch` x1: 캐시된 문서의 .period 에는 옛 종료시각이 박혀 있어 시각 계산만으로는 강제 종료를 판정할 수 없었다
+- `watch` x1: 커뮤니티 타이틀 그레이를 h2 색만 측정해 놓칠 뻔했다 — 실제 글자는 자식 font 태그가 그리고 있었다
+- `watch` x1: 커졌다는 지적을 그대로 받아 최근 변경을 되짚었으나 해당 CSS는 변경 이력이 0이었다. 실제로는 이웃 요소(멤버십 카드)가 접히며 상대적으로 커 보인 것이라, 변경 이력부터 확인하지 않았으면 없는 회귀를 쫓았을 것이다
+- `watch` x1: 컨테이너를 옮기면 그 컨테이너의 자손 셀렉터가 새 자식을 삼킨다 — 이동 당시엔 못 봤고 다른 건 검증하다 우연히 발견
+- `watch` x1: 컷오버 체크리스트에 모바일 디자인 슬롯 항목이 아예 없었다 — 오픈 전날 발주처 질문으로 드러남
+- `watch` x1: 코드 주석이 '링을 남기면 어긋난 테두리가 겹친다'고 이미 경고했는데 소거 타이밍이 신로고 등장보다 늦어 경고가 무력했다 — 주석만 있고 타이밍 검증이 없었다
+- `watch` x1: 코드만 보면 '해시 링크 되니 그렇게 하세요'로 끝낼 뻔했으나 실측하니 섹션 시작점이 136px 가려지는 반쪽 상태였다
+- `watch` x1: 클릭 위임 핸들러로 먼저 구현했으나 Cafe24 스크립트가 버블 전에 stopPropagation 해서 전혀 동작하지 않았다
+- `watch` x1: 킵그로우 CSS 가 CORS 로 페이지에서 안 읽혀 UA별 규칙 차이를 못 보고 헛다리 짚을 뻔함
+- `watch` x1: 파일 6개만 표본 확인하고 '1개뿐'이라 단정 보고
+- `watch` x1: 파일 말미 override 가 :not() 4개짜리 규칙(2,5,0)에 져서 안 먹었다 — PDP infoArea 에 이어 같은 저장소에서 두 번째
+- `watch` x1: 파일·서버 내용은 정상인데 브라우저에 CSS 규칙이 미적용 — 타 세션이 올린 버전 키에 옛 CSS가 캐시된 것
+- `watch` x1: 파티셜 @js 번들이 400초+ 갱신되지 않아 수정본이 서빙되지 않음
+- `watch` x1: 패치 스크립트가 주석 한 단어 차이로 중단됐는데 버전 문자열만 올라간 채 업로드돼 버전-내용 불일치 발생 — 검증과 업로드가 별도 명령이라 중단이 업로드를 못 막았다
+- `watch` x1: 폭 계산식을 높이에 그대로 복사했다가 축마다 100% 기준이 달라 타원이 됐고, 수치 로그(92px 선언)만 보면 정상으로 보여 사용자 지적 전까지 못 잡았다
+- `watch` x1: 폰트 요청은 기술 난이도보다 라이선스가 관문인데, 요청 문구('웹폰트 적용 어려운가요')만 보면 기술 질문으로 오해하기 쉽다
+- `watch` x1: 플로팅 후기를 알파 위젯(review-floating-button)으로 단정해 앱 쪽만 파고듦
+- `watch` x1: 한 연출의 기준점을 바꾸자(중앙 고정 → 실제 위치) 그 기준을 전제로 계산하던 다른 연출이 조용히 어긋났다 — 변경 당시엔 안 보였고 사용자가 발견
+- `watch` x1: 해소된 의문(카드 5개)을 라이브 파일에 '확인 필요'로 남겨두면 다음 세션이 없는 문제를 쫓게 된다. 반대로 지우는 순간 근거도 사라져 같은 의문이 재발할 수 있다
+- `watch` x1: 헤더 위 콘텐츠 겹침 연출
+- `watch` x1: 혜택 등록일을 시작일로 오인했을 것이라 추정해 회신 문안까지 만들었으나 사용자가 시작일 10시임을 확인해줘 추정이 틀렸다
+- `watch` x1: 화면 검증 오염
+- `watch` x1: 확인 없이 쓴 주석이 사실로 굳어 사용자 기억까지 오염 — 죽은 셀렉터라 값 검증으로는 안 잡힘
+- `watch` x1: 회색 출처가 뷰포트마다 달랐다 — PC는 요소 자신의 배경, MO는 body 배경이 비친 것. 한쪽만 보고 고쳤으면 다른 쪽이 안 바뀌었다
+- `watch` x1: 회원 전용 혜택이라 비회원으로는 마크업 자체를 볼 수 없어 8페이지 91장을 훑고도 재현 못 했다
+
+## 마찰 비용 회고 (Retro)
+
+- 마찰 **204건 · 4684분** · 재발(repeat_of) 42건 1005분 (**21%**)
+- phase 기입률: **0/204** — 기입률이 낮으면 아래 분포는 표본 편향이다
+
+| 월 | 건수 | 분 | 재발 분 |
+|---|---|---|---|
+| 2026-05 | 1 | 5 | 0 |
+| 2026-08 | 143 | 3281 | 383 |
+| 2026-09 | 60 | 1398 | 622 |
+
+**비용 상위 5**
+
+- 90분 · `알파 위젯 지연로딩(IntersectionObserver)을 scrollIntoView/scrollTo 로 측정해 1px 자리표시를 빈 위젯으로 오판, 발주처 회신문안·미팅 안건까지 오염` · 재발 — 2026-09-11_alpha-lazyload-misdiagnosis
+- 75분 · `브랜드2 story2.html 5→6장 고정 레이어` — 2026-08-21_story2-flow-boundary-tiling
+- 70분 · `배포 PDF에 재생성 수단이 없어 2.5개월 방치됐고, PDF로 렌더해 보고서야 md 4-4절이 구판(두 그룹)으로 남아 Notion과 어긋난 걸 발견` — 2026-08-25_ops-guide-deck-v8
+- 60분 · `상품 토큰이 치환되지 않아 두 번 헛발 — (1) 영역 설정 상세API 토글이 꺼져 있었고 (2) 토큰이 morenvy-product-area>morenvy-product 안에 있어야 한다는 구조 요건을 몰랐다. 게다가 치환이 비동기라 우리 스크립트가 먼저 읽어 폴백이 잡혔다` — 2026-08-21_ytz-morenvy-product-tokens
+- 60분 · `박스 간격으로 20px 을 통일했지만 옵션 테이블은 내부 여백 때문에 시각 간격이 57/50 이었다. 또 하단을 마진으로 맞추려다 사이의 빈 .guideArea 가 마진 상쇄를 끊고 #totalProducts 가 비어도 마진을 내보내는 바람에 40 이 되어 여러 번 헛돌았다` — 2026-08-24_pdp-option-area-gap-rhythm
+
+## Observations
+
+- `2026-05-07_l1-observe-flow` — domain `meta`, task `docs`
+- `2026-05-15_applied-ci-source-repo-skip` — domain `meta`, task `bugfix`
+- `2026-05-15_methodology-integrity-3-fixes` — domain `meta`, task `refactor`
+- `2026-05-15_observation-lint-policy-realignment` — domain `meta`, task `bugfix`
+- `2026-05-15_qa-dashboard-obs-and-commands-stale` — domain `meta`, task `bugfix`
+- `2026-05-15_stack-bento-card-overview` — domain `meta`, task `feature`
+- `2026-05-15_stack-cleanup-from-design-handoff` — domain `meta`, task `refactor`
+- `2026-05-17_kanban-live-refresh-and-meth016` — domain `meta`, task `feature`
+- `2026-05-17_meth-019-020-013-catalog-adr` — domain `meta`, task `docs`
+- `2026-05-17_meth-022-hook-sync-skip-and-backlog` — domain `meta`, task `feature`
+- `2026-05-17_meth-034-tshome-migration-and-propagation` — domain `meta`, task `bugfix`
+- `2026-05-17_pr22-23-four-project-sync-propagation` — domain `meta`, task `docs`
+- `2026-05-17_qa3-commands-json-coverage` — domain `meta`, task `docs`
+- `2026-05-17_qa4-dashboard-layout-helper` — domain `meta`, task `refactor`
+- `2026-05-17_qa5-launcher-3tier-detection` — domain `meta`, task `bugfix`
+- `2026-05-17_sync-worktree-stale-guard` — domain `meta`, task `bugfix`
+- `2026-05-18_dashboard-api-servers-start-path-augment` — domain `meta`, task `bugfix`
+- `2026-05-18_gitignore-propagation-and-cache-copy-exclusion` — domain `meta`, task `bugfix`
+- `2026-05-18_meth-018-hooks-stale-reinstall` — domain `meta`, task `bugfix`
+- `2026-05-18_meth-038-propagate-4-projects` — domain `meta`, task `refactor`
+- `2026-05-18_session-closeout-meth-036-038-018` — domain `meta`, task `docs`
+- `2026-05-18_ship-npm-manager-run-fix` — domain `meta`, task `bugfix`
+- `2026-05-19_brief-dev-requirements-registered` — domain `meta`, task `docs`
+- `2026-05-19_d06-d12-all-remaining-pdf-items` — domain `meta`, task `feature`
+- `2026-05-19_figma-batch-1-3-apply` — domain `meta`, task `feature`
+- `2026-05-19_figma-build-audit-homepage` — domain `meta`, task `feature`
+- `2026-05-19_header-figma-update` — domain `meta`, task `feature`
+- `2026-05-19_homepage-plp-pdp-implementation` — domain `meta`, task `feature`
+- `2026-05-19_ppt-design-corrections-b01-f01` — domain `meta`, task `feature`
+- `2026-05-19_todo-032-mobile-nav-scroll-subpage` — domain `meta`, task `feature`
+- `2026-05-19_todo-033-hidden-code-page` — domain `meta`, task `feature`
+- `2026-05-20_all-cate-no-finalized-site-ts-collection-tabs-updated` — domain `meta`, task `feature`
+- `2026-05-20_cafe24-cate-no-confirmed-gnb-updated` — domain `meta`, task `feature`
+- `2026-05-20_cafe24-skin178-integration-plan` — domain `meta`, task `docs`
+- `2026-05-20_cafe24-skin178-porting-principles` — domain `meta`, task `docs`
+- `2026-05-20_common-design-tokens-paperlogy` — domain `meta`, task `docs`
+- `2026-05-20_design-priority-figma-web-build` — domain `meta`, task `docs`
+- `2026-05-20_dz-guide-cafe24-manual-learning` — domain `meta`, task `research`
+- `2026-05-20_figma-components-mobile-stack-event` — domain `meta`, task `feature`
+- `2026-05-20_hero-pc-banner-swap` — domain `meta`, task `feature`
+- `2026-05-20_hero-responsive-banner` — domain `meta`, task `feature`
+- `2026-05-20_hidden-code-layout-intro-applied` — domain `meta`, task `feature`
+- `2026-05-20_hidden-code-page-implemented` — domain `meta`, task `feature`
+- `2026-05-20_mobile-tabbar-hook-order-fix` — domain `meta`, task `bugfix`
+- `2026-05-20_next-static-export-cafe24-position` — domain `meta`, task `docs`
+- `2026-05-20_pdp-timedeal-preview-verify` — domain `meta`, task `feature`
+- `2026-05-20_plp-category-tabs-sort-port` — domain `meta`, task `feature`
+- `2026-05-20_plp-mobile-filter-sheet` — domain `meta`, task `feature`
+- `2026-05-20_plp-responsive-grid-pagination` — domain `meta`, task `feature`
+- `2026-05-20_product-card-vanilla-port` — domain `meta`, task `feature`
+- `2026-05-20_quick-float-activation` — domain `meta`, task `feature`
+- `2026-05-20_randol-collection-display-gap-plan` — domain `meta`, task `docs`
+- `2026-05-20_randol-feature-analysis-todo-054-057` — domain `meta`, task `research`
+- `2026-05-20_randol-header-gnb-decisions` — domain `meta`, task `docs`
+- `2026-05-20_randol-header-gnb-gap-plan` — domain `meta`, task `docs`
+- `2026-05-20_randol-product-card-decisions` — domain `meta`, task `docs`
+- `2026-05-20_randol-product-card-gap-plan` — domain `meta`, task `docs`
+- `2026-05-20_remove-brand-community-nav-layers` — domain `meta`, task `feature`
+- `2026-05-20_remove-web-topbanner-popup` — domain `meta`, task `bugfix`
+- `2026-05-20_skin178-collection-section-c01-a` — domain `meta`, task `feature`
+- `2026-05-20_skin178-vanilla-porting-074-077` — domain `meta`, task `feature`
+- `2026-05-20_todo-067-event-carousel` — domain `meta`, task `feature`
+- `2026-05-20_todo-068-solution-section` — domain `meta`, task `feature`
+- `2026-05-20_todo-069-youtube-section` — domain `meta`, task `feature`
+- `2026-05-20_todo-070-slide-review` — domain `meta`, task `feature`
+- `2026-05-20_todo-board-cleanup` — domain `meta`, task `docs`
+- `2026-05-20_top-banner-web-component-layout` — domain `meta`, task `feature`
+- `2026-05-20_vanilla-porting-priority-reset` — domain `meta`, task `docs`
+- `2026-05-20_web-randol-section-architecture` — domain `meta`, task `refactor`
+- `2026-05-20_youtube-section-label-clipping-fix` — domain `meta`, task `bugfix`
+- `2026-05-21_3-input-porting-model-and-folder-normalization` — domain `meta`, task `research`
+- `2026-05-21_alph-widget-css-skin-ftp-setup` — domain `meta`, task `feature`
+- `2026-05-21_auto-sftp-and-asset-rules` — domain `meta`, task `docs`
+- `2026-05-21_collection-empty-state-085` — domain `meta`, task `feature`
+- `2026-05-21_collection-section-gap-analysis-skin178` — domain `meta`, task `refactor`
+- `2026-05-21_fix-design-truth-priority-docs` — domain `meta`, task `docs`
+- `2026-05-21_fix-hero-fade-ghosting` — domain `meta`, task `bugfix`
+- `2026-05-21_gap-analysis-process-formalized` — domain `meta`, task `docs`
+- `2026-05-21_gate2-phase3-entry` — domain `meta`, task `docs`
+- `2026-05-21_header-randol-cleanup-gnb-rebuild` — domain `meta`, task `bugfix`
+- `2026-05-21_layout-css-constraint-fixes` — domain `meta`, task `feature`
+- `2026-05-21_lighthouse-optimization-success` — domain `meta`, task `refactor`
+- `2026-05-21_main-html-inactive-import-cleanup-086-087` — domain `meta`, task `bugfix`
+- `2026-05-21_product-card-gap-analysis-skin178` — domain `meta`, task `refactor`
+- `2026-05-21_qa-snapshot-captures-complete` — domain `meta`, task `docs`
+- `2026-05-21_regression-fixes-114-115-117` — domain `meta`, task `bugfix`
+- `2026-05-21_remove-ambiguous-todo-108` — domain `meta`, task `docs`
+- `2026-05-21_site-header-megamenu-searchpanel-mobilenav-timedeal-section` — domain `meta`, task `feature`
+- `2026-05-21_skin167-parity-audit` — domain `meta`, task `research`
+- `2026-05-21_skin167-track2-scope-confirmed` — domain `meta`, task `docs`
+- `2026-05-21_skin178-after-sync-lighthouse-status` — domain `meta`, task `feature`
+- `2026-05-21_skin178-live-code-backlog-audit` — domain `meta`, task `research`
+- `2026-05-21_skin178-live-upload-blocked-by-sftp` — domain `meta`, task `feature`
+- `2026-05-21_skin178-seo-performance-plp-fallback` — domain `meta`, task `feature`
+- `2026-05-21_todo-021-login-mypage-cart-wishlist-styling` — domain `meta`, task `feature`
+- `2026-05-21_todo-023-figma-image-replacement` — domain `meta`, task `feature`
+- `2026-05-21_todo-026-gnb-shop-banner` — domain `meta`, task `feature`
+- `2026-05-21_todo-028-event-listing-page` — domain `meta`, task `feature`
+- `2026-05-21_todo-053-event-url-structure` — domain `meta`, task `feature`
+- `2026-05-21_todo-088-accessibility-fixes` — domain `meta`, task `feature`
+- `2026-05-21_todo-089-mobile-qa-fixed-ui` — domain `meta`, task `bugfix`
+- `2026-05-21_todo-090-091-092-tracker-smoketest-seo` — domain `meta`, task `docs`
+- `2026-05-21_todo-112-gap-analysis` — domain `meta`, task `feature`
+- `2026-05-21_todo-113-mobile-event-stack` — domain `meta`, task `feature`
+- `2026-05-21_todo-114-hero-and-branding-banners` — domain `meta`, task `feature`
+- `2026-05-21_todo-114-hero-banner-regression-fix` — domain `meta`, task `bugfix`
+- `2026-05-21_todo-115-pdp-gap-analysis` — domain `meta`, task `feature`
+- `2026-05-21_todo-116-mobile-snb` — domain `meta`, task `feature`
+- `2026-05-21_todo-117-review-shorts-gap` — domain `meta`, task `feature`
+- `2026-05-21_todo-118-behavior-cross-check-fix` — domain `meta`, task `bugfix`
+- `2026-05-21_todo-118-common-ui-gap-analysis` — domain `meta`, task `refactor`
+- `2026-05-21_todo-119-common-interaction-tokens` — domain `meta`, task `refactor`
+- `2026-05-21_track1-pdp-widget-verification` — domain `meta`, task `research`
+- `2026-05-21_track2-skins-porting` — domain `meta`, task `feature`
+- `2026-05-21_tsx-based-gap-analysis-planning` — domain `meta`, task `docs`
+- `2026-05-21_visual-regression-workflow-d03` — domain `meta`, task `docs`
+- `2026-05-22_basket-empty-state-figma-parity` — domain `meta`, task `feature`
+- `2026-05-22_basket-tab-background-override` — domain `meta`, task `bugfix`
+- `2026-05-22_basket-tab-removal-and-delvtype-normalization` — domain `meta`, task `refactor`
+- `2026-05-22_best-more-button-center-fix` — domain `meta`, task `bugfix`
+- `2026-05-22_docs-stale-context-refresh` — domain `meta`, task `docs`
+- `2026-05-22_gap4-pdp-mobile-cta-expand` — domain `meta`, task `feature`
+- `2026-05-22_header-gap-state-parity` — domain `meta`, task `feature`
+- `2026-05-22_header-gnb-external-links` — domain `meta`, task `feature`
+- `2026-05-22_header-hover-underline` — domain `meta`, task `feature`
+- `2026-05-22_header-right-nav-font-sync` — domain `meta`, task `bugfix`
+- `2026-05-22_header-shop-font-sync` — domain `meta`, task `bugfix`
+- `2026-05-22_header-text-alignment-fix` — domain `meta`, task `bugfix`
+- `2026-05-22_main-page-js-gap-implementation` — domain `meta`, task `feature`
+- `2026-05-22_mainpage-tabbar-cache-resolution` — domain `meta`, task `bugfix`
+- `2026-05-22_mobile-pdp-figma-parity-todo139` — domain `meta`, task `feature`
+- `2026-05-22_mobile-snb-gap-patch` — domain `meta`, task `bugfix`
+- `2026-05-22_mobile-tabbar-js-fix` — domain `meta`, task `bugfix`
+- `2026-05-22_pdp-figma-gap-implementation` — domain `meta`, task `feature`
+- `2026-05-22_plp-origin-price-fallback-fix` — domain `meta`, task `bugfix`
+- `2026-05-22_plp-price-format-pagination-fix` — domain `meta`, task `bugfix`
+- `2026-05-22_product-card-figma-parity-review-fallback` — domain `meta`, task `bugfix`
+- `2026-05-22_same-ui-parity-lock-docs` — domain `meta`, task `docs`
+- `2026-05-22_support-pages-template-pass` — domain `meta`, task `feature`
+- `2026-05-22_timedeal-randol-engine-merge` — domain `meta`, task `refactor`
+- `2026-05-23_brand-company-compare-consolidation` — domain `meta`, task `research`
+- `2026-05-23_brand-compare-page-implementation` — domain `meta`, task `feature`
+- `2026-05-23_cart-item-list-1row-modernization` — domain `meta`, task `feature`
+- `2026-05-23_event-representative-url` — domain `meta`, task `research`
+- `2026-05-23_header-cart-badge-cleanup` — domain `meta`, task `bugfix`
+- `2026-05-23_member-myshop-ts-member-css-qa` — domain `meta`, task `bugfix`
+- `2026-05-23_mobile-pdp-cta-bar-figma-impl` — domain `meta`, task `feature`
+- `2026-05-23_mobile-pdp-cta-figma-impl` — domain `meta`, task `feature`
+- `2026-05-23_myshop-qa-cta-button-green-fix` — domain `meta`, task `bugfix`
+- `2026-05-23_plp-hover-overlay-cache-refresh` — domain `meta`, task `bugfix`
+- `2026-05-23_plp-hover-overlay-parity-lock` — domain `meta`, task `feature`
+- `2026-05-23_plp-hover-overlay-qa-refinement-v2` — domain `meta`, task `bugfix`
+- `2026-05-23_plp-hover-overlay-qa-refinement` — domain `meta`, task `bugfix`
+- `2026-05-23_project-url-template-mapping` — domain `meta`, task `research`
+- `2026-05-23_skin178-page-coverage-comparison` — domain `meta`, task `research`
+- `2026-05-23_survey-page-retained` — domain `meta`, task `research`
+- `2026-05-23_ts-basket-ui-refactor` — domain `meta`, task `refactor`
+- `2026-05-23_ts-gnb-brand-and-trust-badges` — domain `meta`, task `feature`
+- `2026-05-23_tstrillion-url-structure-audit` — domain `meta`, task `research`
+- `2026-05-24_align-cart-utility-buttons` — domain `meta`, task `refactor`
+- `2026-05-24_basket-spacing-and-ellipsis-fix` — domain `meta`, task `bugfix`
+- `2026-05-24_cart-order-estimate-approval` — domain `meta`, task `docs`
+- `2026-05-24_event-text-editing-manual` — domain `meta`, task `docs`
+- `2026-05-24_fix-plp-timedeal-banner-exposure` — domain `meta`, task `bugfix`
+- `2026-05-24_hero-banner-order-manual` — domain `meta`, task `docs`
+- `2026-05-24_login-page-footer-removal` — domain `meta`, task `bugfix`
+- `2026-05-24_login-page-logo-replacement` — domain `meta`, task `bugfix`
+- `2026-05-24_main-product-display-all-phases-complete` — domain `meta`, task `feature`
+- `2026-05-24_main-slot-remapping-and-display-confirmed` — domain `meta`, task `feature`
+- `2026-05-24_member-pages-approval` — domain `meta`, task `docs`
+- `2026-05-24_mobile-pdp-layout-fix` — domain `meta`, task `bugfix`
+- `2026-05-24_pdp-alpha-upsell-widget-inject` — domain `meta`, task `feature`
+- `2026-05-24_pdp-alpha-upsell-widget-reposition` — domain `meta`, task `feature`
+- `2026-05-24_pdp-membership-redesign-dynamic-grade` — domain `meta`, task `feature`
+- `2026-05-24_pdp-mobile-product-name-responsive-fix` — domain `meta`, task `bugfix`
+- `2026-05-24_pdp-price-decimal-parse-fix` — domain `meta`, task `bugfix`
+- `2026-05-24_pdp-related-products-figma-reposition` — domain `meta`, task `feature`
+- `2026-05-24_pdp-remove-trust-badges` — domain `meta`, task `refactor`
+- `2026-05-24_pdp-simple-desc-relocation` — domain `meta`, task `bugfix`
+- `2026-05-24_pdp-tabs-badge-lineheight-fix` — domain `meta`, task `bugfix`
+- `2026-05-24_plp-admin-2level-category-nav` — domain `meta`, task `feature`
+- `2026-05-24_plp-category-nav-figma-271-567-underline-tab-mobile-clip-bugfix` — domain `meta`, task `bugfix`
+- `2026-05-24_plp-category-scrollbar-design` — domain `meta`, task `feature`
+- `2026-05-24_restore-randol-cart-layout` — domain `meta`, task `refactor`
+- `2026-05-24_solution-section-card-ui-refactor` — domain `meta`, task `refactor`
+- `2026-05-24_solution-section-slot-conflict-fix` — domain `meta`, task `refactor`
+- `2026-05-24_tweak-cart-card-right-margin` — domain `meta`, task `refactor`
+- `2026-05-24_user-guide-and-operation-manual` — domain `meta`, task `docs`
+- `2026-05-25_mobile-pdp-buy-bottom-sheet` — domain `meta`, task `feature`
+- `2026-05-25_mobile-pdp-pc-tabs-overlap-fix` — domain `meta`, task `refactor`
+- `2026-05-25_mobile-viewport-800px-breakpoint-change` — domain `meta`, task `refactor`
+- `2026-05-25_pdp-alpha-review-integration` — domain `meta`, task `feature`
+- `2026-05-25_pdp-mobile-sheet-resize-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-25_pdp-mobile-sheet-stepper-design-parity` — domain `meta`, task `feature`
+- `2026-05-25_pdp-mobile-stepper-price-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-25_pdp-options-default-tr-pre-exposure-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-25_pdp-options-qty-pre-exposure-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-25_pdp-options-stepper-and-price-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-25_pdp-selected-options-stepper-fix` — domain `meta`, task `bugfix`
+- `2026-05-25_pdp-tab-duplication-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-1669-additional-width-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-additional-style-text-tab-duplicate-fix` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-addproduct-name-column-fix` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-figma-800-width-lock` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-mobile-bottom-sheet-expanded-restore` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-mobile-inline-style-restore` — domain `meta`, task `bugfix`
+- `2026-05-26_pdp-right-panel-inline-style-restore` — domain `meta`, task `bugfix`
+- `2026-05-27_disable-non-member-benefit-popup` — domain `meta`, task `bugfix`
+- `2026-05-27_figma-885-101-index-resync` — domain `meta`, task `bugfix`
+- `2026-05-27_figma-absolute-truth-source-priority-established` — domain `meta`, task `docs`
+- `2026-05-27_global-member-top-banner` — domain `meta`, task `feature`
+- `2026-05-27_gnb-banner-dimensions-update` — domain `meta`, task `refactor`
+- `2026-05-27_gnb-banner-hover-zoom` — domain `meta`, task `refactor`
+- `2026-05-27_gnb-banner-nextjs-parity-lock-and-mobile-tab-bar-verification` — domain `meta`, task `feature`
+- `2026-05-27_gnb-banner-specificity-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_gnb-shop-banner-morenvy-integration` — domain `meta`, task `feature`
+- `2026-05-27_header-mega-menu-top-banner-overlap` — domain `meta`, task `bugfix`
+- `2026-05-27_header-search-pill-opacity` — domain `meta`, task `bugfix`
+- `2026-05-27_index-event-banner-figma-790` — domain `meta`, task `bugfix`
+- `2026-05-27_index-pc-response-map` — domain `meta`, task `docs`
+- `2026-05-27_main-hero-counter-figma-lock` — domain `meta`, task `bugfix`
+- `2026-05-27_main-hero-counter-width-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_main-review-smart-pick-widget-switch` — domain `meta`, task `feature`
+- `2026-05-27_mega-layer-white-tone-lock` — domain `meta`, task `bugfix`
+- `2026-05-27_mobile-header-cart-badge-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_mobile-pdp-bottom-sheet-stepper-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_mobile-pdp-stepper-pseudo-background-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_mobile-snb-promo-morenvy-integration` — domain `meta`, task `feature`
+- `2026-05-27_mobile-tabbar-height-update` — domain `meta`, task `refactor`
+- `2026-05-27_paperlogy-font-priority-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-27_pc-header-cart-hover-underline-parity` — domain `meta`, task `bugfix`
+- `2026-05-27_pc-header-utility-nav-cart-badge-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_plp-cate490-figma-parity` — domain `meta`, task `feature`
+- `2026-05-27_plp-font-priority-rollback` — domain `meta`, task `bugfix`
+- `2026-05-27_plp-product-card-text-spacing` — domain `meta`, task `bugfix`
+- `2026-05-27_plp-responsive-category-spacing` — domain `meta`, task `bugfix`
+- `2026-05-27_search-icon-center-inset` — domain `meta`, task `bugfix`
+- `2026-05-27_search-icon-inset-lock` — domain `meta`, task `bugfix`
+- `2026-05-27_search-icon-inside-pill` — domain `meta`, task `bugfix`
+- `2026-05-27_search-input-width-flex-fix` — domain `meta`, task `bugfix`
+- `2026-05-27_search-placeholder-remove` — domain `meta`, task `bugfix`
+- `2026-05-27_solution-event-vertical-gap` — domain `meta`, task `bugfix`
+- `2026-05-27_web-folder-modification-rollback-and-skin178-exclusivity` — domain `meta`, task `refactor`
+- `2026-05-27_youtube-section-figma-redesign` — domain `meta`, task `feature`
+- `2026-05-28_160px-container-audit-and-fix` — domain `meta`, task `bugfix`
+- `2026-05-28_current-figma-source-context` — domain `meta`, task `docs`
+- `2026-05-28_figma-all-sections-checklist-setup` — domain `meta`, task `feature`
+- `2026-05-28_figma-bulk-node-intake-test` — domain `meta`, task `research`
+- `2026-05-28_figma-design-parity-blockers-full-audit` — domain `meta`, task `research`
+- `2026-05-28_figma-internal-box-priority` — domain `meta`, task `docs`
+- `2026-05-28_figma-measurement-inventory-template` — domain `meta`, task `docs`
+- `2026-05-28_figma-mobile-node-intake` — domain `meta`, task `research`
+- `2026-05-28_figma-node-loop-automation-plan` — domain `meta`, task `research`
+- `2026-05-28_figma-node-loop-execution-gnb-search` — domain `meta`, task `feature`
+- `2026-05-28_figma-parity-measurement-docs` — domain `meta`, task `docs`
+- `2026-05-28_figma-pc-node-intake` — domain `meta`, task `research`
+- `2026-05-28_figma-revision-node-intake-batch-2` — domain `meta`, task `research`
+- `2026-05-28_header-js-jquery-ready-guard` — domain `meta`, task `bugfix`
+- `2026-05-28_header-search-figma-parity-lock` — domain `meta`, task `bugfix`
+- `2026-05-28_index-response-map-workflow` — domain `meta`, task `docs`
+- `2026-05-28_loop-mo-04-05-basket-snb-parity-lock` — domain `meta`, task `feature`
+- `2026-05-28_loop-pc-03-09-figma-node-traversal-complete` — domain `meta`, task `feature`
+- `2026-05-28_main-section-css-direct-link-recovery` — domain `meta`, task `bugfix`
+- `2026-05-28_mo-pdp-cart-option-bottom-sheet` — domain `meta`, task `feature`
+- `2026-05-28_mo-search-overlay-subpage-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-fixed-640-principle` — domain `meta`, task `docs`
+- `2026-05-28_mobile-gnb-41px-height-figma-parity-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-gnb-56px-optimized-standard-restoration` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-gnb-cross-verified-and-breakpoint-elevated` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-gnb-hamburger-rollback-to-design-truth` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-gnb-icon-size-parity-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-gnb-rem-fluid-scaling-architecture-migration` — domain `meta`, task `refactor`
+- `2026-05-28_mobile-gnb-true-1x-rem-fluid-scaling-re-porting` — domain `meta`, task `refactor`
+- `2026-05-28_mobile-header-utility-swap-audit` — domain `meta`, task `research`
+- `2026-05-28_mobile-nav-cascade-bug-fix` — domain `meta`, task `bugfix`
+- `2026-05-28_mobile-snb-scale-down-halved-patch` — domain `meta`, task `bugfix`
+- `2026-05-28_plp-alignment-spacing-snb-readability-sftp` — domain `meta`, task `bugfix`
+- `2026-05-28_popular-searches-click-interception-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-28_ppt-skin178-work-summary-2026-05-28` — domain `meta`, task `docs`
+- `2026-05-28_restore-search-keyword-triggers` — domain `meta`, task `feature`
+- `2026-05-28_sec-mo-gnb-01-hybrid-c-conversion` — domain `meta`, task `refactor`
+- `2026-05-28_sec-pc-gnb-02-cross-verify` — domain `meta`, task `bugfix`
+- `2026-05-28_sec-pc-gnb-03-search-layer-cross-verify` — domain `meta`, task `research`
+- `2026-05-28_sec-pc-main-06-cross-verification` — domain `meta`, task `research`
+- `2026-05-28_todo-206-bestsnap-review-layout-fix` — domain `meta`, task `bugfix`
+- `2026-05-28_todo-209-section-160px-youtube-gap-radius` — domain `meta`, task `bugfix`
+- `2026-05-28_workspace-level-collaboration-migration` — domain `meta`, task `refactor`
+- `2026-05-28_youtube-1280px-gap-optimization` — domain `meta`, task `refactor`
+- `2026-05-28_youtube-1280px-layout-fix` — domain `meta`, task `bugfix`
+- `2026-05-28_youtube-1280px-overlap-fix` — domain `meta`, task `bugfix`
+- `2026-05-28_youtube-640px-mobile-fixes` — domain `meta`, task `bugfix`
+- `2026-05-28_youtube-mobile-flex-gap-fallback-margin-lock` — domain `meta`, task `bugfix`
+- `2026-05-29_best-collection-section-alignment-fix` — domain `meta`, task `bugfix`
+- `2026-05-29_best-collection-section-parity-audit` — domain `meta`, task `research`
+- `2026-05-29_four-main-sections-spacing-alignment-integration` — domain `meta`, task `bugfix`
+- `2026-05-29_header-search-banner-overlap-fix` — domain `meta`, task `bugfix`
+- `2026-05-29_header-search-popular-alignment-fix` — domain `meta`, task `feature`
+- `2026-05-29_header-search-popular-mobile-support` — domain `meta`, task `feature`
+- `2026-05-29_mo-event-stacking-interaction-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-29_mo-plp-spacing-visual-hotfix` — domain `meta`, task `bugfix`
+- `2026-05-29_pc-plp-spacing-visual-hotfix` — domain `meta`, task `bugfix`
+- `2026-06-01_pc-fixed-header-offset-audit` — domain `meta`, task `bugfix`
+- `2026-06-01_pc-promo-banner-scroll-y-safe-target` — domain `meta`, task `bugfix`
+- `2026-06-01_pdp-randol-review-widget-restore` — domain `meta`, task `bugfix`
+- `2026-06-01_plp-mobile-width-hover-whiteout-fix` — domain `meta`, task `bugfix`
+- `2026-06-01_plp-reduced-pc-hover-whiteout-final-fix` — domain `meta`, task `bugfix`
+- `2026-06-01_promo-image-placeholder-regression-fix` — domain `meta`, task `bugfix`
+- `2026-06-02_basket-checkbox-uncheck-hotfix` — domain `meta`, task `bugfix`
+- `2026-06-02_basket-default-checked-safeguards` — domain `meta`, task `bugfix`
+- `2026-06-02_basket-selected-total-flow` — domain `meta`, task `bugfix`
+- `2026-06-02_basket-summary-hidden-all-viewports` — domain `meta`, task `bugfix`
+- `2026-06-02_brand-compare-v2-implementation` — domain `meta`, task `feature`
+- `2026-06-02_brand-compare-v2-planning` — domain `meta`, task `docs`
+- `2026-06-02_legacy-breakpoints-bp640-normalized` — domain `meta`, task `bugfix`
+- `2026-06-02_mobile-basket-summary-hidden` — domain `meta`, task `bugfix`
+- `2026-06-02_mobile-quick-recent-hidden` — domain `meta`, task `bugfix`
+- `2026-06-02_mobile-tabbar-bp640-lock` — domain `meta`, task `bugfix`
+- `2026-06-02_pdp-soldout-styling-lock` — domain `meta`, task `feature`
+- `2026-06-02_plp-pdp-soldout-hotfix` — domain `meta`, task `bugfix`
+- `2026-06-02_plp-soldout-styling-lock` — domain `meta`, task `feature`
+- `2026-06-02_review-desktop-search-bar-alignment` — domain `meta`, task `bugfix`
+- `2026-06-02_review-mobile-search-bar-modernization` — domain `meta`, task `bugfix`
+- `2026-06-09_sftp-skin184-migration-and-rollback` — domain `meta`, task `refactor`
+- `2026-06-10_skin184-youtube-shorts-07ab-sftp-upload` — domain `meta`, task `feature`
+- `2026-06-10_skin184-youtube-shorts-morenvy-07ab` — domain `meta`, task `feature`
+- `2026-06-11_skin184-product-hover-overlay-pointer-fix` — domain `meta`, task `bugfix`
+- `2026-06-11_skin184-shorts-07ab-data-script-blocker` — domain `meta`, task `feature`
+- `2026-06-11_skin184-shorts-07ab-install-code-applied` — domain `meta`, task `feature`
+- `2026-06-11_skin184-thumbnail-hover-icon-layer-fix` — domain `meta`, task `bugfix`
+- `2026-06-11_skin184-youtube-shorts-07ab-link-only-recheck` — domain `meta`, task `feature`
+- `2026-06-15_skin184-community-label-no-link` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-mobile-cart-bag-icon-update` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-mobile-snb-banner-e0e5` — domain `meta`, task `feature`
+- `2026-06-15_skin184-mobile-top-nav-icon-replacement` — domain `meta`, task `feature`
+- `2026-06-15_skin184-mypage-dropdown-alignment` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-nav-banner-morenvy-e0e5` — domain `meta`, task `feature`
+- `2026-06-15_skin184-nav-port-from-skin183` — domain `meta`, task `feature`
+- `2026-06-15_skin184-remove-curation-move-survey` — domain `meta`, task `feature`
+- `2026-06-15_skin184-search-layer-design-hotfix` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-shop-event-detail-panel` — domain `meta`, task `feature`
+- `2026-06-15_skin184-shop-event-panel-cache-bust` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-subpage-fixed-header-overlap` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-subpage-morenvy-install` — domain `meta`, task `bugfix`
+- `2026-06-15_skin184-top-text-header-gap-fix` — domain `meta`, task `bugfix`
+- `2026-06-16_order-standalone-nav-morenvy-loader` — domain `meta`, task `bugfix`
+- `2026-06-16_skin184-benefits-remove-membership-event` — domain `meta`, task `bugfix`
+- `2026-06-16_skin184-custom-popup-morenvy-43e7` — domain `meta`, task `feature`
+- `2026-06-16_skin184-event-menu-restore` — domain `meta`, task `bugfix`
+- `2026-06-16_skin184-event-overview-signature-style` — domain `meta`, task `bugfix`
+- `2026-06-16_skin184-mobile-snb-footer-prune` — domain `meta`, task `bugfix`
+- `2026-06-16_skin184-shop-event-benefits-pages` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-board-3001-input-form-template` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-board-driven-pool-final` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-decode-entities-spacing` — domain `meta`, task `bugfix`
+- `2026-06-25_hidden-code-dedicated-page-guard` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-gate-port-skin184-standalone` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-guard-board-auto` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-guard-default-lock-numeric-dest` — domain `meta`, task `feature`
+- `2026-06-25_hidden-code-period-autoday-board101-unsuitable` — domain `meta`, task `bugfix`
+- `2026-06-25_hidden-code-secret-post-blocks-clientfetch` — domain `meta`, task `bugfix`
+- `2026-06-26_dev-fixes-deck-issues-section` — domain `meta`, task `docs`
+- `2026-06-26_hidden-code-attachment-as-background` — domain `meta`, task `feature`
+- `2026-06-26_hidden-code-bg-contain-fit` — domain `meta`, task `feature`
+- `2026-06-26_hidden-code-board3001-e2e-verified` — domain `meta`, task `feature`
+- `2026-06-26_hidden-code-guard-cache-version-tag` — domain `meta`, task `bugfix`
+- `2026-06-26_hidden-code-guard-redirect-by-article-no` — domain `meta`, task `refactor`
+- `2026-06-26_hidden-code-input-text-white` — domain `meta`, task `bugfix`
+- `2026-06-26_hidden-code-numeric-entity-decode` — domain `meta`, task `bugfix`
+- `2026-06-26_hidden-code-period-expiry-and-field-guide` — domain `meta`, task `feature`
+- `2026-06-26_hidden-code-pretty-url-support` — domain `meta`, task `feature`
+- `2026-06-26_hidden-code-remove-bg-url-label` — domain `meta`, task `refactor`
+- `2026-06-26_hidden-code-sample-block-cutoff` — domain `meta`, task `feature`
+- `2026-06-26_hidden-code-title-subtitle-period-toggle` — domain `meta`, task `feature`
+- `2026-06-26_mobile-installment-unbold` — domain `meta`, task `refactor`
+- `2026-06-26_ops-guide-repo-notion-sync-check` — domain `meta`, task `docs`
+- `2026-06-26_r1-global-side-margin-160px` — domain `meta`, task `feature`
+- `2026-06-26_r1-responsive-max-width-refinement` — domain `meta`, task `refactor`
+- `2026-06-26_r10-event-pagination-arrow-fix` — domain `meta`, task `bugfix`
+- `2026-06-26_r10-event-prev-next-buttons` — domain `meta`, task `feature`
+- `2026-06-26_r10-hero-arrow-gray-unify` — domain `meta`, task `feature`
+- `2026-06-26_r10-pagination-gap-unify` — domain `meta`, task `bugfix`
+- `2026-06-26_r10-slider-counter-gray-pill` — domain `meta`, task `feature`
+- `2026-06-26_r12-snb-promo-banner-figma-image` — domain `meta`, task `feature`
+- `2026-06-26_r13-r16-mo-bottomsheet-typography` — domain `meta`, task `feature`
+- `2026-06-26_r17-sheet-handle-close` — domain `meta`, task `bugfix`
+- `2026-06-26_r18-remove-mo-delete-direction-fix` — domain `meta`, task `bugfix`
+- `2026-06-26_r19-mobile-image-header-clearance` — domain `meta`, task `bugfix`
+- `2026-06-26_r2-detail-tab-flush-no-gap` — domain `meta`, task `bugfix`
+- `2026-06-26_r2-detail-tab-sticky-header-overlap` — domain `meta`, task `bugfix`
+- `2026-06-26_r3-right-sheet-max-height` — domain `meta`, task `bugfix`
+- `2026-06-26_r4-pc-option-box-fix` — domain `meta`, task `bugfix`
+- `2026-06-26_r4-pc-remove-delete-x` — domain `meta`, task `bugfix`
+- `2026-06-26_r4-r18-mo-option-box-delete` — domain `meta`, task `bugfix`
+- `2026-06-26_r6-installment-card-text-16px` — domain `meta`, task `bugfix`
+- `2026-06-26_r8-easypay-10px-gap` — domain `meta`, task `bugfix`
+- `2026-06-26_r8-r20-easypay-pc-mo` — domain `meta`, task `bugfix`
+- `2026-06-26_r9-tabbar-icon-stroke-uniform` — domain `meta`, task `bugfix`
+- `2026-06-26_signup-strip-banner-signature-green` — domain `meta`, task `feature`
+- `2026-06-29_client-qa-ab-skin184-tab-overlap-dup-buybtn` — domain `meta`, task `bugfix`
+- `2026-06-29_client-qa-group2-mobile-font-hierarchy-184` — domain `meta`, task `bugfix`
+- `2026-06-29_easypay-1col-fixed-broken-comment-drop` — domain `meta`, task `bugfix`
+- `2026-06-29_easypay-widget-declutter-1col-184-190` — domain `meta`, task `feature`
+- `2026-06-29_header-gnb-montserrat-to-paperlogy` — domain `meta`, task `bugfix`
+- `2026-06-29_promo-banner-fullwidth-restore` — domain `meta`, task `feature`
+- `2026-06-29_skin184-density-v3-075-delivery-gap-selected0` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-easypay-overlap-wrap-2col` — domain `meta`, task `bugfix`
+- `2026-06-29_skin184-global-paperlogy` — domain `meta`, task `feature`
+- `2026-06-29_skin184-installment-card-text-match` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-mobile-sheet-product-name-15px` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-pdp-price-equals-name-fontsize` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-pdp-right-sheet-density` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-product-name-bold` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-right-sheet-density-v2-exclude-membership` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-selected-box-gap-regression-fix` — domain `meta`, task `bugfix`
+- `2026-06-29_skin184-selected-box-no-option-lock` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-selected-products-row-gap` — domain `meta`, task `refactor`
+- `2026-06-29_skin184-stepper-cell-has-quantity-align` — domain `meta`, task `bugfix`
+- `2026-06-29_skin184-totalproducts-addproduct-flex-fix` — domain `meta`, task `bugfix`
+- `2026-06-29_skin184-totalproducts-stepper-remove-unify` — domain `meta`, task `feature`
+- `2026-06-29_skin184-totalproducts-unify-styling` — domain `meta`, task `refactor`
+- `2026-06-29_skin190-detail-tab-sticky-header-fix` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-detailarea-header-overlap-fix` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-double-scrollbar-infoarea-fix` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-infoarea-cap-revert-randol-origin` — domain `meta`, task `refactor`
+- `2026-06-29_skin190-infoarea-scrollbar-visually-hidden` — domain `meta`, task `feature`
+- `2026-06-29_skin190-membership-benefit-card-static` — domain `meta`, task `feature`
+- `2026-06-29_skin190-membership-grade-card-dynamic` — domain `meta`, task `feature`
+- `2026-06-29_skin190-mobile-easypay-gap` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-mobile-tab-image-header-overlap` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-notion-board-sync` — domain `meta`, task `docs`
+- `2026-06-29_skin190-pdp-randol-revert` — domain `meta`, task `feature`
+- `2026-06-29_skin190-randol-join-cta-easypay-1row` — domain `meta`, task `feature`
+- `2026-06-29_skin190-scrollbar-184-css-identical` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-scrollbar-184-parity-final` — domain `meta`, task `feature`
+- `2026-06-29_skin190-scrollbar-hide-revert-keep-randol` — domain `meta`, task `refactor`
+- `2026-06-29_skin190-scrollbar-real-browser-nested-fix` — domain `meta`, task `bugfix`
+- `2026-06-29_skin190-single-scroll-reapply-clarify` — domain `meta`, task `feature`
+- `2026-06-30_client-add-1an-buybtn-easypay-mo-2col` — domain `meta`, task `feature`
+- `2026-06-30_easypay-add-2col-range-641-740` — domain `meta`, task `feature`
+- `2026-06-30_easypay-force-1col-full-sdk-widgets` — domain `meta`, task `feature`
+- `2026-06-30_easypay-revert-to-original-sdk-widgets` — domain `meta`, task `refactor`
+- `2026-06-30_easypay-viewport-1col-2col-1001-1460` — domain `meta`, task `feature`
+- `2026-06-30_skin184-641-1000-price-stepper-overlap-fix` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-addproduct-name-strong-normalize-mobile` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-alpha-upsell-add-stepper-below-name-fix` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-keepgrow-member-design-port-classb` — domain `meta`, task `feature`
+- `2026-06-30_skin184-mo-to-pc-resize-restore-order-fix` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-mobile-hide-inline-totalprice` — domain `meta`, task `refactor`
+- `2026-06-30_skin184-pc-resize-vertical-stack-bugfix` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-pc-stepper-vertical-compact` — domain `meta`, task `refactor`
+- `2026-06-30_skin184-pc-totalproducts-price-show-190style` — domain `meta`, task `feature`
+- `2026-06-30_skin184-sheet-stepper-compact-resize` — domain `meta`, task `refactor`
+- `2026-06-30_skin184-sheet-stepper-option-add-unify` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-totalproducts-641-1000-gap-fix` — domain `meta`, task `bugfix`
+- `2026-06-30_skin184-totalproducts-style-unify-sheet-price` — domain `meta`, task `bugfix`
+- `2026-06-30_skin190-link-missing-quote-emergency-fix` — domain `meta`, task `bugfix`
+- `2026-06-30_skin190-review-3col-to-1row-horizontal` — domain `meta`, task `feature`
+- `2026-06-30_skin190-review-revert-to-default-3col` — domain `meta`, task `refactor`
+- `2026-06-30_skin190-totalproducts-addproduct-bg-unify` — domain `meta`, task `bugfix`
+- `2026-07-01_b-version-trendy-bento-grain-kinetic` — domain `meta`, task `feature`
+- `2026-07-01_brand-ingredients-magazine-a-versions` — domain `meta`, task `feature`
+- `2026-07-01_brand-magazine-seo-alias-board13` — domain `meta`, task `feature`
+- `2026-07-01_brand-pages-phase1-gnb-dropdown` — domain `meta`, task `feature`
+- `2026-07-01_brand-story-ab-aromatica-homage` — domain `meta`, task `feature`
+- `2026-07-01_brand-story-ingredients-phase2-3` — domain `meta`, task `feature`
+- `2026-07-01_brand-story-v2-cinematic-redesign` — domain `meta`, task `feature`
+- `2026-07-01_brand-story-v3-fx-gsap-showpiece` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-about-rebuild` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-boundary-product-sync` — domain `meta`, task `bugfix`
+- `2026-07-01_brand-story1-flower-boundary-clip` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-flower-container-edge-clip` — domain `meta`, task `bugfix`
+- `2026-07-01_brand-story1-fullbleed` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-gif-bloom-visual` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-hero-ink-philosophy` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-history-pictogram-timeline` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-history-product-boundary-clip` — domain `meta`, task `bugfix`
+- `2026-07-01_brand-story1-history-product-transparent-asset` — domain `meta`, task `bugfix`
+- `2026-07-01_brand-story1-product-mask-timing` — domain `meta`, task `bugfix`
+- `2026-07-01_brand-story1-product-top-reveal` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-remove-small-product-layer` — domain `meta`, task `bugfix`
+- `2026-07-01_brand-story1-rhythm-rewrite-gsap-pin` — domain `meta`, task `refactor`
+- `2026-07-01_brand-story1-scroll-follow-visual` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-scroll-morph-pin` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-scroll-scrub-sequence` — domain `meta`, task `feature`
+- `2026-07-01_brand-story1-transition-scale-refine` — domain `meta`, task `feature`
+- `2026-07-01_ingredient-detail-grid-fullwidth` — domain `meta`, task `refactor`
+- `2026-07-01_ingredient-detail-magazine-layout` — domain `meta`, task `feature`
+- `2026-07-01_ingredients2-free-botanical-photos` — domain `meta`, task `feature`
+- `2026-07-01_live-cutover-checklist-review-gallery-count` — domain `meta`, task `docs`
+- `2026-07-01_skin184-brandstory-header-whiteband-fullbleed` — domain `meta`, task `bugfix`
+- `2026-07-01_skin184-subpage-header-3state-unify` — domain `meta`, task `feature`
+- `2026-07-01_skin190-review-first-row-3cards-only` — domain `meta`, task `feature`
+- `2026-07-01_skin190-review-keep-pagination` — domain `meta`, task `feature`
+- `2026-07-02_skin184-footer-about-brand-story` — domain `meta`, task `feature`
+- `2026-07-02_skin184-footer-sns-real-links` — domain `meta`, task `feature`
+- `2026-07-02_skin184-magazine-board-admin-modules-bottom` — domain `meta`, task `feature`
+- `2026-07-02_skin184-member-popup-off` — domain `meta`, task `feature`
+- `2026-07-03_ops-guide-portrait-ppt` — domain `meta`, task `docs`
+- `2026-07-03_ops-guide-ppt-live-edition` — domain `meta`, task `docs`
+- `2026-07-03_ops-guide-ppt-v3-admin-screens` — domain `meta`, task `docs`
+- `2026-07-03_ops-guide-ppt-v4-hover-image` — domain `meta`, task `docs`
+- `2026-07-03_toptext-login-hide-notion-guide` — domain `meta`, task `feature`
+- `2026-07-07_mileage-avail-var-and-name-descender-fix` — domain `meta`, task `bugfix`
+- `2026-07-07_plp-timedeal-name-mileage-unify` — domain `meta`, task `feature`
+- `2026-07-08_todo349-batch-followup-count20-cutover` — domain `meta`, task `feature`
+- `2026-07-09_gnb-cursor-pdp-tab-zindex` — domain `meta`, task `bugfix`
+- `2026-07-09_soldout-overlay-icon-detect-fix` — domain `meta`, task `bugfix`
+- `2026-07-15_skin184-vendor-handoff-commenting` — domain `meta`, task `docs`
+- `2026-07-16_skin184-handoff-upload-cdp-verify` — domain `meta`, task `docs`
+- `2026-07-24_nav-sample-demo-links` — domain `meta`, task `feature`
+- `2026-07-30_hero-safezone-live-overlay-capture` — domain `meta`, task `docs`
+- `2026-07-30_hero-safezone-remeasure` — domain `meta`, task `research`
+- `2026-07-30_hero-safezone-sync-ppt-imgs` — domain `meta`, task `docs`
+- `2026-07-30_ppt-font-pretendard-fix` — domain `meta`, task `bugfix`
+- `2026-07-30_ppt-safezone-slide-mdguide-fix` — domain `meta`, task `docs`
+- `2026-07-31_review-widget-skeleton-deadspace-cap` — domain `meta`, task `bugfix`
+- `2026-08-03_event-section-textfit-overflow` — domain `meta`, task `bugfix`
+- `2026-08-03_hero-text1-decimal-seconds` — domain `meta`, task `feature`
+- `2026-08-03_hero-text1-seconds-dual-parse` — domain `meta`, task `feature`
+- `2026-08-03_hero-video-drag-longswipe-fix` — domain `meta`, task `bugfix`
+- `2026-08-03_hero-video-e2e-mp4-block-finding` — domain `meta`, task `bugfix`
+- `2026-08-03_hero-video-pcmo-native-field-wiring` — domain `meta`, task `feature`
+- `2026-08-03_hero-video-slide-per-banner-duration` — domain `meta`, task `feature`
+- `2026-08-03_notion-inquiry-sweep-board-sync` — domain `meta`, task `docs`
+- `2026-08-03_ops-guide-hero-video-event-textfit-sync` — domain `meta`, task `docs`
+- `2026-08-03_ops-ppt-v7-hero-video-slide` — domain `meta`, task `docs`
+- `2026-08-03_ops-ppt-v71-morenvy-capture` — domain `meta`, task `docs`
+- `2026-08-03_tsplus-8ebc-complete-ppt-v6` — domain `meta`, task `feature`
+- `2026-08-03_tsplus-morenvy-8ebc-conversion` — domain `meta`, task `feature`
+- `2026-08-03_tsplus-morenvy-precleanup-orphan-deadcss` — domain `meta`, task `refactor`
+- `2026-08-05_event-engine-real-post-e2e` — domain `meta`, task `bugfix`
+- `2026-08-05_event-guide-feedback-sample-post` — domain `meta`, task `docs`
+- `2026-08-05_event-guide-section-local-ppt` — domain `meta`, task `docs`
+- `2026-08-05_event-nav-fixed-margin-gap` — domain `meta`, task `bugfix`
+- `2026-08-05_event-post-realtime-product-grid` — domain `meta`, task `feature`
+- `2026-08-05_event-post-section-nav-engine` — domain `meta`, task `feature`
+- `2026-08-05_notion-event-guide-sync-file-upload` — domain `meta`, task `docs`
+- `2026-08-11_youtube-product-carousel-center` — domain `meta`, task `bugfix`
+- `2026-08-12_detail-benefit-banner-stack-redesign` — domain `meta`, task `refactor`
+- `2026-08-12_event-board-menu-sync` — domain `meta`, task `feature`
+- `2026-08-12_gnb-event-2col-project-sync` — domain `meta`, task `feature`
+- `2026-08-12_gnb-event-columns-swap` — domain `meta`, task `refactor`
+- `2026-08-12_gnb-event-hardcoded-links-removal` — domain `meta`, task `refactor`
+- `2026-08-12_gnb-event-title-linkification` — domain `meta`, task `refactor`
+- `2026-08-12_gnb-hover-flicker-fix` — domain `meta`, task `bugfix`
+- `2026-08-12_gnb-membership-menu-relocation` — domain `meta`, task `feature`
+- `2026-08-12_mobile-tabbar-device-height` — domain `meta`, task `bugfix`
+- `2026-08-12_project-menu-layout-project-sync` — domain `meta`, task `bugfix`
+- `2026-08-12_shop-category-admin-sync` — domain `meta`, task `feature`
+- `2026-08-12_shop-ts-care-solution-menu` — domain `meta`, task `feature`
+- `2026-08-14_company-page-build-from-proposal` — domain `meta`, task `feature`
+- `2026-08-14_company-page-fx-news-emblem` — domain `meta`, task `feature`
+- `2026-08-14_pdp-membership-card-collapse-toggle` — domain `meta`, task `feature`
+- `2026-08-14_welcome-card-mo-border-asset-fix` — domain `meta`, task `bugfix`
+- `2026-08-16_done-archive-post-merge` — domain `webapp`, task `docs`
+- `2026-08-16_live-files-cleanup` — domain `webapp`, task `docs`
+- `2026-08-16_skin184-final-selection` — domain `webapp`, task `docs`
+- `2026-08-16_todo-id-collision-registry` — domain `webapp`, task `docs`
+- `2026-08-18_company-awards-real-emblems` — domain `webapp`, task `feature`
+- `2026-08-18_company-b-version-confirmed` — domain `webapp`, task `feature`
+- `2026-08-18_company-focus-dim-soften` — domain `webapp`, task `refactor`
+- `2026-08-18_company-hybrid-rollback` — domain `webapp`, task `feature`
+- `2026-08-18_company-ppt-hybrid-fullscreen` — domain `webapp`, task `feature`
+- `2026-08-18_company2-focus-strengthen` — domain `webapp`, task `feature`
+- `2026-08-18_company2-fullscreen-b-version` — domain `webapp`, task `feature`
+- `2026-08-18_event-menu-hardcode-firstbuy` — domain `webapp`, task `feature`
+- `2026-08-18_event-menu-label-simplify` — domain `webapp`, task `feature`
+- `2026-08-18_event-menu-two-links-final` — domain `webapp`, task `feature`
+- `2026-08-18_wip-cleanup-inprogress-zero` — domain `webapp`, task `docs`
+- `2026-08-19_blocked-cleared-341-342` — domain `webapp`, task `docs`
+- `2026-08-19_company-hero-bottle-upright` — domain `webapp`, task `feature`
+- `2026-08-19_company-hero-header-unify` — domain `webapp`, task `bugfix`
+- `2026-08-19_company-hero-product-order` — domain `webapp`, task `feature`
+- `2026-08-19_company-hero-width-regression` — domain `webapp`, task `bugfix`
+- `2026-08-19_company-titlearea-removed` — domain `webapp`, task `feature`
+- `2026-08-19_company-todo359-closed` — domain `webapp`, task `docs`
+- `2026-08-19_main-merge-pr2-land-pitfalls` — domain `webapp`, task `docs`
+- `2026-08-19_mo-chrome-fluid-height` — domain `webapp`, task `feature`
+- `2026-08-19_mo-chrome-icon-scale` — domain `webapp`, task `bugfix`
+- `2026-08-19_mo-header-home-button-removed` — domain `webapp`, task `feature`
+- `2026-08-19_mo-header-icon-align` — domain `webapp`, task `bugfix`
+- `2026-08-19_mo-main-header-frosted` — domain `webapp`, task `feature`
+- `2026-08-19_mo-pdp-density-reduction` — domain `webapp`, task `feature`
+- `2026-08-19_pdp-minorder-text-hidden` — domain `webapp`, task `feature`
+- `2026-08-19_plp-category-two-tier` — domain `webapp`, task `feature`
+- `2026-08-20_pdp-cta-icon-scale` — domain `webapp`, task `bugfix`
+- `2026-08-20_pdp-sheet-hide-header` — domain `webapp`, task `feature`
+- `2026-08-20_plp-alltab-link-prefix` — domain `webapp`, task `bugfix`
+- `2026-08-20_plp-cate-fouc-fix` — domain `webapp`, task `bugfix`
+- `2026-08-20_upsell-card-gap` — domain `webapp`, task `bugfix`
+- `2026-08-20_upsell-uniform-gap` — domain `webapp`, task `bugfix`
+- `2026-08-20_youtube-shorts-gap-analysis` — domain `webapp`, task `research`
+- `2026-08-21_brand-story2-logo-morph` — domain `webapp`, task `feature`
+- `2026-08-21_brand-story2-page` — domain `webapp`, task `feature`
+- `2026-08-21_brand-story2-ring-gap` — domain `webapp`, task `bugfix`
+- `2026-08-21_brand-story2-ring-morph` — domain `webapp`, task `feature`
+- `2026-08-21_bs2-flow-settle` — domain `webapp`, task `feature`
+- `2026-08-21_gnb-logo-ring-morph` — domain `webapp`, task `feature`
+- `2026-08-21_slogan-lowercase-yourself` — domain `webapp`, task `docs`
+- `2026-08-21_story2-bottle-entrance-gate` — domain `webapp`, task `feature`
+- `2026-08-21_story2-brand-story-parity` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-copy-passes-behind-mark` — domain `webapp`, task `bugfix`
+- `2026-08-21_story2-flow-boundary-tiling` — domain `webapp`, task `bugfix`
+- `2026-08-21_story2-flow-clip-direction` — domain `webapp`, task `bugfix`
+- `2026-08-21_story2-flow-spring-dock` — domain `webapp`, task `feature`
+- `2026-08-21_story2-logo-center-entry` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-logo-pdf-parity` — domain `webapp`, task `feature`
+- `2026-08-21_story2-logo-pin-handoff` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-morph-play-once` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-product-cut-resize` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-remove-logo-morph` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-remove-replay-button` — domain `webapp`, task `refactor`
+- `2026-08-21_story2-scroll-follow-transition` — domain `webapp`, task `feature`
+- `2026-08-21_youtube-zone-logo-motion-build` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-film-cover-regression` — domain `webapp`, task `bugfix`
+- `2026-08-21_ytz-film-morenvy` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-gray-placeholder` — domain `webapp`, task `bugfix`
+- `2026-08-21_ytz-iframe-preload` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-inactive-shorts-dim` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-mo-peek-guarantee` — domain `webapp`, task `bugfix`
+- `2026-08-21_ytz-morenvy-product-tokens` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-morenvy-unify` — domain `webapp`, task `refactor`
+- `2026-08-21_ytz-pc-bottom-align` — domain `webapp`, task `bugfix`
+- `2026-08-21_ytz-product-cta` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-six-slots` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-stacked-width-parity` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-thumb-count-scaling` — domain `webapp`, task `bugfix`
+- `2026-08-21_ytz-thumb-drag` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-thumb-logo-fallback` — domain `webapp`, task `feature`
+- `2026-08-21_ytz-thumb-oval-regression` — domain `webapp`, task `bugfix`
+- `2026-08-21_ytz-youtube-chrome` — domain `webapp`, task `bugfix`
+- `2026-08-22_pdp-density-gate-experiment` — domain `webapp`, task `feature`
+- `2026-08-22_repo-hygiene-undefined-cleanup` — domain `webapp`, task `refactor`
+- `2026-08-24_attend-menu-link` — domain `webapp`, task `feature`
+- `2026-08-24_fullbleed-100vw-scrollbar-offset` — domain `webapp`, task `research`
+- `2026-08-24_pdp-dense-forceall-and-void-rootcause` — domain `webapp`, task `feature`
+- `2026-08-24_pdp-mobile-h1-bold` — domain `webapp`, task `refactor`
+- `2026-08-24_pdp-option-area-gap-rhythm` — domain `webapp`, task `bugfix`
+- `2026-08-24_pdp-pay-row-nowrap-scroll` — domain `webapp`, task `feature`
+- `2026-08-24_pdp-pay-scroll-sticky-buttons` — domain `webapp`, task `bugfix`
+- `2026-08-24_pdp-sheet-vertical-rhythm-20` — domain `webapp`, task `refactor`
+- `2026-08-24_pdp-thumb-actions-gap` — domain `webapp`, task `bugfix`
+- `2026-08-24_pdp-today-box-half-shrink` — domain `webapp`, task `bugfix`
+- `2026-08-24_pdp-total-label-16` — domain `webapp`, task `refactor`
+- `2026-08-24_pdp-upsell-fold-revert-and-baseline-miscount` — domain `webapp`, task `refactor`
+- `2026-08-24_todo376-closeout-and-safe-done-trim` — domain `webapp`, task `docs`
+- `2026-08-24_ytz-commit-after-premature-trim` — domain `webapp`, task `docs`
+- `2026-08-24_ytz-live-verify-after-banner-registration` — domain `webapp`, task `research`
+- `2026-08-24_ytz-mobile-thumb-fit-five` — domain `webapp`, task `feature`
+- `2026-08-25_archive-landscape-deck` — domain `webapp`, task `docs`
+- `2026-08-25_event-post-container-cap` — domain `webapp`, task `bugfix`
+- `2026-08-25_event-post-em-width-radius` — domain `webapp`, task `bugfix`
+- `2026-08-25_event-post-width-unify` — domain `webapp`, task `bugfix`
+- `2026-08-25_firstbuy-link-cate487` — domain `webapp`, task `bugfix`
+- `2026-08-25_main-section-title-unify` — domain `webapp`, task `refactor`
+- `2026-08-25_operator-guide-full-audit` — domain `webapp`, task `docs`
+- `2026-08-25_ops-guide-deck-v8` — domain `webapp`, task `docs`
+- `2026-08-25_user-decisions-544-notion` — domain `webapp`, task `docs`
+- `2026-08-25_ytz-click-split` — domain `webapp`, task `feature`
+- `2026-08-26_gift-button-bridge` — domain `webapp`, task `feature`
+- `2026-08-26_logo-morph-ring-overlap` — domain `webapp`, task `bugfix`
+- `2026-08-26_ops-guide-v9-rebuild` — domain `webapp`, task `docs`
+- `2026-08-26_orderform-header-clear` — domain `webapp`, task `bugfix`
+- `2026-08-26_orderform-top-white` — domain `webapp`, task `bugfix`
+- `2026-08-26_pdp-easypay-empty-scroll` — domain `webapp`, task `bugfix`
+- `2026-08-26_pdp-left-column-gap-cut` — domain `webapp`, task `bugfix`
+- `2026-08-26_pdp-sheet-margin-one-sided` — domain `webapp`, task `bugfix`
+- `2026-08-26_pdp-top-banner-line-and-guide-v10` — domain `webapp`, task `bugfix`
+- `2026-08-26_pdp-wish-share-pc-placement` — domain `webapp`, task `bugfix`
+- `2026-08-26_ytz-redesign-v3` — domain `webapp`, task `feature`
+- `2026-08-26_ytz-swipe-regression` — domain `webapp`, task `bugfix`
+- `2026-08-27_bottle-gate-actual-bottom` — domain `webapp`, task `bugfix`
+- `2026-08-27_brand-argent-typo-images` — domain `webapp`, task `feature`
+- `2026-08-27_brand-bi-section-title` — domain `webapp`, task `feature`
+- `2026-08-27_brand-bottle-gate-prereveal` — domain `webapp`, task `bugfix`
+- `2026-08-27_brand-font-argent-intake` — domain `webapp`, task `research`
+- `2026-08-27_brand-mark-copy-swap` — domain `webapp`, task `feature`
+- `2026-08-27_closing-bg-remove` — domain `webapp`, task `bugfix`
+- `2026-08-27_closing-remove-shadow` — domain `webapp`, task `feature`
+- `2026-08-27_event-attach-hide-and-css-comment-trap` — domain `webapp`, task `bugfix`
+- `2026-08-27_event-bold-and-hero-speed` — domain `webapp`, task `feature`
+- `2026-08-27_gnb-event-1plus1-swap` — domain `webapp`, task `feature`
+- `2026-08-27_gnb-event-popup-fullscreen-intake` — domain `webapp`, task `research`
+- `2026-08-27_gnb-event-promotion` — domain `webapp`, task `feature`
+- `2026-08-27_gnb-event-white-on-story` — domain `webapp`, task `bugfix`
+- `2026-08-27_logo-pin-hold-attempt` — domain `webapp`, task `research`
+- `2026-08-27_logo-pin-hold-done` — domain `webapp`, task `feature`
+- `2026-08-27_logo-safe-margin` — domain `webapp`, task `bugfix`
+- `2026-08-27_magazine-title-kicker-only` — domain `webapp`, task `feature`
+- `2026-08-27_mo-snb-brand-community` — domain `webapp`, task `feature`
+- `2026-08-27_mo-snb-event-label-split` — domain `webapp`, task `feature`
+- `2026-08-27_mo-snb-event-style-unify` — domain `webapp`, task `bugfix`
+- `2026-08-27_pdp-banner-below-tabs` — domain `webapp`, task `feature`
+- `2026-08-28_brand-story-aromatica-3col` — domain `webapp`, task `feature`
+- `2026-08-28_brand-story-center-pin-restore` — domain `webapp`, task `bugfix`
+- `2026-08-28_brand-story-flow-plate-removal` — domain `webapp`, task `bugfix`
+- `2026-08-28_brand-story-s5-gap-widen` — domain `webapp`, task `feature`
+- `2026-08-28_brand-story-s5-left-only` — domain `webapp`, task `feature`
+- `2026-08-28_category-link-prefix-dup-regression` — domain `webapp`, task `bugfix`
+- `2026-08-28_event-post-hash-anchor` — domain `webapp`, task `feature`
+- `2026-08-28_event-post-stable-cate-anchor` — domain `webapp`, task `feature`
+- `2026-08-28_evp-anchor-lands-on-heading` — domain `webapp`, task `bugfix`
+- `2026-08-28_gnb-event-submenu-add` — domain `webapp`, task `feature`
+- `2026-08-28_mobile-category-sync-cors` — domain `webapp`, task `bugfix`
+- `2026-08-28_myshop-grade-badge-dead-css` — domain `webapp`, task `bugfix`
+- `2026-08-28_myshop-grade-hide-mobile` — domain `webapp`, task `feature`
+- `2026-08-28_ua-divergence-audit` — domain `webapp`, task `research`
+- `2026-08-28_vimeo-hero-policy-docs` — domain `webapp`, task `docs`
+- `2026-08-31_board-title-standardize` — domain `webapp`, task `bugfix`
+- `2026-08-31_brand-closing-product-mo` — domain `webapp`, task `bugfix`
+- `2026-08-31_brand-color-copy-verbatim` — domain `webapp`, task `docs`
+- `2026-08-31_brand-color-system-section` — domain `webapp`, task `feature`
+- `2026-08-31_cutover-mobile-slot-gap` — domain `webapp`, task `research`
+- `2026-08-31_cutover-mobile-slot-pconly` — domain `webapp`, task `research`
+- `2026-08-31_event-goto-body-marker-click` — domain `webapp`, task `feature`
+- `2026-08-31_event-goto-editor-wrapped-marker` — domain `webapp`, task `bugfix`
+- `2026-08-31_event-goto-full-url-normalize` — domain `webapp`, task `feature`
+- `2026-08-31_event-list-goto-marker` — domain `webapp`, task `feature`
+- `2026-08-31_event-list-merge-pages` — domain `webapp`, task `bugfix`
+- `2026-08-31_event-list-notice-pin` — domain `webapp`, task `feature`
+- `2026-08-31_event-paging-empty-trap` — domain `webapp`, task `bugfix`
+- `2026-08-31_event-paging-login-confirmed` — domain `webapp`, task `research`
+- `2026-08-31_guide-2nd-sync-after-vimeo` — domain `webapp`, task `docs`
+- `2026-08-31_guide-goto-syntax-doc` — domain `webapp`, task `docs`
+- `2026-08-31_guide-promo-charcount-measured` — domain `webapp`, task `docs`
+- `2026-08-31_hero-video-first-loop-cut` — domain `webapp`, task `bugfix`
+- `2026-08-31_hero-vimeo-embed-support` — domain `webapp`, task `feature`
+- `2026-08-31_login-logo-keepgrow-bypass-removal` — domain `webapp`, task `bugfix`
+- `2026-08-31_magazine-title-y-align` — domain `webapp`, task `bugfix`
+- `2026-08-31_mobile-www-unstyled-field-report` — domain `webapp`, task `research`
+- `2026-08-31_morenvy-banner-skin-prefix-cutover` — domain `webapp`, task `research`
+- `2026-08-31_notion-mirror-sync-korean-corruption` — domain `webapp`, task `docs`
+- `2026-08-31_pdp-banner-last-gap` — domain `webapp`, task `bugfix`
+- `2026-08-31_project-badge-restore` — domain `webapp`, task `bugfix`
+- `2026-08-31_project-page-title-triple-dupe` — domain `webapp`, task `bugfix`
+- `2026-08-31_project-section-heading-hide` — domain `webapp`, task `bugfix`
+- `2026-08-31_promo-banner-pc-revert-mo-only` — domain `webapp`, task `refactor`
+- `2026-08-31_promo-title-26px` — domain `webapp`, task `feature`
+- `2026-08-31_shorts-card-916-ratio` — domain `webapp`, task `bugfix`
+- `2026-08-31_shorts-mobile-916-ratio` — domain `webapp`, task `bugfix`
+- `2026-09-01_company-hero-bg-swap` — domain `webapp`, task `feature`
+- `2026-09-01_company-hero-mo-rhythm` — domain `webapp`, task `refactor`
+- `2026-09-01_company-section-bg-swap` — domain `webapp`, task `feature`
+- `2026-09-01_consensus-verify-loop` — domain `webapp`, task `bugfix`
+- `2026-09-01_cutover-verify-and-guide-fix` — domain `webapp`, task `docs`
+- `2026-09-01_event-link-external-warning` — domain `webapp`, task `bugfix`
+- `2026-09-01_event-post-raw-markup-flash` — domain `webapp`, task `bugfix`
+- `2026-09-01_hamburger-icon-swap` — domain `webapp`, task `feature`
+- `2026-09-01_header-icon-black-tabbar-noline` — domain `webapp`, task `bugfix`
+- `2026-09-01_hero-fallback-white` — domain `webapp`, task `bugfix`
+- `2026-09-01_hero-poster-flash` — domain `webapp`, task `bugfix`
+- `2026-09-01_hero-video-rewind-on-pause` — domain `webapp`, task `bugfix`
+- `2026-09-01_member-grade-discount-price-row` — domain `webapp`, task `bugfix`
+- `2026-09-01_mo-main-nav-hamburger-white` — domain `webapp`, task `feature`
+- `2026-09-01_mo-tabbar-lime-opacity` — domain `webapp`, task `feature`
+- `2026-09-01_pdp-mobile-rhythm-unify` — domain `webapp`, task `refactor`
+- `2026-09-01_pdp-mobile-text-and-alignment` — domain `webapp`, task `bugfix`
+- `2026-09-01_pdp-origin-verdict` — domain `webapp`, task `bugfix`
+- `2026-09-01_pdp-price-rate-consistency` — domain `webapp`, task `bugfix`
+- `2026-09-01_pdp-today-box-shrink` — domain `webapp`, task `refactor`
+- `2026-09-01_plp-paging-mobile-wrap` — domain `webapp`, task `bugfix`
+- `2026-09-01_prestart-price-and-flash` — domain `webapp`, task `bugfix`
+- `2026-09-01_probe-cache-mode-failclosed` — domain `webapp`, task `bugfix`
+- `2026-09-01_td-off-browser-battery` — domain `webapp`, task `bugfix`
+- `2026-09-01_timedeal-badge-and-cache` — domain `webapp`, task `bugfix`
+- `2026-09-01_timedeal-cache-autorelease` — domain `webapp`, task `bugfix`
+- `2026-09-01_timedeal-end-gate` — domain `webapp`, task `feature`
+- `2026-09-01_timedeal-live-3stage-inspection` — domain `webapp`, task `research`
+- `2026-09-01_timedeal-prestart-gate` — domain `webapp`, task `bugfix`
+- `2026-09-01_timedeal-price-final-value` — domain `webapp`, task `bugfix`
+- `2026-09-01_timedeal-rate-per-own-price` — domain `webapp`, task `bugfix`
+- `2026-09-01_timedeal-timer-overlap` — domain `webapp`, task `research`
+- `2026-09-02_cafe24-survey-capsules` — domain `webapp`, task `docs`
+- `2026-09-02_company-hero-hq-reencode` — domain `webapp`, task `feature`
+- `2026-09-02_company-hero-mobile-seam` — domain `webapp`, task `bugfix`
+- `2026-09-02_curl-variant-false-gone` — domain `webapp`, task `research`
+- `2026-09-02_event-card-timedeal-gate` — domain `webapp`, task `feature`
+- `2026-09-02_evt-items-cache-layers` — domain `webapp`, task `bugfix`
+- `2026-09-02_evt-td-end-transition` — domain `webapp`, task `feature`
+- `2026-09-02_evt-td-live-verify` — domain `webapp`, task `feature`
+- `2026-09-02_f1to5-fixes` — domain `webapp`, task `bugfix`
+- `2026-09-02_majority-start-transition` — domain `webapp`, task `bugfix`
+- `2026-09-02_pdp-countdown-shadow` — domain `webapp`, task `bugfix`
+- `2026-09-02_pdp-resurrect-lottery-consensus` — domain `webapp`, task `bugfix`
+- `2026-09-02_pdp-tab-overflow-scroll` — domain `webapp`, task `bugfix`
+- `2026-09-02_perf-our-fixes` — domain `webapp`, task `feature`
+- `2026-09-02_perf-qa-lighthouse` — domain `webapp`, task `research`
+- `2026-09-02_plp-price-oneline` — domain `webapp`, task `bugfix`
+- `2026-09-02_plp-resurrect-inject` — domain `webapp`, task `feature`
+- `2026-09-02_six-scenarios-valsync` — domain `webapp`, task `feature`
+- `2026-09-02_td-probe-endpoint` — domain `webapp`, task `feature`
+- `2026-09-02_timedeal-final-timing` — domain `webapp`, task `feature`
+- `2026-09-02_timedeal-logic-audit` — domain `webapp`, task `research`
+- `2026-09-02_todo461-deploy-unblock` — domain `webapp`, task `feature`
+- `2026-09-02_verdict-majority-symmetric` — domain `webapp`, task `bugfix`
+- `2026-09-03_gd1786-hypothesis-retract` — domain `webapp`, task `research`
+- `2026-09-03_gd1786-price-report` — domain `webapp`, task `research`
+- `2026-09-03_member-deal-asymmetry-confirmed` — domain `webapp`, task `research`
+- `2026-09-03_member-deal-b-plan` — domain `webapp`, task `feature`
+- `2026-09-03_ops-guide-final-pdf` — domain `webapp`, task `docs`
+- `2026-09-03_ops-guide-portrait-ppt` — domain `webapp`, task `docs`
+- `2026-09-04_ad-sublink-old-domain` — domain `webapp`, task `research`
+- `2026-09-04_attend-domain-session-split` — domain `webapp`, task `research`
+- `2026-09-04_attend-kakao-session-reject` — domain `webapp`, task `research`
+- `2026-09-04_cafe24-no-domain-redirect-toggle` — domain `webapp`, task `research`
+- `2026-09-04_event-card-member-dealprice` — domain `webapp`, task `bugfix`
+- `2026-09-04_morenvy-banner-old-domain-links` — domain `webapp`, task `research`
+- `2026-09-04_old-domain-links-cleared` — domain `webapp`, task `research`
+- `2026-09-04_search-box-spacing` — domain `webapp`, task `feature`
+- `2026-09-04_search-layer-autofocus` — domain `webapp`, task `feature`
+- `2026-09-07_alpha-dashboard-root-cause` — domain `webapp`, task `research`
+- `2026-09-07_alpha-install-confirm` — domain `webapp`, task `research`
+- `2026-09-07_alpha-install-scope-audit` — domain `webapp`, task `research`
+- `2026-09-07_alpha-install-scope-correction` — domain `webapp`, task `research`
+- `2026-09-07_alpha-review-widgets-empty` — domain `webapp`, task `research`
+- `2026-09-07_alpha-vs-cafe24-review-mapping` — domain `webapp`, task `research`
+- `2026-09-07_floating-alpha-api-feasibility` — domain `webapp`, task `research`
+- `2026-09-07_floating-review-alpha-done` — domain `webapp`, task `feature`
+- `2026-09-07_floating-review-randol-nodata` — domain `webapp`, task `research`
+- `2026-09-07_upsell-buytop-duplicate` — domain `webapp`, task `research`
+- `2026-09-11_alpha-lazyload-misdiagnosis` — domain `webapp`, task `bugfix`
+- `2026-09-11_final-meeting-prep` — domain `webapp`, task `docs`
+- `2026-09-14_event-post-timedeal-bar-24h` — domain `webapp`, task `bugfix`
+- `2026-09-14_evlist-mobile-title-18px` — domain `webapp`, task `feature`
+- `2026-09-14_evlist-title-width-not-size` — domain `webapp`, task `research`
+- `2026-09-14_final-meeting-decisions` — domain `webapp`, task `docs`
+- `2026-09-14_maintenance-pricing-proposal` — domain `webapp`, task `research`
+- `2026-09-14_methodology-backfeed-survey` — domain `webapp`, task `research`
+- `2026-09-14_parallel-session-ship-sweep` — domain `webapp`, task `docs`
+- `2026-09-14_talmo-error-root-cause` — domain `webapp`, task `research`
+- `2026-09-14_talmo-handover-request-draft` — domain `webapp`, task `docs`
+- `2026-09-14_talmo-server-migration-check` — domain `webapp`, task `research`
+- `2026-09-14_talmo-takeover-request` — domain `webapp`, task `docs`
+- `2026-09-14_todo-id-collision-concurrent` — domain `webapp`, task `docs`
+- `2026-09-14_todo482-tdbar-harness-verify-sftp-blocked` — domain `webapp`, task `bugfix`
+- `2026-09-14_todo482-tdbar-live-deploy-verified` — domain `webapp`, task `bugfix`
+- `2026-09-17_cafe24-renewal-retrospective` — domain `webapp`, task `research`
+- `2026-09-17_github-actions-skin-deploy-verified` — domain `webapp`, task `feature`
+- `2026-09-17_github-actions-skin-deploy` — domain `webapp`, task `feature`
+- `2026-09-17_pdp-tab-underline-fix` — domain `webapp`, task `bugfix`
+- `2026-09-17_retro-capsules` — domain `webapp`, task `docs`
+- `2026-09-17_snb-event-expanded-attend-removed` — domain `webapp`, task `feature`
+- `2026-09-17_talmo-recovered-gnuboard4` — domain `webapp`, task `research`
+- `2026-09-17_talmo-tech-spec` — domain `webapp`, task `research`
+- `2026-09-18_talmo-takeover-checklist` — domain `webapp`, task `docs`
