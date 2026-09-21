@@ -4848,7 +4848,9 @@ def _adr_citations_missing(target: Path) -> list[tuple[str, str]]:
         fp = target / rel
         if not fp.is_file():
             continue
-        for num in sorted(set(re.findall(r"ADR-(\d{3,4})", read_text(fp)))):
+        # `<repo>:ADR-NNNN` 은 다른 repo 의 ADR — 이 저장소 파일과 대조하지 않는다(METH-148).
+        # 공유 지침이 하류 사고 사례를 인용할 때 모든 repo 에서 오경고가 나던 것을 막는다.
+        for num in sorted(set(re.findall(r"(?<![\w:])ADR-(\d{3,4})", read_text(fp)))):
             if num not in existing and num.lstrip("0") not in {e.lstrip("0") for e in existing}:
                 out.append((rel, f"ADR-{num}"))
     return out
