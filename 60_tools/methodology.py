@@ -4850,7 +4850,10 @@ def _adr_citations_missing(target: Path) -> list[tuple[str, str]]:
             continue
         # `<repo>:ADR-NNNN` 은 다른 repo 의 ADR — 이 저장소 파일과 대조하지 않는다(METH-148).
         # 공유 지침이 하류 사고 사례를 인용할 때 모든 repo 에서 오경고가 나던 것을 막는다.
-        for num in sorted(set(re.findall(r"(?<![\w:])ADR-(\d{3,4})", read_text(fp)))):
+        # 코드 블록·인라인 코드 안은 인용이 아니라 형식 예시다(지침 02 «`ADR-001`», 지침 18 YAML 예시).
+        body = re.sub(r"```.*?```", "", read_text(fp), flags=re.DOTALL)
+        body = re.sub(r"`[^`\n]*`", "", body)
+        for num in sorted(set(re.findall(r"(?<![\w:])ADR-(\d{3,4})", body))):
             if num not in existing and num.lstrip("0") not in {e.lstrip("0") for e in existing}:
                 out.append((rel, f"ADR-{num}"))
     return out

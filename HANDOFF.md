@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-148 반영 중** — PR 1 도구(#180 land) · PR 2 지침·catalog·ADR-005(branch `feat/meth-148-guides`) 완료 → PR 3 정리·전파.
+- **Working on**: **METH-148 마무리** — PR 1 도구(#180)·PR 2 지침·catalog(#181) land. PR 3(branch `chore/meth-148-closeout-adr-qualify`) `_inbox` 정리·ADR 인용 표기 → 전파.
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none. (METH-148 판단 3지점·법무 안내 변경 2026-09-21 사용자 승인.)
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-21 — **METH-148 첫 전파 실패·복구**: zsh 가 `$P` 를 나누지 않아 11곳 모두 커밋 0건(오류는 `2>/dev/null` 에 묻힘). 진단 중 cafe24-renewal HEAD 를 실수로 한 칸 되감았다가 즉시 복구(soft, 작업 손실 0). 6곳 작업 트리 원복. 재시도 전 ADR 인용 표기도 정리.
 - 2026-09-21 — **METH-148 지침·catalog**: 지침 26·27 수치를 `20_guides/_data/2026-Q3_design-tool-landscape.md` 로 분리 · **지침 26 FLUX 라이선스 문장 교체(Class C, ADR-005)** · HunyuanVideo-1.5 는 라이선스상 한국 제외(원문) · 23 §1-6 문장→도구 승급 기준 · **C-003 승급**(머지=배포 CI) · P-009(호스팅 플랫폼 관측 우선).
 - 2026-09-21 — **METH-148 도구**: friction `phase` 선택 필드 · thinktank `--path`+마찰 비용 회고. cafe24 회고 수치(204건·4,684분·21%)를 표준 명령이 정확히 재현.
 - 2026-09-18 — **캡슐 6회차 판정 초안(METH-148)**: 10건 실측 대조 — 유효 9·부분 이미 반영 1. 1차 출처 확인으로 **상류 지침 26 의 FLUX [dev] «출력만 상업 OK» 문장이 라이선스 원문과 어긋남** 발견(모델 구동 자체가 비상업 한정) · Sora 는 앱 04-26·API 09-24 로 양쪽 다 정확 · 머지=배포 CI 는 4개 날짜 재현으로 C-003 승급 후보.
