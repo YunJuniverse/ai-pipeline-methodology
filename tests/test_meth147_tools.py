@@ -119,6 +119,37 @@ def test_adr_citation_missing_flagged() -> None:
         assert ("note.md", "ADR-0029") in out and all(c != "ADR-0011" for _, c in out)
 
 
+# ── METH-148 판단 ① friction phase (선택 필드, 닫힌 5값)
+def test_friction_phase_optional_trailing_field() -> None:
+    it = m.parse_friction_item("배포|30|자격증명 없음 a|b|null|deploy", 0)
+    assert it["phase"] == "deploy" and it["repeat_of"] is None and "a|b" in it["resolution"]
+    it2 = m.parse_friction_item("배포|30|원인|null", 0)
+    assert "phase" not in it2                          # 선택 — 없어도 유효
+
+
+def test_friction_phase_unknown_value_not_consumed() -> None:
+    # 닫힌 5값이 아닌 마지막 토큰은 phase 로 먹지 않는다 → repeat_of 로 남는다
+    it = m.parse_friction_item("w|5|r|x|some-slug", 0)
+    assert "phase" not in it and it["repeat_of"] == "some-slug"
+
+
+# ── METH-148 thinktank 마찰 비용 회고
+def test_friction_retro_aggregates_cost_month_repeat_phase() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        d = Path(tmp)
+        def obs(name: str, items: str) -> Path:
+            p = d / name
+            p.write_text("---\nsession_id: x\nfriction:\n" + items + "prompt_patterns: []\n---\n")
+            return p
+        f1 = obs("2026-08-01_a.md", "  - id: F-001\n    where: \"w1\"\n    cost_minutes: 30\n    resolution: \"r\"\n    repeat_of: null\n    phase: diagnose\n")
+        f2 = obs("2026-09-02_b.md", "  - id: F-001\n    where: \"w2\"\n    cost_minutes: 10\n    resolution: \"r\"\n    repeat_of: prior-slug\n")
+        out = "\n".join(m._friction_retro_section([f1, f2]))
+        assert "2건 · 40분" in out and "재발(repeat_of) 1건 10분" in out and "(**25%**)" in out
+        assert "phase 기입률: **1/2**" in out and "diagnose 1건 30분" in out
+        assert "| 2026-08 | 1 | 30 | 0 |" in out and "| 2026-09 | 1 | 10 | 10 |" in out
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

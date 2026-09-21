@@ -4,10 +4,10 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **캡슐 6회차 판정 초안 작성 완료(METH-148)** — 유효 9·부분 이미 반영 1·만료 0. 사람 확정 대기(판단 3지점, 그중 1건 Class C). 초안 `40_dev/snapshots/2026-09-18_캡슐-트리아지-판정초안.md`.
+- **Working on**: **METH-148 반영 중**(판단 3지점 확정·Class C 승인) — PR 1 도구(branch `feat/meth-148-tools`) → PR 2 지침·catalog·ADR → PR 3 정리·전파.
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
-- **Blockers**: METH-148 **사람 확정** 대기(2026-09-18~) — 판단 3지점: friction phase 선택/필수 · **지침 26 FLUX 라이선스 문장(Class C)** · 지침 26·27 수치 분리.
+- **Blockers**: none. (METH-148 판단 3지점·법무 안내 변경 2026-09-21 사용자 승인.)
 
 ## Active Links
 
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-21 — **METH-148 도구**: friction `phase` 선택 필드 · thinktank `--path`+마찰 비용 회고. cafe24 회고 수치(204건·4,684분·21%)를 표준 명령이 정확히 재현.
 - 2026-09-18 — **캡슐 6회차 판정 초안(METH-148)**: 10건 실측 대조 — 유효 9·부분 이미 반영 1. 1차 출처 확인으로 **상류 지침 26 의 FLUX [dev] «출력만 상업 OK» 문장이 라이선스 원문과 어긋남** 발견(모델 구동 자체가 비상업 한정) · Sora 는 앱 04-26·API 09-24 로 양쪽 다 정확 · 머지=배포 CI 는 4개 날짜 재현으로 C-003 승급 후보.
 - 2026-09-18 — **캡슐 수거 6회차(METH-148)**: 19곳 순회, 신규 **10건**(cafe24-renewal 7 · ai-icons 2 · icons 1), 원장 68→78. ID 는 `reserve` 원격 태그로 예약 — 새 규칙 첫 실사용.
 - 2026-09-15 — **METH-147 종결·전파 11/11**: #176 후 2차 sync 로 훅 3 repo 통과. 후속 후보 2(작음): ① 워크트리에서 PR 을 만들면 주 체크아웃이 main 이라 백그라운드 land 가 거부 — land 는 PR 브랜치 워크트리에서 `--no-sync` 로(지침 30 한 줄) ② 순서가 의미인 표(변경이력)는 정렬 검증.
