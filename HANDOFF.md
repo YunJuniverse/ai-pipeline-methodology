@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **METH-148 마무리** — PR 1 도구(#180)·PR 2 지침·catalog(#181) land. PR 3(branch `chore/meth-148-closeout-adr-qualify`) `_inbox` 정리·ADR 인용 표기 → 전파.
+- **Working on**: **다음 작업 대기.** 직전 완결: METH-148 캡슐 6회차 — 10건 반영(도구 2·지침 6·ADR-005·C-003·P-009)·전파 11/11(#178~#182).
 - **Current mode**: fullstack
 - **Next TODO**: **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none. (METH-148 판단 3지점·법무 안내 변경 2026-09-21 사용자 승인.)
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-09-21 — **METH-148 종결·전파 11/11**: 재시도는 bash 스크립트로 SHA 검증. 알릴 것 2: ① ai-icons 로컬 main 이 미푸시 커밋 3개로 원격과 갈라져 있음(다른 세션) ② ai-icons 리서치의 HunyuanVideo «Apache-2.0» 은 오기(원문은 한국 제외 라이선스) — 그 repo 문서는 그 세션 몫.
 - 2026-09-21 — **METH-148 첫 전파 실패·복구**: zsh 가 `$P` 를 나누지 않아 11곳 모두 커밋 0건(오류는 `2>/dev/null` 에 묻힘). 진단 중 cafe24-renewal HEAD 를 실수로 한 칸 되감았다가 즉시 복구(soft, 작업 손실 0). 6곳 작업 트리 원복. 재시도 전 ADR 인용 표기도 정리.
 - 2026-09-21 — **METH-148 지침·catalog**: 지침 26·27 수치를 `20_guides/_data/2026-Q3_design-tool-landscape.md` 로 분리 · **지침 26 FLUX 라이선스 문장 교체(Class C, ADR-005)** · HunyuanVideo-1.5 는 라이선스상 한국 제외(원문) · 23 §1-6 문장→도구 승급 기준 · **C-003 승급**(머지=배포 CI) · P-009(호스팅 플랫폼 관측 우선).
 - 2026-09-21 — **METH-148 도구**: friction `phase` 선택 필드 · thinktank `--path`+마찰 비용 회고. cafe24 회고 수치(204건·4,684분·21%)를 표준 명령이 정확히 재현.
