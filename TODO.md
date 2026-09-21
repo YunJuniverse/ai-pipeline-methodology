@@ -40,7 +40,9 @@
   - [x] **사람 확정**(2026-09-21) — 판단 3지점 전부 권고안 채택 + **법무 안내 변경(Class C) 명시 승인**. ① phase 선택 필드 ② FLUX 라이선스 문장 교체 ③ 지침 26·27 수치를 날짜 데이터 파일로 분리
   - [x] **도구**(PR 1) — observe friction `phase` 선택 필드(닫힌 5값, 오값은 validate 거부) · thinktank `--path` + 마찰 비용 회고(합계·월별·재발 비중·phase 기입률·상위 5). **cafe24 에 돌려 캡슐의 임시 파서 수치를 정확히 재현**(204건·4,684분·재발 42건 1,005분·21%). 테스트 3건, 전체 green
   - [x] **지침·catalog·ADR**(PR 2) — **ADR-005**(Class C 승인 박제) · 지침 26 v2(§1 역할·기준·라이선스 요구 · **§1b 라이선스 읽기**) · 27 v2(알파 부재·QA 4항) · 25 v3(Sora API 날짜·`_data/` 규칙) · 21 v2(인터랙션 수치 스펙 + wireframe-spec 템플릿) · 23 v6(**§1-6 문장→도구 승급 기준**·§2-7 스캔) · 24 v5(외부 CLI 헤드리스 확인) · `20_guides/_data/2026-Q3_design-tool-landscape.md`(행마다 1차/인용) · **C-003 승급** · P-009 · catalog README 생애주기. **덤**: METH-147 ADR 인용 검사가 지침 24 의 icons ADR 사례 인용을 오경고 → 타 repo ADR 은 `<repo>:ADR-NNNN` 표기 규칙 + 검사기가 그 표기를 건너뜀(테스트 1)
-  - [ ] `_inbox` 10건 정리(원장 유지) · 전파 11 repo · 훅 재설치 — PR 3
+  - [x] `_inbox` 10건 정리(원장 78 유지) — PR 3
+  - [x] **ADR 인용 표기 정리**(PR 3) — 첫 전파 시도에서 공유 지침의 상류 `ADR-005` 가 다운스트림마다 «없는 ADR» 경고를 낼 구조임을 발견. 공유 문서의 상류 ADR 은 `methodology:ADR-NNN` 으로(16건 중 12건), 형식 예시(지침 02·18)는 인라인 코드로 두고 검사기가 코드 안을 건너뜀. 잔여 0
+  - [ ] 전파 11 repo(ai-icons 는 로컬 main 이 다른 세션 커밋 3개로 갈라져 있어 격리 워크트리로)
   - [ ] 유효분 반영 + negative case · `_inbox` 정리(원장 유지) · 전파
 - **notes**: 발신처 — **cafe24-renewal 7**(도구 2: observe friction `phase` 필드 · thinktank 회고 집계 명령 / catalog 4: 사고→차단 도구 승급 기준 · 인터랙션 수치 스펙 선합의 · 머지=배포 CI 경로 · 서드파티 통합 레지스트리 / skeleton 1: 호스팅 플랫폼 관측 인프라 선구축) · **ai-icons 2**(지침 26·27 도구 매트릭스 2026Q3 갱신) · **icons 1**(외부 에이전트 CLI 능력은 헤드리스로 실행해 확인). 눈에 띄는 연결: cafe24 `merge-is-deploy-ci-path` 는 5회차 `boot-deploy-access-preflight`(배포 자격증명 로컬 부재)의 근본 해법 쪽 · `hosted-platform-observability-bootstrap` 은 P-005·P-007(캐시 적대 플랫폼) 계열과 묶일 후보.
 

@@ -161,6 +161,17 @@ def test_adr_citation_repo_qualified_skipped() -> None:
 
 
 
+def test_adr_citation_ignores_code_examples() -> None:
+    """형식 예시(인라인 코드·코드 블록)는 인용이 아니다 — 지침 02·18 오경고 방지(METH-148)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = _repo(tmp)
+        (t / "40_dev" / "adr").mkdir(parents=True)
+        (t / "note.md").write_text("형식: `ADR-001`\n```yaml\nblocking: [ADR-005]\n```\n진짜 인용 ADR-0088\n")
+        out = [c for _, c in m._adr_citations_missing(t)]
+        assert out == ["ADR-0088"], out
+
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
