@@ -29,6 +29,10 @@
 
 ## InProgress
 
+## Blocked
+
+## Done
+
 ### METH-151 · 전수조사 판단 7지점 반영 (ADR-006)
 - **mode**: fullstack / **change-class**: C(사람 승인 ADR-006) / **owner**: AI
 - **acceptance criteria**:
@@ -40,12 +44,9 @@
   - [x] D5 land `required_checks`
   - [x] D6 C-004~006 승급
   - [x] 테스트 7건(tests/test_meth151_decisions.py) · 전체 127/127
-  - [ ] PR 머지 + maincheck → Done 전이
+  - [x] PR 머지 + maincheck → Done 전이
 - **notes**: 이 PR 의 land 가 D2 를 첫 실주행한다 — 이 항목이 Done 으로 자동 이동하면 실증. 전파(D7)는 그 뒤.
-
-## Blocked
-
-## Done
+- **landed**: PR #186 · main `69b956ca` · 2026-11-09 (land 자동 기록)
 
 ### METH-150 · 전수조사 판단 7지점 — 운영 규칙 변경(사람 결정 대기)
 - **mode**: fullstack / **change-class**: C / **owner**: Human

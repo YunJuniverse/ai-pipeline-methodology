@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-11-09 — land: PR #186 머지(main `69b956ca`) · Done METH-151
 - 2026-11-09 — **METH-151 판단 반영(ADR-006)**: checkpoint 세션별 절 · land 머지 기록 직접 커밋 · 같은 날 관찰로그 갱신 인정 · 공유 가드 미추적 신규만 · `required_checks` · C-004~006 승급. METH-149 #185 머지(`86a11ed7`)·METH-150 종결.
 - 2026-11-09 — **METH-149 전수조사(30일·9 repo)**: 도구 결함 15 반영(줄수 우회 lint·phase 오파싱·reserve 접두어·land TODO Class·ship 대용량) · 지침 8 개정 · P-010~014 · SOP 시트 편집. 판단 7지점은 METH-150 Blocked.
 - 2026-09-21 — **METH-148 종결·전파 11/11**: 재시도는 bash 스크립트로 SHA 검증. 알릴 것 2: ① ai-icons 로컬 main 이 미푸시 커밋 3개로 원격과 갈라져 있음(다른 세션) ② ai-icons 리서치의 HunyuanVideo «Apache-2.0» 은 오기(원문은 한국 제외 라이선스) — 그 repo 문서는 그 세션 몫.
