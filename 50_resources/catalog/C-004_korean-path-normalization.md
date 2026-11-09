@@ -1,9 +1,9 @@
 ---
-id: P-010
+id: C-004
 title: "한글 경로·파일명은 NFD/NFC 정규화와 셸 인용을 먼저 의심한다"
 domain: tooling
-status: pending
-source_observations:
+status: active
+seen_in:
   - invest-ops__2026-09-07_zenith-namecard-roster
   - invest-ops__2026-10-20_zenith-namecard-order-package
   - invest-ops__2026-10-23_kopan-master-dd
@@ -12,9 +12,14 @@ source_observations:
   - methodology METH-145 (core.quotePath)
 signature: "한글.*(경로|파일명)|NFD|NFC|unzip.*한글|quotePath|octal|자모 분리|glob.*안 맞"
 created: 2026-11-09
-last_seen: 2026-10-23
-promotion_rule: "4개 repo 재현 — 승급 조건(≥2 프로젝트) 충족. 사람 승인 후 active(C-004) 등재."
+last_hit: 2026-10-23
+promoted_from: P-010
+verified_with:
+  - claude-opus-5-5
+deps_implicated: []
 ---
+
+> **승급 (2026-11-09, METH-151)**: P-010 → C-004. 2개 이상 repo 재현 — 사람 승인 methodology:ADR-006 D6.
 
 ## 패턴 (Pattern)
 

@@ -1,19 +1,22 @@
 ---
-id: P-011
+id: C-005
 title: "repo 밖 스프레드시트 정본을 브라우저로 편집할 때는 다운로드 diff 로 끝낸다"
 domain: external-sot
-status: pending
-source_observations:
-  - drip-chat-planning__2026-10-29_tier-names-sheet-redo
-  - drip-chat-planning__2026-11-02_closed-beta-rolling-access-30k
-  - drip-chat-planning__2026-10-29_tier-names-nobility-guild
+status: active
+seen_in:
+  - drip-chat-planning 관찰로그 12건 (2026-10~11, repeat_of 4회)
   - lifeManager__2026-10-23_n2n-sheet-feed
   - lifeManager__2026-10-27_n2n-sheet-last4-col
 signature: "Google Sheet|스프레드시트|이름 상자|Name box|IME.*첫 글자|자동완성|IMPORTRANGE|셀 입력|열 삽입"
 created: 2026-11-09
-last_seen: 2026-11-06
-promotion_rule: "2개 repo 재현(250분) — 승급 조건 충족. 사람 승인 후 active 등재. 절차는 standing SOP 로 이미 배포."
+last_hit: 2026-11-06
+promoted_from: P-011
+verified_with:
+  - claude-opus-5-5
+deps_implicated: []
 ---
+
+> **승급 (2026-11-09, METH-151)**: P-011 → C-005. 2개 이상 repo 재현 — 사람 승인 methodology:ADR-006 D6.
 
 ## 패턴 (Pattern)
 

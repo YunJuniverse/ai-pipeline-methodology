@@ -29,31 +29,35 @@
 
 ## InProgress
 
-### METH-149 · 전레포 30일 전수조사(2026-10-10~11-09) 반영
-- **mode**: fullstack / **change-class**: A / **owner**: AI(조사·반영) + Human(판단 METH-150)
+### METH-151 · 전수조사 판단 7지점 반영 (ADR-006)
+- **mode**: fullstack / **change-class**: C(사람 승인 ADR-006) / **owner**: AI
 - **acceptance criteria**:
-  - [x] 30일 활동 9개 repo 읽기 전용 조사(에이전트 9기) — 커밋 2,187·friction 260건·≈3,049분. 스냅샷 `40_dev/snapshots/2026-11-09_전레포-30일-전수조사.md`(패턴 Q1~Q14)
-  - [x] 도구 결함 15건 반영(T1~T15: 사이즈 린트 글자 수·줄 길이·Recent·Done 밖 ✅ · 칸반 제목 부연·깨진 헤더 · phase 오값 거부 · repeat_of `new`→null · agent 계열 · reserve 접두어 추론·아카이브·0 채움 · land TODO change-class·스냅샷 제외·push 확인·`--match-head-commit` · `ship --land` PR 생성 · ship 대용량 신규 파일 · ADR 두 형식 · AGENTS.md 중복) — negative case 14건(옛 코드 13 실패), 전체 120/120
-  - [x] 지침 8개 개정 — 03 v3·05 v6·08 v3·19 v6·23 v7·24 v6·29 v2·30 v4 · README v4.9
-  - [x] pending P-010~014 · 상류 SOP `SOP_external-sheet-edit.md`(shared_paths 등록)
+  - [x] ADR-006 — D1~D7 승인 박제(2026-11-09 채팅)
+  - [x] D1 checkpoint 세션별 절 — CLAUDE/AGENTS 역할표·③·지침 30 v5·템플릿 · `rotate --checkpoint` 절 단위 회전 · 절 4개+ 경고
+  - [x] D2 land 머지 기록 직접 커밋(`chore(land):`, TODO·HANDOFF 만, push 거부 시 작업트리 보존) · `--no-record` · CLAUDE «no direct push» 예외 명기
+  - [x] D3 같은 날 관찰로그 갱신 인정 · 지침 03 v4
+  - [x] D4 공유 가드 미추적 신규만(`-uall` — 새 디렉터리 접힘 결함 동시 수정)
+  - [x] D5 land `required_checks`
+  - [x] D6 C-004~006 승급
+  - [x] 테스트 7건(tests/test_meth151_decisions.py) · 전체 127/127
   - [ ] PR 머지 + maincheck → Done 전이
-  - [ ] 다운스트림 전파(사용자 결정 METH-150 D7 — ai-icons TODO.md 29행 헤더 선복구 필요)
-- **notes**: 직전 조사(07-29) 대비 스택-PR 사고 0·cafe24 friction 기록 정착·크롤 페널티 0 은 개선. 남긴 도구 후보는 스냅샷 §2 말미.
-
+- **notes**: 이 PR 의 land 가 D2 를 첫 실주행한다 — 이 항목이 Done 으로 자동 이동하면 실증. 전파(D7)는 그 뒤.
 
 ## Blocked
 
+## Done
+
 ### METH-150 · 전수조사 판단 7지점 — 운영 규칙 변경(사람 결정 대기)
 - **mode**: fullstack / **change-class**: C / **owner**: Human
-- **blocked-by**: 사용자 판단 — 스냅샷 `2026-11-09_전레포-30일-전수조사.md` §3
+- **resolved**: 2026-11-09 사용자 채팅 — 7건 모두 권고안 → **ADR-006** · 반영 METH-151
 - **acceptance criteria**:
-  - [ ] D1 checkpoint 모델(세션별 절 prepend 공식화 vs 덮어쓰기 유지)
-  - [ ] D2 머지 기록 PR(land 가 머지 후 Done 전이를 main 에 기록 — 직행 예외, ADR 필요 vs 현행)
-  - [ ] D3 관찰로그 의무 빈도(연속 PR·재시도는 기존 로그 갱신 인정 vs 현행)
-  - [ ] D4 공유 체크아웃 가드 범위(미추적 신규 파일만 열거 vs 현행)
-  - [ ] D5 land 필수 체크 지정(`required_checks`) · 기계 증거 Class B 하위 등급
-  - [ ] D6 catalog 승급 P-010·P-011·P-013 → C-004~006
-  - [ ] D7 METH-149 다운스트림 전파 여부·시점
+  - [x] D1 checkpoint 모델(세션별 절 prepend 공식화 vs 덮어쓰기 유지)
+  - [x] D2 머지 기록 PR(land 가 머지 후 Done 전이를 main 에 기록 — 직행 예외, ADR 필요 vs 현행)
+  - [x] D3 관찰로그 의무 빈도(연속 PR·재시도는 기존 로그 갱신 인정 vs 현행)
+  - [x] D4 공유 체크아웃 가드 범위(미추적 신규 파일만 열거 vs 현행)
+  - [x] D5 land 필수 체크 지정(`required_checks`) · 기계 증거 Class B 하위 등급
+  - [x] D6 catalog 승급 P-010·P-011·P-013 → C-004~006
+  - [x] D7 METH-149 다운스트림 전파 여부·시점
 - **notes**: 근거 수치는 스냅샷 §1 Q2·Q3·Q7. METH-147 의 «checkpoint 세션별 분리 파일» 비채택과 D1 은 다른 안(파일 1개·절 단위).
 
 
@@ -61,7 +65,17 @@
 
 
 
-## Done
+### METH-149 · 전레포 30일 전수조사(2026-10-10~11-09) 반영
+- **mode**: fullstack / **change-class**: A / **owner**: AI(조사·반영) + Human(판단 METH-150)
+- **acceptance criteria**:
+  - [x] 30일 활동 9개 repo 읽기 전용 조사(에이전트 9기) — 커밋 2,187·friction 260건·≈3,049분. 스냅샷 `40_dev/snapshots/2026-11-09_전레포-30일-전수조사.md`(패턴 Q1~Q14)
+  - [x] 도구 결함 15건 반영(T1~T15: 사이즈 린트 글자 수·줄 길이·Recent·Done 밖 ✅ · 칸반 제목 부연·깨진 헤더 · phase 오값 거부 · repeat_of `new`→null · agent 계열 · reserve 접두어 추론·아카이브·0 채움 · land TODO change-class·스냅샷 제외·push 확인·`--match-head-commit` · `ship --land` PR 생성 · ship 대용량 신규 파일 · ADR 두 형식 · AGENTS.md 중복) — negative case 14건(옛 코드 13 실패), 전체 120/120
+  - [x] 지침 8개 개정 — 03 v3·05 v6·08 v3·19 v6·23 v7·24 v6·29 v2·30 v4 · README v4.9
+  - [x] pending P-010~014 · 상류 SOP `SOP_external-sheet-edit.md`(shared_paths 등록)
+  - [x] PR 머지 + maincheck → Done 전이 — PR **#185** · main `86a11ed7` ✓
+  - [x] 다운스트림 전파 — METH-151 결정 반영분과 함께 한 번에(methodology:ADR-006 D7)
+- **notes**: 직전 조사(07-29) 대비 스택-PR 사고 0·cafe24 friction 기록 정착·크롤 페널티 0 은 개선. 남긴 도구 후보는 스냅샷 §2 말미.
+
 
 ### METH-148 · 캡슐 트리아지 6회차 — 수거 10건 전량 종결
 - **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)

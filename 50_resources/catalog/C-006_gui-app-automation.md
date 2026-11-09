@@ -1,18 +1,23 @@
 ---
-id: P-013
+id: C-006
 title: "GUI 네이티브 앱 자동화는 타임아웃을 실패로 보지 않고 결과를 재조회한다"
 domain: design-automation
-status: pending
-source_observations:
+status: active
+seen_in:
   - ai-icons__2026-10-16_workorder-zh-cells
   - ai-icons__2026-10-21_n2n-v8-song-copy-angle
   - ai-icons__2026-10-19_loop138-native-preview-final-v008
   - invest-ops (Illustrator jsx 10분)
 signature: "AppleEvent|-1712|-2741|osacompile|Illustrator.*(응답 없음|타임아웃|바쁨)|jsx"
 created: 2026-11-09
-last_seen: 2026-10-30
-promotion_rule: "ai-icons 25건 300분 + invest-ops — 2번째 repo 재현 충족. 사람 승인 후 active, 지침 25·27 공통 절 후보."
+last_hit: 2026-10-30
+promoted_from: P-013
+verified_with:
+  - claude-opus-5-5
+deps_implicated: []
 ---
+
+> **승급 (2026-11-09, METH-151)**: P-013 → C-006. 2개 이상 repo 재현 — 사람 승인 methodology:ADR-006 D6.
 
 ## 패턴 (Pattern)
 

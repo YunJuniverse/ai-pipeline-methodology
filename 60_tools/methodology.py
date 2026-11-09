@@ -1981,6 +1981,36 @@ def _pr_checks_failing(target: Path, pr_number: int) -> list[str] | None:
     return [r.get("name", "?") for r in rows if str(r.get("state", "")).upper() in bad]
 
 
+def _required_checks(target: Path) -> list[str]:
+    """`.methodology-version` 의 `required_checks` — land 가 반드시 통과를 볼 체크 이름 (METH-151 D5)."""
+    vf = target / VERSION_FILE_NAME
+    try:
+        data = json.loads(read_text(vf)) if vf.exists() else {}
+    except Exception:  # noqa: BLE001
+        return []
+    req = data.get("required_checks") or []
+    return [str(r) for r in req if str(r).strip()]
+
+
+def _required_checks_missing(target: Path, pr_number: int, required: list[str]) -> list[str] | None:
+    """필수 체크 중 SUCCESS 가 아닌(없음 포함) 것. None = 조회 불가."""
+    try:
+        out = subprocess.check_output(
+            ["gh", "pr", "checks", str(pr_number), "--json", "name,state"],
+            cwd=str(target), text=True, stderr=subprocess.DEVNULL)
+        rows = json.loads(out)
+    except Exception:  # noqa: BLE001
+        return None
+    return _missing_required(rows, required)
+
+
+def _missing_required(rows: list[dict], required: list[str]) -> list[str]:
+    """순수 판정 — 체크 행 목록에서 필수 이름이 전부 SUCCESS 인지."""
+    ok_states = {"SUCCESS", "PASS"}
+    passed = {r.get("name") for r in rows if str(r.get("state", "")).upper() in ok_states}
+    return [name for name in required if name not in passed]
+
+
 def _pr_checks_pending(target: Path, pr_number: int) -> list[str]:
     """아직 끝나지 않은 체크 이름 목록."""
     try:
@@ -2012,6 +2042,105 @@ def _pr_merge_info(target: Path, pr_num: int | str) -> tuple[str | None, str | N
         return state, (commit.get("oid") or None)
     except Exception:  # noqa: BLE001 — gh 미설치·네트워크 모두 "판정 불가"
         return None, None
+
+
+LAND_RECORD_PATHS = ("TODO.md", "HANDOFF.md")
+_MERGE_AC_RE = re.compile(r"머지|merge|maincheck|Done|전이|land", re.IGNORECASE)
+
+
+def _land_record_todo(text: str, ids: set[str], pr_num: int | str, sha8: str, today: str) -> tuple[str, list[str], list[str]]:
+    """TODO 에 land 기록 — (새 텍스트, Done 으로 옮긴 ID, 기록만 단 ID) (METH-151 D2).
+
+    항목에 `landed` 줄을 단다. 남은 미체크 AC 가 «머지·Done 전이» 류뿐이면 Done 맨 위로 옮긴다
+    — PR 여러 개로 끝나는 항목(METH-148: PR 5개)을 첫 PR 에서 Done 처리하지 않기 위함.
+    """
+    parts = re.split(r"(?=^##\s)", text, flags=re.MULTILINE)
+    done_idx = next((i for i, p in enumerate(parts) if _kanban_heading(p.split("\n", 1)[0], "## Done")), None)
+    moved: list[str] = []
+    noted: list[str] = []
+    to_move: list[str] = []
+    for i, sec in enumerate(parts):
+        if i == done_idx or not sec.startswith("## "):
+            continue
+        blocks = re.split(r"(?=^###\s)", sec, flags=re.MULTILINE)
+        keep = []
+        for b in blocks:
+            m = re.match(r"^###\s+(?:~~)?([A-Z][A-Z0-9]*-\d+)\b", b)
+            if not m or m.group(1).upper() not in ids:
+                keep.append(b)
+                continue
+            line = f"- **landed**: PR #{pr_num} · main `{sha8}` · {today} (land 자동 기록)\n"
+            body = b.rstrip("\n") + "\n" + line
+            # 자동 기록이므로 «머지·Done 전이» AC 는 이 시점에 충족된다 — 체크한다
+            body = re.sub(r"^(\s*-\s*)\[ \](.*(?:머지|merge|maincheck|Done 전이).*)$", r"\1[x]\2", body,
+                          flags=re.MULTILINE | re.IGNORECASE)
+            open_ac = [l for l in body.splitlines() if re.match(r"^\s*-\s*\[ \]", l)]
+            if not open_ac and done_idx is not None:
+                to_move.append(body + "\n")
+                moved.append(m.group(1))
+            else:
+                keep.append(body + "\n")
+                noted.append(m.group(1))
+        parts[i] = "".join(keep)
+    if to_move and done_idx is not None:
+        head, _, rest = parts[done_idx].partition("\n")
+        parts[done_idx] = head + "\n\n" + "".join(to_move) + rest.lstrip("\n")
+    return "".join(parts), moved, noted
+
+
+def _land_record(target: Path, pr_num: int | str, merge_sha: str, ids: set[str], default_branch: str) -> None:
+    """머지 후 TODO·HANDOFF 기록을 main 에 직접 커밋 — «머지 기록 PR» 제거 (METH-151 D2, ADR-006).
+
+    예외의 범위: 변경이 TODO.md·HANDOFF.md 뿐일 때만. push 가 거부되면(보호 규칙 등) 커밋을
+    되돌리고 변경을 작업트리에 남긴다 — 다음 PR 에 실린다.
+    """
+    if not ids:
+        return
+    cur = subprocess.run(["git", "-C", str(target), "branch", "--show-current"], capture_output=True, text=True).stdout.strip()
+    if cur != default_branch:
+        warn(f"  land 기록 skip — {default_branch} 가 체크아웃돼 있지 않다(다른 worktree 점유).")
+        return
+    dirty = subprocess.run(["git", "-C", str(target), "status", "--porcelain", "--", *LAND_RECORD_PATHS],
+                           capture_output=True, text=True).stdout.strip()
+    if dirty:
+        warn("  land 기록 skip — TODO/HANDOFF 에 미커밋 변경이 있다.")
+        return
+    today = datetime.now().strftime("%Y-%m-%d")
+    sha8 = merge_sha[:8]
+    todo_p, ho_p = target / "TODO.md", target / "HANDOFF.md"
+    if not todo_p.exists():
+        return
+    new_todo, moved, noted = _land_record_todo(read_text(todo_p), ids, pr_num, sha8, today)
+    if not moved and not noted:
+        info(f"  land 기록 — TODO 에서 {', '.join(sorted(ids))} 항목을 못 찾아 기록 없음")
+        return
+    write_text(todo_p, new_todo)
+    if ho_p.exists():
+        ho = read_text(ho_p)
+        desc = (f"Done {', '.join(moved)}" if moved else "") + (" · " if moved and noted else "") \
+            + (f"기록 {', '.join(noted)}" if noted else "")
+        line = f"- {today} — land: PR #{pr_num} 머지(main `{sha8}`) · {desc}\n"
+        ho2 = re.sub(r"(^##\s+Recent Changes[^\n]*\n)", lambda m_: m_.group(1) + line, ho, count=1, flags=re.MULTILINE)
+        if ho2 != ho:
+            write_text(ho_p, ho2)
+    subprocess.run(["git", "-C", str(target), "add", "--", *LAND_RECORD_PATHS], capture_output=True)
+    staged = subprocess.run(["git", "-C", str(target), "diff", "--cached", "--name-only"],
+                            capture_output=True, text=True).stdout.split()
+    if not staged or any(f not in LAND_RECORD_PATHS for f in staged):
+        subprocess.run(["git", "-C", str(target), "reset", "-q"], capture_output=True)
+        warn(f"  land 기록 중단 — 스테이징이 TODO/HANDOFF 밖을 포함: {staged}")
+        return
+    subprocess.run(["git", "-C", str(target), "commit", "-q", "-m",
+                    f"chore(land): PR #{pr_num} 머지 기록 — {', '.join(sorted(moved + noted))}"], capture_output=True)
+    env = dict(os.environ, METHODOLOGY_SHIP_IN_PROGRESS="1")   # 훅 wrap 재검증 skip — 범위는 위에서 검사
+    ps = subprocess.run(["git", "-C", str(target), "push", "-q", "origin", f"HEAD:{default_branch}"],
+                        capture_output=True, text=True, env=env)
+    if ps.returncode != 0:
+        subprocess.run(["git", "-C", str(target), "reset", "-q", "HEAD~1"], capture_output=True)
+        warn(f"  land 기록 push 거부 — 변경은 작업트리에 남겼다(다음 PR 에 실린다): {(ps.stderr or '').strip()[:160]}")
+        return
+    ok(f"  land 기록 → main 직접 커밋: " + (f"Done {', '.join(moved)}" if moved else "") +
+       (f" 기록 {', '.join(noted)}" if noted else ""))
 
 
 def cmd_land(args: argparse.Namespace) -> int:
@@ -2064,9 +2193,11 @@ def cmd_land(args: argparse.Namespace) -> int:
             "스택-PR 금지(METH-120): 중간 브랜치로 머지되면 main 미도달이 된다.")
         return 1
 
-    # 2) Class 판정 — fail-closed
-    info("land: 2/6 — Class 판정 (Class B/C 자동 머지 금지)")
-    hits = _classify_change(target, base_ref)
+    # 2) Class 판정 — fail-closed. 이미 머지된 PR 이면 판정 대상이 없다 — 게이트는 «자동 머지»를
+    # 막는 장치이고, 사람이 머지한 Class B/C PR 도 도달 확인·기록(ADR-006 D2)은 받아야 한다(METH-151).
+    already_merged = str(pr.get("state", "")).upper() == "MERGED"
+    info("land: 2/6 — Class 판정 (Class B/C 자동 머지 금지)" + (" — skip (이미 머지됨)" if already_merged else ""))
+    hits = [] if already_merged else _classify_change(target, base_ref)
     if hits:
         err(f"Class B/C 트리거 {len(hits)}건 — 자동 머지 거부. 사람 검토가 필요하다.")
         seen: set[str] = set()
@@ -2077,7 +2208,7 @@ def cmd_land(args: argparse.Namespace) -> int:
             err(f"      {path}")
         err("CLAUDE.md §3: 근거·영향 범위·롤백 계획·리스크를 PR 에 남기고 사람이 머지한다.")
         return 2
-    todo_hits = _todo_change_class(target, _pr_todo_ids(pr, branch))
+    todo_hits = [] if already_merged else _todo_change_class(target, _pr_todo_ids(pr, branch))
     if todo_hits:
         err(f"TODO change-class B/C 항목을 가리키는 PR — 자동 머지 거부: "
             + ", ".join(f"{i}(Class {c})" for i, c in todo_hits))
@@ -2155,6 +2286,20 @@ def cmd_land(args: argparse.Namespace) -> int:
                 err("가드의 '통과'는 약해도 '거부'는 강하다 — 고치고 재실행.")
                 return 1
             print("  ✓ 실패 체크 0건")
+            required = _required_checks(target)
+            if required:
+                missing = _required_checks_missing(target, pr_num, required)
+                if missing is None:
+                    err("필수 체크 조회 불가 — 판정 불가라 머지하지 않는다.")
+                    return 1
+                if missing:
+                    # icons-ax 실측: 테스트 CI 없이 프리뷰 배포 체크만 있어도 «실패 0» 이었다(METH-151 D5).
+                    err(f"필수 체크 미통과·부재 {len(missing)}건 — 머지 거부: {', '.join(missing)}")
+                    return 1
+                print(f"  ✓ 필수 체크 {len(required)}건 전부 통과")
+            else:
+                warn("  required_checks 미지정 — 체크 종류를 가리지 않고 «실패 0» 만 봤다. "
+                     "`.methodology-version` 에 테스트 체크 이름을 등록하라(METH-151 D5).")
         else:
             warn("  --no-ci-check — CI 검증 생략(무검증 머지)")
 
@@ -2216,7 +2361,10 @@ def cmd_land(args: argparse.Namespace) -> int:
 
     ok(f"land 완료 — PR #{pr_num} 이 {default_branch} 에 도달(squash {check_sha[:8]}). "
        "이제 TODO Done 전이가 기계적으로 정당하다.")
-    print("  다음: TODO Done 이동 → HANDOFF/checkpoint 갱신 → ship")
+    if getattr(args, "no_record", False) or getattr(args, "no_sync", False):
+        print("  다음: TODO Done 이동 → HANDOFF/checkpoint 갱신 → ship")
+    else:
+        _land_record(target, pr_num, check_sha, _pr_todo_ids(pr, branch), default_branch)
     return 0
 
 
@@ -3360,7 +3508,7 @@ def cmd_ship(args: argparse.Namespace) -> int:
         land_args = argparse.Namespace(
             path=str(target), dry_run=False,
             no_ci_check=getattr(args, "no_ci_check", False),
-            local_ci=False, no_sync=False,
+            local_ci=False, no_sync=False, no_record=False,
         )
         return cmd_land(land_args)
     return 0
@@ -4063,6 +4211,19 @@ def current_git_head(target: Path) -> str | None:
         return None
 
 
+def _observations_updated_today(target: Path, cur_obs: list[str]) -> list[str]:
+    """오늘(UTC·로컬) 날짜 파일명의 관찰로그 중 HEAD 대비 내용이 바뀐 것 (METH-151 D3)."""
+    days = {datetime.now(timezone.utc).strftime("%Y-%m-%d"), datetime.now().strftime("%Y-%m-%d")}
+    out = []
+    for rel in cur_obs:
+        if not Path(rel).name[:10] in days:
+            continue
+        head = _git_blob_sha256(target, rel)
+        if head is not None and head != file_sha256(target / rel):
+            out.append(rel)
+    return out
+
+
 def list_observation_files(target: Path) -> list[str]:
     """관찰 로그 파일들의 relative path 리스트 (정렬됨).
 
@@ -4414,12 +4575,20 @@ def _shared_checkout_foreign_files(target: Path) -> tuple[int, list[str]] | None
         return None
     try:
         st = subprocess.check_output(
-            ["git", "-C", str(target), "-c", "core.quotePath=false", "status", "--porcelain"],
+            ["git", "-C", str(target), "-c", "core.quotePath=false", "status", "--porcelain", "-uall"],
             text=True, stderr=subprocess.DEVNULL)
     except Exception:  # noqa: BLE001
         return None
-    paths = [l[3:] for l in st.splitlines() if l.strip()]
-    return (n, paths) if paths else None
+    # METH-151 판단 D4: 추적 파일 수정은 열거하지 않는다 — 워크트리가 있기만 하면 매 ship 에
+    # 발동해 165회 중 91회 우회 학습됐고, 실사고(남의 미커밋 관찰로그 4건 흡수)는 못 막았다
+    # (drip-chat-planning e231a62). 실사고 유형은 «남이 만든 새 파일»이다 — 미추적 신규만 본다.
+    # 이 세션의 관찰로그 1건(가장 최근 것)은 정상 산출물이라 제외하고, 2건 이상이면 전부 보인다.
+    untracked = [l[3:].strip().strip('"') for l in st.splitlines() if l.startswith("?? ")]
+    obs = sorted((u for u in untracked if "/ai_observations/" in f"/{u}"),
+                 key=lambda u: (target / u).stat().st_mtime if (target / u).exists() else 0)
+    if len(obs) == 1:
+        untracked = [u for u in untracked if u != obs[0]]
+    return (n, untracked) if untracked else None
 
 
 LARGE_NEW_FILE_BYTES = 1_048_576
@@ -4642,7 +4811,12 @@ def cmd_rotate(args: argparse.Namespace) -> int:
         cp_text = read_text(cp_p)
         cp_lines = cp_text.splitlines(keepends=True)
         limit = LIVE_FILE_LINE_LIMITS[".ai/checkpoint.md"]
-        if len(cp_lines) > limit:
+        kept, archived, n_moved = _rotate_checkpoint_sessions(cp_text)
+        if n_moved:
+            header = f"# checkpoint 세션 절 아카이브 — {today} rotate ({n_moved}절)\n\n"
+            actions.append((cp_p, kept, arch_dir / f"{today}_checkpoint.md", header + archived))
+            info(f"checkpoint: 세션 절 {n_moved}개 이관 예정 (최신 {CHECKPOINT_KEEP_SESSIONS}절 유지)")
+        elif len(cp_lines) > limit:
             keep_n = 40
             stub = "".join(cp_lines[:keep_n]) + (
                 f"\n> (이하 {len(cp_lines) - keep_n}줄은 {LIVE_ARCHIVE_DIR}/{today}_checkpoint.md 로 "
@@ -4665,6 +4839,26 @@ def cmd_rotate(args: argparse.Namespace) -> int:
         ok(f"{live.relative_to(target)} → {arch.relative_to(target)}")
     info("커밋은 ship 으로. wrap 은 회전된 콘텐츠 변경을 갱신으로 인정한다.")
     return 0
+
+
+# METH-151 판단 D1 (ADR-006): checkpoint = **세션별 절**, 최신이 맨 위. 동시 세션 4개 repo 가 이미
+# 이렇게 적응했고(ai-icons 절 30개), «매 세션 덮어씀» 규칙과 지침 30 §6 «맨 위 prepend» 가 서로
+# 어긋나 있었다. 절 = 날짜를 품은 H2(`## 2026-11-09 · slug`). 최신 N절만 남기고 나머지는 아카이브.
+CHECKPOINT_KEEP_SESSIONS = 3
+_CHECKPOINT_SESSION_RE = re.compile(r"^##\s+.*\b\d{4}-\d{2}-\d{2}\b", re.MULTILINE)
+
+
+def _checkpoint_session_count(text: str) -> int:
+    return len(_CHECKPOINT_SESSION_RE.findall(text))
+
+
+def _rotate_checkpoint_sessions(text: str, keep: int = CHECKPOINT_KEEP_SESSIONS) -> tuple[str, str, int]:
+    """(유지 텍스트, 아카이브 텍스트, 이관 절 수). 절이 keep 이하이면 (text, "", 0)."""
+    starts = [m.start() for m in _CHECKPOINT_SESSION_RE.finditer(text)]
+    if len(starts) <= keep:
+        return text, "", 0
+    cut = starts[keep]
+    return text[:cut].rstrip("\n") + "\n", text[cut:], len(starts) - keep
 
 
 def _latest_commit_date(target: Path) -> str | None:
@@ -4786,6 +4980,12 @@ def _live_file_char_warnings(target: Path) -> list[str]:
                 worst = max(long_lines, key=lambda t: t[1])
                 out.append(f"{rel}: {LIVE_FILE_MAX_LINE_CHARS:,}자 넘는 줄 {len(long_lines)}개(최장 {worst[0]}행 "
                            f"{worst[1]:,}자) — 상태 보드는 terse 1줄. 덧붙이기 대신 교체한다.")
+    cp = target / ".ai" / "checkpoint.md"
+    if cp.exists():
+        n = _checkpoint_session_count(read_text(cp))
+        if n > CHECKPOINT_KEEP_SESSIONS:
+            out.append(f".ai/checkpoint.md: 세션 절 {n}개 (유지 {CHECKPOINT_KEEP_SESSIONS}절) — "
+                       "`methodology rotate --checkpoint --apply` 로 오래된 절을 이관.")
     h = target / "HANDOFF.md"
     if h.exists():
         m = re.search(r"^##\s+Recent Changes[^\n]*\n(.*?)(?=^##\s|\Z)", read_text(h), re.MULTILINE | re.DOTALL)
@@ -4904,6 +5104,13 @@ def cmd_wrap(args: argparse.Namespace) -> int:
     seen = set((state.get("observations") or {}).get("validated_files", []))
     cur_obs = list_observation_files(target)
     new_obs = [f for f in cur_obs if f not in seen]
+    if not new_obs and not bootstrapped:
+        # METH-151 판단 D3: 같은 세션의 연속 PR·land 재시도는 **오늘 날짜 관찰로그의 갱신**을
+        # 인정한다(`observe --slug <같은> --force`). PR 마다 새 로그를 강제하자 마감·재시도용
+        # 마이크로 로그가 9% 쌓였다(ai-icons). 새 작업 단위는 여전히 새 로그.
+        updated = _observations_updated_today(target, cur_obs)
+        if updated:
+            new_obs = updated
     if bootstrapped:
         checks.append(("ai_observations/", True, "bootstrapped"))
     elif not new_obs:
@@ -5711,6 +5918,8 @@ def main(argv: list[str] | None = None) -> int:
                      help="CI green 검증 생략 (무검증 머지 — 기본 금지)")
     pld.add_argument("--local-ci", dest="local_ci", action="store_true",
                      help="CI 가 결제·인프라로 안 돌 때 — TODO Blocked 의 PM 판정 + CI 단계 로컬 재현 통과 시에만 머지 (METH-147)")
+    pld.add_argument("--no-record", dest="no_record", action="store_true",
+                     help="머지 후 TODO·HANDOFF 기록 커밋을 main 에 남기지 않는다 (기본: 기록, METH-151 D2·ADR-006)")
     pld.add_argument("--no-sync", dest="no_sync", action="store_true",
                      help="기본 브랜치 로컬 동기화 생략 — main 이 다른 worktree 에 점유된 경우")
     pld.set_defaults(func=cmd_land)
