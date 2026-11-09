@@ -2214,11 +2214,12 @@ def cmd_land(args: argparse.Namespace) -> int:
             + ", ".join(f"{i}(Class {c})" for i, c in todo_hits))
         err("경로 트리거가 비어도 사람이 TODO 에 적은 클래스가 우선한다. 승인 근거를 PR 에 남기고 사람이 머지한다.")
         return 2
-    skipped = _excluded_assets(target, base_ref)
+    skipped = [] if already_merged else _excluded_assets(target, base_ref)
     if skipped:
         print(f"  · 자산 {len(skipped)}건은 트리거 검사 제외(이미지·영상·폰트) — "
               f"예: {skipped[0]}")
-    print("  ✓ Class B/C 트리거 없음 — Class A")
+    if not already_merged:
+        print("  ✓ Class B/C 트리거 없음 — Class A")
 
     if str(pr.get("state", "")).upper() != "MERGED":
         # 2b) DIRTY — main 이 움직여 머지 참조를 못 만드는 상태. 1회 자동 해소 (METH-147 #1③).
