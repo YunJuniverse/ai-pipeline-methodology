@@ -1,7 +1,7 @@
 ---
 doc_id: guide-30
 title: 동시 세션 git 격리 (Concurrent Session Isolation)
-version: v4
+version: v5
 status: active
 last_updated: 2026-11-09
 ai_relevance: foundational
@@ -59,7 +59,7 @@ git -C <repo> worktree remove <경로>
 리베이스 중 `ours` 는 **upstream** 이다. 라이브 파일(TODO·HANDOFF·checkpoint) 충돌을 일괄 `ours` 로 풀면 **내 checkpoint 와 HANDOFF 줄이 사라지고**, 그대로 ship 하면 wrap 이 4/4 미달로 선다(icons, docs PR 2건).
 
 - HANDOFF 의 내 줄(Working-on·Recent)은 **재삽입**한다.
-- checkpoint 는 «치환»이 아니라 **맨 위 prepend** 로만 쓴다 — 치환 대상 문자열이 리베이스로 사라져 있을 수 있다.
+- checkpoint 는 «치환»이 아니라 **맨 위에 이번 세션 절(`## YYYY-MM-DD · <slug>`)을 추가**한다 — 치환 대상 문자열이 리베이스로 사라져 있을 수 있다. 이것이 checkpoint 의 정식 모델이다(methodology:ADR-006): 최근 3절 유지, 오래된 절은 `rotate --checkpoint --apply`.
 - 리베이스 직후 `wrap` 으로 4/4 를 확인하고 ship 한다.
 - TODO·HANDOFF 는 `.gitattributes merge=union` 이라 대부분 자동 합쳐진다. wrap 구조 검증이 잡는 것은 **Working-on 2줄·섹션 제목 중복·깨진 헤더**까지다. **같은 항목의 두 판이 줄 단위로 나란히 남는 것**(같은 Recent 줄의 옛판·새판, 두 Recent 목록 이어붙음)은 **못 잡는다** — gamblescan 실측 20분 + 정정 커밋 2건. union 머지 직후에는 `git diff HEAD~1 -- HANDOFF.md TODO.md` 로 중복 줄을 눈으로 확인하고 오래된 쪽을 지운다.
 
@@ -101,6 +101,7 @@ git -C <repo> worktree remove <경로>
 
 | 버전 | 날짜 | 내용 |
 |---|---|---|
+| v5 | 2026-11-09 | §6 checkpoint = 세션별 절 정식화(methodology:ADR-006 D1) |
 | v4 | 2026-11-09 | §6 union 중복 검출 범위 정정(줄 단위 두 판은 wrap 이 못 잡는다 — gamblescan) · **§8b 작업물 영속 경로** · **§8c 세션은 대상 repo 에서 시작**(도구 메모리 오배치·dev 서버 디렉터리 분리). METH-149 전수조사 |
 | v3 | 2026-09-15 | §6 리베이스 라이브 파일 · §7 ID 예약(`reserve`)·Blocked 중복 등록 방지 · §8 생성물 비커밋·union. 캡슐 5회차 병렬 세션 경합 7건 병합(METH-147) |
 | v2 | 2026-09-02 | §1 보강 — 워크트리 push 는 로컬 기본브랜치를 따라오게 하지 않는다(invest-ops 2차 전파 충돌 실사고, METH-142 friction) |

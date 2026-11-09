@@ -32,5 +32,5 @@
 - 가안 값은 시트에도 상태 표기(`[가안]`)를 단다(지침 24 §3c).
 
 ## 관련
-- `50_resources/catalog/_pending/P-011_external-sheet-browser-edit.md` · 지침 23 §2-8 · 지침 24 §1·§3c
+- `50_resources/catalog/C-005_external-sheet-browser-edit.md` · 지침 23 §2-8 · 지침 24 §1·§3c
 - 원형 메모: drip-chat-planning checkpoint «다음 사람에게» · lifeManager `2026-10-27_n2n-sheet-last4-col`
