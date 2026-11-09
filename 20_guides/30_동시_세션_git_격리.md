@@ -1,9 +1,9 @@
 ---
 doc_id: guide-30
 title: 동시 세션 git 격리 (Concurrent Session Isolation)
-version: v3
+version: v4
 status: active
-last_updated: 2026-09-02
+last_updated: 2026-11-09
 ai_relevance: foundational
 ---
 
@@ -61,7 +61,7 @@ git -C <repo> worktree remove <경로>
 - HANDOFF 의 내 줄(Working-on·Recent)은 **재삽입**한다.
 - checkpoint 는 «치환»이 아니라 **맨 위 prepend** 로만 쓴다 — 치환 대상 문자열이 리베이스로 사라져 있을 수 있다.
 - 리베이스 직후 `wrap` 으로 4/4 를 확인하고 ship 한다.
-- TODO·HANDOFF 는 `.gitattributes merge=union` 이라 대부분 자동 합쳐진다. union 이 만든 중복(Working-on 2줄·Done 항목 2개)은 wrap 구조 검증이 error 로 잡는다 — 그때는 오래된 쪽을 지운다.
+- TODO·HANDOFF 는 `.gitattributes merge=union` 이라 대부분 자동 합쳐진다. wrap 구조 검증이 잡는 것은 **Working-on 2줄·섹션 제목 중복·깨진 헤더**까지다. **같은 항목의 두 판이 줄 단위로 나란히 남는 것**(같은 Recent 줄의 옛판·새판, 두 Recent 목록 이어붙음)은 **못 잡는다** — gamblescan 실측 20분 + 정정 커밋 2건. union 머지 직후에는 `git diff HEAD~1 -- HANDOFF.md TODO.md` 로 중복 줄을 눈으로 확인하고 오래된 쪽을 지운다.
 
 ## 7. TODO ID 는 예약하고 쓴다 (METH-147)
 
@@ -73,6 +73,21 @@ git -C <repo> worktree remove <경로>
 
 `.ai/wrap-state.json`·`50_resources/prompting-report.md` 는 관찰로그와 HEAD 에서 언제든 재계산되는 생성물이다. 이것들이 모든 PR 에 실려 **PR 13건 중 11건이 이 두 파일과 라이브 파일 충돌**로 리베이스됐다(내용 충돌 0). ship 이 인덱스에서 빼고 `.gitignore` 가 막는다. wrap 의 baseline 은 HEAD 에서 재계산한다 — 파일이 없어도 판정은 같다.
 
+
+## 8b. 작업물은 저장소 안 영속 경로에 둔다 (METH-149)
+
+세션 스크래치·`/tmp`·바탕화면은 세션이 끝나면 사라진다. 실사고: 외부 repo 를 세션 스크래치에 클론해 작업 → 유실, 재클론과 env 재구성(lifeManager 25분 2회, checkpoint 는 지금도 사라진 경로를 가리킴) · 디자인 QA 의 근거 스크린샷 전부가 `/tmp/…` (icons-ax) · 바탕화면에만 있던 완성본이 사라져 재제작 30분(ai-icons).
+
+- 이어서 쓸 작업물(다른 repo 클론·산출물·검증 증거)은 `~/Development/...` 의 정식 위치나 repo 의 `40_dev/snapshots/<date>_<slug>/` 에 둔다. 스크래치는 버려도 되는 중간물만.
+- checkpoint·HANDOFF 의 «환경» 줄이 휘발 경로를 가리키면 그 자체가 인계 결함이다.
+
+## 8c. 세션은 대상 repo 에서 시작한다 (METH-149)
+
+도구 메모리·설정은 **세션을 시작한 폴더** 기준으로 붙는다. 방법론 repo 에서 세션을 연 뒤 다른 repo 로 `cd` 해 24일을 일하자, 그 프로젝트의 규칙(대외 가안 수치 금지·명사형 종결·시트 정본)이 **방법론 프로젝트의 메모리**에 저장됐다 — 그 프로젝트의 다른 세션·다른 에이전트(Codex)는 그 규칙을 못 보고, 방법론 세션에는 무관한 규칙이 주입된다(drip-chat-planning).
+
+- 작업할 repo 에서 세션을 연다. 다른 repo 를 다뤄야 하면 그 repo 의 세션을 따로 연다.
+- **프로젝트 규칙은 도구 메모리가 아니라 repo 에 박제**한다 — CLAUDE.md 프로젝트 섹션 또는 `00_briefs/standing/`. 도구 메모리는 사용자 개인 선호용(CLAUDE.md §2 «반복 작업 기억» 구분).
+- 같은 repo 의 검증용 dev 서버를 세션마다 띄워야 하면 **산출물·DB 디렉터리를 분리**한 실행 설정을 둔다(`NEXT_DIST_DIR=.next-s2`·`PGLITE_DIR` 분리·다른 포트 — `.claude/launch.json` 에 정의). build-guard 와 다른 축의 회피책이다.
 
 ## 9. 적용 지점
 
@@ -86,6 +101,7 @@ git -C <repo> worktree remove <경로>
 
 | 버전 | 날짜 | 내용 |
 |---|---|---|
+| v4 | 2026-11-09 | §6 union 중복 검출 범위 정정(줄 단위 두 판은 wrap 이 못 잡는다 — gamblescan) · **§8b 작업물 영속 경로** · **§8c 세션은 대상 repo 에서 시작**(도구 메모리 오배치·dev 서버 디렉터리 분리). METH-149 전수조사 |
 | v3 | 2026-09-15 | §6 리베이스 라이브 파일 · §7 ID 예약(`reserve`)·Blocked 중복 등록 방지 · §8 생성물 비커밋·union. 캡슐 5회차 병렬 세션 경합 7건 병합(METH-147) |
 | v2 | 2026-09-02 | §1 보강 — 워크트리 push 는 로컬 기본브랜치를 따라오게 하지 않는다(invest-ops 2차 전파 충돌 실사고, METH-142 friction) |
 | v1 | 2026-09-02 | 신설 — 캡슐 2건 승급(METH-142). 지침 08(서브에이전트, 한 세션 내 팬아웃)과 축이 달라 별도 지침으로 분리 |
