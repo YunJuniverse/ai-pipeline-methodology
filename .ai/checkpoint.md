@@ -2,6 +2,19 @@
 
 > 세션 서사 바통 — **세션마다 맨 위에 절 `## YYYY-MM-DD · <slug>` 추가, 최근 3절 유지**(methodology:ADR-006). 누적 상태는 `HANDOFF.md`.
 
+## 2026-11-09 · meth-151-propagation
+
+### 방금 한 것
+- PR #186 머지(사용자 지시로 gh, `--match-head-commit`) → land 재실행이 **main 에 `chore(land):` 기록 커밋 `bfb0e5a`** — METH-151 이 Done 맨 위로 자동 이동(D2 실증).
+- 전파 13/13: bash 스크립트로 repo 마다 origin/main 격리 워크트리 → sync → commit → push → ls-remote 대조. origin 실내용 5항목 × 13 ✓. 다른 세션 체크아웃 무접촉.
+- ai-icons TODO 29행 깨진 헤더를 «정리 대기» 제목으로 복구(ai-icons#469). `--no-ci-check` 는 권한 검사에 막혀 쓰지 않고 일반 land 로.
+
+### 다음 구체 행동
+- 없음. 다운스트림 `required_checks` 등록과 각 repo 즉시 주의 항목은 repo 세션 몫(로컬 사본 `_local/` §4).
+
+### 막힌 것
+- 없음.
+
 ## 2026-11-09 · meth-151-decisions
 
 ### 방금 한 것

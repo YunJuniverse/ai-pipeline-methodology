@@ -19,7 +19,7 @@ friction:
     phase: fix
 prompt_patterns: []
 prompting:
-  rounds_total: 4
+  rounds_total: 5
 ---
 
-METH-151: 전수조사 판단 7지점 사용자 승인(ADR-006) 반영 — checkpoint 세션별 절 회전, land 머지 기록 main 직접 커밋(TODO·HANDOFF 한정, push 거부 시 보존), 같은 날 관찰로그 갱신 인정, 공유 가드 미추적 신규만, land required_checks, C-004~006 승급. 테스트 7건 추가, 전체 127.
+METH-151: 전수조사 판단 7지점 사용자 승인(ADR-006) 반영 후 머지(#186)·land 기록 첫 실주행(bfb0e5a)·전파 13/13(격리 워크트리, 원격 5항목 대조)·ai-icons 깨진 헤더 복구(#469). checkpoint 세션별 절, land 머지 기록, 같은 날 관찰로그 갱신, 공유 가드 미추적 신규만, required_checks, C-004~006.

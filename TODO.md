@@ -47,6 +47,7 @@
   - [x] PR 머지 + maincheck → Done 전이
 - **notes**: 이 PR 의 land 가 D2 를 첫 실주행한다 — 이 항목이 Done 으로 자동 이동하면 실증. 전파(D7)는 그 뒤.
 - **landed**: PR #186 · main `69b956ca` · 2026-11-09 (land 자동 기록)
+- **전파**(D7, 2026-11-09): 13/13 — origin 실내용 5항목 대조 ✓ · ai-icons 깨진 헤더 선복구 ai-icons#469
 
 ### METH-150 · 전수조사 판단 7지점 — 운영 규칙 변경(사람 결정 대기)
 - **mode**: fullstack / **change-class**: C / **owner**: Human
