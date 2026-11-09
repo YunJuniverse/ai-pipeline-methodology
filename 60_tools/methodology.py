@@ -108,6 +108,7 @@ MANIFEST = {
         "00_briefs/_README.md",
         "00_briefs/standing/SOP_template.md",
         "00_briefs/standing/SOP_scraping-pace.md",  # METH-125: 전 repo 공통 수집 페이스 SOP
+        "00_briefs/standing/SOP_external-sheet-edit.md",  # METH-149: repo 밖 스프레드시트 정본 편집
         "20_guides",
         "50_resources/templates",
         "50_resources/prompts",
@@ -380,12 +381,19 @@ def yaml_scalar(value: str | None) -> str:
 REPEAT_OF_RE = re.compile(r"^(?:\d{4}-\d{2}-\d{2}_)?[a-z0-9]+(?:-[a-z0-9]+)*$|^C-\d{3}$")
 
 
+# «반복 아님»의 표기들 — null 로 정규화. ai-icons 실측: 형식 밖 값 12건이 "new"·"first-seen"
+# 이었고, 이것들이 kebab 슬러그로 통과해 thinktank ≥2 집계에서 가짜 앵커가 됐다(METH-149).
+REPEAT_OF_NULLS: frozenset[str] = frozenset({
+    "", "null", "none", "no", "-", "new", "first", "first-seen", "firstseen", "initial", "n/a", "na",
+})
+
+
 def normalize_repeat_of(raw: str) -> str | None:
     """repeat_of 값 정규화 — 접두 오염 제거 후 형식 검증. 위반 시 ValueError."""
     value = raw.strip().strip('"')
     while value.startswith("repeat_of:"):
         value = value[len("repeat_of:"):].strip()
-    if value in {"", "null", "none", "no", "-"}:
+    if value in REPEAT_OF_NULLS:
         return None
     if value in {"yes", "repeat", "true"}:
         raise ValueError(
@@ -442,6 +450,14 @@ def parse_friction_item(raw: str, index: int) -> dict:
         _rest, _last = raw.rsplit("|", 1)
         if _last.strip() in FRICTION_PHASES:
             phase, raw = _last.strip(), _rest
+        elif re.fullmatch(r"[a-z]+", _last.strip()) and _last.strip() not in REPEAT_OF_NULLS:
+            # 5필드인데 마지막이 닫힌 5값 밖의 «한 단어» — phase 오기다(METH-149, cafe24 실측
+            # `execute`·`investigate`). 그대로 두면 그 단어가 repeat_of 로, 진짜 repeat_of 가
+            # resolution 꼬리로 밀려 들어가 오류 없이 저장됐다(무음 오파싱). 슬러그·session_id 는
+            # 하이픈·숫자를 품으므로 한 단어 소문자만 phase 시도로 본다.
+            raise ValueError(
+                f"friction phase '{_last.strip()}' 는 허용값이 아니다 — "
+                f"{', '.join(FRICTION_PHASES)} 중 하나이거나 생략")
     # 세로줄 4필드 — resolution 본문의 `|`(grep 인용문 등)가 형식 오류를 내던 결함(METH-147 #9).
     # 마지막 구분자 → repeat_of, 앞 두 구분자 → where·cost. 가운데 resolution 은 세로줄 허용.
     if raw.count("|") >= 3:
@@ -688,7 +704,12 @@ def cmd_observe(args: argparse.Namespace) -> int:
     # METH-121: 메타 자동 채움 — "unknown" 상수가 900+건 쌓인 결함의 근본 수정.
     # ctx의 "unknown"은 미기입으로 취급하고, 환경에서 실측·추정한다.
     agent = args.agent or _ctx_value("last_session", "agent", "model") \
-        or os.environ.get("ANTHROPIC_MODEL") or os.environ.get("CLAUDE_MODEL") or "unknown"
+        or os.environ.get("ANTHROPIC_MODEL") or os.environ.get("CLAUDE_MODEL") \
+        or ("claude" if os.environ.get("CLAUDECODE") else None) \
+        or ("codex" if os.environ.get("CODEX_SANDBOX") else None) or "unknown"
+    # METH-149: Claude Code 는 모델 환경변수를 두지 않아 METH-121 이후에도 unknown 이 73~100%
+    # (5개 repo 실측). 모델명을 모르면 계열이라도 남긴다 — unknown 보다 집계에 쓸모 있다.
+    agent = agent.strip().lower() if agent != "unknown" else agent
     tool = args.tool or _ctx_value("last_session", "agent", "tool") \
         or ("claude-code" if os.environ.get("CLAUDECODE") else None) \
         or ("codex" if os.environ.get("CODEX_SANDBOX") else None) or "unknown"
@@ -1774,6 +1795,11 @@ ASSET_EXTS: frozenset[str] = frozenset({
 })
 
 
+# 날짜 산출물·관찰 로그 — 실행되는 코드도, 배포되는 정책도 아니다. ai-icons 실측:
+# 스냅샷에 둔 `worker.py` 가 «백그라운드 작업» 트리거에 걸려 Class B 로 거부됐다(METH-149).
+CLASS_SCAN_EXCLUDED_PREFIXES: tuple[str, ...] = ("40_dev/snapshots/", "50_resources/ai_observations/")
+
+
 def _is_asset(path: str) -> bool:
     """표현용 바이너리 자산인가 — 확장자만 본다(경로 위치와 무관)."""
     return Path(path).suffix.lower() in ASSET_EXTS
@@ -1795,6 +1821,8 @@ def _classify_change(target: Path, base_ref: str, head_ref: str = "HEAD") -> lis
     for path in (p.strip() for p in out.splitlines() if p.strip()):
         if _is_asset(path):
             continue  # 자산은 로직을 바꾸지 않는다 — ASSET_EXTS 주석 참조
+        if path.startswith(CLASS_SCAN_EXCLUDED_PREFIXES):
+            continue  # 날짜 산출물·관찰 로그 — CLASS_SCAN_EXCLUDED_PREFIXES 주석 참조
         for label, pattern in CLASS_BC_PATTERNS:
             if re.search(pattern, path, re.IGNORECASE):
                 hits.append((label, path))
@@ -1814,6 +1842,41 @@ def _excluded_assets(target: Path, base_ref: str, head_ref: str = "HEAD") -> lis
     return [p.strip() for p in out.splitlines()
             if p.strip() and _is_asset(p.strip())
             and any(re.search(pat, p.strip(), re.IGNORECASE) for _, pat in CLASS_BC_PATTERNS)]
+
+
+def _todo_change_class(target: Path, ids: set[str]) -> list[tuple[str, str]]:
+    """PR 이 가리키는 TODO 항목 중 change-class 가 B/C 인 것 — [(ID, 클래스)] (METH-149).
+
+    경로 트리거는 영문 경로 단어만 본다. drip-chat-planning 실측: TODO change-class C 항목을
+    담은 기획 PR 다수가 한글 파일명이라 전부 Class A 로 자동 머지됐다. 사람이 TODO 에 적어 둔 클래스가 경로 추정보다 정확하다.
+    """
+    texts = []
+    for src in (["show", "origin/main:TODO.md"], ["show", "origin/master:TODO.md"]):
+        try:
+            texts.append(subprocess.check_output(["git", "-C", str(target), *src], text=True,
+                                                 stderr=subprocess.DEVNULL))
+            break
+        except Exception:  # noqa: BLE001
+            continue
+    tp = target / "TODO.md"
+    if tp.exists():
+        texts.append(read_text(tp))
+    hits: dict[str, str] = {}
+    for text in texts:
+        for block in re.split(r"(?=^###\s)", text, flags=re.MULTILINE):
+            m = re.match(r"^###\s+(?:~~)?([A-Z][A-Z0-9]*-\d+)\b", block)
+            if not m or m.group(1).upper() not in ids:
+                continue
+            cm = re.search(r"change-class\W*([ABC])\b", block)
+            if cm and cm.group(1) in "BC":
+                hits[m.group(1).upper()] = cm.group(1)
+    return sorted(hits.items())
+
+
+def _pr_todo_ids(pr: dict, branch: str) -> set[str]:
+    """PR 제목·브랜치 이름에 적힌 TODO ID — 커밋 본문은 보지 않는다(기록 PR 의 언급까지 막지 않도록)."""
+    text = f"{pr.get('title', '')} {branch}"
+    return {f"{a.upper()}-{b}" for a, b in re.findall(r"(?<![A-Za-z0-9])([A-Za-z][A-Za-z0-9]*)-(\d+)\b", text)}
 
 
 def _pr_for_branch(target: Path, branch: str) -> dict | None:
@@ -2014,6 +2077,12 @@ def cmd_land(args: argparse.Namespace) -> int:
             err(f"      {path}")
         err("CLAUDE.md §3: 근거·영향 범위·롤백 계획·리스크를 PR 에 남기고 사람이 머지한다.")
         return 2
+    todo_hits = _todo_change_class(target, _pr_todo_ids(pr, branch))
+    if todo_hits:
+        err(f"TODO change-class B/C 항목을 가리키는 PR — 자동 머지 거부: "
+            + ", ".join(f"{i}(Class {c})" for i, c in todo_hits))
+        err("경로 트리거가 비어도 사람이 TODO 에 적은 클래스가 우선한다. 승인 근거를 PR 에 남기고 사람이 머지한다.")
+        return 2
     skipped = _excluded_assets(target, base_ref)
     if skipped:
         print(f"  · 자산 {len(skipped)}건은 트리거 검사 제외(이미지·영상·폰트) — "
@@ -2034,7 +2103,13 @@ def cmd_land(args: argparse.Namespace) -> int:
                 subprocess.run(["git", "-C", str(target), "merge", "--abort"], capture_output=True)
                 err("자동 머지 충돌 — 사람이 해소해야 한다(라이브 파일이면 지침 30 §6: 일괄 ours 금지, checkpoint 는 prepend).")
                 return 1
-            subprocess.run(["git", "-C", str(target), "push", "-q"], capture_output=True)
+            ps = subprocess.run(["git", "-C", str(target), "push", "-q"], capture_output=True, text=True)
+            if ps.returncode != 0:
+                # 결과를 버리면 «재푸시 완료» 거짓 보고 뒤 같은 DIRTY 를 무한 반복한다(ai-icons 로컬 패치
+                # b71ff23b3 의 상류 반영, METH-149). pre-push 훅이 막은 경우가 흔하다.
+                err(f"머지 커밋 push 실패 — 로컬에만 머지됐다: {(ps.stderr or '').strip()[:300]}")
+                err("훅 거부면 그 메시지대로 고친 뒤 `git push` 후 land 재실행.")
+                return 1
             err("origin 머지·재푸시 완료 — CI 가 새로 돈다. 한 사이클(≥2분) 뒤 land 를 재실행하라.")
             return 1
         # 3) CI green
@@ -2088,8 +2163,11 @@ def cmd_land(args: argparse.Namespace) -> int:
         if args.dry_run:
             ok(f"  DRY-RUN — 여기서 `gh pr merge {pr_num} --squash --delete-branch` 를 실행한다.")
             return 0
+        # CI 가 검사한 커밋 = 머지되는 커밋. 체크 확인 뒤 누가 push 하면 검사 안 된 커밋이 섞인다
+        # (팀 repo 관행 `--match-head-commit`, METH-149). 로컬에 미푸시 커밋이 있어도 여기서 멈춘다.
+        head_sha = subprocess.check_output(["git", "-C", str(target), "rev-parse", "HEAD"], text=True).strip()
         rc = subprocess.call(
-            ["gh", "pr", "merge", str(pr_num), "--squash", "--delete-branch"],
+            ["gh", "pr", "merge", str(pr_num), "--squash", "--delete-branch", "--match-head-commit", head_sha],
             cwd=str(target),
         )
         if rc != 0:
@@ -2100,6 +2178,7 @@ def cmd_land(args: argparse.Namespace) -> int:
             state, _sha = _pr_merge_info(target, pr_num)
             if state != "MERGED":
                 err(f"머지 실패 — 충돌·권한·보호 규칙을 확인. (PR 상태: {state or '조회 불가'})")
+                err(f"  PR head 가 로컬 HEAD({head_sha[:8]})와 다르면(미푸시·타인 push) 동기화 후 CI 를 다시 기다린다.")
                 return 1
             warn("  머지는 성공 — 로컬 정리(브랜치 삭제·체크아웃)만 실패. 재머지 금지, 동기화로 진행.")
     else:
@@ -3192,6 +3271,15 @@ def cmd_ship(args: argparse.Namespace) -> int:
         if rc != 0:
             err("git add 실패.")
             return 1
+        big = _large_new_files(target)
+        if big and not getattr(args, "allow_large", False):
+            err(f"`git add -A` 가 새 대용량 파일 {len(big)}건을 담았다 — 이 작업의 것인지 확인하라:")
+            for path, size in big[:10]:
+                err(f"    {size / 1_048_576:.1f}MB  {path}")
+            err("lifeManager 실사고: 무관한 문서 pptx·pdf 2.4MB 가 다른 기능 커밋에 섞여 main 에 남았다.")
+            err("이 작업의 산출물이면 --allow-large, 아니면 `git reset -q <path>` 후 .gitignore 또는 다른 위치로.")
+            subprocess.run(["git", "-C", str(target), "reset", "-q"], capture_output=True)
+            return 1
     # 변경이 staged 됐는지 확인
     diff_rc = subprocess.call(
         ["git", "-C", str(target), "diff", "--cached", "--quiet"],
@@ -3258,6 +3346,17 @@ def cmd_ship(args: argparse.Namespace) -> int:
     # 8) (선택) land — 머지 착지까지 이어서
     if getattr(args, "land", False):
         info("ship: 8/8 — land (머지 착지)")
+        if _pr_for_branch(target, branch) is None:
+            # invest-ops 실측: `ship --land` 가 «PR 없음»에서 멈추고 다음 명령을 몰라 8분 — land 는
+            # PR 을 전제하므로, 착지를 요청한 ship 이 PR 을 연다(제목·본문 = 커밋 메시지, METH-149).
+            base = (_git_remote_default_ref(target) or "origin/main").rsplit("/", 1)[-1]
+            cr = subprocess.run(["gh", "pr", "create", "--fill", "--base", base],
+                                cwd=str(target), capture_output=True, text=True)
+            if cr.returncode != 0:
+                err(f"PR 생성 실패 — `gh pr create --fill --base {base}` 후 `methodology land`: "
+                    f"{(cr.stderr or '').strip()[:200]}")
+                return 1
+            ok(f"  PR 생성: {cr.stdout.strip()}")
         land_args = argparse.Namespace(
             path=str(target), dry_run=False,
             no_ci_check=getattr(args, "no_ci_check", False),
@@ -4069,6 +4168,19 @@ LIVE_FILE_LINE_LIMITS = {
     ".ai/checkpoint.md": 200,   # 백서 §2-2: ≤200줄
 }
 TODO_DONE_SOFT_CAP = 6          # 템플릿 규정: 최근 완료 ~4건만 유지
+# METH-149 (전수조사 2026-11): 줄수 한도는 «긴 줄»로 우회된다 — gamblescan HANDOFF 149줄/70KB
+# (줄당 470B)·cafe24 148줄/92KB(최장 23,885자)·drip-chat-planning checkpoint 70KB·icons-ax
+# CLAUDE.md 88줄/47KB. 6개 repo 가 줄수만 지키며 비대해졌다. 글자 수(한글 1자=1)와 줄 길이를
+# 함께 본다. **경고만** 낸다 — rotate 가 아직 긴 줄·서사를 자동 회전하지 못하므로 경성 fail 은
+# 탈출구 없는 차단이 된다(METH-122 원칙: fail-closed 에는 기계 탈출구가 있어야 한다).
+LIVE_FILE_CHAR_LIMITS = {
+    "HANDOFF.md": 12_000,
+    ".ai/checkpoint.md": 16_000,
+    "CLAUDE.md": 20_000,
+    "AGENTS.md": 20_000,
+}
+LIVE_FILE_MAX_LINE_CHARS = 1_000    # 상태 보드 한 줄 — Working-on 1,516자·Recent 23,885자 실측
+HANDOFF_RECENT_SOFT_CAP = 10        # Recent Changes 불릿 — drip-chat-planning 71건 실측 (rotate 는 5건 유지)
 # METH-122 (전수조사 P3): 경고만으로는 안 지켜졌다 — cafe24 checkpoint 345줄/342KB·
 # gamblescan TODO 761줄 실증. 규정의 2배(경성 한도) 초과 시 wrap --strict 가 fail —
 # `methodology rotate` 로 기계 회전하면 즉시 해소되므로 fail-closed 의 탈출구가 있다.
@@ -4080,8 +4192,19 @@ LIVE_ARCHIVE_DIR = Path("40_dev/snapshots/live-archive")
 STALE_DAYS = 7                  # 신선도 경고 임계 (HANDOFF 날짜·wrap 미실행 vs 최근 커밋)
 
 
+# `## Done (최근 6건 …)`·`## Blocked — 외부 게이트` 처럼 제목 뒤 부연을 단 repo 가 많다(gamblescan).
+# 완전일치로 찾으면 Done 상한이 무력해지고 칸반 섹션이 «부재»로 오판된다(METH-149).
+DONE_SECTION_RE = r"^##\s+Done\b[^\n]*$(.*?)(?=^##\s|\Z)"
+
+
+def _kanban_heading(line: str, sec: str) -> bool:
+    """`## Done`·`## Done (최근 6건)`·`## Blocked — 외부 게이트` 를 같은 섹션으로 본다."""
+    t = line.strip()
+    return t == sec or bool(re.match(rf"^{re.escape(sec)}(?:\s+[\(\[—–:-]|\s*$)", t))
+
+
 def _todo_done_count(text: str) -> int:
-    section = re.search(r"^##\s+Done\s*$(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
+    section = re.search(DONE_SECTION_RE, text, re.MULTILINE | re.DOTALL)
     return len(re.findall(r"^###\s+", section.group(1), re.MULTILINE)) if section else 0
 
 
@@ -4147,8 +4270,13 @@ def live_file_structure_issues(target: Path) -> tuple[list[str], list[str]]:
     todo = target / "TODO.md"
     if todo.exists():
         lines = read_text(todo).splitlines()
+        for i, l in enumerate(lines):
+            # ai-icons 실측: 머리 주석 속 백틱이 분절돼 «## InProgress`, `## Blocked`, `## Done» 한 줄이
+            # 됐고, «Done 으로 이동» 편집이 그 아래 가짜 구획으로 들어가 완료 6건이 Done 밖에 숨었다.
+            if l.startswith("## ") and l.count("## ") > 1:
+                errors.append(f"TODO.md: {i + 1}행이 여러 섹션 제목을 한 줄에 품었다 — 깨진 헤더다: {l[:60]!r}")
         for sec in KANBAN_SECTIONS:
-            n = sum(1 for l in lines if l.strip() == sec)
+            n = sum(1 for l in lines if _kanban_heading(l, sec))
             if n > 1:
                 errors.append(f"TODO.md: 칸반 섹션 '{sec}' 이 {n}개다 — 대시보드 파싱이 갈린다")
             elif n == 0:
@@ -4211,7 +4339,7 @@ def _rotate_todo_done(text: str, keep: int = ROTATE_KEEP_DONE,
     반환: (새 TODO 텍스트, 아카이브 md, 이관 건수, 날짜 미판정 건수).
     Done 항목 순서는 최신-우선 관례를 따르며, **그 가정을 검사한다**(METH-142).
     """
-    m = re.search(r"^##\s+Done\s*$\n(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
+    m = re.search(r"^##\s+Done\b[^\n]*$\n(.*?)(?=^##\s|\Z)", text, re.MULTILINE | re.DOTALL)
     if not m:
         return text, "", 0, 0
     body = m.group(1)
@@ -4294,6 +4422,29 @@ def _shared_checkout_foreign_files(target: Path) -> tuple[int, list[str]] | None
     return (n, paths) if paths else None
 
 
+LARGE_NEW_FILE_BYTES = 1_048_576
+
+
+def _large_new_files(target: Path) -> list[tuple[str, int]]:
+    """인덱스에 새로 추가된(A) 1MB 이상 파일 — [(경로, 바이트)] (METH-149)."""
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", str(target), "-c", "core.quotePath=false", "diff", "--cached",
+             "--name-only", "--diff-filter=A"], text=True, stderr=subprocess.DEVNULL)
+    except Exception:  # noqa: BLE001
+        return []
+    big = []
+    for rel in (l.strip() for l in out.splitlines() if l.strip()):
+        fp = target / rel
+        try:
+            size = fp.stat().st_size
+        except OSError:
+            continue
+        if size >= LARGE_NEW_FILE_BYTES:
+            big.append((rel, size))
+    return big
+
+
 def _externally_staged(target: Path) -> list[str]:
     """인덱스에 있는데 작업트리 변경이 아닌 경로 — 남이 스테이징해 둔 것 (METH-142).
 
@@ -4321,6 +4472,39 @@ def _max_todo_id(text: str, prefix: str) -> int:
     return max(nums) if nums else 0
 
 
+def _infer_todo_prefix(text: str) -> str | None:
+    """TODO 항목 제목(`### PREFIX-N`)의 최빈 접두어 — reserve 기본값 (METH-149).
+
+    기본값이 METH 고정이라 lifeManager 에서 3회 `id/METH-1·2·3` 이 원격에 만들어졌다.
+    """
+    found = re.findall(r"^###\s+(?:~~)?([A-Z][A-Z0-9]*)-\d+\b", text, re.MULTILINE)
+    if not found:
+        return None
+    counts: dict[str, int] = {}
+    for f in found:
+        counts[f] = counts.get(f, 0) + 1
+    return max(counts.items(), key=lambda kv: kv[1])[0]
+
+
+def _todo_id_width(text: str, prefix: str) -> int:
+    """기존 ID 의 0 채움 폭 — `I18N-002` 류 repo 에 `id/I18N-2` 를 발급하던 불일치 (gamblescan)."""
+    widths = [len(n) for n in re.findall(rf"\b{re.escape(prefix)}-(\d+)\b", text) if n.startswith("0")]
+    return max(widths) if widths else 0
+
+
+def _todo_archive_texts(target: Path) -> list[str]:
+    """회전된 TODO 아카이브 — 여기 있는 번호도 «쓴 번호»다(gamblescan I18N-002·NEWS-005 재발급)."""
+    out: list[str] = []
+    for pattern in ("40_dev/snapshots/live-archive/*", "40_dev/snapshots/*todo*archive*", "docs/snapshots/*todo*archive*"):
+        for f in target.glob(pattern):
+            if f.is_file() and f.suffix == ".md":
+                try:
+                    out.append(read_text(f))
+                except Exception:  # noqa: BLE001
+                    continue
+    return out
+
+
 def cmd_reserve(args: argparse.Namespace) -> int:
     """TODO ID 원자적 예약 — 원격 태그 `id/<PREFIX>-N` (METH-147 판단 ③).
 
@@ -4330,7 +4514,13 @@ def cmd_reserve(args: argparse.Namespace) -> int:
     origin/main·로컬 TODO·기존 예약 태그의 최댓값 + 1 부터 시도하고, 선점당하면 다음 번호.
     """
     target = Path(args.path or ".").resolve()
-    prefix = args.prefix
+    tp0 = target / "TODO.md"
+    prefix = args.prefix or (_infer_todo_prefix(read_text(tp0)) if tp0.exists() else None)
+    if not prefix:
+        err("ID 접두어를 TODO.md 에서 추론하지 못했다 — `--prefix <PREFIX>` 로 지정하라.")
+        return 1
+    if not args.prefix:
+        info(f"접두어 {prefix} — TODO.md 최빈 접두어에서 추론 (다르면 --prefix)")
     subprocess.run(["git", "-C", str(target), "fetch", "-q", "origin", "--tags"], capture_output=True)
     texts = []
     for src in (["show", "origin/main:TODO.md"], ["show", "origin/master:TODO.md"]):
@@ -4347,9 +4537,12 @@ def cmd_reserve(args: argparse.Namespace) -> int:
                                        text=True, stderr=subprocess.DEVNULL)
     except Exception:  # noqa: BLE001
         tags = ""
+    texts.extend(_todo_archive_texts(target))
     n = max([_max_todo_id(x, prefix) for x in texts] + [_max_todo_id(tags, prefix)]) + 1
+    width = max([_todo_id_width(x, prefix) for x in texts] + [0])
     for _ in range(8):
-        tag = f"id/{prefix}-{n}"
+        num = str(n).zfill(width)
+        tag = f"id/{prefix}-{num}"
         mk = subprocess.run(["git", "-C", str(target), "tag", tag], capture_output=True)
         if mk.returncode != 0:
             n += 1
@@ -4357,8 +4550,8 @@ def cmd_reserve(args: argparse.Namespace) -> int:
         push = subprocess.run(["git", "-C", str(target), "push", "-q", "origin", f"refs/tags/{tag}"],
                               capture_output=True, text=True)
         if push.returncode == 0:
-            ok(f"예약: {prefix}-{n}  (원격 태그 {tag})")
-            print(f"{prefix}-{n}")
+            ok(f"예약: {prefix}-{num}  (원격 태그 {tag})")
+            print(f"{prefix}-{num}")
             return 0
         subprocess.run(["git", "-C", str(target), "tag", "-d", tag], capture_output=True)
         if "already exists" in (push.stderr or "") or "rejected" in (push.stderr or ""):
@@ -4575,6 +4768,47 @@ def _process_cwd(pid: str) -> Path | None:
     return None
 
 
+def _live_file_char_warnings(target: Path) -> list[str]:
+    """글자 수·줄 길이·Recent 건수·Done 밖 완료 표기 — 줄수 한도 우회 탐지 (METH-149)."""
+    out: list[str] = []
+    for rel, limit in LIVE_FILE_CHAR_LIMITS.items():
+        p = target / rel
+        if not p.exists():
+            continue
+        text = read_text(p)
+        if len(text) > limit:
+            out.append(f"{rel}: {len(text):,}자 (규정 ≤{limit:,}자, {len(text)/limit:.1f}×) — 줄수는 지켜도 "
+                       "내용이 쌓였다. 서사·완료 이력은 snapshots/live-archive 로 옮기고 요지만 남긴다.")
+        if rel in LIVE_FILE_LINE_LIMITS:
+            long_lines = [(i + 1, len(l)) for i, l in enumerate(text.splitlines())
+                          if len(l) > LIVE_FILE_MAX_LINE_CHARS]
+            if long_lines:
+                worst = max(long_lines, key=lambda t: t[1])
+                out.append(f"{rel}: {LIVE_FILE_MAX_LINE_CHARS:,}자 넘는 줄 {len(long_lines)}개(최장 {worst[0]}행 "
+                           f"{worst[1]:,}자) — 상태 보드는 terse 1줄. 덧붙이기 대신 교체한다.")
+    h = target / "HANDOFF.md"
+    if h.exists():
+        m = re.search(r"^##\s+Recent Changes[^\n]*\n(.*?)(?=^##\s|\Z)", read_text(h), re.MULTILINE | re.DOTALL)
+        if m:
+            n = len(re.findall(r"^-\s+", m.group(1), re.MULTILINE))
+            if n > HANDOFF_RECENT_SOFT_CAP:
+                out.append(f"HANDOFF.md: Recent Changes {n}건 (권장 5건) — `methodology rotate --apply` 로 회전.")
+    t = target / "TODO.md"
+    if t.exists():
+        done_outside = 0
+        current = None
+        for line in read_text(t).splitlines():
+            if line.startswith("## "):
+                current = next((sec for sec in KANBAN_SECTIONS if _kanban_heading(line, sec)), line)
+            elif line.startswith("### ") and current in ("## Backlog", "## Ready", "## InProgress", "## Blocked"):
+                if "✅" in line or re.search(r"~~.+~~", line):
+                    done_outside += 1
+        if done_outside:
+            out.append(f"TODO.md: Done 밖에 완료 표기(✅·취소선) 항목 {done_outside}건 — Done 집계를 우회한다. "
+                       "Done 으로 옮기거나 rotate 로 아카이브(cafe24 실측: Ready 96건 중 93건 ✅).")
+    return out
+
+
 def live_file_size_warnings(target: Path) -> list[str]:
     """라이브 파일 비대화 경고 목록 — wrap·boot 공용.
 
@@ -4592,11 +4826,12 @@ def live_file_size_warnings(target: Path) -> list[str]:
                 f"{rel}: {n}줄 (규정 ≤{limit}줄, {n/limit:.1f}×) — 트리밍 필요. "
                 "오래된 내용은 git·40_dev/snapshots 로 이관하고 요지만 남긴다."
             )
+    warnings.extend(_live_file_char_warnings(target))
     todo_p = target / "TODO.md"
     if todo_p.exists():
         try:
             section = re.search(
-                r"^##\s+Done\s*$(.*?)(?=^##\s|\Z)",
+                DONE_SECTION_RE,
                 read_text(todo_p), re.MULTILINE | re.DOTALL,
             )
             done = len(re.findall(r"^###\s+", section.group(1), re.MULTILINE)) if section else 0
@@ -4840,7 +5075,10 @@ def _adr_citations_missing(target: Path) -> list[tuple[str, str]]:
             text=True, stderr=subprocess.DEVNULL).splitlines()
     except Exception:  # noqa: BLE001
         return []
-    existing = {m.group(1) for f in adr_dir.glob("ADR-*.md") for m in [re.match(r"ADR-(\d{3,4})", f.name)] if m}
+    # 파일명 두 형식 모두 인정 — `ADR-NNN-*.md`(상류·지침 02)와 `NNNN-*.md`(adr/README 구 규정).
+    # drip-chat-planning 은 README 대로 `0001-…` 로 지었다가 ship 마다 오경고 10건을 받았다(METH-149).
+    existing = {m.group(1) for f in adr_dir.glob("*.md")
+                for m in [re.match(r"(?:ADR-)?(\d{3,4})[-_.]", f.name)] if m}
     out: list[tuple[str, str]] = []
     for rel in changed + untracked:
         if not rel.endswith(".md") or rel.startswith("40_dev/adr/"):
@@ -5336,6 +5574,8 @@ def main(argv: list[str] | None = None) -> int:
                      help="공유 체크아웃(워크트리 2개 이상) 경고를 통과 — 커밋 대상이 전부 이 세션 것임을 확인했을 때만 (METH-147)")
     psh.add_argument("--index-verified", dest="index_verified", action="store_true",
                      help="--no-add-all 시 스테이징 확인 경고를 통과 — 인덱스 내용을 직접 확인했을 때만")
+    psh.add_argument("--allow-large", dest="allow_large", action="store_true",
+                     help="새 1MB+ 파일 커밋 허용 — 이 작업의 산출물임을 확인했을 때만 (METH-149)")
     psh.add_argument("--no-commit", action="store_true", help="commit 단계 skip (검증만)")
     psh.add_argument("--no-push", action="store_true", help="push 단계 skip (commit까지만)")
     psh.add_argument("--allow-sensitive", action="store_true", help="sensitive 파일 의심 패턴 차단 우회")
@@ -5492,7 +5732,7 @@ def main(argv: list[str] | None = None) -> int:
         help="TODO ID 원자적 예약 — 원격 태그 id/<PREFIX>-N (병렬 세션 번호 충돌 방지, METH-147)",
     )
     prv.add_argument("--path", help="대상 폴더 (기본: 현재)")
-    prv.add_argument("--prefix", default="METH", help="ID 접두어 (기본 METH)")
+    prv.add_argument("--prefix", default=None, help="ID 접두어 (기본: TODO.md 최빈 접두어 추론)")
     prv.set_defaults(func=cmd_reserve)
 
     psp = sub.add_parser(
