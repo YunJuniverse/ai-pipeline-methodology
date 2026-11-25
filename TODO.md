@@ -38,14 +38,14 @@
 
 ## Blocked
 
+## Done
+
 ### METH-154 · ADR-007 전파 — 활동 repo 만
 - **mode**: fullstack / **change-class**: A / **owner**: AI
-- **blocked-by**: METH-152 PR 의 사람 머지(Class C — land 자동 머지 거부가 정상)
 - **acceptance criteria**:
-  - [ ] METH-152 가 main 에 도달한 뒤 `sync-all --apply`(휴면 repo 자동 skip) + 다른 루트의 활동 repo 개별 sync — 다른 세션이 도는 repo 는 격리 워크트리
-  - [ ] 전파된 repo 의 origin 에서 CLAUDE.md «머지 기록 커밋·PR 을 만들지 않는다» 문구와 land 기록 코드 부재 대조
-
-## Done
+  - [x] METH-152 가 main 에 도달한 뒤 `sync-all --apply`(휴면 repo 자동 skip) + 다른 루트의 활동 repo 개별 sync — 다른 세션이 도는 repo 는 격리 워크트리
+  - [x] 전파된 repo 의 origin 에서 CLAUDE.md «머지 기록 커밋·PR 을 만들지 않는다» 문구와 land 기록 코드 부재 대조
+- **notes**: 2026-11-25 활동 repo 7/7 — repo 마다 origin/main 격리 워크트리 → sync → 브랜치 PR → land(Class A·실패 체크 0) → origin 대조(규칙 문구·직push 예외 삭제·기록 코드 부재·적용 커밋 `d809c27`). main 직접 push 는 권한 검사에 막혀 PR 경로로 전환. 휴면 6곳은 미전파(다음 세션 boot 가 알림).
 
 ### METH-152 · land 머지 기록 폐지 · 전파 축소 (ADR-007)
 - **mode**: fullstack / **change-class**: C(사람 승인 ADR-007) / **owner**: AI

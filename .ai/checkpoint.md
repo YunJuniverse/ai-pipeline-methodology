@@ -9,13 +9,16 @@
 - D1: `methodology.py` 에서 land 기록 커밋 코드 삭제, CLAUDE/AGENTS 규칙 3곳·§6 워크플로 수정. D2: `sync-all` 휴면 skip + boot 상류 알림. 테스트 12개 파일 전부 통과.
 - ID 예약: METH-152(이번)·153(슬림화 목록, Ready)·154(전파, Blocked).
 
+- 사용자 지시로 #188 을 gh 로 머지 → land 는 maincheck 만 하고 기록 커밋을 만들지 않았다(D1 실증).
+- METH-154 전파 7/7: 격리 워크트리 → sync → 브랜치 PR → 각 repo land → origin 대조. main 직접 push 는 권한 검사에 막혀 PR 경로로 바꿨다. 임시 워크트리·원격 브랜치 정리 완료.
+- zsh 에서 `g="git -C …"; $g …` 는 단어 분리가 안 돼 전부 실패한다 — 여러 repo 순회는 bash 스크립트 파일로.
+
 ### 다음 구체 행동
-1. 사용자가 METH-152 PR 을 머지(Class C — land 자동 머지 거부가 정상) → `land` 재실행으로 maincheck 만 확인. 기록 커밋이 안 생기는 것이 D1 실증.
-2. METH-154: `sync-all --apply` — 표의 `30d` 열이 0 인 repo 가 skip 되는지 확인. 다른 루트의 repo 는 개별 sync.
-3. METH-153: CLAUDE.md §2 분류표를 만들어 승인받기.
+1. METH-153: CLAUDE.md §2 규칙 분류표(도구 강제 / 산문 유지 / 지침으로 내림)를 만들어 승인받기.
+2. 휴면 6곳은 손대지 않는다 — 그 repo 세션의 boot 가 상류 버전 차이를 알릴 때 sync.
 
 ### 막힌 것
-- METH-154 는 PR 머지(사람) 대기.
+- 없음.
 
 ## 2026-11-09 · meth-151-propagation
 
