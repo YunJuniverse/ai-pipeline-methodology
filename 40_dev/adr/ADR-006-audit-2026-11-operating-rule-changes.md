@@ -2,7 +2,7 @@
 
 ## Status
 
-accepted
+accepted — D2 는 ADR-007 로 대체(2026-11-25)
 
 ## Date
 

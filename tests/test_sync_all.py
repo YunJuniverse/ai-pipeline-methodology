@@ -101,6 +101,65 @@ def test_is_behind() -> None:
                          "applied_commit": "unknown"}, "new") is False
 
 
+# ── METH-152 D2 (ADR-007) — 휴면 repo 는 전파하지 않는다
+import subprocess
+
+
+def _git(t: Path, *a: str) -> None:
+    subprocess.run(["git", "-C", str(t), "-c", "user.email=t@t", "-c", "user.name=t", *a],
+                   check=True, capture_output=True)
+
+
+def _git_repo(root: Path, name: str, subjects: list[str]) -> Path:
+    d = _mk_project(root, name)
+    _git(d, "init", "-q", ".")
+    for i, subj in enumerate(subjects):
+        (d / f"f{i}").write_text(str(i))
+        _git(d, "add", "-A")
+        _git(d, "commit", "-q", "-m", subj)
+    return d
+
+
+def test_sync_commits_do_not_count_as_activity() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        dormant = _git_repo(root, "dormant", ["chore: 방법론 sync — METH-1"])
+        active = _git_repo(root, "active", ["chore: 방법론 sync — METH-1", "feat: 실제 작업"])
+        assert m._recent_work_commits(dormant) == 0
+        assert m._recent_work_commits(active) == 1
+        assert m._recent_work_commits(root / "nope") is None
+
+
+def test_dormant_skipped_unless_forced() -> None:
+    ns = argparse.Namespace(include_dormant=False, active_days=30)
+    assert "휴면" in m._dormant_reason({"active": 0}, ns)
+    assert m._dormant_reason({"active": 3}, ns) is None
+    assert m._dormant_reason({"active": None}, ns) is None            # 판정 불가는 막지 않는다
+    assert m._dormant_reason({"active": 0}, argparse.Namespace(include_dormant=True)) is None
+
+
+def test_upstream_behind_notice() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        up = root / "methodology"
+        (up / "60_tools").mkdir(parents=True)
+        (up / "60_tools" / "methodology.py").write_text("#")
+        (up / m.META_ROOT).mkdir()
+        (up / m.META_ROOT / "x").write_text("x")
+        _git(up, "init", "-q", ".")
+        _git(up, "add", "-A")
+        _git(up, "commit", "-q", "-m", "init")
+        head = subprocess.check_output(["git", "-C", str(up), "rev-parse", "HEAD"], text=True).strip()
+        ds = root / "proj"
+        ds.mkdir()
+        assert m._upstream_behind_notice(ds) is None                   # 버전 파일 없음
+        (ds / m.VERSION_FILE_NAME).write_text('{"upstream_commit": "%s"}' % head[:7])
+        assert m._upstream_behind_notice(ds) is None                   # 최신
+        (ds / m.VERSION_FILE_NAME).write_text('{"upstream_commit": "0000000"}')
+        note = m._upstream_behind_notice(ds)
+        assert note and "0000000" in note and head[:7] in note, note
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

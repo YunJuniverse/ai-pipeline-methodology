@@ -27,11 +27,35 @@
 
 ## Ready
 
+### METH-153 · 산문 규칙 슬림화 목록 (ADR-007 D3)
+- **mode**: fullstack / **change-class**: C(목록 승인 필요) / **owner**: AI + Human
+- **acceptance criteria**:
+  - [ ] CLAUDE.md §2 규칙을 «도구가 fail-closed 로 막는가»로 분류한 표 — 도구 강제(한 줄 포인터로 축소) / 산문 유지(최근 전수조사 위반·재발 근거 있음) / 지침 본문으로 내림
+  - [ ] 표와 목표 분량을 사용자에게 제시 → 승인 후에만 CLAUDE.md·AGENTS.md 수정
+- **notes**: ADR-007 은 방향만 정했다. 미적용 repo 용 얇은 판 제안 여부는 이 결과물을 보고 판단(ADR-007 Open questions).
+
 ## InProgress
 
 ## Blocked
 
+### METH-154 · ADR-007 전파 — 활동 repo 만
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **blocked-by**: METH-152 PR 의 사람 머지(Class C — land 자동 머지 거부가 정상)
+- **acceptance criteria**:
+  - [ ] METH-152 가 main 에 도달한 뒤 `sync-all --apply`(휴면 repo 자동 skip) + 다른 루트의 활동 repo 개별 sync — 다른 세션이 도는 repo 는 격리 워크트리
+  - [ ] 전파된 repo 의 origin 에서 CLAUDE.md «머지 기록 커밋·PR 을 만들지 않는다» 문구와 land 기록 코드 부재 대조
+
 ## Done
+
+### METH-152 · land 머지 기록 폐지 · 전파 축소 (ADR-007)
+- **mode**: fullstack / **change-class**: C(사람 승인 ADR-007) / **owner**: AI
+- **acceptance criteria**:
+  - [x] ADR-007 — D1~D3 승인 박제(2026-11-25 채팅 «전부 채택»), ADR-006 Status 에 D2 대체 표기
+  - [x] D1 land 기록 커밋 제거 — `_land_record`·`_land_record_todo` 삭제, `--no-record` 무동작 유지 · CLAUDE/AGENTS: Done 전이는 작업 PR 안에, «no direct push» 예외 삭제, §6 워크플로 순서
+  - [x] D2 `sync-all` 휴면 skip(최근 30일 작업 커밋 0, sync 커밋 제외, `--include-dormant`·`--active-days`) · boot 상류 버전 차이 알림
+  - [x] D3 방향 박제 → 실행은 METH-153
+  - [x] 테스트 — 기록 코드 부재 1 · 활동 판정 2 · 상류 알림 1, 전체 스위트 통과
+- **notes**: 근거는 2026-11-25 전 repo 30일 커밋 집계(ADR-007 Context). 전파는 METH-154.
 
 ### METH-151 · 전수조사 판단 7지점 반영 (ADR-006)
 - **mode**: fullstack / **change-class**: C(사람 승인 ADR-006) / **owner**: AI
@@ -78,55 +102,4 @@
   - [x] 다운스트림 전파 — METH-151 결정 반영분과 함께 한 번에(methodology:ADR-006 D7)
 - **notes**: 직전 조사(07-29) 대비 스택-PR 사고 0·cafe24 friction 기록 정착·크롤 페널티 0 은 개선. 남긴 도구 후보는 스냅샷 §2 말미.
 
-
-### METH-148 · 캡슐 트리아지 6회차 — 수거 10건 전량 종결
-- **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
-- **acceptance criteria**:
-  - [x] `collect --apply` 전 repo 순회(2026-09-18) — 19곳 스캔, **신규 10건** 적재(원장 68→78). dry-run 18 → 실적재 10(icons 1건이 워크트리 9곳에서 dedup). ID 는 `reserve` 로 원격 태그 예약(METH-147 이후 첫 사용)
-  - [x] **판정 초안 작성**(AI, 2026-09-18) — `40_dev/snapshots/2026-09-18_캡슐-트리아지-판정초안.md`. 집계 **유효 9 · 부분 이미 반영 1 · 만료 0**. 도구 매트릭스 2건은 1차 출처 직접 확인(OpenAI Help Center·BFL 라이선스 원문·BFL 문서·HF 모델 카드). **발견: 상류 지침 26 의 FLUX [dev] 문장(«출력만 상업 OK»)이 라이선스 원문과 어긋난다** — 모델 구동 자체가 비상업 한정
-  - [x] **사람 확정**(2026-09-21) — 판단 3지점 전부 권고안 채택 + **법무 안내 변경(Class C) 명시 승인**. ① phase 선택 필드 ② FLUX 라이선스 문장 교체 ③ 지침 26·27 수치를 날짜 데이터 파일로 분리
-  - [x] **도구**(PR 1) — observe friction `phase` 선택 필드(닫힌 5값, 오값은 validate 거부) · thinktank `--path` + 마찰 비용 회고(합계·월별·재발 비중·phase 기입률·상위 5). **cafe24 에 돌려 캡슐의 임시 파서 수치를 정확히 재현**(204건·4,684분·재발 42건 1,005분·21%). 테스트 3건, 전체 green
-  - [x] **지침·catalog·ADR**(PR 2) — **ADR-005**(Class C 승인 박제) · 지침 26 v2(§1 역할·기준·라이선스 요구 · **§1b 라이선스 읽기**) · 27 v2(알파 부재·QA 4항) · 25 v3(Sora API 날짜·`_data/` 규칙) · 21 v2(인터랙션 수치 스펙 + wireframe-spec 템플릿) · 23 v6(**§1-6 문장→도구 승급 기준**·§2-7 스캔) · 24 v5(외부 CLI 헤드리스 확인) · `20_guides/_data/2026-Q3_design-tool-landscape.md`(행마다 1차/인용) · **C-003 승급** · P-009 · catalog README 생애주기. **덤**: METH-147 ADR 인용 검사가 지침 24 의 icons ADR 사례 인용을 오경고 → 타 repo ADR 은 `<repo>:ADR-NNNN` 표기 규칙 + 검사기가 그 표기를 건너뜀(테스트 1)
-  - [x] `_inbox` 10건 정리(원장 78 유지) — PR 3
-  - [x] **ADR 인용 표기 정리**(PR 3) — 첫 전파 시도에서 공유 지침의 상류 `ADR-005` 가 다운스트림마다 «없는 ADR» 경고를 낼 구조임을 발견. 공유 문서의 상류 ADR 은 `methodology:ADR-NNN` 으로(16건 중 12건), 형식 예시(지침 02·18)는 인라인 코드로 두고 검사기가 코드 안을 건너뜀. 잔여 0
-  - [x] **전파 11/11**(2026-09-21) — bash 스크립트로 재시도: main 직접 5 · 격리 워크트리 6(ai-icons 포함). repo 마다 HEAD 변화·원격 일치를 스크립트가 확인, origin 실내용 5항목(26 §1b·데이터 파일·23 §1-6·phase·ADR 표기) × 11 ✓. 훅 3 repo 경로 판정 통과. ai-icons 로컬 main 의 다른 세션 커밋 3개 무접촉
-  - [ ] 유효분 반영 + negative case · `_inbox` 정리(원장 유지) · 전파
-- **notes**: 발신처 — **cafe24-renewal 7**(도구 2: observe friction `phase` 필드 · thinktank 회고 집계 명령 / catalog 4: 사고→차단 도구 승급 기준 · 인터랙션 수치 스펙 선합의 · 머지=배포 CI 경로 · 서드파티 통합 레지스트리 / skeleton 1: 호스팅 플랫폼 관측 인프라 선구축) · **ai-icons 2**(지침 26·27 도구 매트릭스 2026Q3 갱신) · **icons 1**(외부 에이전트 CLI 능력은 헤드리스로 실행해 확인). 눈에 띄는 연결: cafe24 `merge-is-deploy-ci-path` 는 5회차 `boot-deploy-access-preflight`(배포 자격증명 로컬 부재)의 근본 해법 쪽 · `hosted-platform-observability-bootstrap` 은 P-005·P-007(캐시 적대 플랫폼) 계열과 묶일 후보.
-
-- **종결**(2026-09-21): PR **#178**(수거)·**#179**(초안)·**#180**(도구)·**#181**(지침·catalog·ADR-005, Class C 승인)·**#182**(`_inbox`·ADR 표기). 전파 11/11. 첫 전파는 zsh 단어 분할 부재로 커밋 0건이었고, 진단 중 cafe24 HEAD 를 되감았다 즉시 복구(손실 0).
-
-### METH-147 · 캡슐 트리아지 5회차 — 수거 23건 전량 종결
-- **mode**: fullstack / **change-class**: A / **owner**: Human(판정) + AI(반영)
-- **acceptance criteria**:
-  - [x] `collect --apply` 전 repo 순회(2026-09-14) — 19 스캔(icons 워크트리 8곳 포함), **신규 23건** 적재(원장 45→68). dry-run 119 → 실적재 23(워크트리 dedup 정상)
-  - [x] **판정 초안 작성**(AI, 2026-09-14) — `40_dev/snapshots/2026-09-14_캡슐-트리아지-판정초안.md`. 전 건 실측 대조. 집계 **유효 22 · 이미 반영 1(도구 측) · 만료 0**. 병렬 세션 경합 7건을 묶음 A 로 병합(지침 30 v3 + ship/land/todo). **C-002 승급 후보 1**(P-004 숨은 패널 애니메이션 — icons 2회 + cafe24 교차)
-  - [x] **사람 확정**(2026-09-15) — 판단 3지점 전부 권고안 채택: ① wrap baseline **HEAD 재계산**(wrap-state 커밋 중단) ② `.gitattributes merge=union` TODO·HANDOFF ③ ID 예약 **원격 태그**. 비채택 2 확정(land CI 미대기 머지 · checkpoint 세션별 분리)
-  - [x] **도구 묶음 반영**(PR 1) — wrap HEAD baseline · ship 생성물 2종 인덱스 제외+`.gitignore` 블록 · ship 공유 체크아웃 가드(`--allow-shared`) · `reserve` · land DIRTY 1회 자동 해소 · land 스텝0 경합 분류 · `land --local-ci`(Blocked PM 판정 전제) · observe 세로줄 파서 · boot `required_local_files` preflight · wrap ADR 인용 검사. 단위 9테스트 + e2e 3(HEAD baseline 동치 · ship 제외 커밋 · reserve 선점 스킵). 전체 96/96
-  - [x] **지침·catalog 반영**(PR 2) — 05 v5(§9b 8·9항) · 19 v5(§8b.4 소비처 인벤토리) · 23 v5(§1-4 exit code·§1-5 read-back·§2-6 부재 관측조건·§2-7 애니메이션 visible) · 24 v4(§2b 제보 트리아지·§4 벤더 원본·§4b 인용 원문) · **30 v3**(§6 리베이스·§7 ID 예약·§8 생성물) · CLAUDE.md/AGENTS.md Blocked 중복 grep+reserve · README 현황표 · **P-004 → C-002 승급** · P-006~008. README 변경이력 표가 앞선 세션들의 «해당 행 앞에 끼워넣기» 편집 누적으로 v4.1·4.2·4.3·4.7·4.6·4.5·4.4 순으로 흐트러져 있던 것을 발견해 **오름차순 복구 + v4.7**
-  - [x] `_inbox` 23건 정리(원장 68 유지 — 재수거 방지) — PR 3
-  - [x] 전파 1차 8/11 — 훅 설치 3 repo(ai-icons·invest-ops·lifeManager)가 **새 경로 판정에 막힘**: `shared-paths` 가 managed_files(CLAUDE.md·AGENTS.md)를 안 내보내 CLAUDE.md 한 줄이 든 sync push 가 «관리 경로 밖»으로 판정됨. 게다가 세 repo 는 origin 이 앞서 있어 rebase 필요
-  - [x] **전파 종결 11/11**(2026-09-15) — #176 land 후 2차 sync(methodology.py)·훅 3 repo 재설치·rebase·push 전부 통과. origin 대조 4항목(30 v3·shared-paths managed·gitattributes·CLAUDE reserve) × 11 ✓. 다운스트림의 생성물 인덱스 제외는 각 repo 의 **다음 ship** 이 수행(그 커밋은 각 세션 몫)
-  - [ ] 유효분 반영 + negative case 증명 · `_inbox` 정리(원장 유지) · 전파
-- **notes**: 발신처 — **cafe24-renewal 11**(지침 23·24·05 보강 4 · catalog 3 · 도구 3: boot 배포접속 preflight·TODO ID 예약·노션 미러 read-back · 계약 소비처 인벤토리 1) · **icons 12**(도구 6: land 머지참조 경합·CI 부재 로컬 게이트·ship 미추적 가드·라이브파일 append-only·observe 세로줄·테스트 판정 fail-closed·rebase ours · 지침 4 · skeleton/planning 1). 형식 경고 1: `icons__2026-09-02_self-citation-drift-adr` id 불일치(워크트리 발행 잔재). **주제 겹침 눈에 띔** — 병렬 세션 경합 계열이 icons 에서 5건(wrap 생성물 PR 충돌·라이브파일 union·ID 예약(cafe24 도 1건)·land 머지참조 경합·ship 미추적) → 지침 30 v3 + 도구 묶음 후보.
-
-- **종결**(2026-09-15): PR **#171**(수거)·**#172**(초안)·**#173**(도구 10)·**#174**(지침 5·catalog 4)·**#175**(`_inbox` 정리)·**#176**(훅 판정 구멍 2호). maincheck ✓. 판단 3지점 권고안 채택(wrap HEAD baseline·union·reserve). 전파 2회 11/11. 도구 판정기 구멍 2개(한글 경로·managed_files)를 전파 중 잡아 고침.
-
-### METH-146 · pre-push 훅의 wrap 을 읽기 전용으로 — 훅이 repo 를 dirty 로 만들던 부작용
-- **mode**: fullstack / **change-class**: A / **owner**: AI
-- **acceptance criteria**:
-  - [x] 재현 — 훅 경로의 `wrap --strict` 가 `prompting-report.md` 재생성 + `wrap-state.json` 부트스트랩을 수행해 **push 가 실패해도 파일이 남는다**. 다음 `sync-all` 이 그것을 «진행 중 작업»으로 오인해 skip(2026-09-02 하루 2회, 3 repo 를 `git restore` 로 치움)
-  - [x] `wrap --read-only` 신설 — 부트스트랩 쓰기·리포트 재생성 생략. baseline 이 없으면 부트스트랩 대신 「pass + 다음 ship 이 저장」으로 밝힌다
-  - [x] 훅 템플릿 `wrap --strict --read-only` — 훅은 검사만 한다
-  - [x] 증명 — 대조군(플래그 없음 → `wrap-state.json` 생성) vs 실험군(→ 생성 안 함) · 임시 repo 실 push 후 `git status` 비어 있음 · 단위 3테스트. 91/91
-  - [x] **전파 11/11 + 훅 3 repo 재설치**(2026-09-02) — 재설치 직후 ai-icons·invest-ops·lifeManager 가 새 훅을 통해 push 했고 **직후 `git status` 가 전부 비어 있었다**(구 훅이면 dirty=1). origin 대조 `--read-only` × 11 ✓
-- **notes**: ship 의 wrap(step 1)은 그대로 쓴다 — 거기선 리포트 갱신이 의도된 산출물이고 commit 에 포함된다.
-
-### METH-145 · 훅 sync 경로 판정의 한글 경로 함정 — core.quotePath
-- **mode**: fullstack / **change-class**: A / **owner**: AI
-- **acceptance criteria**:
-  - [x] 재현 — METH-144 전파에서 ai-icons·lifeManager push 가 「sync 메시지지만 관리 경로 밖 변경」으로 차단. 원인 = `git diff --name-only` 가 기본 `core.quotePath=true` 라 `20_guides/30_동시_…` 를 `"20_guides/30_\353\217…"` 로 이스케이프 → `20_guides/*` 패턴 불일치
-  - [x] 수정 — 훅 템플릿에서 `git -c core.quotePath=false diff --name-only`. 상류 sync 검증에서 이미 한 번 기록된 함정(관찰로그 `git ls-tree 한글 경로 octal-escape`)의 재발
-  - [x] **ASCII 픽스처의 구멍** — METH-142 의 A/B/C 실 push 증명은 `20_guides/a.md` 로 했기에 통과했다. 한글 파일명 픽스처로 A/B 재증명(skip·성공 / 검증·차단) + 회귀 테스트 1건. 88/88
-  - [x] **전파 11/11 + 훅 3 repo 재설치**(2026-09-02) — 재설치 직후 ai-icons·lifeManager 의 막혔던 METH-144 커밋을 push 해 **새 훅이 한글 경로 sync 를 통과시키는 것을 실 push 로 e2e 증명**. origin 대조 3항목(지침 30 v2 문구·그래프 g30·quotePath) × 11 ✓
-- **notes**: 지침 23 §2-5(픽스처는 스키마가 실제로 만들어내는 특이값을 포함) — 이 repo 의 특이값은 한글 경로다. METH-144 도 이로써 11/11.
 

@@ -36,47 +36,11 @@ def _repo(tmp: str) -> Path:
     return t
 
 
-# ── D2 land 기록 — AC 가 다 닫힌 항목만 Done 으로, 진행형 항목은 기록만
-TODO = """# TODO
-
-## InProgress
-
-### METH-201 · 끝나는 일
-- **acceptance criteria**:
-  - [x] 구현
-  - [ ] PR 머지 + maincheck → Done 전이
-
-### METH-202 · 여러 PR 로 끝나는 일
-- **acceptance criteria**:
-  - [x] PR 1
-  - [ ] PR 2 반영
-
-### METH-203 · 무관
-- [ ] x
-
-## Blocked
-
-## Done
-
-### METH-100 · 옛 완료
-"""
-
-
-def test_land_record_moves_only_finished_items() -> None:
-    new, moved, noted = m._land_record_todo(TODO, {"METH-201", "METH-202"}, 190, "abcd1234", "2026-11-09")
-    assert moved == ["METH-201"] and noted == ["METH-202"], (moved, noted)
-    done = new.split("## Done", 1)[1]
-    assert done.index("METH-201") < done.index("METH-100")           # 최신이 맨 위
-    assert "- [x] PR 머지 + maincheck → Done 전이" in done
-    assert "PR #190 · main `abcd1234`" in done
-    inprog = new.split("## InProgress", 1)[1].split("## Blocked", 1)[0]
-    assert "METH-202" in inprog and "landed" in inprog and "METH-201" not in inprog
-    assert "METH-203" in inprog and inprog.count("landed") == 1      # 무관 항목은 손대지 않는다
-
-
-def test_land_record_noop_for_unknown_ids() -> None:
-    new, moved, noted = m._land_record_todo(TODO, {"LM-9"}, 1, "x", "2026-11-09")
-    assert new == TODO and not moved and not noted
+# ── D2 land 기록 — ADR-007(METH-152 D1)로 폐지. land 는 기록 커밋을 만들지 않는다
+def test_land_record_removed() -> None:
+    assert not hasattr(m, "_land_record") and not hasattr(m, "_land_record_todo")
+    src = Path(m.__file__).read_text(encoding="utf-8")
+    assert '"chore(land):' not in src and "HEAD:{default_branch}" not in src   # main 직push 경로 없음
 
 
 # ── D1 checkpoint 세션 절 회전
