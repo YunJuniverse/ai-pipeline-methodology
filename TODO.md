@@ -27,18 +27,19 @@
 
 ## Ready
 
-### METH-153 · 산문 규칙 슬림화 목록 (ADR-007 D3)
-- **mode**: fullstack / **change-class**: C(목록 승인 필요) / **owner**: AI + Human
-- **acceptance criteria**:
-  - [ ] CLAUDE.md §2 규칙을 «도구가 fail-closed 로 막는가»로 분류한 표 — 도구 강제(한 줄 포인터로 축소) / 산문 유지(최근 전수조사 위반·재발 근거 있음) / 지침 본문으로 내림
-  - [ ] 표와 목표 분량을 사용자에게 제시 → 승인 후에만 CLAUDE.md·AGENTS.md 수정
-- **notes**: ADR-007 은 방향만 정했다. 미적용 repo 용 얇은 판 제안 여부는 이 결과물을 보고 판단(ADR-007 Open questions).
-
 ## InProgress
 
 ## Blocked
 
 ## Done
+
+### METH-153 · CLAUDE.md §2 슬림화 (ADR-007 D3)
+- **mode**: fullstack / **change-class**: C(사람 승인 — 분류표 채팅 승인 2026-11-25) / **owner**: AI
+- **acceptance criteria**:
+  - [x] §2 규칙 20개 분류표(`40_dev/snapshots/2026-11-25_claude-md-규칙-분류표.md`) — 도구가 막음 4 · 산문 유지 4 · 지침으로 내림 6 · 원칙 6
+  - [x] 지우기 전 정본 대조 — 지침에 없던 절차(마감·ship·land·스택-PR·Blocked·export)는 **지침 31 신설**, 프롬프팅 기록은 03 §5.3, SOP·캡슐 요청 절차는 각 README 로 이관
+  - [x] CLAUDE.md·AGENTS.md §2 재작성 — 11.3KB → 3.8KB(−66%), 파일 전체 18.6KB → 11.1KB · 테스트 전체 통과
+- **notes**: 표의 목표(2.9KB)보다 0.9KB 크다 — 키워드 트리거와 부팅 줄을 덜 줄였다. 준수율 변화는 측정하지 않았다. 전파는 머지 후 활동 repo 만.
 
 ### METH-154 · ADR-007 전파 — 활동 repo 만
 - **mode**: fullstack / **change-class**: A / **owner**: AI

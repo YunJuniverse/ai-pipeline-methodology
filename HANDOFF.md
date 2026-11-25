@@ -4,10 +4,10 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **다음 작업 대기.** 직전 완결: METH-152(ADR-007, #188) · METH-154 전파 — 활동 repo 7/7(origin 대조 ✓), 휴면 6곳 미전파.
+- **Working on**: **METH-153 PR 사람 머지 대기**(Class C) — CLAUDE.md §2 슬림화·지침 31 신설. 머지 후 활동 repo 전파.
 - **Current mode**: fullstack
-- **Next TODO**: **METH-153 산문 규칙 슬림화 목록**(ADR-007 D3, 승인 필요) · 다운스트림 `required_checks` 등록(repo 세션 몫) · 남긴 도구 후보(Blocked 1:1 대조·rotate 긴 줄 회전 등, 스냅샷 §2) · **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
-- **Blockers**: none.
+- **Next TODO**: **METH-153 전파(활동 repo)** · 다운스트림 `required_checks` 등록(repo 세션 몫) · 남긴 도구 후보(Blocked 1:1 대조·rotate 긴 줄 회전 등, 스냅샷 §2) · **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
+- **Blockers**: METH-153 PR 사람 머지(Class C).
 
 ## Active Links
 
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-11-25 — **METH-153 CLAUDE.md §2 슬림화**: 11.3KB → 3.8KB. 도구가 막는 규칙은 포인터로, 절차 정본은 **지침 31**(신설)·03 §5.3·briefs/outbox README.
 - 2026-11-25 — **METH-154 전파 7/7**: 활동 repo 만, 격리 워크트리 → 브랜치 PR → land. 기록 커밋 0건(ADR-007 D1 실증). 휴면 6곳은 boot 알림에 맡김.
 - 2026-11-25 — **METH-152(ADR-007)**: land 머지 기록 커밋 폐지(Done 전이는 작업 PR 안에, main 직push 예외 삭제) · sync-all 휴면 repo skip · boot 상류 버전 차이 알림 · 슬림화는 METH-153. 근거: 전 repo 30일 커밋 집계.
 - 2026-11-09 — **METH-149·151 전파 13/13**: repo 마다 origin/main 격리 워크트리에서 sync → push → 원격 대조(SOP·land 기록·ADR-006·지침 23 v7·AGENTS 중복 해소). ai-icons TODO 깨진 헤더 선복구(ai-icons#469). D2 첫 실주행 성공(`bfb0e5a`).
