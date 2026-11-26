@@ -39,7 +39,7 @@
   - [x] §2 규칙 20개 분류표(`40_dev/snapshots/2026-11-25_claude-md-규칙-분류표.md`) — 도구가 막음 4 · 산문 유지 4 · 지침으로 내림 6 · 원칙 6
   - [x] 지우기 전 정본 대조 — 지침에 없던 절차(마감·ship·land·스택-PR·Blocked·export)는 **지침 31 신설**, 프롬프팅 기록은 03 §5.3, SOP·캡슐 요청 절차는 각 README 로 이관
   - [x] CLAUDE.md·AGENTS.md §2 재작성 — 11.3KB → 3.8KB(−66%), 파일 전체 18.6KB → 11.1KB · 테스트 전체 통과
-- **notes**: 표의 목표(2.9KB)보다 0.9KB 크다 — 키워드 트리거와 부팅 줄을 덜 줄였다. 준수율 변화는 측정하지 않았다. 전파는 머지 후 활동 repo 만.
+- **notes**: 표의 목표(2.9KB)보다 0.9KB 크다 — 키워드 트리거와 부팅 줄을 덜 줄였다. 준수율 변화는 측정하지 않았다. **전파 7/7(2026-11-25)** — 활동 repo 에 브랜치 PR → land, origin 대조(§2 3.8KB·지침 31·03 §5.3·AGENTS 동일·적용 커밋 `dc58a54`). 휴면 repo 는 미전파.
 
 ### METH-154 · ADR-007 전파 — 활동 repo 만
 - **mode**: fullstack / **change-class**: A / **owner**: AI
@@ -73,34 +73,4 @@
 - **notes**: 이 PR 의 land 가 D2 를 첫 실주행한다 — 이 항목이 Done 으로 자동 이동하면 실증. 전파(D7)는 그 뒤.
 - **landed**: PR #186 · main `69b956ca` · 2026-11-09 (land 자동 기록)
 - **전파**(D7, 2026-11-09): 13/13 — origin 실내용 5항목 대조 ✓ · ai-icons 깨진 헤더 선복구 ai-icons#469
-
-### METH-150 · 전수조사 판단 7지점 — 운영 규칙 변경(사람 결정 대기)
-- **mode**: fullstack / **change-class**: C / **owner**: Human
-- **resolved**: 2026-11-09 사용자 채팅 — 7건 모두 권고안 → **ADR-006** · 반영 METH-151
-- **acceptance criteria**:
-  - [x] D1 checkpoint 모델(세션별 절 prepend 공식화 vs 덮어쓰기 유지)
-  - [x] D2 머지 기록 PR(land 가 머지 후 Done 전이를 main 에 기록 — 직행 예외, ADR 필요 vs 현행)
-  - [x] D3 관찰로그 의무 빈도(연속 PR·재시도는 기존 로그 갱신 인정 vs 현행)
-  - [x] D4 공유 체크아웃 가드 범위(미추적 신규 파일만 열거 vs 현행)
-  - [x] D5 land 필수 체크 지정(`required_checks`) · 기계 증거 Class B 하위 등급
-  - [x] D6 catalog 승급 P-010·P-011·P-013 → C-004~006
-  - [x] D7 METH-149 다운스트림 전파 여부·시점
-- **notes**: 근거 수치는 스냅샷 §1 Q2·Q3·Q7. METH-147 의 «checkpoint 세션별 분리 파일» 비채택과 D1 은 다른 안(파일 1개·절 단위).
-
-
-
-
-
-
-### METH-149 · 전레포 30일 전수조사(2026-10-10~11-09) 반영
-- **mode**: fullstack / **change-class**: A / **owner**: AI(조사·반영) + Human(판단 METH-150)
-- **acceptance criteria**:
-  - [x] 30일 활동 9개 repo 읽기 전용 조사(에이전트 9기) — 커밋 2,187·friction 260건·≈3,049분. 스냅샷 `40_dev/snapshots/2026-11-09_전레포-30일-전수조사.md`(패턴 Q1~Q14)
-  - [x] 도구 결함 15건 반영(T1~T15: 사이즈 린트 글자 수·줄 길이·Recent·Done 밖 ✅ · 칸반 제목 부연·깨진 헤더 · phase 오값 거부 · repeat_of `new`→null · agent 계열 · reserve 접두어 추론·아카이브·0 채움 · land TODO change-class·스냅샷 제외·push 확인·`--match-head-commit` · `ship --land` PR 생성 · ship 대용량 신규 파일 · ADR 두 형식 · AGENTS.md 중복) — negative case 14건(옛 코드 13 실패), 전체 120/120
-  - [x] 지침 8개 개정 — 03 v3·05 v6·08 v3·19 v6·23 v7·24 v6·29 v2·30 v4 · README v4.9
-  - [x] pending P-010~014 · 상류 SOP `SOP_external-sheet-edit.md`(shared_paths 등록)
-  - [x] PR 머지 + maincheck → Done 전이 — PR **#185** · main `86a11ed7` ✓
-  - [x] 다운스트림 전파 — METH-151 결정 반영분과 함께 한 번에(methodology:ADR-006 D7)
-- **notes**: 직전 조사(07-29) 대비 스택-PR 사고 0·cafe24 friction 기록 정착·크롤 페널티 0 은 개선. 남긴 도구 후보는 스냅샷 §2 말미.
-
 
