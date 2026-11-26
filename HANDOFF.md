@@ -4,7 +4,7 @@
 > Keep this file under 150 lines.
 > Date initialized: 2026-05-07
 
-- **Working on**: **다음 작업 대기.** 직전 완결: METH-155(ship `--no-test --no-build` NameError 수정) · ADR-007 전부 — METH-152(land 기록 폐지·휴면 skip, #188) · METH-153(CLAUDE.md §2 슬림화·지침 31, #190) · 활동 repo 전파 7/7 두 차례(origin 대조 ✓).
+- **Working on**: **다음 작업 대기.** 직전 완결: METH-156(퇴역 다운스트림 표시) · METH-155(ship `--no-test --no-build` NameError 수정) · ADR-007 전부 — METH-152(land 기록 폐지·휴면 skip, #188) · METH-153(CLAUDE.md §2 슬림화·지침 31, #190) · 활동 repo 전파 7/7 두 차례(origin 대조 ✓).
 - **Current mode**: fullstack
 - **Next TODO**: **슬림화 후 준수 관찰**(1~2주 뒤 다운스트림 관찰 로그에서 «규칙을 몰라서 생긴 마찰» 증감) · 다운스트림 `required_checks` 등록(repo 세션 몫) · 남긴 도구 후보(Blocked 1:1 대조·rotate 긴 줄 회전 등, 스냅샷 §2) · **METH-135 첫 실주행 검증**(사이클 45~90분 환산 실측 → 지침 29 v2 환류) · 무인 권한 allowlist(settings.json) · METH-134 실험 모드 첫 실전 적용. 다음 캡슐 수거는 다운스트림 축적 후(주기 약 1주). 후속 후보: capsule 발신 시점 id 검증(워크트리 접두어 경고 — METH-140 이전 발행분이 이번 수거에도 1건) · 월간 전수조사 2회차(8월 말). **프로세스: branch-first · 세션 종료 = ship → land.** 상세는 checkpoint.
 - **Blockers**: none.
@@ -40,6 +40,7 @@
 | - | ~~ai-icons·talmo-com 다운스트림 sync 미적용~~ | — | **Closed(2026-07-15)** — 두 곳 clean 재확인 후 v4.0 sync·push(각 29파일). ai-icons push는 자체 라이브파일 비대로 pre-push 훅 차단→established 절차대로 --no-verify 우회. **잔여**: ai-icons 자체 checkpoint(547줄)·TODO Done(272건) 비대 트리밍은 그 repo 세션 몫 |
 
 ## Recent Changes
+- 2026-11-26 — **METH-156**: 버전 파일 `"retired": true` 로 다운스트림 목록에서 제외(원격 없는 2곳 적용). METH-155 는 활동 7곳 + 원격 있는 휴면 5곳 전파 완료.
 - 2026-11-26 — **METH-155**: ship `--no-test --no-build` 조합에서 tsc 단계가 `manager` 미정의로 죽던 버그 수정(다운스트림 신고). npm 의 `exec --` 누락도 함께. 머지된 브랜치 108개·워크트리 1개 정리.
 - 2026-11-25 — **METH-153 전파 7/7**: 활동 repo, 브랜치 PR → land → origin 대조. 한글 경로 quotepath 로 경로 검사 오탐 1회(C-004 재발).
 - 2026-11-25 — **METH-153 CLAUDE.md §2 슬림화**: 11.3KB → 3.8KB. 도구가 막는 규칙은 포인터로, 절차 정본은 **지침 31**(신설)·03 §5.3·briefs/outbox README.
