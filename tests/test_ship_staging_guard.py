@@ -154,6 +154,41 @@ def test_hook_template_runs_wrap_read_only() -> None:
 
 
 
+def test_pkg_manager_by_lockfile() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        assert m._pkg_manager(t) == "npm"
+        (t / "yarn.lock").write_text("")
+        assert m._pkg_manager(t) == "yarn"
+        (t / "pnpm-lock.yaml").write_text("")
+        assert m._pkg_manager(t) == "pnpm"
+
+
+def test_typecheck_cmd_npm_needs_separator() -> None:
+    """npm exec 는 `--` 뒤만 tsc 로 넘긴다 — 없으면 --noEmit 이 npm 옵션으로 먹힌다."""
+    assert m._typecheck_cmd("npm") == ["npm", "exec", "--", "tsc", "--noEmit"]
+    assert m._typecheck_cmd("pnpm") == ["pnpm", "exec", "tsc", "--noEmit"]
+
+
+def test_ship_manager_bound_outside_skippable_blocks() -> None:
+    """회귀: --no-test --no-build 조합에서 tsc 단계가 `manager` NameError 로 죽었다.
+
+    manager 는 cmd_ship 본문 최상위에서 한 번만 정해져야 한다 — if 블록 안 대입 금지.
+    """
+    import ast
+    import inspect
+    fn = ast.parse(inspect.getsource(m.cmd_ship)).body[0]
+
+    def assigns(node: ast.AST) -> bool:
+        return isinstance(node, ast.Assign) and any(
+            isinstance(x, ast.Name) and x.id == "manager" for x in node.targets)
+
+    top = [n for n in fn.body if assigns(n)]
+    everywhere = [n for n in ast.walk(fn) if assigns(n)]
+    assert len(top) == 1, "manager 는 함수 본문 최상위에서 정해야 한다"
+    assert len(everywhere) == 1, "조건 블록 안에서 manager 를 다시 정하지 말 것"
+
+
 def main() -> int:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
