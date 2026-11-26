@@ -33,6 +33,14 @@
 
 ## Done
 
+### METH-155 · ship `--no-test --no-build` 조합 NameError 수정
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 패키지 매니저 판정을 `_pkg_manager()` 로 빼 test·build 단계 진입 전에 한 번 정한다 — 두 단계를 모두 건너뛰어도 `tsc --noEmit` 최소 검증이 죽지 않는다
+  - [x] npm 은 `npm exec -- tsc --noEmit`(`--` 없으면 `--noEmit` 이 npm 옵션으로 먹힌다)
+  - [x] 회귀 테스트 3 — 매니저 판정 · tsc 명령 · `manager` 가 조건 블록 안에서 정해지면 실패. 전체 스위트 통과
+- **notes**: 다운스트림 세션이 겪고 «상류에서 고칠 일»로 넘긴 건(2026-11-26). `package.json`·`tsconfig.json` 둘 다 있는 repo 에서만 난다. 실제 Node repo 에서 ship 을 끝까지 돌려 보지는 않았다. 전파는 머지 직후 활동 repo 에 sync — 결과는 각 repo 의 `.methodology-version` 적용 커밋으로 확인한다.
+
 ### METH-153 · CLAUDE.md §2 슬림화 (ADR-007 D3)
 - **mode**: fullstack / **change-class**: C(사람 승인 — 분류표 채팅 승인 2026-11-25) / **owner**: AI
 - **acceptance criteria**:
@@ -57,20 +65,4 @@
   - [x] D3 방향 박제 → 실행은 METH-153
   - [x] 테스트 — 기록 코드 부재 1 · 활동 판정 2 · 상류 알림 1, 전체 스위트 통과
 - **notes**: 근거는 2026-11-25 전 repo 30일 커밋 집계(ADR-007 Context). 전파는 METH-154.
-
-### METH-151 · 전수조사 판단 7지점 반영 (ADR-006)
-- **mode**: fullstack / **change-class**: C(사람 승인 ADR-006) / **owner**: AI
-- **acceptance criteria**:
-  - [x] ADR-006 — D1~D7 승인 박제(2026-11-09 채팅)
-  - [x] D1 checkpoint 세션별 절 — CLAUDE/AGENTS 역할표·③·지침 30 v5·템플릿 · `rotate --checkpoint` 절 단위 회전 · 절 4개+ 경고
-  - [x] D2 land 머지 기록 직접 커밋(`chore(land):`, TODO·HANDOFF 만, push 거부 시 작업트리 보존) · `--no-record` · CLAUDE «no direct push» 예외 명기
-  - [x] D3 같은 날 관찰로그 갱신 인정 · 지침 03 v4
-  - [x] D4 공유 가드 미추적 신규만(`-uall` — 새 디렉터리 접힘 결함 동시 수정)
-  - [x] D5 land `required_checks`
-  - [x] D6 C-004~006 승급
-  - [x] 테스트 7건(tests/test_meth151_decisions.py) · 전체 127/127
-  - [x] PR 머지 + maincheck → Done 전이
-- **notes**: 이 PR 의 land 가 D2 를 첫 실주행한다 — 이 항목이 Done 으로 자동 이동하면 실증. 전파(D7)는 그 뒤.
-- **landed**: PR #186 · main `69b956ca` · 2026-11-09 (land 자동 기록)
-- **전파**(D7, 2026-11-09): 13/13 — origin 실내용 5항목 대조 ✓ · ai-icons 깨진 헤더 선복구 ai-icons#469
 

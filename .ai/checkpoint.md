@@ -2,6 +2,20 @@
 
 > 세션 서사 바통 — **세션마다 맨 위에 절 `## YYYY-MM-DD · <slug>` 추가, 최근 3절 유지**(methodology:ADR-006). 누적 상태는 `HANDOFF.md`.
 
+## 2026-11-26 · meth-155-ship-manager
+
+### 방금 한 것
+- 사용자 지시로 #191 을 gh 머지(land 가 Class C 로 자동 머지를 거부한 기록 PR) → ADR-007 완결.
+- 머지된 브랜치 정리: 원격 106개·로컬 6개 삭제, 7월 워크트리 1개 제거. 기준은 «모든 커밋이 main 에 있음» 또는 «머지된 PR 의 끝 커밋과 같음». 닫힌 PR 1건은 사용자에게 물어서 지웠다.
+- METH-155: 다운스트림이 신고한 ship 버그 수정 — `manager` 를 test·build 블록 안에서만 정해 `--no-test --no-build` 조합에서 tsc 단계가 NameError 로 죽었다. 같은 줄의 npm `exec --` 누락도 고쳤다.
+
+### 다음 구체 행동
+1. METH-155 머지 후 활동 repo 7곳에 sync 전파(격리 워크트리 → 브랜치 PR → land → origin 대조).
+2. 1~2주 뒤: 다운스트림 관찰 로그에서 «규칙을 몰라서 생긴 마찰» 증감 확인(§2 슬림화의 준수율 영향 미측정).
+
+### 막힌 것
+- 없음.
+
 ## 2026-11-25 · meth-152-adr-007
 
 ### 방금 한 것
@@ -39,17 +53,3 @@
 
 ### 막힌 것
 - 없음.
-
-## 2026-11-09 · meth-151-decisions
-
-### 방금 한 것
-- 사용자가 전수조사 판단 7지점(METH-150) 전부 권고안 채택 → **ADR-006**. 반영(METH-151, 브랜치 `chore/meth-151-decisions`): D1 checkpoint 절 모델(이 파일이 첫 적용) · D2 land 머지 기록 직접 커밋 · D3 같은 날 관찰로그 갱신 · D4 공유 가드 미추적 신규만(+`-uall` 결함) · D5 `required_checks` · D6 C-004~006.
-- land 가 이미 머지된 PR 은 Class 판정을 건너뛰게 함 — Class C PR 을 사람이 머지한 뒤에도 기록(D2)이 돌도록.
-- METH-149 는 #185 로 main 도달(`86a11ed7`).
-
-### 다음 구체 행동
-1. ship → land: Class C 라 자동 머지 거부가 정상(T8 실증). 사용자 머지 후 land 재실행 → METH-151 이 Done 으로 자동 이동하면 D2 실증.
-2. D7 전파: ai-icons TODO.md 29행 헤더 선복구 → `sync-all --apply`(Personal) + ICONS 루트 개별 sync → origin 대조.
-
-### 막힌 것
-- 없음(머지는 사람 몫).

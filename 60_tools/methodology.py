@@ -3278,12 +3278,11 @@ def cmd_ship(args: argparse.Namespace) -> int:
 
     # 4) test / build (있을 때만)
     pkg = target / "package.json"
+    # 매니저는 단계 밖에서 한 번 정한다 — test·build 블록 안에서만 정하면
+    # --no-test --no-build 조합에서 tsc 단계가 NameError 로 죽는다.
+    manager = _pkg_manager(target)
     if pkg.exists() and not args.no_test:
         info("ship: 4/7 — pnpm test (있으면)")
-        # 어느 매니저인지 단순 추정
-        manager = "pnpm" if (target / "pnpm-lock.yaml").exists() else (
-            "yarn" if (target / "yarn.lock").exists() else "npm"
-        )
         # test 스크립트 있는지 확인
         try:
             pkg_data = json.loads(pkg.read_text(encoding="utf-8"))
@@ -3302,9 +3301,6 @@ def cmd_ship(args: argparse.Namespace) -> int:
 
     if pkg.exists() and not args.no_build:
         info("ship: 5/7 — pnpm build (있으면)")
-        manager = "pnpm" if (target / "pnpm-lock.yaml").exists() else (
-            "yarn" if (target / "yarn.lock").exists() else "npm"
-        )
         try:
             pkg_data = json.loads(pkg.read_text(encoding="utf-8"))
             scripts = pkg_data.get("scripts", {})
@@ -3332,7 +3328,7 @@ def cmd_ship(args: argparse.Namespace) -> int:
         warn("빌드 미검증 상태로 push 한다 — 파손이 배포에서만 드러날 수 있다.")
         if (target / "tsconfig.json").exists():
             info("  최소 검증: tsc --noEmit")
-            rc = subprocess.call([manager, "exec", "tsc", "--noEmit"], cwd=str(target))
+            rc = subprocess.call(_typecheck_cmd(manager), cwd=str(target))
             if rc != 0:
                 err("타입 검사 실패 — push 중단. (--no-build 여도 타입은 본다)")
                 err("정말 건너뛰려면 원인을 고치거나 tsconfig 를 조정할 것.")
@@ -4889,6 +4885,22 @@ def staleness_warnings(target: Path) -> list[str]:
         except ValueError:
             pass
     return warnings
+
+
+def _pkg_manager(target: Path) -> str:
+    """lock 파일로 패키지 매니저를 단순 추정한다 (pnpm > yarn > npm)."""
+    if (target / "pnpm-lock.yaml").exists():
+        return "pnpm"
+    if (target / "yarn.lock").exists():
+        return "yarn"
+    return "npm"
+
+
+def _typecheck_cmd(manager: str) -> list[str]:
+    """`tsc --noEmit` 실행 명령. npm 은 `--` 가 없으면 --noEmit 을 자기 옵션으로 삼킨다."""
+    if manager == "npm":
+        return ["npm", "exec", "--", "tsc", "--noEmit"]
+    return [manager, "exec", "tsc", "--noEmit"]
 
 
 def _dev_server_running(target: Path | None = None) -> str | None:
