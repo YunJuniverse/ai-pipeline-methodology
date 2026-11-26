@@ -42,6 +42,21 @@ def test_discover_picks_only_versioned_dirs() -> None:
         assert found == {"alpha", "beta"}, found
 
 
+def test_discover_skips_retired() -> None:
+    """버전 파일에 "retired": true 가 있으면 목록에서 빠진다. 깨진 파일은 남는다."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        _mk_project(root, "alive")
+        gone = _mk_project(root, "gone")
+        (gone / m.VERSION_FILE_NAME).write_text('{"methodology_version": "v4.0", "retired": true}')
+        soft = _mk_project(root, "not-quite")
+        (soft / m.VERSION_FILE_NAME).write_text('{"retired": "yes"}')
+        broken = _mk_project(root, "broken")
+        (broken / m.VERSION_FILE_NAME).write_text("{not json")
+        found = {p.name for p in m._discover_downstreams(root)}
+        assert found == {"alive", "not-quite", "broken"}, found
+
+
 def test_discover_excludes_methodology_root() -> None:
     # METHODOLOGY_ROOT 자신은 발견 대상에서 제외된다.
     parent = m.METHODOLOGY_ROOT.parent

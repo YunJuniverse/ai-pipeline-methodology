@@ -21,7 +21,7 @@
 - **mode**: fullstack
 - **change-class**: A / **owner**: AI(각 repo 세션) + Human
 - **acceptance criteria**:
-  - [ ] UI 보유 repo(tshome·talmo-com·lifeManager·icons-marketing·gamblescan·icons)에 각각: ① axe-core PR 차단 게이트 설치 ② 인접 요소 간격 검사 스크립트 ③ 절대색 차단을 기존 토큰 가드레일에 추가 ④ Section/Stack 프리미티브 내장 간격 확인(기본 패딩 0 구조면 교정)
+  - [ ] UI 보유 repo(lifeManager·icons-marketing·gamblescan·icons)에 각각: ① axe-core PR 차단 게이트 설치 ② 인접 요소 간격 검사 스크립트 ③ 절대색 차단을 기존 토큰 가드레일에 추가 ④ Section/Stack 프리미티브 내장 간격 확인(기본 패딩 0 구조면 교정)
   - [ ] 각 repo 완료 시 더미 위반 주입으로 게이트 실효 증명(지침 23 §1-3)
 - **notes**: 2026-07-29 사용자 반복 실수 환류(다크 배경+검은 텍스트·패딩 누락 텍스트 붙음) — 지침 20 v3(§4 절대색 차단·§9.5 3층 방어)로 규칙화 완료, 이 항목은 **각 repo 실설치**. 규칙은 sync로 전파되지만 게이트 설치는 repo별 작업이라 분리. 해당 repo 세션 착수 시 이 항목 참조. **규칙 전파(07-29) 완료 11/11** — 잔여는 설치뿐.
 
@@ -32,6 +32,14 @@
 ## Blocked
 
 ## Done
+
+### METH-156 · 퇴역 다운스트림 표시 — 목록에서 제외
+- **mode**: fullstack / **change-class**: A / **owner**: AI
+- **acceptance criteria**:
+  - [x] 버전 파일의 `"retired": true` 를 읽어 `_discover_downstreams` 가 그 폴더를 건너뛴다 — sync-all 표·전파·캡슐 수거 대상에서 모두 빠진다
+  - [x] 깨진 버전 파일은 퇴역으로 보지 않는다(목록에 남겨 드러낸다) · 회귀 테스트 1
+  - [x] 원격이 사라진 2곳에 표시 적용, METH-130 대상에서 제거
+- **notes**: 다운스트림 목록은 파일이 아니라 디스크 스캔이라 «빼는» 수단이 없었다. 표시를 폴더 자신이 갖게 해 상류에는 이름을 적지 않는다. 되돌리려면 그 줄을 지운다. METH-155 를 휴면 repo 까지 전파하다 원격 없는 2곳을 발견(2026-11-26) — 원격 있는 휴면 5곳은 전파 완료, 그중 2곳은 옛 관찰 로그 `repeat_of` 형식 위반 9건을 고쳐 CI 를 살렸다.
 
 ### METH-155 · ship `--no-test --no-build` 조합 NameError 수정
 - **mode**: fullstack / **change-class**: A / **owner**: AI
